@@ -7,6 +7,7 @@ import { createPublicClient, http } from "viem"
 import { Button } from "../../../components/button"
 import { Input } from "../../../components/input"
 import { Container } from "../../../components/container"
+import { createPublicClient, http, webSocket } from 'viem';
 
 /*
 //From chainlist.org
@@ -14,50 +15,67 @@ const knownEvmChainIds = [1, 43114, 43113]
 */
 
 export default function L1Form() {
-  const [isSwitching, setIsSwitching] = useState(false)
-  const { coreWalletClient /*walletChainId*/ } = useWalletStore()
-  const {
-    evmChainId,
-    setEvmChainId,
-    evmChainName,
-    setEvmChainName,
-    evmChainRpcUrl,
-    setEvmChainRpcUrl,
-    evmChainCoinName,
-    setEvmChainCoinName,
-    evmChainIsTestnet,
-    setEvmChainIsTestnet,
-  } = useToolboxStore()
-  const [localError, setLocalError] = useState<string | null>(null)
-  const [isCheckingRpc, setIsCheckingRpc] = useState(false)
-  const viemChain = useViemChainStore()
-  const [success, setSuccess] = useState(false)
+    const [isSwitching, setIsSwitching] = useState(false);
+    const { coreWalletClient, /*walletChainId*/ } = useWalletStore();
+    const {
+        evmChainId,
+        setEvmChainId,
+        evmChainName,
+        evmChainRpcUrl,
+        evmChainCoinName,
+        setEvmChainName,
+        setEvmChainRpcUrl,
+        setEvmChainCoinName,
+        evmChainIsTestnet,
+        setEvmChainIsTestnet,
+    } = useToolboxStore();
+    const [localError, setLocalError] = useState<string | null>(null);
+    const [isCheckingRpc, setIsCheckingRpc] = useState(false);
+    const viemChain = useViemChainStore();
 
-  //TODO: restore after wallet_getEthereumChain is restored in Core
-  // async function loadFromWallet() {
-  //     try {
-  //         setLocalError(null);
+    //TODO: restore after wallet_getEthereumChain is restored in Core
+    // async function loadFromWallet() {
+    //     try {
+    //         setLocalError(null);
 
-  //         const chain = await coreWalletClient.getEthereumChain()
-  //         setEvmChainCoinName(chain.nativeCurrency.name)
-  //         setEvmChainIsTestnet(chain.isTestnet)
-  //         setEvmChainRpcUrl(chain.rpcUrls[0])
-  //         refetchChainIdFromRpc()
-  //     } catch (error) {
-  //         setLocalError((error as Error)?.message || "Unknown error");
-  //     } finally {
-  //         setIsCheckingRpc(false);
-  //     }
-  // }
+    //         const chain = await coreWalletClient.getEthereumChain()
+    //         setEvmChainCoinName(chain.nativeCurrency.name)
+    //         setEvmChainIsTestnet(chain.isTestnet)
+    //         setEvmChainRpcUrl(chain.rpcUrls[0])
+    //         refetchChainIdFromRpc()
+    //     } catch (error) {
+    //         setLocalError((error as Error)?.message || "Unknown error");
+    //     } finally {
+    //         setIsCheckingRpc(false);
+    //     }
+    // }
 
-  async function refetchChainIdFromRpc() {
-    setEvmChainId(0)
-    setIsCheckingRpc(true)
-    setSuccess(false)
 
-    if (!evmChainRpcUrl) {
-      setIsCheckingRpc(false)
-      return
+    async function refetchChainIdFromRpc() {
+        setEvmChainId(0);
+
+        if (!evmChainRpcUrl) {
+            return;
+        }
+
+        if (!evmChainRpcUrl.startsWith("http") && !evmChainRpcUrl.startsWith("ws")) {
+            setLocalError("Invalid RPC URL");
+            return;
+        }
+
+        try {
+            setLocalError(null);
+            const publicClient = createPublicClient({
+                transport: evmChainRpcUrl.startsWith("ws") ? webSocket(evmChainRpcUrl) : http(evmChainRpcUrl)
+            });
+
+            const chainId = await publicClient.getChainId();
+            setEvmChainId(chainId);
+        } catch (error) {
+            setLocalError((error as Error)?.message || "Unknown error");
+        } finally {
+            setIsCheckingRpc(false);
+        }
     }
 
     if (!evmChainRpcUrl.startsWith("http") && !evmChainRpcUrl.startsWith("ws")) {

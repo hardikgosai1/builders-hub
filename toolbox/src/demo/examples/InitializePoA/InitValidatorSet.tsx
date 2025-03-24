@@ -5,11 +5,12 @@ import { useToolboxStore, useViemChainStore, useWalletStore } from "../../utils/
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
 import ValidatorManagerABI from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
+
 import { Button } from "../../../components/button";
 import { Input } from "../../../components/input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
+import { Success } from "../../ui/Success";
 import { RequireChainL1 } from '../../ui/RequireChain';
-import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 import { CodeHighlighter } from '../../ui/CodeHighlighter';
 import { Container } from '../../../components/container';
 import { ResultField } from '../../../components/result-field';
@@ -22,6 +23,7 @@ export default function InitValidatorSet() {
         setL1ID,
         L1ConversionSignature,
         setL1ConversionSignature,
+        L1ConversionSignature,
         proxyAddress,
         evmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
@@ -82,6 +84,7 @@ export default function InitValidatorSet() {
 
 
             setCollectedData({ ...txArgs[0] as any, L1ConversionSignature })
+
 
 
             // Convert signature to bytes and pack into access list
@@ -150,6 +153,13 @@ export default function InitValidatorSet() {
                         onChange={setL1ID}
                         placeholder="Enter L1 ID (CB58 format)"
                     />
+                    <Input
+                        label="Aggregated Signature"
+                        value={L1ConversionSignature}
+                        onChange={setL1ConversionSignature}
+                        type="textarea"
+                        placeholder="0x...."
+                    />
                 </div>
 
                 {
@@ -175,7 +185,7 @@ export default function InitValidatorSet() {
                     variant="primary"
                     onClick={() => onInitialize(false)}
                     loading={isInitializing}
-                    disabled={!L1ID}
+                    disabled={!L1ID || !L1ConversionSignature}
                 >
                     Initialize Validator Set
                     </Button>
