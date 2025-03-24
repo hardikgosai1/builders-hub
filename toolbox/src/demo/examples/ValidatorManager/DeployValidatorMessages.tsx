@@ -60,11 +60,13 @@ export default function DeployValidatorMessages() {
                         Deploy Contract
                     </Button>
                 </div>
-                <ResultField
-                    label="Library Address"
-                    value={validatorMessagesLibAddress}
-                    showCheck={!!validatorMessagesLibAddress}
-                />
+                {validatorMessagesLibAddress && (
+                    <ResultField
+                        label="Library Address"
+                        value={validatorMessagesLibAddress}
+                        showCheck={!!validatorMessagesLibAddress}
+                    />
+                )}
             </Container>
         </RequireChainL1>
     );

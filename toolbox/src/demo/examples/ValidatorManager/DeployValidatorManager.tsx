@@ -93,11 +93,13 @@ export default function DeployValidatorManager() {
                         Deploy Contract
                     </Button>
                 </div>
-                <ResultField
-                    label="ValidatorManager Address"
-                    value={validatorManagerAddress}
+                {validatorManagerAddress && (
+                    <ResultField
+                        label="ValidatorManager Address"
+                        value={validatorManagerAddress}
                         showCheck={!!validatorManagerAddress}
                     />
+                )}
                 </div>
             </Container>
         </RequireChainL1>

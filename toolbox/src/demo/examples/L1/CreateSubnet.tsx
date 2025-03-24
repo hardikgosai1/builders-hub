@@ -49,11 +49,13 @@ export default function CreateSubnet() {
           Create Subnet
         </Button>
       </div>
-      <ResultField
-        label="Subnet ID"
-        value={subnetID}
-        showCheck={!!subnetID}
-      />
+      {subnetID && (
+        <ResultField
+          label="Subnet ID"
+          value={subnetID}
+          showCheck={!!subnetID}
+        />
+      )}
     </Container>
   );
 };
