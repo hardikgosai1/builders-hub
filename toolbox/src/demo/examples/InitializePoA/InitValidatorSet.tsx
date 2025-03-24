@@ -9,11 +9,11 @@ import ValidatorManagerABI from "../../../../contracts/icm-contracts/compiled/Va
 import { Button } from "../../../components/button";
 import { Input } from "../../../components/input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
-import { Success } from "../../ui/Success";
 import { RequireChainL1 } from '../../ui/RequireChain';
 import { CodeHighlighter } from '../../ui/CodeHighlighter';
 import { Container } from '../../../components/container';
 import { ResultField } from '../../../components/result-field';
+import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 
 const cb58ToHex = (cb58: string) => utils.bufferToHex(utils.base58check.decode(cb58));
 const add0x = (hex: string): `0x${string}` => hex.startsWith('0x') ? hex as `0x${string}` : `0x${hex}`;
@@ -23,7 +23,6 @@ export default function InitValidatorSet() {
         setL1ID,
         L1ConversionSignature,
         setL1ConversionSignature,
-        L1ConversionSignature,
         proxyAddress,
         evmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
