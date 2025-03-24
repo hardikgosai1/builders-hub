@@ -10,28 +10,51 @@ import { useWalletStore, useViemChainStore } from "../../utils/store"
 import { JsonRpcProvider } from "ethers"
 import { bytesToHex, Chain, hexToBytes } from "viem"
 import { createPublicClient, http } from "viem"
+
+// Instead of declaring the window.avalanche type, we'll use proper client-side checks
+
 export default function CrossChainTransfer() {
+  
   const platformEndpoint = "https://api.avax-test.network";
 
   const [amount, setAmount] = useState<string>("0.0")
   const [sourceChain, setSourceChain] = useState<string>("c-chain")
   const [destinationChain, setDestinationChain] = useState<string>("p-chain")
   const [availableBalance, setAvailableBalance] = useState<number>(0)
-  const { pChainAddress, walletEVMAddress } = useWalletStore()
+  const [publicClient, setPublicClient] = useState<any>(null)
+  
+  // Use nullish coalescing to safely access store values
+  const { pChainAddress = '', walletEVMAddress = '' } = useWalletStore() || {}
   const chain = useViemChainStore()
-  const publicClient = createPublicClient({
-    chain: chain as Chain,
-    transport: http(),
-  })
+  
+  // Initialize the client on the client-side only
+  useEffect(() => {
+    if (typeof window !== 'undefined' && chain) {
+      const client = createPublicClient({
+        chain: chain as Chain,
+        transport: http(),
+      })
+      setPublicClient(client)
+    }
+  }, [chain])
 
   useEffect(() => {
     const getAvailableBalance = async () => {
-      const availableBalance = await publicClient.getBalance({
-        address: walletEVMAddress as `0x${string}`,
-      })
-      setAvailableBalance(Number(availableBalance) / 1e18)
+      if (!publicClient || !walletEVMAddress) return
+      
+      try {
+        const availableBalance = await publicClient.getBalance({
+          address: walletEVMAddress as `0x${string}`,
+        })
+        setAvailableBalance(Number(availableBalance) / 1e18)
+      } catch (error) {
+        console.error("Error fetching balance:", error)
+      }
     }
-    getAvailableBalance()
+    
+    if (publicClient && walletEVMAddress) {
+      getAvailableBalance()
+    }
   }, [publicClient, walletEVMAddress])
 
   const handleMaxAmount = () => {
@@ -57,79 +80,98 @@ export default function CrossChainTransfer() {
 
   // Add handlers for buttons
   const handleExport = async () => {
+    if (typeof window === 'undefined' || !walletEVMAddress || !pChainAddress) {
+      console.error("Missing required data or not in client environment")
+      return
+    }
+    
     console.log("Export initiated with amount:", amount)
-    const provider = new JsonRpcProvider(platformEndpoint + "/ext/bc/C/rpc");
-    let evmapi = new evm.EVMApi(platformEndpoint);
-    let context = await Context.getContextFromURI(platformEndpoint);
-    const baseFee = await evmapi.getBaseFee();
-    const txCount = await provider.getTransactionCount(walletEVMAddress);
-
-    console.log(walletEVMAddress)
-    console.log(pChainAddress)
-    const tx = evm.newExportTx(
-      context,
-      BigInt(Math.round(Number(amount) * 1e9)),
-      context.pBlockchainID,
-      utils.hexToBuffer(walletEVMAddress),
-      [utils.bech32ToBytes(pChainAddress)],
-      baseFee,
-      BigInt(txCount),
-    )
-
-    const txBytes = tx.toBytes()
-    const txHex = bytesToHex(txBytes)
-    console.log("Export transaction created:", txHex);
-
     try {
-      const response = (await window.avalanche?.request({
+      const provider = new JsonRpcProvider(platformEndpoint + "/ext/bc/C/rpc");
+      let evmapi = new evm.EVMApi(platformEndpoint);
+      let context = await Context.getContextFromURI(platformEndpoint);
+      const baseFee = await evmapi.getBaseFee();
+      const txCount = await provider.getTransactionCount(walletEVMAddress);
+
+      console.log(walletEVMAddress)
+      console.log(pChainAddress)
+      const tx = evm.newExportTx(
+        context,
+        BigInt(Math.round(Number(amount) * 1e9)),
+        context.pBlockchainID,
+        utils.hexToBuffer(walletEVMAddress),
+        [utils.bech32ToBytes(pChainAddress)],
+        baseFee,
+        BigInt(txCount),
+      )
+
+      const txBytes = tx.toBytes()
+      const txHex = bytesToHex(txBytes)
+      console.log("Export transaction created:", txHex);
+
+      // Safely access window.avalanche using optional chaining
+      if (!window.avalanche) {
+        throw new Error("Avalanche wallet extension not found")
+      }
+      
+      const response = await window.avalanche.request({
         method: "avalanche_sendTransaction",
         params: {
           transactionHex: txHex,
           chainAlias: "C",
         },
-      })) as string
+      })
 
       console.log("Export transaction sent:", response);
     } catch (error) {
       console.error("Error sending export transaction:", error);
     }
-
   }
 
   const handleImport = async () => {
+    if (typeof window === 'undefined' || !walletEVMAddress || !pChainAddress) {
+      console.error("Missing required data or not in client environment")
+      return
+    }
+    
     console.log("Import initiated")
-
-    const pvmApi = new pvm.PVMApi(platformEndpoint);
-    let { utxos } = await pvmApi.getUTXOs({ sourceChain: 'C', addresses: [pChainAddress] });
-    let context = await Context.getContextFromURI(platformEndpoint);
-
-    const importTx = pvm.newImportTx(
-      context,
-      context.cBlockchainID,
-      utxos,
-      [hexToBytes(walletEVMAddress as `0x${string}`)],
-      [utils.bech32ToBytes(pChainAddress)],
-    );
-
-    const importTxBytes = importTx.toBytes()
-    const importTxHex = bytesToHex(importTxBytes)
-    console.log("Import transaction created:", importTxHex);
-
+    
     try {
+      const pvmApi = new pvm.PVMApi(platformEndpoint);
+      let { utxos } = await pvmApi.getUTXOs({ sourceChain: 'C', addresses: [pChainAddress] });
+      let context = await Context.getContextFromURI(platformEndpoint);
+
+      const importTx = pvm.newImportTx(
+        context,
+        context.cBlockchainID,
+        utxos,
+        [hexToBytes(walletEVMAddress as `0x${string}`)],
+        [utils.bech32ToBytes(pChainAddress)],
+      );
+
+      const importTxBytes = importTx.toBytes()
+      const importTxHex = bytesToHex(importTxBytes)
+      console.log("Import transaction created:", importTxHex);
+
+      // Safely access window.avalanche using optional chaining
+      if (!window.avalanche) {
+        throw new Error("Avalanche wallet extension not found")
+      }
+      
       console.log("submitting import transaction")
-      const response = (await window.avalanche?.request({
+      const response = await window.avalanche.request({
         method: "avalanche_sendTransaction",
         params: {
           transactionHex: importTxHex,
           chainAlias: "P",
           utxos: utxos,
         },
-      })) as string
+      })
+      
       console.log("Import transaction sent:", response);
     } catch (error) {
       console.error("Error sending import transaction:", error);
     }
-
   }
 
   // Chain options with icons
