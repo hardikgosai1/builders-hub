@@ -241,6 +241,20 @@ async function main(): Promise<void> {
       description: "This page lists all available configuration options for AvalancheGo nodes.",
       contentUrl: "https://github.com/ava-labs/avalanchego/blob/master/config/",
     },
+    {
+      sourceUrl: "https://raw.githubusercontent.com/ava-labs/icm-contracts/refs/heads/main/contracts/validator-manager/README.md",
+      outputPath: "content/docs/avalanche-l1s/validator-manager/contract.mdx",
+      title: "Validator Manager Contracts",
+      description: "This page lists all available contracts for the Validator Manager.",
+      contentUrl: "https://github.com/ava-labs/icm-contracts/blob/main/contracts/validator-manager/",
+    },
+    {
+      sourceUrl: "https://raw.githubusercontent.com/ava-labs/icm-contracts/refs/heads/main/contracts/ictt/README.md",
+      outputPath: "content/docs/cross-chain/interchain-token-transfer/overview.mdx",
+      title: "Avalanche Interchain Token Transfer (ICTT)",
+      description: "This page describes the Avalanche Interchain Token Transfer (ICTT)",
+      contentUrl: "https://github.com/ava-labs/icm-contracts/blob/main/contracts/ictt/",
+    },
   ];
 
   for (const fileConfig of fileConfigs) {
