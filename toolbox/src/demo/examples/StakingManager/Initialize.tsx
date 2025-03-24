@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../../components/button";
 import { Input } from "../../../components/input";
 import { ResultField } from "../../../components/result-field";
-import { AbiEvent, Log, parseEther, formatEther } from 'viem';
+import { AbiEvent, Log, parseEther } from 'viem';
 import NativeTokenStakingManagerABI from "../../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
 import { RequireChainL1 } from "../../ui/RequireChain";
 import { Container } from "../../../components/container";

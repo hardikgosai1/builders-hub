@@ -18,7 +18,7 @@ function calculateLibraryHash(libraryPath: string) {
 export default function DeployStakingManager() {
     const { showBoundary } = useErrorBoundary();
     const { stakingManagerAddress, setStakingManagerAddress, validatorMessagesLibAddress } = useToolboxStore();
-    const { walletChainId, coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
 
