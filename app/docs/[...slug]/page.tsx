@@ -29,6 +29,7 @@ import type { MDXComponents } from 'mdx/types';
 import YouTube from '@/components/content-design/youtube';
 import { Feedback } from '@/components/ui/feedback';
 import posthog from 'posthog-js';
+import { openapi } from '@/lib/source';
 
 export const dynamicParams = false;
 export const revalidate = false;
@@ -64,6 +65,7 @@ export default async function Page(props: {
         <MDX
           components={{
             ...defaultComponents,
+            APIPage: openapi.APIPage,
             ...((await import('lucide-react')) as unknown as MDXComponents),
 
             Popup,

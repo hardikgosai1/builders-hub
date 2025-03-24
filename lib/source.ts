@@ -4,6 +4,7 @@ import { icons } from 'lucide-react';
 import { createMDXSource } from 'fumadocs-mdx';
 import { meta, docs, guide as guides, course, courseMeta, integrations } from '@/.source';
 import type { InferMetaType, InferPageType } from 'fumadocs-core/source';
+import { createOpenAPI } from 'fumadocs-openapi/server';
 
 export const documentation = loader({
   baseUrl: '/docs',
@@ -31,6 +32,16 @@ export const guide = loader({
 export const integration = loader({
   baseUrl: '/integrations',
   source: createMDXSource(integrations, []),
+});
+
+export const openapi = createOpenAPI({
+  proxyUrl: '/api/proxy',
+  shikiOptions: {
+    themes: {
+      dark: 'vesper',
+      light: 'vitesse-light',
+    },
+  },
 });
 
 export type Page = InferPageType<typeof documentation>;
