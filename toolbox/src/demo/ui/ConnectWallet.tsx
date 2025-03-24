@@ -29,7 +29,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
 
   useEffect(() => {
     setIsBrowser(true)
-    
+
     async function init() {
       try {
         //first, let's check if there is a wallet at all
@@ -55,11 +55,11 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
         showBoundary(error)
       }
     }
-    
+
     if (isBrowser) {
       init()
     }
-    
+
     // Clean up event listeners
     return () => {
       // Since we're dealing with a type mismatch between the API's on() and removeListener() methods,
@@ -114,7 +114,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
 
   async function connectWallet() {
     if (!isBrowser) return
-    
+
     console.log("Connecting wallet")
     window.avalanche
       ?.request<string[]>({ method: "eth_requestAccounts" })
@@ -167,29 +167,38 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
   if (required && !hasWallet) {
     return (
       <div className="space-y-4 max-w-md mx-auto">
-        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-zinc-800 dark:to-zinc-900 p-6 rounded-2xl shadow-lg border border-red-200 dark:border-zinc-700">
-          <div className="flex items-center justify-center mb-4">
-            <img
-              src="/small-logo.png"
-              alt="Avalanche Logo"
-              className="h-12 w-auto"
-            />
+        <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-700 relative overflow-hidden">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#e5484d]/10 via-transparent to-[#e5484d]/5 dark:from-[#e5484d]/5 dark:via-transparent dark:to-[#e5484d]/2 pointer-events-none"></div>
+
+          <div className="relative">
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-[#e5484d]/20 rounded-full blur-md"></div>
+                <img src="/small-logo.png" alt="Avalanche Logo" className="h-16 w-auto relative" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-center text-zinc-800 dark:text-zinc-100 mb-4">
+              Core Wallet Required
+            </h3>
+            <p className="text-zinc-600 dark:text-zinc-300 text-center mb-8 leading-relaxed">
+              To interact with Avalanche Builder Hub, you'll need to install the Core wallet extension.
+            </p>
+            <a
+              href="https://chromewebstore.google.com/detail/core-crypto-wallet-nft-ex/agoakfejjabomempkjlepdflaleeobhb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full"
+            >
+              <Button className="w-full bg-[#e5484d] hover:bg-[#d13438] text-white font-medium py-4 px-5 rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center">
+                <ExternalLink className="w-5 h-5 mr-2.5 text-white" />
+                Download Core Wallet
+              </Button>
+            </a>
+            <p className="text-xs text-center text-zinc-500 dark:text-zinc-400 mt-6">
+              Core is a secure wallet for managing digital assets on Avalanche
+            </p>
           </div>
-          <h3 className="text-xl font-bold text-center text-red-600 dark:text-red-400 mb-3">Core Wallet Required</h3>
-          <p className="text-zinc-700 dark:text-zinc-300 text-center mb-6">
-            Core wallet is required to interact with Avalanche Builder Hub.
-          </p>
-          <a
-            href="https://chromewebstore.google.com/detail/core-crypto-wallet-nft-ex/agoakfejjabomempkjlepdflaleeobhb"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full"
-          >
-            <Button className="w-full bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-medium py-3.5 px-5 rounded-xl shadow-lg hover:translate-y-[-1px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center border-b-2 border-red-800/50">
-              <ExternalLink className="w-4 h-4 mr-2.5 text-white" />
-              Download Core Wallet
-            </Button>
-          </a>
         </div>
       </div>
     )
@@ -198,46 +207,70 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
   if (required && !walletEVMAddress) {
     return (
       <div className="space-y-4 max-w-md mx-auto">
-        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-zinc-800 dark:to-zinc-900 p-6 rounded-2xl shadow-lg border border-red-200 dark:border-zinc-700">
-          <div className="flex items-center justify-center mb-4">
-            <img
-              src="/small-logo.png"
-              alt="Avalanche Logo"
-              className="h-24 w-auto"
-            />
+        <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-700 relative overflow-hidden">
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#e5484d]/10 via-transparent to-transparent dark:from-[#e5484d]/5 dark:via-transparent pointer-events-none"></div>
+
+          {/* Decorative elements */}
+          {/* <div className="absolute top-0 right-0 w-32 h-32 bg-[#e5484d]/5 dark:bg-[#e5484d]/2 rounded-full -mr-16 -mt-16"></div> */}
+          {/* <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#e5484d]/5 dark:bg-[#e5484d]/2 rounded-full -ml-12 -mb-12"></div> */}
+
+          <div className="relative">
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative">
+                {/* <div className="absolute -inset-2 bg-[#e5484d]/20 rounded-full blur-md animate-pulse"></div> */}
+                <img src="/small-logo.png" alt="Avalanche Logo" className="h-20 w-auto relative" />
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-bold text-center text-zinc-800 dark:text-zinc-100 mb-4">
+              Connect Your Wallet
+            </h3>
+            <p className="text-zinc-600 dark:text-zinc-300 text-center mb-8 leading-relaxed">
+              Connect your Core wallet to access Avalanche Builder Hub and explore the ecosystem.
+            </p>
+
+            <Button
+              onClick={connectWallet}
+              className="w-full bg-[#e5484d] hover:bg-[#d13438] text-white font-medium py-4 px-5 rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center relative group"
+            >
+              <span className="absolute inset-0 w-full h-full bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="relative z-10 text-black dark:text-white">Connect Wallet</span>
+            </Button>
+
+            <div className="mt-8 flex items-center justify-center">
+              <div className="w-full max-w-xs">
+                <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+                  <div className="flex items-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></div>
+                    <span>Secure connection</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></div>
+                    <span>No data sharing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 className="text-xl font-bold text-center text-red-600 dark:text-red-400 mb-3">Connect Core</h3>
-          <p className="text-zinc-700 dark:text-zinc-300 text-center mb-6">
-            Connect your Core wallet to access Avalanche Builder Hub.
-          </p>
-          <Button
-            onClick={connectWallet}
-            className="w-full bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-medium py-3.5 px-5 rounded-xl shadow-lg hover:translate-y-[-1px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center border-b-2 border-red-800/50"
-          >
-            Connect Wallet
-          </Button>
         </div>
       </div>
     )
   }
 
   return (
-      <div className="space-y-4 transition-all duration-300">
+    <div className="space-y-4 transition-all duration-300">
       {walletEVMAddress && (
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-xl p-4 relative overflow-hidden">
-          {/* Background gradient effect */}
-          {/* <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent dark:from-red-900/10 dark:to-transparent pointer-events-none"></div> */}
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#e5484d]/10 via-transparent to-transparent dark:from-[#e5484d]/5 dark:via-transparent pointer-events-none"></div>
 
           {/* Header with logo, wallet info, and badges */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 relative">
             {/* Wider logo and title section with subtitle underneath */}
             <div className="flex items-start flex-1">
-              <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-2.5 mr-3 h-[60px] w-[60px] flex items-center justify-center">
-                <img
-                  src="/small-logo.png"
-                  alt="Avalanche Logo"
-                  className="h-8 w-auto"
-                />
+              <div className="bg-[#e5484d]/10 dark:bg-[#e5484d]/20 rounded-lg p-2.5 mr-3 h-[60px] w-[60px] flex items-center justify-center">
+                <img src="/small-logo.png" alt="Avalanche Logo" className="h-8 w-auto" />
               </div>
               <div className="flex flex-col justify-center h-[60px]">
                 <h3 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">Avalanche Wallet</h3>
@@ -250,7 +283,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
               {walletChainId && (
                 <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-xs">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-zinc-700 dark:text-zinc-300 font-medium">Chain {walletChainId}</span>
+                  <span className="text-black dark:text-black font-medium">Chain {walletChainId}</span>
                 </div>
               )}
 
@@ -275,7 +308,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
           </div>
 
           {/* Wallet addresses in a compact format */}
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             {/* EVM Address */}
             <div className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/80 rounded-md p-2.5 border border-zinc-200 dark:border-zinc-700">
               <div className="flex items-center">
@@ -320,3 +353,4 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
     </div>
   )
 }
+

@@ -28,6 +28,8 @@ export const initialState = {
     gasLimit: 12000000,
     targetBlockRate: 2,
     icmReceiverAddress: "",
+    stakingManagerAddress: "",
+    rewardCalculatorAddress: "",
 }
 
 export const useToolboxStore = create(
@@ -40,6 +42,8 @@ export const useToolboxStore = create(
             setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
             setValidatorWeights: (validatorWeights: number[]) => set({ validatorWeights }),
             setManagerAddress: (managerAddress: string) => set({ managerAddress }),
+            setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
+            setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
             setL1ID: (L1ID: string) => set({ L1ID }),
             setL1ConversionSignature: (L1ConversionSignature: string) => set({ L1ConversionSignature }),
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),

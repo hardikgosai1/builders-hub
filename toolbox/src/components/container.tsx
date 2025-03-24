@@ -8,7 +8,7 @@ type ColorTheme = "red" | "blue" | "green" | "purple" | "orange" | "cyan" | "amb
 interface ContainerProps {
   title: string
   children: ReactNode
-  description?: string
+  description?: ReactNode
   subDescription?: string
   showConfetti?: boolean
   logoSrc?: string

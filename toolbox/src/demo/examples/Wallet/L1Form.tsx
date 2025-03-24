@@ -223,14 +223,9 @@ export default function L1Form() {
               </Button>
             ) : (
               <Button
-                variant="secondary"
+                variant="primary"
                 onClick={handleSwitchChain}
                 disabled={isSwitching}
-                className={`w-full py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center transition-all duration-200 ${
-                  isSwitching
-                    ? "bg-red-400 text-white cursor-not-allowed"
-                    : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0"
-                }`}
               >
                 {isSwitching ? (
                   <>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useToolboxStore, useWalletStore } from "../../utils/store"
+import { useToolboxStore, useViemChainStore, useWalletStore } from "../../utils/store"
 import { useErrorBoundary } from "react-error-boundary"
 import { createWalletClient, custom, createPublicClient, fromBytes, bytesToHex, hexToBytes } from "viem"
 import { pvm, utils, Context, networkIDs } from "@avalabs/avalanchejs"
@@ -67,6 +67,7 @@ export default function AddValidator() {
   const [_, setSavedPChainResponse] = useState<string>("")
   const [networkName, setNetworkName] = useState<"fuji" | "mainnet" | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
+  const viemChain = useViemChainStore()
 
   const pChainChainID = "11111111111111111111111111111111LpoYY"
   var platformEndpoint = "https://api.avax-test.network"
@@ -190,18 +191,7 @@ export default function AddValidator() {
             functionName: "initiateValidatorRegistration",
             args,
             account,
-            chain: {
-              id: walletChainId,
-              name: evmChainName,
-              rpcUrls: {
-                default: { http: [evmChainRpcUrl] },
-              },
-              nativeCurrency: {
-                name: evmChainCoinName,
-                symbol: evmChainCoinName,
-                decimals: 18,
-              },
-            },
+            chain: viemChain
           })
 
           // Get receipt to extract warp message and validation ID
@@ -599,10 +589,6 @@ export default function AddValidator() {
           <Button
             onClick={() => addValidator()}
             disabled={!proxyAddress}
-            className={`mt-4 w-full py-2 px-4 rounded-md text-sm font-medium flex items-center justify-center ${!proxyAddress
-                ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-sm hover:shadow transition-all duration-200"
-              }`}
           >
             {!proxyAddress ? "Set Proxy Address First" : "Add Validator"}
           </Button>
