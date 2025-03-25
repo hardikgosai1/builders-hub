@@ -7,12 +7,10 @@ icon: Terminal
 ---
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-
 We will deploy two Avalanche Interchain Token Transfer contracts. One of the source chain (which is C-chain in our case) and another on the destination chain (myblockchain in our case).
 
 <Steps>
 <Step>
-
 ### Deploy ERC20Home Contract
 
 ```bash
@@ -29,16 +27,16 @@ Deployed to: 0x789a5FDac2b37FCD290fb2924382297A6AE65860
 Transaction hash: 0x5818b2b6870c0f88555a885f61cd077799e17c139f97ac6c23195d79204f0b51
 ```
 </Step>
-<Step>
 
+<Step>
 ### Save the ERC-20 Home Address
 
-<Callout type="info">
-  **Note:** The address `0x789a5FDac2b37FCD290fb2924382297A6AE65860` is your receiver contract address.
+<Callout title="Note" type="info">
+The address `0x789a5FDac2b37FCD290fb2924382297A6AE65860` is your receiver contract address.
 </Callout>
+
 ```bash
 export ERC20_HOME_C_CHAIN=0x...
 ```
-
 </Step>
 </Steps>
