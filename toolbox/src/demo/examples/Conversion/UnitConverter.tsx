@@ -4,7 +4,6 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "../../../components/button";
-import { Input } from "../../../components/input";
 import { Container } from "../../../components/container";
 
 export default function UnitConverter() {
