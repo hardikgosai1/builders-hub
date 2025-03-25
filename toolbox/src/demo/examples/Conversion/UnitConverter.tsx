@@ -2,8 +2,10 @@
 
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
-import { Button, Input } from "../../ui";
 import { Copy, Check } from "lucide-react";
+import { Button } from "../../../components/button";
+import { Input } from "../../../components/input";
+import { Container } from "../../../components/container";
 
 export default function UnitConverter() {
     const { showBoundary } = useErrorBoundary();
@@ -101,64 +103,63 @@ export default function UnitConverter() {
     }, [amount, selectedUnit]);
 
     return (
-        <div className="space-y-6">
+        <Container 
+            title="Unit Converter"
+            description="Convert between different AVAX denominations"
+            logoColorTheme="red"
+        >
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Unit Converter</h2>
-                
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg space-y-2 border border-blue-100 dark:border-blue-800">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg space-y-2 border border-gray-100 dark:border-zinc-700">
+                    <p className="text-sm text-gray-700 dark:text-zinc-300">
                         AVAX is the native token used to pay gas on Avalanche's Primary Network. Each Avalanche L1 has only 1 token used to pay for 
                         network fees on that specific Avalanche L1, this is defined by the Avalanche L1 deployer.
                     </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <p className="text-sm text-gray-700 dark:text-zinc-300">
                         Varying denominations such as Gwei and Wei are commonly used when interacting with cryptocurrency. Use this converter
                         to easily navigate between them.
                     </p>
                 </div>
 
-                <div className="space-y-4 p-4 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
-                    <div className="space-y-4">
-                        {units.map((unit) => (
-                            <div key={unit.id} className="flex items-center space-x-4">
-                                <div className="w-32 flex-shrink-0">
-                                    <span className={`text-sm font-medium ${unit.id === "AVAX" ? "text-blue-600 dark:text-blue-400" : ""}`}>
-                                        {unit.label}
-                                    </span>
-                                </div>
-                                <Input
-                                    value={unit.id === selectedUnit ? amount : results[unit.id] || ""}
-                                    onChange={(value) => {
-                                        handleInputChange(value, unit.id);
-                                    }}
-                                    className="flex-grow"
-                                    placeholder="0"
+                <div className="space-y-4">
+                    {units.map((unit) => (
+                        <div key={unit.id} className="flex items-center">
+                            <div className="w-28 flex-shrink-0 mr-3">
+                                <span className={`text-sm font-medium ${unit.id === "AVAX" ? "text-blue-600 dark:text-blue-400" : ""}`}>
+                                    {unit.label}
+                                </span>
+                            </div>
+                            <div className="relative flex-grow flex">
+                                <input
                                     type="number"
-                                    step={unit.exponent < 0 ? 0.000000001 : 1} 
+                                    value={unit.id === selectedUnit ? amount : results[unit.id] || ""}
+                                    onChange={(e) => handleInputChange(e.target.value, unit.id)}
+                                    placeholder="0"
+                                    step={unit.exponent < 0 ? 0.000000001 : 1}
+                                    className="w-full rounded-md px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary shadow-sm transition-colors duration-200 rounded-r-none border-r-0"
                                 />
-                                <Button
-                                    type="secondary"
+                                <button
                                     onClick={() => handleCopy(unit.id === selectedUnit ? amount : results[unit.id] || "", unit.id)}
-                                    className="flex-shrink-0 w-10"
+                                    className="flex items-center justify-center px-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-r-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     {copied === unit.id ? (
                                         <Check className="h-4 w-4 text-green-500" />
                                     ) : (
-                                        <Copy className="h-4 w-4" />
+                                        <Copy className="h-4 w-4 text-zinc-500" />
                                     )}
-                                </Button>
+                                </button>
                             </div>
-                        ))}
-                    </div>
-
-                    <Button
-                        type="secondary"
-                        onClick={handleReset}
-                        className="w-full mt-4"
-                    >
-                        Reset
-                    </Button>
+                        </div>
+                    ))}
                 </div>
+
+                <Button
+                    onClick={handleReset}
+                    variant="secondary"
+                    className="mt-4"
+                >
+                    Reset
+                </Button>
             </div>
-        </div>
+        </Container>
     );
 }

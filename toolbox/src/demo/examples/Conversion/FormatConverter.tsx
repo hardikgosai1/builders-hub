@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Button, Input } from "../../ui";
 import { utils } from "@avalabs/avalanchejs";
 import { Copy, Check } from "lucide-react";
+import { Button } from "../../../components/button";
+import { Input } from "../../../components/input";
+import { Container } from "../../../components/container";
 
 // Utility functions for conversions
 const hexToBytes = (hex: string): Uint8Array => {
@@ -155,15 +157,15 @@ const CopyableSuccess = ({ label, value }: { label: string; value: string }) => 
   }, [value]);
 
   return (
-    <div className="p-4 bg-white dark:bg-neutral-800 rounded-lg space-y-2 border border-neutral-200 dark:border-neutral-700">
+    <div className="p-4 bg-white dark:bg-zinc-800 rounded-lg space-y-2 border border-zinc-200 dark:border-zinc-700">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <p className="text-neutral-700 dark:text-neutral-200 font-semibold">{label}:</p>
+          <p className="text-zinc-700 dark:text-zinc-200 font-semibold">{label}:</p>
           <Check className="h-5 w-5 text-green-500" />
         </div>
         <button 
           onClick={handleCopy} 
-          className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
+          className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
           title="Copy to clipboard"
         >
           {copied ? (
@@ -176,11 +178,11 @@ const CopyableSuccess = ({ label, value }: { label: string; value: string }) => 
         </button>
       </div>
       <div 
-        className="bg-white dark:bg-neutral-800 p-3 rounded border border-neutral-200 dark:border-neutral-700 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-750 transition-colors"
+        className="bg-white dark:bg-zinc-800 p-3 rounded border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
         onClick={handleCopy}
         title="Click to copy"
       >
-        <p className="font-mono text-sm break-all dark:text-neutral-200">{value}</p>
+        <p className="font-mono text-sm break-all dark:text-zinc-200">{value}</p>
       </div>
     </div>
   );
@@ -255,104 +257,125 @@ export default function FormatConverter() {
   }, [hexToUnformat]);
 
   return (
-    <div className="space-y-8">
-      {/* Hex to CB58 */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Hex to CB58 Encoded</h2>
-        <Input
-          label="Hex"
-          value={hexToConvert}
-          onChange={setHexToConvert}
-          placeholder="Enter hex value (must be even length)"
-          error={hexToCb58Error ? "Invalid hex string" : ""}
-        />
-        <Button type="primary" onClick={handleHexToCb58Convert}>
-          Convert
-        </Button>
-        {hexToCb58Result && !hexToCb58Error && (
-          <CopyableSuccess label="CB58 Encoded Result" value={hexToCb58Result} />
-        )}
-      </div>
-
-      {/* CB58 to Hex */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">CB58 Encoded to Hex</h2>
-        <Input
-          label="CB58"
-          value={cb58ToConvert}
-          onChange={setCb58ToConvert}
-          placeholder="Enter CB58 encoded value"
-          error={cb58ToHexError ? "Invalid CB58 string" : ""}
-        />
-        <Button type="primary" onClick={handleCb58ToHexConvert}>
-          Convert
-        </Button>
-        {cb58ToHexResult && !cb58ToHexError && (
-          <CopyableSuccess label="Hex Result" value={cb58ToHexResult} />
-        )}
-      </div>
-
-      {/* CB58 to Hex with Checksum */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">CB58 Encoded to Hex with Checksum</h2>
-        <div className="text-sm text-gray-600 mb-2">
-          This tool converts a CB58 encoded string to a hex string with checksum. It has 0x as prefix and 4 bytes
-          checksum at the end. It won't work if you just copy+paste the hex string into "Hex to CB58 encoded" tool.
+    <Container
+      title="Format Converter"
+      description="Convert between different encodings"
+      logoColorTheme="red"
+    >
+      <div className="space-y-6">
+        {/* Hex to CB58 */}
+        <div className="space-y-4 p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-base font-semibold">Hex to CB58 Encoded</h3>
+          <Input
+            label="Hex"
+            value={hexToConvert}
+            onChange={(value) => setHexToConvert(value)}
+            placeholder="Enter hex value (must be even length)"
+            helperText={hexToCb58Error ? hexToCb58Error : ""}
+          />
+          <Button 
+            onClick={handleHexToCb58Convert}
+            variant="primary"
+          >
+            Convert
+          </Button>
+          {hexToCb58Result && !hexToCb58Error && (
+            <CopyableSuccess label="CB58 Encoded Result" value={hexToCb58Result} />
+          )}
         </div>
-        <Input
-          label="CB58"
-          value={cb58WithChecksumToConvert}
-          onChange={setCb58WithChecksumToConvert}
-          placeholder="Enter CB58 encoded value"
-          error={cb58ToHexWithChecksumError ? "Invalid CB58 string" : ""}
-        />
-        <Button type="primary" onClick={handleCb58ToHexWithChecksumConvert}>
-          Convert
-        </Button>
-        {cb58ToHexWithChecksumResult && !cb58ToHexWithChecksumError && (
-          <CopyableSuccess label="Hex Result with Checksum" value={cb58ToHexWithChecksumResult} />
-        )}
-      </div>
 
-      {/* Clean Hex String */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Clean Hex String</h2>
-        <div className="text-sm text-gray-600 mb-2">
-          Formats hex by adding spaces between each byte. Preserves 0x prefix if present.
+        {/* CB58 to Hex */}
+        <div className="space-y-4 p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-base font-semibold">CB58 Encoded to Hex</h3>
+          <Input
+            label="CB58"
+            value={cb58ToConvert}
+            onChange={(value) => setCb58ToConvert(value)}
+            placeholder="Enter CB58 encoded value"
+            helperText={cb58ToHexError ? cb58ToHexError : ""}
+          />
+          <Button
+            onClick={handleCb58ToHexConvert}
+            variant="primary"
+          >
+            Convert
+          </Button>
+          {cb58ToHexResult && !cb58ToHexError && (
+            <CopyableSuccess label="Hex Result" value={cb58ToHexResult} />
+          )}
         </div>
-        <Input
-          label="Hex"
-          value={hexToClean}
-          onChange={setHexToClean}
-          placeholder="Enter hex value to format (e.g. 0x3213213322aab101)"
-        />
-        <Button type="primary" onClick={handleCleanHex}>
-          Format
-        </Button>
-        {cleanHexResult && (
-          <CopyableSuccess label="Formatted Hex Result" value={cleanHexResult} />
-        )}
-      </div>
 
-      {/* Unformat Hex */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Unformat Hex</h2>
-        <div className="text-sm text-gray-600 mb-2">
-          Removes all spaces from hex string. Preserves 0x prefix if present.
+        {/* CB58 to Hex with Checksum */}
+        <div className="space-y-4 p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-base font-semibold">CB58 Encoded to Hex with Checksum</h3>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            This tool converts a CB58 encoded string to a hex string with checksum. It has 0x as prefix and 4 bytes
+            checksum at the end. It won't work if you just copy+paste the hex string into "Hex to CB58 encoded" tool.
+          </p>
+          <Input
+            label="CB58"
+            value={cb58WithChecksumToConvert}
+            onChange={(value) => setCb58WithChecksumToConvert(value)}
+            placeholder="Enter CB58 encoded value"
+            helperText={cb58ToHexWithChecksumError ? cb58ToHexWithChecksumError : ""}
+          />
+          <Button
+            onClick={handleCb58ToHexWithChecksumConvert}
+            variant="primary"
+          >
+            Convert
+          </Button>
+          {cb58ToHexWithChecksumResult && !cb58ToHexWithChecksumError && (
+            <CopyableSuccess label="Hex Result with Checksum" value={cb58ToHexWithChecksumResult} />
+          )}
         </div>
-        <Input
-          label="Hex"
-          value={hexToUnformat}
-          onChange={setHexToUnformat}
-          placeholder="Enter formatted hex value (e.g. 0x 32 13 21 33 22 aa b1 01)"
-        />
-        <Button type="primary" onClick={handleUnformatHex}>
-          Unformat
-        </Button>
-        {unformatHexResult && (
-          <CopyableSuccess label="Unformatted Hex Result" value={unformatHexResult} />
-        )}
+
+        {/* Clean Hex String */}
+        <div className="space-y-4 p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-base font-semibold">Clean Hex String</h3>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Formats hex by adding spaces between each byte. Preserves 0x prefix if present.
+          </p>
+          <Input
+            label="Hex"
+            value={hexToClean}
+            onChange={(value) => setHexToClean(value)}
+            placeholder="Enter hex value to format (e.g. 0x3213213322aab101)"
+          />
+          <Button
+            onClick={handleCleanHex}
+            variant="primary"
+          >
+            Format
+          </Button>
+          {cleanHexResult && (
+            <CopyableSuccess label="Formatted Hex Result" value={cleanHexResult} />
+          )}
+        </div>
+
+        {/* Unformat Hex */}
+        <div className="space-y-4 p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-base font-semibold">Unformat Hex</h3>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Removes all spaces from hex string. Preserves 0x prefix if present.
+          </p>
+          <Input
+            label="Hex"
+            value={hexToUnformat}
+            onChange={(value) => setHexToUnformat(value)}
+            placeholder="Enter formatted hex value (e.g. 0x 32 13 21 33 22 aa b1 01)"
+          />
+          <Button
+            onClick={handleUnformatHex}
+            variant="primary"
+          >
+            Unformat
+          </Button>
+          {unformatHexResult && (
+            <CopyableSuccess label="Unformatted Hex Result" value={unformatHexResult} />
+          )}
+        </div>
       </div>
-    </div>
+    </Container>
   );
 }
