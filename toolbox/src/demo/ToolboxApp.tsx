@@ -34,6 +34,13 @@ const componentGroups: Record<string, ComponentType[]> = {
             component: lazy(() => import('./examples/Conversion/FormatConverter')),
             fileNames: [],
             skipWalletConnection: true,
+        },
+        {
+            id: 'unitConverter',
+            label: "Unit Converter",
+            component: lazy(() => import('./examples/Conversion/UnitConverter')),
+            fileNames: [],
+            skipWalletConnection: true,
         }
     ],
     'Create an L1': [
