@@ -85,13 +85,6 @@ export default function AddL1s() {
   const currentChains = filteredChains.slice(indexOfFirstChain, indexOfLastChain);
   const totalPages = Math.ceil(filteredChains.length / chainsPerPage);
 
-  // Change page
-  const goToPage = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
-
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
