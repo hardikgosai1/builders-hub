@@ -1,5 +1,5 @@
 ---
-title: Connect Core Wallet
+title: Connect & Fund Core Wallet
 description: Learn how to connect Core wallet to Avalanche and understand different chain address formats.
 updated: 2025-03-13
 authors: [owenwahlgren]
@@ -8,17 +8,23 @@ icon: Wallet
 
 import ToolboxMdxWrapper from "../../../../toolbox/src/demo/ui/ToolboxMdxWrapper.tsx"
 
+## Install Core Wallet
+
+If you don't have Core Wallet installed already, head to the [Chome Web
+Store](https://chromewebstore.google.com/detail/core-crypto-wallet-nft-ex/agoakfejjabomempkjlepdflaleeobhb)
+and install it. Since you will need to issue P-Chain transactions and the need a compatible wallet,
+unfortunately, the MetaMask or other popular wallet extension are not supported.
+
+## Claim Testnet AVAX from the Faucet
+
+Head to the [Avalanche Faucet](https://core.app/tools/testnet-faucet/?subnet=c&token=c) and claim
+some AVAX tokens on the C-Chain of the Fuji testnet. Use the code `avalanche-academy` to claim your
+tokens
+
+## Connect Core
+
 <ToolboxMdxWrapper>
-
-## Prerequisites
-
-<Callout type="info">
-Before you begin, make sure you have:
-- [Core wallet](https://core.app/) installed on your device
-- Some AVAX tokens:
-  - For mainnet: Purchase AVAX from supported exchanges
-  - For Fuji testnet: Get test tokens from the [Avalanche Faucet](https://faucet.avax.network/)
-</Callout>
+</ToolboxMdxWrapper>
 
 ## Understanding Avalanche Addresses
 
@@ -84,7 +90,7 @@ The C-Chain (Contract Chain) uses the Ethereum hex format since it's EVM-compati
 
 Example: `0x1234567890123456789012345678901234567890`
 
-</ToolboxMdxWrapper>
+
 
 
 

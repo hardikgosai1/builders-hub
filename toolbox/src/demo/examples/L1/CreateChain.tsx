@@ -69,8 +69,6 @@ export default function CreateChain() {
             title="Create Chain"
             description="Create a new blockchain on your subnet with custom parameters and genesis data."
         >
-            <Input label="Your P-Chain Address" value={pChainAddress} disabled />
-
             <Input
                 label="Chain Name"
                 value={evmChainName}

@@ -72,30 +72,29 @@ export default function ConvertToL1() {
         >
             <div className="space-y-4">
                 <Input
-                    label="Your P-Chain Address"
-                    value={pChainAddress}
-                    disabled={true}
-                    type="text"
-                />
-                <Input
                     label="Subnet ID"
                     value={subnetID}
                     onChange={setSubnetID}
                     type="text"
                 />
                 <Input
-                    label="Chain ID"
+                    label="Validator Manager Blockchain ID"
                     value={chainID}
                     onChange={setChainID}
                     type="text"
                 />
                 <Input
-                    label="Manager Address (0x...)"
+                    label="Validator Manager Contract Address (0x...)"
                     value={managerAddress}
                     onChange={setManagerAddress}
                     placeholder="0x..."
                     type="text"
                 />
+                <div className="text-xl mt-12">
+                    Initial Validators
+                </div>
+
+
                 <InputArray
                     label="Proofs of possession of the initial validators"
                     values={nodePopJsons}
