@@ -24,7 +24,7 @@ export default function CreateChain() {
         setEvmChainName,
     } = useToolboxStore();
     const [isCreating, setIsCreating] = useState(false);
-    const { walletEVMAddress, coreWalletClient, pChainAddress } = useWalletStore();
+    const { walletEVMAddress, coreWalletClient } = useWalletStore();
 
     useEffect(() => {
         if (!genesisData) {
