@@ -30,6 +30,9 @@ export default function AddL1s() {
   const [addingChainId, setAddingChainId] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState<ChainInfo | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const chainsPerPage = 5;
 
   useEffect(() => {
     fetchChains();
@@ -72,7 +75,34 @@ export default function AddL1s() {
       );
       setFilteredChains(filtered);
     }
+    // Reset to first page when filters change
+    setCurrentPage(1);
   }, [chains, searchTerm]);
+
+  // Get current chains
+  const indexOfLastChain = currentPage * chainsPerPage;
+  const indexOfFirstChain = indexOfLastChain - chainsPerPage;
+  const currentChains = filteredChains.slice(indexOfFirstChain, indexOfLastChain);
+  const totalPages = Math.ceil(filteredChains.length / chainsPerPage);
+
+  // Change page
+  const goToPage = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   // Copy to clipboard function
   const copyToClipboard = (text: string, field: string) => {
@@ -354,56 +384,94 @@ export default function AddL1s() {
       {isLoading ? (
         <div className="py-4 text-center">Loading chains...</div>
       ) : (
-        <div className="space-y-2">
-          {filteredChains.length > 0 ? (
-            filteredChains.map((chain) => (
-              <div 
-                key={chain.chainId} 
-                className="flex justify-between items-center p-3 border rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => openChainDetails(chain)}
-              >
-                <div className="flex items-center space-x-3">
-                  {chain.chainLogoUri && (
-                    <img 
-                      src={chain.chainLogoUri} 
-                      alt={`${chain.chainName} logo`} 
-                      className="w-8 h-8 rounded-full"
-                      onError={(e) => {
-                        // Handle image loading errors
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <div>
-                    <div className="font-medium">{chain.chainName}</div>
-                    <div className="text-sm text-gray-500">{chain.networkToken.symbol}</div>
+        <>
+          <div className="space-y-2">
+            {currentChains.length > 0 ? (
+              currentChains.map((chain) => (
+                <div 
+                  key={chain.chainId} 
+                  className="flex justify-between items-center p-3 border rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() => openChainDetails(chain)}
+                >
+                  <div className="flex items-center space-x-3">
+                    {chain.chainLogoUri && (
+                      <img 
+                        src={chain.chainLogoUri} 
+                        alt={`${chain.chainName} logo`} 
+                        className="w-8 h-8 rounded-full"
+                        onError={(e) => {
+                          // Handle image loading errors
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <div>
+                      <div className="font-medium">{chain.chainName}</div>
+                      <div className="text-sm text-gray-500">{chain.networkToken.symbol}</div>
+                    </div>
+                  </div>
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent opening the modal
+                      handleAddToWallet(chain);
+                    }}
+                  >
+                    <Button
+                      variant={Number(chain.chainId) === walletChainId ? "secondary" : "primary"}
+                      loading={addingChainId === chain.chainId}
+                      onClick={() => handleAddToWallet(chain)}
+                    >
+                      {Number(chain.chainId) === walletChainId ? 'Connected' : 'Add to Wallet'}
+                    </Button>
                   </div>
                 </div>
-                <div 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent opening the modal
-                    handleAddToWallet(chain);
-                  }}
-                >
-                  <Button
-                    variant={Number(chain.chainId) === walletChainId ? "secondary" : "primary"}
-                    loading={addingChainId === chain.chainId}
-                    onClick={() => handleAddToWallet(chain)}
+              ))
+            ) : (
+              <div className="text-center py-4">
+                {searchTerm ? 
+                  `No chains found matching "${searchTerm}"` : 
+                  "No chains found for this network type"
+                }
+              </div>
+            )}
+          </div>
+          
+          {/* Pagination */}
+          {filteredChains.length > chainsPerPage && (
+            <div className="mt-6">
+              <div className="flex justify-center">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden flex">
+                  <button 
+                    onClick={goToPrevPage}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 flex items-center ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                   >
-                    {Number(chain.chainId) === walletChainId ? 'Connected' : 'Add to Wallet'}
-                  </Button>
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Prev
+                  </button>
+                  <div className={`px-4 py-2 border-l border-r border-gray-200 dark:border-gray-700 flex items-center justify-center text-blue-500`}>
+                    {currentPage}
+                  </div>
+                  <button 
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 flex items-center ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                  >
+                    Next
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-4">
-              {searchTerm ? 
-                `No chains found matching "${searchTerm}"` : 
-                "No chains found for this network type"
-              }
+              <div className="text-center text-sm text-gray-500 mt-2">
+                • Page {currentPage} of {totalPages} •
+              </div>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Chain details modal */}
