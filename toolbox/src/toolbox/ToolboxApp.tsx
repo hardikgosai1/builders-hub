@@ -19,13 +19,13 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: 'switchChain',
             label: "Switch Chain",
-            component: lazy(() => import('./examples/Wallet/SwitchChain')),
+            component: lazy(() => import('./Wallet/SwitchChain')),
             fileNames: ["toolbox/src/demo/examples/Wallet/SwitchChain.tsx"]
         },
         {
             id: 'addL1s',
             label: "Add L1s",
-            component: lazy(() => import('./examples/Wallet/AddL1s')),
+            component: lazy(() => import('./Wallet/AddL1s')),
             fileNames: []
         }
     ],
@@ -33,14 +33,14 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: 'formatConverter',
             label: "Format Converter",
-            component: lazy(() => import('./examples/Conversion/FormatConverter')),
+            component: lazy(() => import('./Conversion/FormatConverter')),
             fileNames: [],
             skipWalletConnection: true,
         },
         {
             id: 'unitConverter',
             label: "Unit Converter",
-            component: lazy(() => import('./examples/Conversion/UnitConverter')),
+            component: lazy(() => import('./Conversion/UnitConverter')),
             fileNames: [],
             skipWalletConnection: true,
         }
@@ -49,31 +49,31 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: 'createSubnet',
             label: "Create Subnet",
-            component: lazy(() => import('./examples/L1/CreateSubnet')),
+            component: lazy(() => import('./L1/CreateSubnet')),
             fileNames: ["toolbox/src/demo/examples/L1/CreateSubnet.tsx"]
         },
         {
             id: 'createChain',
             label: "Create Chain",
-            component: lazy(() => import('./examples/L1/CreateChain')),
+            component: lazy(() => import('./L1/CreateChain')),
             fileNames: ["toolbox/src/demo/examples/L1/CreateChain.tsx"]
         },
         {
             id: 'convertToL1',
             label: "Convert to L1",
-            component: lazy(() => import('./examples/L1/ConvertToL1')),
+            component: lazy(() => import('./L1/ConvertToL1')),
             fileNames: ["toolbox/src/demo/examples/L1/ConvertToL1.tsx"]
         },
         {
             id: 'collectConversionSignatures',
             label: "Collect conversion signatures",
-            component: lazy(() => import('./examples/L1/CollectConversionSignatures')),
+            component: lazy(() => import('./L1/CollectConversionSignatures')),
             fileNames: ["toolbox/src/demo/examples/L1/CollectConversionSignatures.tsx", "toolbox/src/demo/examples/L1/convertWarp.ts"]
         },
         {
             id: 'genesisBuilder',
             label: "Genesis Builder",
-            component: lazy(() => import('./examples/L1/GenesisBuilder')),
+            component: lazy(() => import('./L1/GenesisBuilder')),
             fileNames: ["toolbox/src/demo/examples/L1/GenesisBuilder.tsx"]
         }
     ],
@@ -81,25 +81,25 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: "deployValidatorMessages",
             label: "Validator Messages Library",
-            component: lazy(() => import('./examples/ValidatorManager/DeployValidatorMessages')),
+            component: lazy(() => import('./ValidatorManager/DeployValidatorMessages')),
             fileNames: ["toolbox/src/demo/examples/ValidatorManager/DeployValidatorMessages.tsx"]
         },
         {
             id: "deployValidatorManager",
             label: "Deploy Validator Manager",
-            component: lazy(() => import('./examples/ValidatorManager/DeployValidatorManager')),
+            component: lazy(() => import('./ValidatorManager/DeployValidatorManager')),
             fileNames: ["toolbox/src/demo/examples/ValidatorManager/DeployValidatorManager.tsx"]
         },
         {
             id: "upgradeProxy",
             label: "Upgrade Proxy",
-            component: lazy(() => import('./examples/ValidatorManager/UpgradeProxy')),
+            component: lazy(() => import('./ValidatorManager/UpgradeProxy')),
             fileNames: ["toolbox/src/demo/examples/ValidatorManager/UpgradeProxy.tsx"]
         },
         {
             id: "readContract",
             label: "Read Contract",
-            component: lazy(() => import('./examples/ValidatorManager/ReadContract')),
+            component: lazy(() => import('./ValidatorManager/ReadContract')),
             fileNames: ["toolbox/src/demo/examples/ValidatorManager/ReadContract.tsx"]
         }
     ],
@@ -107,13 +107,13 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: "initialize",
             label: "Initialize",
-            component: lazy(() => import('./examples/InitializePoA/Initialize')),
+            component: lazy(() => import('./InitializePoA/Initialize')),
             fileNames: ["toolbox/src/demo/examples/InitializePoA/Initialize.tsx"]
         },
         {
             id: "initValidatorSet",
             label: "Initialize Validator Set",
-            component: lazy(() => import('./examples/InitializePoA/InitValidatorSet')),
+            component: lazy(() => import('./InitializePoA/InitValidatorSet')),
             fileNames: ["toolbox/src/demo/examples/InitializePoA/InitValidatorSet.tsx"]
         }
     ],
@@ -121,21 +121,21 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: "rpcMethodsCheck",
             label: "RPC Methods Check",
-            component: lazy(() => import('./examples/Nodes/RPCMethodsCheck')),
+            component: lazy(() => import('./Nodes/RPCMethodsCheck')),
             fileNames: ["toolbox/src/demo/examples/Nodes/RPCMethodsCheck.tsx"],
             skipWalletConnection: true,
         },
         {
             id: "avalanchegoDocker",
             label: "Avalanchego in Docker",
-            component: lazy(() => import('./examples/Nodes/AvalanchegoDocker')),
+            component: lazy(() => import('./Nodes/AvalanchegoDocker')),
             fileNames: ["toolbox/src/demo/examples/Nodes/AvalanchegoDocker.tsx"],
             skipWalletConnection: true,
         },
         {
             id: "performanceMonitor",
             label: "Performance Monitor",
-            component: lazy(() => import('./examples/Nodes/PerformanceMonitor')),
+            component: lazy(() => import('./Nodes/PerformanceMonitor')),
             fileNames: ["toolbox/src/demo/examples/Nodes/PerformanceMonitor.tsx"],
             skipWalletConnection: true,
         }
@@ -144,25 +144,25 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: "teleporterMessenger",
             label: "Teleporter Messenger",
-            component: lazy(() => import('./examples/ICM/TeleporterMessenger')),
+            component: lazy(() => import('./ICM/TeleporterMessenger')),
             fileNames: ["toolbox/src/demo/examples/ICM/TeleporterMessenger.tsx"]
         },
         {
             id: "teleporterRegistry",
             label: "Teleporter Registry",
-            component: lazy(() => import('./examples/ICM/TeleporterRegistry')),
+            component: lazy(() => import('./ICM/TeleporterRegistry')),
             fileNames: ["toolbox/src/demo/examples/ICM/TeleporterRegistry.tsx"]
         },
         {
             id: "icmRelayer",
             label: "ICM Relayer",
-            component: lazy(() => import('./examples/ICM/ICMRelayer')),
+            component: lazy(() => import('./ICM/ICMRelayer')),
             fileNames: ["toolbox/src/demo/examples/ICM/ICMRelayer.tsx"]
         },
         {
             id: "receiverOnSubnet",
             label: "ReceiverOnSubnet",
-            component: lazy(() => import('./examples/ICM/ReceiverOnSubnet')),
+            component: lazy(() => import('./ICM/ReceiverOnSubnet')),
             fileNames: [
                 "toolbox/src/demo/examples/ICM/ReceiverOnSubnet.tsx",
                 "toolbox/contracts/example-contracts/contracts/receiverOnSubnet.sol",
@@ -171,7 +171,7 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: "sendICMMessage",
             label: "Send ICM Message",
-            component: lazy(() => import('./examples/ICM/SendICMMessage')),
+            component: lazy(() => import('./ICM/SendICMMessage')),
             fileNames: [
                 "toolbox/src/demo/examples/ICM/SendICMMessage.tsx",
                 "toolbox/contracts/example-contracts/contracts/senderOnCChain.sol",

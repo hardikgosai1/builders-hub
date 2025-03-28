@@ -1,4 +1,4 @@
-import L1Form from "../toolbox/examples/Wallet/L1Form";
+import L1Form from "../toolbox/Wallet/L1Form";
 import { useErrorBoundary } from "react-error-boundary";
 import { useToolboxStore, useViemChainStore } from "../stores/toolboxStore";
 import { useWalletStore } from "../stores/walletStore";
