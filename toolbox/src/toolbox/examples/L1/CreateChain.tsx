@@ -1,10 +1,15 @@
 "use client";
 
-import { initialState, useToolboxStore, useWalletStore } from "../../../stores/toolboxStore";
+import { initialState, useToolboxStore } from "../../../stores/toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
-import { Button, Input, Container, GenesisInput, ResultField } from "../../../components";
+import { Button } from "../../../components/button";
+import { Input } from "../../../components/input";
+import { Container } from "../../../components/container";
+import { GenesisInput } from "../../../components/genesis-input";
+import { ResultField } from "../../../components/result-field";
 import { quickAndDirtyGenesisBuilder } from "./GenesisBuilder";
+import { useWalletStore } from "../../../stores/walletStore";
 
 export default function CreateChain() {
     const { showBoundary } = useErrorBoundary();

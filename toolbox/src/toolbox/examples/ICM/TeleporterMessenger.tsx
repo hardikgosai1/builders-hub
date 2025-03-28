@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useErrorBoundary } from "react-error-boundary";
-import { Button } from "../../ui";
+import { Button } from "../../../components/button";
 import { Success } from "../../../components/Success";
 import { formatEther, parseEther } from 'viem';
-import { useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import TeleporterMessengerDeploymentTransaction from '../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Deployment_Transaction_v1.0.0.txt.json';
 import TeleporterMessengerDeployerAddress from '../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Deployer_Address_v1.0.0.txt.json';
 import TeleporterMessengerAddress from '../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';

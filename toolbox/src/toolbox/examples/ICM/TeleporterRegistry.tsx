@@ -1,9 +1,10 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
-import { Button } from "../../ui";
+import { Button } from "../../../components/button";
 import { Success } from "../../../components/Success";
 import TeleporterRegistryBytecode from '../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterRegistry_Bytecode_v1.0.0.txt.json';
 import TeleporterMessengerAddress from '../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';

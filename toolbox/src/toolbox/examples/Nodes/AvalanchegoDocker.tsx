@@ -1,7 +1,8 @@
 "use client";
 
-import { useToolboxStore, useWalletStore } from "../../../stores/toolboxStore";
-import { Select } from "../../ui";
+import { useToolboxStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
+import { Select } from "../../../components/Select";
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import versions from "../../../versions.json";

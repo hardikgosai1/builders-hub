@@ -1,5 +1,6 @@
-import { Input, InputProps, TextareaProps } from "./Input";
-import { Button } from "./Button";
+import { Input, InputProps, TextareaProps } from "./input";
+
+import { Button } from "./button";
 import { X } from "lucide-react";
 
 type InputArrayProps = {
@@ -51,7 +52,7 @@ export const InputArray = ({
                             value={value}
                             onChange={(newValue) => handleChange(index, newValue)}
                             placeholder={placeholder}
-                            notes={index === 0 ? notesUnderInput : undefined}
+                            helperText={index === 0 ? notesUnderInput : undefined}
                         />
                         {!disableAddRemove && (
                             <button

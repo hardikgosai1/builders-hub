@@ -1,6 +1,7 @@
 import L1Form from "../toolbox/examples/Wallet/L1Form";
 import { useErrorBoundary } from "react-error-boundary";
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../stores/toolboxStore";
+import { useWalletStore } from "../stores/walletStore";
 
 
 export function RequireChainL1({ children }: { children: React.ReactNode }) {
@@ -26,7 +27,7 @@ export function RequireChainL1({ children }: { children: React.ReactNode }) {
 }
 
 import { avalancheFuji } from "viem/chains";
-import { Button } from "./Button";
+import { Button } from "./button";
 import { useState } from "react";
 
 export function RequireChainFuji({ children }: { children: React.ReactNode }) {

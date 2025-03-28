@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
 import ValidatorManagerABI from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json";

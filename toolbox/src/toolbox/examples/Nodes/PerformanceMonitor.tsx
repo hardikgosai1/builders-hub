@@ -1,7 +1,9 @@
 "use client";
 
 import { useToolboxStore } from "../../../stores/toolboxStore";
-import { Input, Button, Select } from "../../ui";
+import { Input } from "../../../components/input";
+import { Button } from "../../../components/button";
+import { Select } from "../../../components/Select";
 import { useState, useEffect, useRef } from "react";
 import { createPublicClient, http, webSocket } from 'viem';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';

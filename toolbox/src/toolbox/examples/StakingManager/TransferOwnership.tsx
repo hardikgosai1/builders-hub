@@ -1,6 +1,7 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../../components/button";
@@ -8,7 +9,7 @@ import { ResultField } from "../../../components/result-field";
 import ValidatorManagerABI from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { RequireChainL1 } from "../../../components/RequireChain";
 import { Container } from "../../../components/container";
-import { Input } from "../../../components";
+import { Input } from "../../../components/input";
 import { TransactionReceipt } from "viem";
 export default function TransferOwnership() {
     const { showBoundary } = useErrorBoundary();

@@ -1,12 +1,14 @@
 "use client";
 
-import { useWalletStore, useToolboxStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
+import { useToolboxStore } from "../../../stores/toolboxStore";
 import { Button } from "../../../components/button";
 import { Input } from "../../../components/input";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { ResultField } from "../../../components/result-field";
 import { Container } from "../../../components/container";
+
 export default function CreateSubnet() {
   const { showBoundary } = useErrorBoundary();
   const { setSubnetID, subnetID } = useToolboxStore();

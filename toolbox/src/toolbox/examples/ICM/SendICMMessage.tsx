@@ -1,16 +1,17 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo } from "react";
-import { Button } from "../../ui";
+import { Button } from "../../../components/button";
 import { AlertTriangle } from "lucide-react";
 import { Success } from "../../../components/Success";
 import { createPublicClient, http } from 'viem';
 import ReceiverOnSubnetABI from "../../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import SenderOnCChainABI from "../../../../contracts/example-contracts/compiled/SenderOnCChain.json";
 import { utils } from "@avalabs/avalanchejs";
-import { Input } from "../../ui";
+import { Input } from "../../../components/input";
 import { avalancheFuji } from "viem/chains";
 import { RequireChainFuji } from "../../../components/RequireChain";
 

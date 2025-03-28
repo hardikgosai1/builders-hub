@@ -1,9 +1,10 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, useWalletStore } from "../../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "../../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
-import { Button } from "../../ui";
+import { Button } from "../../../components/button";
 import { Success } from "../../../components/Success";
 import ReceiverOnSubnetABI from "../../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import { avalancheFuji } from "viem/chains";
