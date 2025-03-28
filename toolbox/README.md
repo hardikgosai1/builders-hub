@@ -15,3 +15,4 @@ Please read this guide before contributing or at least feed this into your Curso
 ## CoreViem
 An experimental library that unifies Core wallet transactions and RPC calls. Will eventually be released as an SDK.
 
+Toolbox is an independent software from builder-hub and could not have any dependencies on builder-hub.
