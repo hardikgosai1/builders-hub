@@ -6,7 +6,7 @@ import { cn } from "../../lib/utils"
 
 interface ButtonProps {
   children: ReactNode
-  onClick: () => void
+  onClick?: () => void
   loading?: boolean
   loadingText?: string
   icon?: ReactNode

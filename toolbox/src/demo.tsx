@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import ToolboxApp from './demo/ToolboxApp'
+import ToolboxApp from './toolbox/ToolboxApp'
 
 export function DummyRouter() {
   if (window.location.pathname.startsWith('/l1-toolbox')) {
