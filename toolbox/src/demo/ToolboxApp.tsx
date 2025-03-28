@@ -121,7 +121,7 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: ["toolbox/src/demo/examples/InitializePoA/InitValidatorSet.tsx"]
         }
     ],
-    "Validator Operations": [
+    "ValidatorManager Operations": [
         {
             id: "addValidator",
             label: "Add Validator",
@@ -139,6 +139,34 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Change Weight",
             component: lazy(() => import('./examples/ValidatorManager/ChangeWeight')),
             fileNames: ["toolbox/src/demo/examples/ValidatorManager/ChangeWeight.tsx"]
+        }
+    ],
+    "Deploy StakingManager": [
+        {
+            id: "deployRewardCalculator",
+            label: "Deploy Reward Calculator",
+            component: lazy(() => import('./examples/StakingManager/DeployRewardCalculator')),
+            fileNames: ["toolbox/src/demo/examples/StakingManager/DeployRewardCalculator.tsx"]
+        },
+        {
+            id: "deployStakingManager",
+            label: "Deploy Staking Manager",
+            component: lazy(() => import('./examples/StakingManager/DeployStakingManager')),
+            fileNames: ["toolbox/src/demo/examples/StakingManager/DeployStakingManager.tsx"]
+        },
+    ],
+    "Initialize StakingManager": [
+        {
+            id: "initializeStakingManager",
+            label: "Initialize Staking Manager",
+            component: lazy(() => import('./examples/StakingManager/Initialize')),
+            fileNames: ["toolbox/src/demo/examples/StakingManager/Initialize.tsx"]
+        },
+        {
+            id: "transferValidatorManagerOwnership",
+            label: "Transfer Validator Manager Ownership",
+            component: lazy(() => import('./examples/StakingManager/TransferOwnership')),
+            fileNames: ["toolbox/src/demo/examples/StakingManager/TransferOwnership.tsx"]
         }
     ],
     "Nodes": [
