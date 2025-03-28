@@ -7,13 +7,13 @@ import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 
-import { Button } from "../../components/button";
-import { Input } from "../../components/input";
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
 import { RequireChainL1 } from '../../components/RequireChain';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
-import { Container } from '../../components/container';
-import { ResultField } from '../../components/result-field';
+import { Container } from '../../components/Container';
+import { ResultField } from '../../components/ResultField';
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 
 const cb58ToHex = (cb58: string) => utils.bufferToHex(utils.base58check.decode(cb58));

@@ -89,8 +89,8 @@ import { useEffect, useState } from "react";
 import { useToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
-import { Container } from "../../components/container";
-import { Input } from "../../components/input";
+import { Container } from "../../components/Container";
+import { Input } from "../../components/Input";
 
 export default function GenesisBuilder() {
     const {

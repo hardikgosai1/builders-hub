@@ -1,4 +1,4 @@
-import { Button } from "../components/button";
+import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
 import { useToolboxStore } from '../stores/toolboxStore';
 import { RefreshCw } from 'lucide-react';

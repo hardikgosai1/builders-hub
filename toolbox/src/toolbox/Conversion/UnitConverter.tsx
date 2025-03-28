@@ -3,8 +3,8 @@
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
-import { Button } from "../../components/button";
-import { Container } from "../../components/container";
+import { Button } from "../../components/Button";
+import { Container } from "../../components/Container";
 
 export default function UnitConverter() {
     const { showBoundary } = useErrorBoundary();

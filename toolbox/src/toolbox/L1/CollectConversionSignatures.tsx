@@ -4,11 +4,11 @@ import { useToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { useState } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
-import { Button } from "../../components/button";
+import { Button } from "../../components/Button";
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
-import { Container } from "../../components/container";
-import { Input } from "../../components/input";
+import { Container } from "../../components/Container";
+import { Input } from "../../components/Input";
 
 export default function CollectConversionSignatures() {
     const {

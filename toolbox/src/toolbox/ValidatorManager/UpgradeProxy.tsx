@@ -4,12 +4,12 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useViemChainStore } from "../../stores/toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
-import { Button } from "../../components/button";
-import { Input } from "../../components/input";
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
 import { Success } from "../../components/Success";
 import ProxyAdminABI from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
 import { RequireChainL1 } from "../../components/RequireChain";
-import { Container } from "../../components/container";
+import { Container } from "../../components/Container";
 import { useToolboxStore } from "../../stores/toolboxStore";
 
 export default function UpgradeProxy() {

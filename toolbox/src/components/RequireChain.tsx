@@ -27,7 +27,7 @@ export function RequireChainL1({ children }: { children: React.ReactNode }) {
 }
 
 import { avalancheFuji } from "viem/chains";
-import { Button } from "./button";
+import { Button } from "./Button";
 import { useState } from "react";
 
 export function RequireChainFuji({ children }: { children: React.ReactNode }) {

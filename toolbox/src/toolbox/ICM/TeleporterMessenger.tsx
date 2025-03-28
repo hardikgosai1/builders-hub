@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useErrorBoundary } from "react-error-boundary";
-import { Button } from "../../components/button";
+import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { formatEther, parseEther } from 'viem';
 import { useViemChainStore } from "../../stores/toolboxStore";

@@ -11,9 +11,9 @@ import { packWarpIntoAccessList } from "../InitializePoA/packWarp"
 import { packL1ValidatorRegistration } from "../L1/convertWarp"
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import { AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
-import { Container } from "../../components/container"
-import { Input } from "../../components/input"
-import { Button } from "../../components/button"
+import { Container } from "../../components/Container"
+import { Input } from "../../components/Input"
+import { Button } from "../../components/Button"
 // Define interfaces for step status tracking
 interface StepStatus {
   status: "pending" | "loading" | "success" | "error"

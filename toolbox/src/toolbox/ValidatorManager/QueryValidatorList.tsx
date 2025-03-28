@@ -4,9 +4,9 @@ import { useToolboxStore } from "../../stores/toolboxStore"
 import { useWalletStore } from "../../stores/walletStore"
 import { useState, useEffect } from "react"
 import { Calendar, Clock, ChevronRight, Users, ChevronLeft, Coins, Database, Globe, Info } from "lucide-react"
-import { Container } from "../../components/container"
-import { Input } from "../../components/input"
-import { Button } from "../../components/button"
+import { Container } from "../../components/Container"
+import { Input } from "../../components/Input"
+import { Button } from "../../components/Button"
 import { networkIDs } from "@avalabs/avalanchejs"
 
 interface Validator {

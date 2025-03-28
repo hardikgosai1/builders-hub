@@ -7,8 +7,8 @@ import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import versions from "../../versions.json";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
-import { Container } from "../../components/container";
-import { Input } from "../../components/input";
+import { Container } from "../../components/Container";
+import { Input } from "../../components/Input";
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
     const stakingPort = isRPC ? "9653" : "9651";

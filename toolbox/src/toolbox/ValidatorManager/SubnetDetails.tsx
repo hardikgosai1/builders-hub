@@ -16,9 +16,9 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { networkIDs } from "@avalabs/avalanchejs"
-import { Input } from "../../components/input"
-import { Button } from "../../components/button"
-import { Container } from "../../components/container"
+import { Input } from "../../components/Input"
+import { Button } from "../../components/Button"
+import { Container } from "../../components/Container"
 interface SubnetDetails {
   createBlockTimestamp: number
   createBlockIndex: string

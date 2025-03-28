@@ -4,9 +4,9 @@ import { useWalletStore } from "../../stores/walletStore"
 import { useViemChainStore, useToolboxStore } from "../../stores/toolboxStore"
 import { useState, useEffect } from "react"
 import { createPublicClient, http, webSocket } from "viem"
-import { Button } from "../../components/button"
-import { Input } from "../../components/input"
-import { Container } from "../../components/container"
+import { Button } from "../../components/Button"
+import { Input } from "../../components/Input"
+import { Container } from "../../components/Container"
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
 /*

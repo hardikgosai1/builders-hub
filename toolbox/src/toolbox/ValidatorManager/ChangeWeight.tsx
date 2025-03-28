@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Container } from "../../components/container"
-import { cn } from "../../../lib/utils"
-import { Input } from "../../components/input"
-import { Button } from "../../components/button"
+import { Container } from "../../components/Container"
+import { cn } from "../../lib/utils"
+import { Input } from "../../components/Input"
+import { Button } from "../../components/Button"
 
 export default function ChangeWeight() {
   const [nodeID, setNodeID] = useState("")

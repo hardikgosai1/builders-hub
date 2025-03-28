@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Button } from "../../components/button"
+import { Button } from "../../components/Button"
 import { CodeHighlighter } from "../../components/CodeHighlighter"
 
 const dockerInstallInstructions: Record<string, string> = {

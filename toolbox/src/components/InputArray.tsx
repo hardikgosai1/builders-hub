@@ -1,5 +1,5 @@
-import { Input, InputProps } from "./input";
-import { Button } from "./button";
+import { Input, InputProps } from "./Input";
+import { Button } from "./Button";
 import { X } from "lucide-react";
 
 type InputArrayProps = {

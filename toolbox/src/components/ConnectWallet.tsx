@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "../components/button"
+import { Button } from "./Button"
 import { useErrorBoundary } from "react-error-boundary"
 import { Copy } from "lucide-react"
 import { createCoreWalletClient } from "../coreViem"

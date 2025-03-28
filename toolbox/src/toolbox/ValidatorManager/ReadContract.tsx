@@ -6,10 +6,10 @@ import { useErrorBoundary } from "react-error-boundary"
 import type { AbiEvent } from "viem"
 import { useEffect, useState } from "react"
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
-import { Button } from "../../components/button"
-import { Input } from "../../components/input"
+import { Button } from "../../components/Button"
+import { Input } from "../../components/Input"
 import { RequireChainL1 } from "../../components/RequireChain"
-import { Container } from "../../components/container"
+import { Container } from "../../components/Container"
 import { ChevronDown, ChevronRight } from "lucide-react"
 
 type ViewData = {

@@ -2,12 +2,12 @@
 
 import { useWalletStore } from "../../stores/walletStore";
 import { useToolboxStore } from "../../stores/toolboxStore";
-import { Button } from "../../components/button";
-import { Input } from "../../components/input";
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
-import { ResultField } from "../../components/result-field";
-import { Container } from "../../components/container";
+import { ResultField } from "../../components/ResultField";
+import { Container } from "../../components/Container";
 
 export default function CreateSubnet() {
   const { showBoundary } = useErrorBoundary();

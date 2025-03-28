@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { AlertCircle, Search } from "lucide-react";
-import { Button } from "../../components/button";
-import { Container } from "../../components/container";
+import { Button } from "../../components/Button";
+import { Container } from "../../components/Container";
 import { Select } from "../../components/Select";
 import { CoreWalletChain } from "../../coreViem/overrides/addChain";
 import { useWalletStore } from "../../stores/walletStore";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useToolboxStore } from "../../stores/toolboxStore";
-import { Input } from "../../components/input";
-import { Button } from "../../components/button";
+import { Input } from "../../components/Input";
+import { Button } from "../../components/Button";
 import { Select } from "../../components/Select";
 import { useState, useEffect, useRef } from "react";
 import { createPublicClient, http, webSocket } from 'viem';
