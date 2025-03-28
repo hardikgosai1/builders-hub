@@ -1,5 +1,4 @@
-import { Input, InputProps, TextareaProps } from "./input";
-
+import { Input, InputProps } from "./input";
 import { Button } from "./button";
 import { X } from "lucide-react";
 
@@ -9,11 +8,9 @@ type InputArrayProps = {
     onChange: (values: string[]) => void,
     placeholder?: string,
     notesUnderInput?: string,
-    type?: string,
-    rows?: number,
     disabled?: boolean,
     disableAddRemove?: boolean,
-} & Omit<InputProps | TextareaProps, 'label' | 'value' | 'onChange' | 'notes'>;
+} & Omit<InputProps, 'label' | 'value' | 'onChange' | 'notes'>;
 
 export const InputArray = ({
     label,
@@ -73,7 +70,6 @@ export const InputArray = ({
                 <Button
                     onClick={handleAdd}
                     disabled={inputProps.disabled}
-                    type="default"
                     className="w-full mt-2"
                 >
                     Add Entry

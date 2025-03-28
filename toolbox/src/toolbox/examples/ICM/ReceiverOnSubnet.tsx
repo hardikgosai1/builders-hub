@@ -81,7 +81,7 @@ export default function DeployReceiver() {
                         ✅  TeleporterMessenger contract is detected at address <code>{TeleporterMessengerAddress.content}</code>.
                     </div>}
                     <Button
-                        type={icmReceiverAddress ? "default" : "primary"}
+                        variant={icmReceiverAddress ? "secondary" : "primary"}
                         onClick={handleDeploy}
                         loading={isDeploying}
                         disabled={isDeploying || avalancheFuji.id === walletChainId || !isTeleporterDeployed}

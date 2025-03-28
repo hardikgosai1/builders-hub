@@ -3,7 +3,7 @@
 import { useToolboxStore, useViemChainStore } from "../../../stores/toolboxStore";
 import { useWalletStore } from "../../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../../components/button";
 import { AlertTriangle } from "lucide-react";
 import { Success } from "../../../components/Success";
@@ -31,6 +31,20 @@ export default function DeployReceiver() {
     const chainIDHex = useMemo(() =>
         utils.bufferToHex(utils.base58check.decode(chainID))
         , [chainID]);
+
+    let receiverChainIDError: string | undefined;
+    useEffect(() => {
+        try {
+            if (chainID && utils.base58check.decode(chainID).length !== 32) {
+                receiverChainIDError = `Invalid chain ID length: ${utils.base58check.decode(chainID).length}`;
+            } else {
+                receiverChainIDError = undefined;
+            }
+        } catch (e) {
+            // Handle potential decoding errors
+            receiverChainIDError = "Invalid base58check format";
+        }
+    }, [chainID]);
 
     async function handleSendMessage() {
         if (!icmReceiverAddress) {
@@ -110,7 +124,7 @@ export default function DeployReceiver() {
                         label="Receiver Chain ID"
                         value={chainID}
                         onChange={setChainID}
-                        validator={chainID => utils.base58check.decode(chainID).length === 32 ? undefined : "Invalid chain ID length: " + utils.base58check.decode(chainID).length}
+                        error={receiverChainIDError}
                     />
                     <Input
                         label="Receiver Chain ID in Hex"
@@ -121,7 +135,7 @@ export default function DeployReceiver() {
                         label="Message"
                         value={message}
                         onChange={setMessage}
-                        validator={message => message.length > 0 ? undefined : "Message is required"}
+                        required
                     />
                     <Input
                         label="C-Chain Sender Address"

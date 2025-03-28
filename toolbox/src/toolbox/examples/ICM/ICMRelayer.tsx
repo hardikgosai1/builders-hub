@@ -2,8 +2,10 @@
 
 import { formatEther, parseEther } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { useToolboxStore, useViemChainStore, useWalletStore } from '../../../stores/toolboxStore';
-import { Input, Button } from '../../ui';
+import { useToolboxStore, useViemChainStore } from '../../../stores/toolboxStore';
+import { useWalletStore } from '../../../stores/walletStore';
+import { Input } from '../../../components/input';
+import { Button } from '../../../components/button';
 import { CodeHighlighter } from '../../../components/CodeHighlighter';
 import { useState, useEffect } from 'react';
 import { useErrorBoundary } from "react-error-boundary";

@@ -1,6 +1,6 @@
 "use client"
 
-import { Input } from "../ui"
+import { Input } from "./input"
 import { useState, useEffect } from "react"
 import { AlertTriangle, ExternalLink } from "lucide-react"
 

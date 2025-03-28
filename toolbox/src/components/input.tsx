@@ -1,6 +1,6 @@
 "use client"
 
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react"
+import type { InputHTMLAttributes } from "react"
 import { cn } from "../../lib/utils"
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
@@ -10,11 +10,6 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   helperText?: string
   button?: React.ReactNode
   error?: string | null
-}
-
-export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
-  label: string
-  onChange?: (newValue: string) => void
 }
 
 export function Input({ label, unit, className, onChange, id, helperText, button, error, ...props }: InputProps) {

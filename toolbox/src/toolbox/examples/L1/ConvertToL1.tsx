@@ -11,6 +11,7 @@ import { Container } from "../../../components/container";
 import { ResultField } from "../../../components/result-field";
 import { InputArray } from "../../../components/InputArray";
 import { CodeHighlighter } from "../../../components/CodeHighlighter";
+import { TextareaArray } from "../../../components/TextareaArray";
 export default function ConvertToL1() {
     const {
         subnetID,
@@ -96,11 +97,10 @@ export default function ConvertToL1() {
                 </div>
 
 
-                <InputArray
+                <TextareaArray
                     label="Proofs of possession of the initial validators"
                     values={nodePopJsons}
                     onChange={setNodePopJsons}
-                    type="textarea"
                     placeholder={'{"result":{"nodeID":"NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg","nodePOP":{"publicKey":"0x...","proofOfPossession":"0x..."}}}'}
                 />
                 <div className="text-sm">
