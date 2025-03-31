@@ -51,7 +51,7 @@ Page: [${issuePath}](https://build.avax.network${issuePath})
             <span>{duration}</span>
           </div>
           <div className="sm:ml-auto flex items-center gap-3">
-            <Link href={`https://github.com/ava-labs/builders-hub/blob/master/components/tools/${githubDir}`} target="_blank" rel="noopener noreferrer" >
+            <Link href={`https://github.com/ava-labs/builders-hub/tree/master/toolbox/src/${githubDir}`} target="_blank" rel="noopener noreferrer" >
               <Button variant="secondary" size="sm" className="rounded-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <GithubIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </Button>

@@ -10,7 +10,7 @@ export default function L1Launcher() {
                 title="L1 Launcher"
                 duration="30 min"
                 description="Launch your self-hosted Testnet or Mainnet L1 on your own infrastructure"
-                githubDir="L1Launcher"
+                githubDir="l1-launcher"
                 issuePath="/tools/l1-launcher"
                 issueTitle="Update L1 Launcher Tool Information"
             />
