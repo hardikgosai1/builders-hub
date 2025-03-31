@@ -22,4 +22,7 @@ Please read this guide before contributing or at least feed this into your Curso
 ## CoreViem
 An experimental library that unifies Core wallet transactions and RPC calls. Will eventually be released as an SDK.
 
+# Styles
+Toolbox uses `avalanche-docs-shim.css` to be as close as possible to the builder hub look and feel. Feel free to edit it if some styles do not match.
+
 Toolbox is an independent software from builder-hub and could not have any dependencies on builder-hub.
