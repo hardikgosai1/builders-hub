@@ -86,8 +86,8 @@ export const quickAndDirtyGenesisBuilder = (ownerAddress: `${string}`, chainID: 
 }
 
 import { useEffect, useState } from "react";
-import { useToolboxStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useToolboxStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../../components/Container";
 import { Input } from "../../components/Input";

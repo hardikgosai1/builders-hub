@@ -8,7 +8,7 @@ import { useErrorBoundary } from "react-error-boundary"
 import { Copy } from "lucide-react"
 import { createCoreWalletClient } from "../coreViem"
 import { networkIDs } from "@avalabs/avalanchejs"
-import { useWalletStore } from "../stores/walletStore"
+import { useWalletStore } from "../lib/walletStore"
 
 export const ConnectWallet = ({ children, required }: { children: React.ReactNode; required: boolean }) => {
   const {

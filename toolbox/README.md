@@ -8,7 +8,7 @@ Please read this guide before contributing or at least feed this into your Curso
 - Keep components minimal to reduce dependency complexity
 
 ## Stores
-- Create new stores when state shouldn't be shared with toolbox
+- Create a store per component
 - State persists in localStorage except when it doesn't make sense to do so like in the Wallet store
 - Use derived stores to simplify dependencies (see `useViemChainStore` example)
 

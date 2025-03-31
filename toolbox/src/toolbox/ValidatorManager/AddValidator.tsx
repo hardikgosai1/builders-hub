@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import { createWalletClient, custom, createPublicClient, fromBytes, bytesToHex, hexToBytes } from "viem"
 import { pvm, utils, Context, networkIDs } from "@avalabs/avalanchejs"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useToolboxStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useToolboxStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";

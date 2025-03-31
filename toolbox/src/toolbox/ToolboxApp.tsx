@@ -1,6 +1,6 @@
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
-import { useToolboxStore } from '../stores/toolboxStore';
+import { useToolboxStore } from './toolboxStore';
 import { RefreshCw } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "../components/GithubLink";

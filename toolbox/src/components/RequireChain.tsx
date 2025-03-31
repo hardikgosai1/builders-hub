@@ -1,7 +1,7 @@
 import L1Form from "../toolbox/Wallet/L1Form";
 import { useErrorBoundary } from "react-error-boundary";
-import { useToolboxStore, useViemChainStore } from "../stores/toolboxStore";
-import { useWalletStore } from "../stores/walletStore";
+import { useToolboxStore, useViemChainStore } from "../toolbox/toolboxStore";
+import { useWalletStore } from "../lib/walletStore";
 
 
 export function RequireChainL1({ children }: { children: React.ReactNode }) {

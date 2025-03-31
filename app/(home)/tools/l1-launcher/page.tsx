@@ -1,5 +1,5 @@
 'use client'
-import L1Launcher from "@/components/tools/L1Launcher";
+import L1Launcher from "../../../../toolbox/src/l1-launcher/index";
 import dynamic from 'next/dynamic';
 
 

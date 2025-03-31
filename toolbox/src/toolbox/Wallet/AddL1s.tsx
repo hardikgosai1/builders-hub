@@ -7,7 +7,7 @@ import { Button } from "../../components/Button";
 import { Container } from "../../components/Container";
 import { Select } from "../../components/Select";
 import { CoreWalletChain } from "../../coreViem/overrides/addChain";
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 import { ChainInfo } from "@avalabs/avacloud-sdk/models/components";
 

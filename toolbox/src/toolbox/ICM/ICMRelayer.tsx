@@ -2,8 +2,8 @@
 
 import { formatEther, parseEther } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { useToolboxStore, useViemChainStore } from '../../stores/toolboxStore';
-import { useWalletStore } from '../../stores/walletStore';
+import { useToolboxStore, useViemChainStore } from '../toolboxStore';
+import { useWalletStore } from '../../lib/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
