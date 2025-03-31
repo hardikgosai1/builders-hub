@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Steps from "./components/Steps";
 import ToolHeader from "./components/ToolHeader";
 import { stepGroups, stepList } from "./stepList";
+import { useL1LauncherStore } from "./L1LauncherStore";
+import { Button } from "../components/Button";
 
 
 export default function L1Launcher() {
-    const [currentStep, setCurrentStep] = useState<keyof typeof stepList>("genesis");
+    const { stepsCurrentStep, setStepsCurrentStep, reset } = useL1LauncherStore();
+    const [maxStep, setMaxStep] = useState<keyof typeof stepList>(Object.keys(stepList)[0]);
 
-    const onReset = () => {
-        alert("TODO: Implement reset");
-    }
+    //This guards user from advancing beyond the last step
+    useEffect(() => {
+        const newMaxStep = "chain-parameters";
+        setMaxStep(newMaxStep);
+    }, []);
 
     return <>
         <div className="container mx-auto max-w-6xl p-8 ">
@@ -25,23 +30,27 @@ export default function L1Launcher() {
             />
             <div className="flex flex-col lg:flex-row">
                 <div className="w-full lg:w-80 mb-8">
-                    <Steps stepGroups={stepGroups} stepList={stepList} currentStep={currentStep} maxAdvancedStep={"add-to-wallet"} advanceTo={(step) => { setCurrentStep(step) }} onReset={() => { setCurrentStep("genesis") }} />
+                    <Steps stepGroups={stepGroups} stepList={stepList} currentStep={stepsCurrentStep} maxAdvancedStep={maxStep} advanceTo={(step) => { setStepsCurrentStep(step) }} />
                     {/* Reset button */}
                     <div className="mt-8 -ml-4 w-full">
-                        <button
-                            onClick={onReset}
-                            className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-950 border border-red-100 dark:border-red-900/50"
+                        <Button
+                            onClick={() => window.confirm("Are you sure you want to start over? All progress will be lost.") && reset()}
+                            variant="light-danger"
+                            icon={
+                                <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                            }
                         >
-                            <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
                             Start Over
-                        </button>
+                        </Button>
                     </div>
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="h-full">
-                        {stepList[currentStep].component}
+                        <Suspense fallback={<div>Loading...</div>}>
+                            {stepList[stepsCurrentStep].component}
+                        </Suspense>
                     </div>
                 </div>
             </div>

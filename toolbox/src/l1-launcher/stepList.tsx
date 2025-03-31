@@ -1,5 +1,7 @@
 import { BookOpen, Terminal, Flag, Settings, Server } from 'lucide-react'
 import { StepGroupListType, StepListType } from './components/Steps'
+import { lazy } from 'react'
+
 
 export const stepGroups: StepGroupListType = {
     "welcome": {
@@ -24,10 +26,12 @@ export const stepGroups: StepGroupListType = {
     },
 }
 
+const LazyWelcome = lazy(() => import('./01_Welcome/Welcome'))
+
 export const stepList: StepListType = {
     "welcome": {
         title: "Welcome",
-        component: <div>Welcome</div>,
+        component: <LazyWelcome />,
         group: "welcome",
     },
     "chain-parameters": {
@@ -106,3 +110,4 @@ export const stepList: StepListType = {
         group: "whats-next",
     }
 }
+

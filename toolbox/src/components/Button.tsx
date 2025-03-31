@@ -11,7 +11,7 @@ interface ButtonProps {
   loadingText?: string
   icon?: ReactNode
   disabled?: boolean
-  variant?: "primary" | "secondary" | "outline"
+  variant?: "primary" | "secondary" | "outline" | "danger" | "outline-danger" | "light-danger"
   size?: "default" | "sm" | "lg"
   className?: string
 }
@@ -48,6 +48,10 @@ export function Button({
     variantClasses = "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600";
   } else if (variant === "outline") {
     variantClasses = "border-2 border-zinc-300 bg-transparent text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-500";
+  } else if (variant === "danger") {
+    variantClasses = "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600";
+  } else if (variant === "light-danger") {
+    variantClasses = "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 dark:border-red-900/50";
   }
 
   // State classes (disabled)
@@ -75,8 +79,8 @@ export function Button({
         </>
       ) : (
         <>
-          {children}
           {icon && icon}
+          {children}
         </>
       )}
     </button>

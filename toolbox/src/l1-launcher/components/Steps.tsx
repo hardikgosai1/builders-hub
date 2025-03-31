@@ -7,8 +7,6 @@ type StepsProps = {
     currentStep: keyof StepListType;
     maxAdvancedStep: keyof StepListType;
     advanceTo: (step: keyof StepListType) => void;
-
-    onReset: () => void;
 };
 
 export interface StepWizardState {
