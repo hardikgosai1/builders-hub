@@ -1,17 +1,19 @@
-import { Label } from "@radix-ui/react-label";
 import { useL1LauncherStore } from "../L1LauncherStore";
-import { RadioGroup, RadioGroupItem } from "../components/RadioGroup";
+import { RadioGroup } from "../../components/RadioGroup";
 import { Input } from "../../components/Input";
-import TokenAllocationList from "../components/TokenAllocationList";
+import TokenAllocationList from "../../components/genesis/TokenAllocationList";
 import { useWalletStore } from "../../lib/walletStore";
 import { useEffect } from "react";
 import { useState } from "react";
+import NextPrev from "../components/NextPrev";
+import AllowlistPrecompileConfigurator from "../../components/genesis/AllowlistPrecompileConfigurator";
 
 export default function Tokenomics() {
-    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations } = useL1LauncherStore();
+    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations, genesisNativeMinterAllowlistConfig, setGenesisNativeMinterAllowlistConfig } = useL1LauncherStore();
     const { walletEVMAddress } = useWalletStore()
 
     const [initComplete, setInitComplete] = useState(false)
+    const [nativeTokenType, setNativeTokenType] = useState("own-token")
 
     useEffect(() => {
         if (initComplete) return
@@ -35,27 +37,16 @@ export default function Tokenomics() {
                 <p className="text-gray-600">Choose what kind of token should be used as the native token of the L1 which is used to pay for transaction fees.</p>
 
                 <RadioGroup
-                    defaultValue={"own-token"}
-                    onValueChange={() => { }}
+                    value={nativeTokenType}
+                    onChange={setNativeTokenType}
                     className="space-y-2"
-                >
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="own-token" id={`own-token`} />
-                        <Label htmlFor={`validator-option-poa`}>It's own native token</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="c-chain-usdc" id={`c-chain-usdc`} disabled={true} />
-                        <Label htmlFor={`validator-option-pos`}>USDC (Coming soon)</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="c-chain-avax" id={`c-chain-avax`} disabled={true} />
-                        <Label htmlFor={`validator-option-pos`}>AVAX (Coming soon)</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="another-token" id={`another-token`} disabled={true} />
-                        <Label htmlFor={`validator-option-pos`}>Another token (specify blockchain id and token address) (Coming soon)</Label>
-                    </div>
-                </RadioGroup>
+                    items={[
+                        { value: "own-token", label: "It's own native token" },
+                        { value: "c-chain-usdc", label: "USDC (Coming soon)", isDisabled: true },
+                        { value: "c-chain-avax", label: "AVAX (Coming soon)", isDisabled: true },
+                        { value: "another-token", label: "Another token (specify blockchain id and token address) (Coming soon)", isDisabled: true }
+                    ]}
+                />
             </div>
 
             <div className='space-y-4'>
@@ -72,20 +63,18 @@ export default function Tokenomics() {
                 />
             </div>
 
-            TODO: AllowlistPrecompileConfigurator
 
-            {/* <AllowlistPrecompileConfigurator
+            <AllowlistPrecompileConfigurator
                 title="Native Minter Allowlist"
                 description="This precompile restricts which addresses may mint new native Tokens on this blockchain."
                 precompileAction="mint new native tokens"
-                config={nativeMinterAllowlistConfig}
-                onUpdateConfig={setNativeMinterAllowlistConfig}
+                config={genesisNativeMinterAllowlistConfig}
+                onUpdateConfig={setGenesisNativeMinterAllowlistConfig}
                 radioOptionFalseLabel="I want to have a fixed supply of tokens on my blockchain."
                 radioOptionTrueLabel="I want to be able to mint additional tokens (recommended for production)."
-            /> */}
+            />
 
-            {/* <NextPrev nextEnabled={evmTokenSymbol && tokenAllocations.length > 0 && isValidAllowlistPrecompileConfig(nativeMinterAllowlistConfig)} /> */}
-            TODO: NextPrev
+            <NextPrev nextEnabled={Boolean(evmTokenSymbol) && Boolean(tokenAllocations.length > 0) /*&& isValidAllowlistPrecompileConfig(nativeMinterAllowlistConfig)*/} />
         </div>
     );
 }

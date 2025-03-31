@@ -1,15 +1,25 @@
-import { useEffect, useRef } from 'react';
-import { Label } from '@radix-ui/react-label';
+import { useEffect, useRef, useState } from 'react';
 import { useL1LauncherStore } from '../L1LauncherStore';
 import NextPrev from "../components/NextPrev";
 import Link from 'next/link';
-import { RadioGroup, RadioGroupItem } from "../components/RadioGroup";
-import { isValidL1Name } from '../lib/validation';
+import { RadioGroup } from "../../components/RadioGroup";
 import { Input } from '../../components/Input';
+
+
+function isValidL1Name(name: string): boolean {
+    if (name.length < 1) return false;
+    if (name.length > 100) return false; // Made up number
+    return name.split('').every(char => {
+        const code = char.charCodeAt(0);
+        return code <= 127 && // MaxASCII check
+            (char.match(/[a-zA-Z0-9 ]/) !== null); // only letters, numbers, spaces
+    });
+}
 
 export default function ChainParameters() {
     const { l1Name, setL1Name, evmChainId, setEvmChainId } = useL1LauncherStore();
     const initializedRef = useRef(false);
+    const [network, setNetwork] = useState("fuji-testnet");
 
     //Set the L1 name if it's empty
     useEffect(() => {
@@ -34,26 +44,20 @@ export default function ChainParameters() {
             </div>
 
             <div>
-
                 <div>
                     <h3 className="mb-4 font-medium">Network</h3>
                     <p className="mb-4 text-gray-600">Do you want to deploy your L1 on testnet or mainnet?</p>
                 </div>
 
                 <RadioGroup
-                    defaultValue={"fuji-testnet"}
-                    onValueChange={() => { }}
+                    value={network}
+                    onChange={setNetwork}
                     className="space-y-2"
-                >
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="fuji-testnet" id={`network-option-fuji-testnet`} />
-                        <Label htmlFor={`network-option-fuji-testnet`}>Fuji Testnet</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="mainnet" id={`network-option-mainnet`} disabled={true} />
-                        <Label htmlFor={`network-option-true`}>Mainnet (coming soon)</Label>
-                    </div>
-                </RadioGroup>`
+                    items={[
+                        { value: "fuji-testnet", label: "Fuji Testnet" },
+                        { value: "mainnet", label: "Mainnet (coming soon)", isDisabled: true }
+                    ]}
+                />
             </div>
 
             <NextPrev nextEnabled={isValidL1Name(l1Name) && evmChainId > 0} />

@@ -1,5 +1,5 @@
 import { BookOpen, Terminal, Flag, Settings, Server } from 'lucide-react'
-import { StepGroupListType, StepListType } from './components/Steps'
+import { StepGroupListType, StepListType } from '../components/Steps'
 import { lazy } from 'react'
 
 

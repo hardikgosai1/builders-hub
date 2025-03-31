@@ -1,4 +1,4 @@
-import { Note } from "../components/Note";
+import { Note } from "../../components/Note";
 import NextPrev from "../components/NextPrev";
 
 export default function Welcome() {

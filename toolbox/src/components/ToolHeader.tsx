@@ -1,6 +1,6 @@
 import React from "react"
 import { AlertCircle, Clock, GithubIcon, MessageSquare } from "lucide-react"
-import { Button } from "../../components/Button"
+import { Button } from "./Button"
 
 interface ToolHeaderProps {
   title: string

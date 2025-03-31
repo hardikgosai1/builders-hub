@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import Steps from "./components/Steps";
-import ToolHeader from "./components/ToolHeader";
+import Steps from "../components/Steps";
+import ToolHeader from "../components/ToolHeader";
 import { stepGroups, stepList } from "./stepList";
 import { useL1LauncherStore } from "./L1LauncherStore";
 import { Button } from "../components/Button";
