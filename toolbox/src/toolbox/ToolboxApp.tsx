@@ -3,8 +3,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useToolboxStore } from '../toolbox/toolboxStore';
 import { RefreshCw } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
-import { GithubLink } from "../components/GithubLink";
-import { ConnectWallet } from "../components/ConnectWallet";
+import { GithubLink } from "./components/GithubLink";
+import { ConnectWallet } from "./components/ConnectWallet";
 
 type ComponentType = {
     id: string;

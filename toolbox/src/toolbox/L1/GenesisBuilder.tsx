@@ -88,9 +88,9 @@ export const quickAndDirtyGenesisBuilder = (ownerAddress: `${string}`, chainID: 
 import { useEffect, useState } from "react";
 import { useToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { CodeHighlighter } from "../../components/CodeHighlighter";
-import { Container } from "../../components/Container";
-import { Input } from "../../components/Input";
+import { CodeHighlighter } from "../components/CodeHighlighter";
+import { Container } from "../components/Container";
+import { Input } from "../components/Input";
 
 export default function GenesisBuilder() {
     const {

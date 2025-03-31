@@ -1,6 +1,6 @@
 "use client";
 
-import ToolHeader from "../components/ToolHeader";
+import ToolHeader from "./components/ToolHeader";
 
 
 export default function L1Launcher() {

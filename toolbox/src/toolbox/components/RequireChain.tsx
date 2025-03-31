@@ -1,6 +1,6 @@
-import { useWalletStore } from "../stores/walletStore";
+import { useWalletStore } from "../../stores/walletStore";
 import { avalancheFuji } from "viem/chains";
-import { Button } from "./Button";
+import { Button } from "../../components/Button";
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 

@@ -1,15 +1,15 @@
 "use client";
 
 import { useToolboxStore } from "../toolboxStore";
-import { Input } from "../../components/Input";
+import { Input } from "../components/Input";
 import { Button } from "../../components/Button";
-import { Select } from "../../components/Select";
+import { Select } from "../components/Select";
 import { useState, useEffect, useRef } from "react";
 import { createPublicClient, http, webSocket } from 'viem';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { BlockWatcher, BlockInfo } from "./BlockWatcher";
 import { ChainInfo } from "./chainInfo";
-import { RPCURLInput } from "../../components/RPCURLInput";
+import { RPCURLInput } from "../components/RPCURLInput";
 // Data structure for bucketed metrics
 interface BucketedData {
     transactions: number;

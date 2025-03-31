@@ -5,10 +5,10 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
-import { ResultField } from "../../components/ResultField";
+import { ResultField } from "../components/ResultField";
 import NativeTokenStakingManagerABI from "../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
-import { Container } from "../../components/Container";
+import { Container } from "../components/Container";
 import { keccak256 } from "viem";
 function calculateLibraryHash(libraryPath: string) {
     const hash = keccak256(

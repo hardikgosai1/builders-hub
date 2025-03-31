@@ -4,10 +4,10 @@ import { initialState, useToolboxStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { Container } from "../../components/Container";
-import { GenesisInput } from "../../components/GenesisInput";
-import { ResultField } from "../../components/ResultField";
+import { Input } from "../components/Input";
+import { Container } from "../components/Container";
+import { GenesisInput } from "../components/GenesisInput";
+import { ResultField } from "../components/ResultField";
 import { quickAndDirtyGenesisBuilder } from "./GenesisBuilder";
 import { useWalletStore } from "../../stores/walletStore";
 

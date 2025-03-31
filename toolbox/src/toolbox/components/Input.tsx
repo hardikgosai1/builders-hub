@@ -1,7 +1,7 @@
 "use client"
 
 import type { InputHTMLAttributes } from "react"
-import { cn } from "../lib/utils"
+import { cn } from "../../lib/utils"
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label: string

@@ -1,7 +1,6 @@
 import React from "react"
-import Link from "next/link"
 import { AlertCircle, Clock, GithubIcon, MessageSquare } from "lucide-react"
-import { Button } from "./Button"
+import { Button } from "../../components/Button"
 
 interface ToolHeaderProps {
   title: string
@@ -51,17 +50,17 @@ Page: [${issuePath}](https://build.avax.network${issuePath})
             <span>{duration}</span>
           </div>
           <div className="sm:ml-auto flex items-center gap-3">
-            <Link href={`https://github.com/ava-labs/builders-hub/tree/master/toolbox/src/${githubDir}`} target="_blank" rel="noopener noreferrer" >
+            <a href={`https://github.com/ava-labs/builders-hub/tree/master/toolbox/src/${githubDir}`} target="_blank" rel="noopener noreferrer" >
               <Button variant="secondary" size="sm" className="rounded-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <GithubIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </Button>
-            </Link>
-            <Link href="https://t.me/+4kKgMmWAknxjY2Ey" target="_blank" rel="noopener noreferrer" >
+            </a>
+            <a href="https://t.me/+4kKgMmWAknxjY2Ey" target="_blank" rel="noopener noreferrer" >
               <Button variant="secondary" size="sm" className="rounded-full px-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
                 Give&nbsp;Feedback
               </Button>
-            </Link>
+            </a>
             {issuePath && issueTitle && (
               <Button
                 variant="secondary"

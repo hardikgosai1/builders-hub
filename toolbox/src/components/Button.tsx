@@ -27,23 +27,46 @@ export function Button({
   size = "default",
   className,
 }: ButtonProps) {
+  // Base classes shared by all buttons
+  const baseClasses = [
+    "w-full rounded-xl text-sm font-medium shadow-sm",
+    "transition-colors duration-300",
+    "flex items-center justify-center gap-2",
+  ];
+
+  // Size-specific classes
+  let sizeClasses = "";
+  if (size === "default") sizeClasses = "px-4 py-3";
+  else if (size === "sm") sizeClasses = "px-3 py-2 text-xs rounded-sm";
+  else if (size === "lg") sizeClasses = "px-6 py-4 text-base";
+
+  // Variant-specific classes
+  let variantClasses = "";
+  if (variant === "primary") {
+    variantClasses = "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600";
+  } else if (variant === "secondary") {
+    variantClasses = "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600";
+  } else if (variant === "outline") {
+    variantClasses = "border-2 border-zinc-300 bg-transparent text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-500";
+  }
+
+  // State classes (disabled)
+  const stateClasses = "disabled:bg-zinc-200 disabled:text-zinc-500 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-400 disabled:cursor-not-allowed";
+
+  // Combine all classes
+  const buttonClasses = cn(
+    ...baseClasses,
+    sizeClasses,
+    variantClasses,
+    stateClasses,
+    className
+  );
+
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={cn(
-        "w-full rounded-xl text-sm font-medium shadow-sm",
-        "transition-colors duration-300",
-        "flex items-center justify-center gap-2",
-        variant === "primary" && "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
-        variant === "secondary" && "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600",
-        variant === "outline" && "border-2 border-zinc-300 bg-transparent text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-500",
-        "disabled:bg-zinc-200 disabled:text-zinc-500 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-400 disabled:cursor-not-allowed",
-        size === "default" && "px-4 py-3",
-        size === "sm" && "px-3 py-2 text-xs rounded-sm",
-        size === "lg" && "px-6 py-4 text-base",
-        className,
-      )}
+      className={buttonClasses}
     >
       {loading ? (
         <>

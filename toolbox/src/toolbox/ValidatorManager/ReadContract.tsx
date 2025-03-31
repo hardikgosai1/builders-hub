@@ -7,9 +7,9 @@ import type { AbiEvent } from "viem"
 import { useEffect, useState } from "react"
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 import { Button } from "../../components/Button"
-import { Input } from "../../components/Input"
+import { Input } from "../components/Input"
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 import { ChevronDown, ChevronRight } from "lucide-react"
 
 type ViewData = {

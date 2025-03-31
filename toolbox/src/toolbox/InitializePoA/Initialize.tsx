@@ -5,13 +5,13 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { ResultField } from "../../components/ResultField";
+import { Input } from "../components/Input";
+import { ResultField } from "../components/ResultField";
 import { AbiEvent } from 'viem';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
-import { Container } from "../../components/Container";
+import { Container } from "../components/Container";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
     const { subnetID, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();

@@ -6,14 +6,14 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { AlertTriangle } from "lucide-react";
-import { Success } from "../../components/Success";
+import { Success } from "../components/Success";
 import { createPublicClient, http } from 'viem';
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import SenderOnCChainABI from "../../../contracts/example-contracts/compiled/SenderOnCChain.json";
 import { utils } from "@avalabs/avalanchejs";
-import { Input } from "../../components/Input";
+import { Input } from "../components/Input";
 import { avalancheFuji } from "viem/chains";
-import { RequireChainFuji } from "../../components/RequireChain";
+import { RequireChainFuji } from "../components/RequireChain";
 
 const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
 

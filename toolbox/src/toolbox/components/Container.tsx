@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { cn } from "../lib/utils"
+import { cn } from "../../lib/utils"
 
 type ColorTheme = "red" | "blue" | "green" | "purple" | "orange" | "cyan" | "amber" | "emerald" | "indigo" | "pink"
 

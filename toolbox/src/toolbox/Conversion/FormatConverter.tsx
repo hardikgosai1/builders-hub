@@ -4,8 +4,8 @@ import { useState, useCallback } from "react";
 import { utils } from "@avalabs/avalanchejs";
 import { Copy, Check } from "lucide-react";
 import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { Container } from "../../components/Container";
+import { Input } from "../components/Input";
+import { Container } from "../components/Container";
 
 // Utility functions for conversions
 const hexToBytes = (hex: string): Uint8Array => {

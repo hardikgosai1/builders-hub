@@ -1,5 +1,5 @@
 import { Textarea } from "./Textarea";
-import { Button } from "./Button";
+import { Button } from "../../components/Button";
 import { X } from "lucide-react";
 
 type TextareaArrayProps = {

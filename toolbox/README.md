@@ -4,10 +4,7 @@ Please read this guide before contributing or at least feed this into your Curso
 
 ## UI Components
 - Reusable components are in `./src/components`
-- Only create shared components when used in multiple places
-- Keep components minimal to reduce dependency complexity
-- Put into shared components only the components that do not depend on anything specific to the tool. For example, RequireChainFuji is abstract in relation to state, therefore shared, but RequireChainToolboxL1 requires L1 form to be supplied and some state from a store, so it has to be toolbox-specific
-- It's okay to copy paste and duplicate code if it makes things simpler
+- Put into shared components only the components that are already used in 2 or more tools.
 
 ## Stores
 - Create new stores when state shouldn't be shared with toolbox

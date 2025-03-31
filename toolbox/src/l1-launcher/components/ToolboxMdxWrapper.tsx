@@ -1,8 +1,8 @@
 "use client";
 
 import { ErrorBoundary } from "react-error-boundary";
-import { Button } from "./Button";
-import { ConnectWallet } from "./ConnectWallet";
+import { Button } from "../../components/Button";
+import { ConnectWallet } from "../../toolbox/components/ConnectWallet";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error, resetErrorBoundary: () => void }) => {
     return (

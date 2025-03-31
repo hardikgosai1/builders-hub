@@ -5,7 +5,7 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
-import { Success } from "../../components/Success";
+import { Success } from "../components/Success";
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import { avalancheFuji } from "viem/chains";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';

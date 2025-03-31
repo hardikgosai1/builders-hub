@@ -5,10 +5,10 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
-import { ResultField } from "../../components/ResultField";
+import { ResultField } from "../components/ResultField";
 import ExampleRewardCalculatorABI from "../../../contracts/icm-contracts/compiled/ExampleRewardCalculator.json";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
-import { Container } from "../../components/Container";
+import { Container } from "../components/Container";
 
 export default function DeployRewardCalculator() {
     const { showBoundary } = useErrorBoundary();
