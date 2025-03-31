@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
@@ -10,7 +10,7 @@ import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/Valid
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
-import { RequireChainL1 } from '../../components/RequireChain';
+import { RequireChainToolboxL1 } from '../components/RequireChainToolboxL1';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { Container } from '../../components/Container';
 import { ResultField } from '../../components/ResultField';
@@ -127,7 +127,7 @@ export default function InitValidatorSet() {
     };
 
     return (
-        <RequireChainL1>
+        <RequireChainToolboxL1>
             <Container
                 title="Initialize Validator Set"
                 description="This will initialize the ValidatorManager contract."
@@ -191,7 +191,7 @@ export default function InitValidatorSet() {
                     </Button>
                 </div>
             </Container>
-        </RequireChainL1>
+        </RequireChainToolboxL1>
     );
 }
 

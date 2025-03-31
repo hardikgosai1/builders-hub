@@ -6,11 +6,18 @@ Please read this guide before contributing or at least feed this into your Curso
 - Reusable components are in `./src/components`
 - Only create shared components when used in multiple places
 - Keep components minimal to reduce dependency complexity
+- Put into shared components only the components that do not depend on anything specific to the tool. For example, RequireChainFuji is abstract in relation to state, therefore shared, but RequireChainToolboxL1 requires L1 form to be supplied and some state from a store, so it has to be toolbox-specific
+- It's okay to copy paste and duplicate code if it makes things simpler
 
 ## Stores
 - Create new stores when state shouldn't be shared with toolbox
 - State persists in localStorage except when it doesn't make sense to do so like in the Wallet store
 - Use derived stores to simplify dependencies (see `useViemChainStore` example)
+
+## Errors
+- All async errors should be caught with try/catch blocks
+- Use the `showBoundary` function from `useErrorBoundary` to display errors that should block the whole page
+- For errors that shouldn't block the page, handle them locally with state management and UI feedback
 
 ## CoreViem
 An experimental library that unifies Core wallet transactions and RPC calls. Will eventually be released as an SDK.

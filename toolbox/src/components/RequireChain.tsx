@@ -1,34 +1,8 @@
-import L1Form from "../toolbox/Wallet/L1Form";
-import { useErrorBoundary } from "react-error-boundary";
-import { useToolboxStore, useViemChainStore } from "../stores/toolboxStore";
 import { useWalletStore } from "../stores/walletStore";
-
-
-export function RequireChainL1({ children }: { children: React.ReactNode }) {
-    const { walletChainId } = useWalletStore();
-    const { evmChainId } = useToolboxStore();
-    const viemChain = useViemChainStore();
-
-    if (walletChainId === evmChainId && !!viemChain) {
-        return children;
-    }
-
-    return <>
-        <div className="space-y-4">
-            <div >
-                Before you continue, please switch Core wallet to your L1 using form below:
-            </div>
-            <L1Form />
-            <div className="opacity-50 pointer-events-none">
-                {children}
-            </div>
-        </div>
-    </>
-}
-
 import { avalancheFuji } from "viem/chains";
 import { Button } from "./Button";
 import { useState } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 
 export function RequireChainFuji({ children }: { children: React.ReactNode }) {
     const { walletChainId, coreWalletClient } = useWalletStore();

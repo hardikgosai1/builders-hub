@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import { ResultField } from "../../components/ResultField";
 import { AbiEvent } from 'viem';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
-import { RequireChainL1 } from "../../components/RequireChain";
+import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../../components/Container";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
@@ -109,7 +109,7 @@ export default function Initialize() {
     }
 
     return (
-        <RequireChainL1>
+        <RequireChainToolboxL1>
             <Container
                 title="Initialize Validator Manager"
                 description="This will initialize the ValidatorManager contract."
@@ -184,7 +184,7 @@ export default function Initialize() {
                     )}
                 </div>
             </Container>
-        </RequireChainL1>
+        </RequireChainToolboxL1>
     );
 };
 

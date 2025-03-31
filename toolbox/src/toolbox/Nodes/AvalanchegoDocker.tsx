@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore } from "../../stores/toolboxStore";
+import { useToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { Select } from "../../components/Select";
 import { useState, useEffect } from "react";

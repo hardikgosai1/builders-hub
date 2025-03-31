@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { createPublicClient, http } from 'viem';
 import { useErrorBoundary } from "react-error-boundary";
-import { useToolboxStore } from "../../stores/toolboxStore";
+import { useToolboxStore } from "../toolboxStore";
 import { pvm } from '@avalabs/avalanchejs';
 import { RPCURLInput } from "../../components/RPCURLInput";
 import { useWalletStore } from "../../stores/walletStore";

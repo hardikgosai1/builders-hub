@@ -1,6 +1,6 @@
 "use client";
 
-import { initialState, useToolboxStore } from "../../stores/toolboxStore";
+import { initialState, useToolboxStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";

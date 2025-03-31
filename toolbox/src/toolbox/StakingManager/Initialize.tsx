@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { Input } from "../../components/Input";
 import { ResultField } from "../../components/ResultField";
 import { AbiEvent, Log, parseEther } from 'viem';
 import NativeTokenStakingManagerABI from "../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
-import { RequireChainL1 } from "../../components/RequireChain";
+import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../../components/Container";
 
 export default function Initialize() {
@@ -148,7 +148,7 @@ export default function Initialize() {
     }
 
     return (
-        <RequireChainL1>
+        <RequireChainToolboxL1>
             <Container
                 title="Initialize Staking Manager"
                 description="This will initialize the NativeTokenStakingManager contract."
@@ -253,7 +253,7 @@ export default function Initialize() {
                     )}
                 </div>
             </Container>
-        </RequireChainL1>
+        </RequireChainToolboxL1>
     );
 };
 
