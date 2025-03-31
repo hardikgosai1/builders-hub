@@ -4,7 +4,7 @@ import { formatEther, parseEther } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { useToolboxStore, useViemChainStore } from '../toolboxStore';
 import { useWalletStore } from '../../stores/walletStore';
-import { Input } from '../components/Input';
+import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { CodeHighlighter } from '../components/CodeHighlighter';
 import { useState, useEffect } from 'react';

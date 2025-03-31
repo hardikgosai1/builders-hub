@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { Suspense } from "react";
 import Steps from "./components/Steps";
 import ToolHeader from "./components/ToolHeader";
 import { stepGroups, stepList } from "./stepList";
@@ -9,14 +9,7 @@ import { Button } from "../components/Button";
 
 
 export default function L1Launcher() {
-    const { stepsCurrentStep, setStepsCurrentStep, reset } = useL1LauncherStore();
-    const [maxStep, setMaxStep] = useState<keyof typeof stepList>(Object.keys(stepList)[0]);
-
-    //This guards user from advancing beyond the last step
-    useEffect(() => {
-        const newMaxStep = "chain-parameters";
-        setMaxStep(newMaxStep);
-    }, []);
+    const { stepsCurrentStep, setStepsCurrentStep, stepsMaxStep, reset } = useL1LauncherStore();
 
     return <>
         <div className="container mx-auto max-w-6xl p-8 ">
@@ -30,7 +23,7 @@ export default function L1Launcher() {
             />
             <div className="flex flex-col lg:flex-row">
                 <div className="w-full lg:w-80 mb-8">
-                    <Steps stepGroups={stepGroups} stepList={stepList} currentStep={stepsCurrentStep} maxAdvancedStep={maxStep} advanceTo={(step) => { setStepsCurrentStep(step) }} />
+                    <Steps stepGroups={stepGroups} stepList={stepList} currentStep={stepsCurrentStep} maxAdvancedStep={stepsMaxStep} advanceTo={(step) => { setStepsCurrentStep(step) }} />
                     {/* Reset button */}
                     <div className="mt-8 -ml-4 w-full">
                         <Button

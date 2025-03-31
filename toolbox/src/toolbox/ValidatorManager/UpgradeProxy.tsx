@@ -5,7 +5,7 @@ import { useViemChainStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { Success } from "../components/Success";
 import ProxyAdminABI from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";

@@ -9,7 +9,7 @@ import { ResultField } from "../components/ResultField";
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../components/Container";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { TransactionReceipt } from "viem";
 export default function TransferOwnership() {
     const { showBoundary } = useErrorBoundary();

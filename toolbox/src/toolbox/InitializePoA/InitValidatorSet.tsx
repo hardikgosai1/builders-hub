@@ -8,7 +8,7 @@ import { packWarpIntoAccessList } from './packWarp';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 
 import { Button } from "../../components/Button";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
 import { RequireChainToolboxL1 } from '../components/RequireChainToolboxL1';
 import { CodeHighlighter } from '../components/CodeHighlighter';

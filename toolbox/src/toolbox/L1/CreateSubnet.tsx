@@ -3,7 +3,7 @@
 import { useWalletStore } from "../../stores/walletStore";
 import { useToolboxStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { ResultField } from "../components/ResultField";

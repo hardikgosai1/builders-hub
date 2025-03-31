@@ -1,4 +1,4 @@
-import { Input, InputProps } from "./Input";
+import { Input, InputProps } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { X } from "lucide-react";
 

@@ -18,6 +18,6 @@ export default function Welcome() {
             Please note that this tool is in Beta and you may experience errors.
         </Note>
 
-        <NextPrev />
+        <NextPrev nextEnabled={true} />
     </>;
 }

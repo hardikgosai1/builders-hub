@@ -1,0 +1,62 @@
+import { useEffect, useRef } from 'react';
+import { Label } from '@radix-ui/react-label';
+import { useL1LauncherStore } from '../L1LauncherStore';
+import NextPrev from "../components/NextPrev";
+import Link from 'next/link';
+import { RadioGroup, RadioGroupItem } from "../components/RadioGroup";
+import { isValidL1Name } from '../lib/validation';
+import { Input } from '../../components/Input';
+
+export default function ChainParameters() {
+    const { l1Name, setL1Name, evmChainId, setEvmChainId } = useL1LauncherStore();
+    const initializedRef = useRef(false);
+
+    //Set the L1 name if it's empty
+    useEffect(() => {
+        if (!initializedRef.current && l1Name === "") {
+            setL1Name(`Chain ${evmChainId}`);
+        }
+        initializedRef.current = true;
+    }, [l1Name, evmChainId, setL1Name]);
+
+    return (
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-2xl font-medium mb-4">Chain Parameters</h1>
+                <p>Enter the basic parameters of your L1, such as it's name, it's EVM chain ID, and the network you want to deploy it on.</p>
+            </div>
+
+            <Input value={l1Name} onChange={setL1Name} label="L1 Name" error={(l1Name === "" || isValidL1Name(l1Name)) ? "" : "Invalid L1 name. Only letters, numbers, and spaces are allowed."} />
+
+            <div className='space-y-4'>
+                <h3 className="font-medium">EVM Chain ID</h3>
+                <Input type='number' value={evmChainId} onChange={v => setEvmChainId(parseInt(v))} min={0} step={1} label="EVM Chain ID" helperText={<span>Unique identifier for your blockchain network. Check if it's unique <Link href={`https://chainlist.org/?search=${evmChainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</Link>.</span>} />
+            </div>
+
+            <div>
+
+                <div>
+                    <h3 className="mb-4 font-medium">Network</h3>
+                    <p className="mb-4 text-gray-600">Do you want to deploy your L1 on testnet or mainnet?</p>
+                </div>
+
+                <RadioGroup
+                    defaultValue={"fuji-testnet"}
+                    onValueChange={() => { }}
+                    className="space-y-2"
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fuji-testnet" id={`network-option-fuji-testnet`} />
+                        <Label htmlFor={`network-option-fuji-testnet`}>Fuji Testnet</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="mainnet" id={`network-option-mainnet`} disabled={true} />
+                        <Label htmlFor={`network-option-true`}>Mainnet (coming soon)</Label>
+                    </div>
+                </RadioGroup>`
+            </div>
+
+            <NextPrev nextEnabled={isValidL1Name(l1Name) && evmChainId > 0} />
+        </div>
+    );
+}

@@ -8,7 +8,7 @@ import { Button } from "../../components/Button";
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
 import { CodeHighlighter } from "../components/CodeHighlighter";
 import { Container } from "../components/Container";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 
 export default function CollectConversionSignatures() {
     const {

@@ -11,7 +11,7 @@ import { createPublicClient, http } from 'viem';
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import SenderOnCChainABI from "../../../contracts/example-contracts/compiled/SenderOnCChain.json";
 import { utils } from "@avalabs/avalanchejs";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
 import { RequireChainFuji } from "../components/RequireChain";
 

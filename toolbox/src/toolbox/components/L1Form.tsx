@@ -5,7 +5,7 @@ import { useViemChainStore, useToolboxStore } from "../toolboxStore"
 import { useState, useEffect } from "react"
 import { createPublicClient, http, webSocket } from "viem"
 import { Button } from "../../components/Button"
-import { Input } from "./Input"
+import { Input } from "../../components/Input"
 import { Container } from "./Container"
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 

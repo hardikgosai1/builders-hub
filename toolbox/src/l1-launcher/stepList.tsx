@@ -27,6 +27,7 @@ export const stepGroups: StepGroupListType = {
 }
 
 const LazyWelcome = lazy(() => import('./01_Welcome/Welcome'))
+const LazyChainParameters = lazy(() => import('./02_Configure/ChainParameters'))
 
 export const stepList: StepListType = {
     "welcome": {
@@ -36,7 +37,7 @@ export const stepList: StepListType = {
     },
     "chain-parameters": {
         title: "Chain Parameters",
-        component: <div>Chain Parameters</div>,
+        component: <LazyChainParameters />,
         group: "configure",
     },
     "tokenomics": {

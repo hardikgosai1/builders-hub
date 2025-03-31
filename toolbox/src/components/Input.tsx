@@ -1,13 +1,13 @@
 "use client"
 
 import type { InputHTMLAttributes } from "react"
-import { cn } from "../../lib/utils"
+import { cn } from "../lib/utils"
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label: string
   unit?: string
   onChange?: (newValue: string) => void
-  helperText?: string
+  helperText?: string | React.ReactNode
   button?: React.ReactNode
   error?: string | null
 }

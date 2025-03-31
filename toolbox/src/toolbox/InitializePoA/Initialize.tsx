@@ -5,7 +5,7 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
-import { Input } from "../components/Input";
+import { Input } from "../../components/Input";
 import { ResultField } from "../components/ResultField";
 import { AbiEvent } from 'viem';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
