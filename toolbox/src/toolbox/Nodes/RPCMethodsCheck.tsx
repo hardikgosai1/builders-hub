@@ -7,7 +7,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useToolboxStore } from "../toolboxStore";
 import { pvm } from '@avalabs/avalanchejs';
 import { RPCURLInput } from "../components/RPCURLInput";
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../lib/walletStore";
 
 type TestResult = Record<string, { passed: boolean, message: string }>;
 async function runPChainTests(payload: { evmChainRpcUrl: string, baseURL: string, pChainAddress: string, ethAddress: string }): Promise<TestResult> {

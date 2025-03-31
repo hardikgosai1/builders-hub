@@ -28,7 +28,7 @@ export const stepGroups: StepGroupListType = {
 
 const LazyWelcome = lazy(() => import('./01_Welcome/Welcome'))
 const LazyChainParameters = lazy(() => import('./02_Configure/ChainParameters'))
-
+const LazyTokenomics = lazy(() => import('./02_Configure/Tokenomics'))
 export const stepList: StepListType = {
     "welcome": {
         title: "Welcome",
@@ -42,7 +42,7 @@ export const stepList: StepListType = {
     },
     "tokenomics": {
         title: "Tokenomics",
-        component: <div>Tokenomics</div>,
+        component: <LazyTokenomics />,
         group: "configure",
     },
     "permissions": {

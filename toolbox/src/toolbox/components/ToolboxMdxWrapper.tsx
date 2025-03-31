@@ -1,28 +1,8 @@
 "use client";
 
 import { ErrorBoundary } from "react-error-boundary";
-import { Button } from "../../components/Button";
-import { ConnectWallet } from "./ConnectWallet";
-
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error, resetErrorBoundary: () => void }) => {
-    return (
-        <div className="space-y-2">
-            <div className="text-red-500 text-sm">
-                {error.message}
-            </div>
-            {
-                error.message.includes("The error is mostly returned when the client requests") && (
-                    <div className="text-sm text-red-500">
-                        ^ This usually indicates that the core wallet is not in testnet mode. Open settings &gt; Advanced &gt; Testnet mode.
-                    </div>
-                )
-            }
-            <Button onClick={resetErrorBoundary}>
-                Try Again
-            </Button>
-        </div>
-    );
-};
+import { ConnectWallet } from "../../components/ConnectWallet";
+import { ErrorFallback } from "../../components/ErrorFallback";
 
 export default function ToolboxMdxWrapper({ children }: { children: React.ReactNode }) {
     const handleReset = () => {

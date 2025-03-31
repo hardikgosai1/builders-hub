@@ -1,6 +1,6 @@
 "use client";
 
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";

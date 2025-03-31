@@ -1,6 +1,6 @@
 import L1Form from "./L1Form";
 import { useToolboxStore, useViemChainStore } from "../toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useWalletStore } from "../../lib/walletStore"
 
 export function RequireChainToolboxL1({ children }: { children: React.ReactNode }) {
     const { walletChainId } = useWalletStore();

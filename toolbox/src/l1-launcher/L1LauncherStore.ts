@@ -2,12 +2,19 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { stepList } from './stepList'
 
+export interface AllocationEntry {
+    address: string;
+    amount: number;
+}
+
 export const initialState = {
     subnetID: "",
     stepsCurrentStep: Object.keys(stepList)[0],
     stepsMaxStep: Object.keys(stepList)[0],
     l1Name: "",
     evmChainId: Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000,
+    evmTokenSymbol: "",
+    tokenAllocations: [] as AllocationEntry[]
 }
 
 export const useL1LauncherStore = create(
@@ -25,6 +32,9 @@ export const useL1LauncherStore = create(
             },
             setL1Name: (l1Name: string) => set({ l1Name }),
             setEvmChainId: (evmChainId: number) => set({ evmChainId }),
+            setEvmTokenSymbol: (evmTokenSymbol: string) => set({ evmTokenSymbol }),
+            setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
+
             reset: () => {
                 if (typeof window !== 'undefined') {
                     window.localStorage.removeItem('l1-launcher-storage');

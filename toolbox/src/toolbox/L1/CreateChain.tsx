@@ -9,7 +9,7 @@ import { Container } from "../components/Container";
 import { GenesisInput } from "../components/GenesisInput";
 import { ResultField } from "../components/ResultField";
 import { quickAndDirtyGenesisBuilder } from "./GenesisBuilder";
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../lib/walletStore";
 
 export default function CreateChain() {
     const { showBoundary } = useErrorBoundary();

@@ -1,6 +1,6 @@
 "use client"
 
-import { useWalletStore } from "../../stores/walletStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useViemChainStore, useToolboxStore } from "../toolboxStore"
 import { useState, useEffect } from "react"
 import { createPublicClient, http, webSocket } from "viem"

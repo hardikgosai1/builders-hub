@@ -8,3 +8,4 @@ export function isValidL1Name(name: string): boolean {
             (char.match(/[a-zA-Z0-9 ]/) !== null); // only letters, numbers, spaces
     });
 }
+

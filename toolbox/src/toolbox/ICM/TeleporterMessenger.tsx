@@ -6,7 +6,7 @@ import { Button } from "../../components/Button";
 import { Success } from "../components/Success";
 import { formatEther, parseEther } from 'viem';
 import { useViemChainStore } from "../toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../lib/walletStore";
 import TeleporterMessengerDeploymentTransaction from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Deployment_Transaction_v1.0.0.txt.json';
 import TeleporterMessengerDeployerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Deployer_Address_v1.0.0.txt.json';
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';

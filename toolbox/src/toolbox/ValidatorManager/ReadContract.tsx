@@ -1,7 +1,7 @@
 "use client"
 
 import { useToolboxStore } from "../toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import type { AbiEvent } from "viem"
 import { useEffect, useState } from "react"

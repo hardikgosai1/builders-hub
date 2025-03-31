@@ -6,7 +6,9 @@ import ToolHeader from "./components/ToolHeader";
 import { stepGroups, stepList } from "./stepList";
 import { useL1LauncherStore } from "./L1LauncherStore";
 import { Button } from "../components/Button";
-
+import { ConnectWallet } from "../components/ConnectWallet";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorFallback } from "../components/ErrorFallback";
 
 export default function L1Launcher() {
     const { stepsCurrentStep, setStepsCurrentStep, stepsMaxStep, reset } = useL1LauncherStore();
@@ -41,9 +43,13 @@ export default function L1Launcher() {
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="h-full">
-                        <Suspense fallback={<div>Loading...</div>}>
-                            {stepList[stepsCurrentStep].component}
-                        </Suspense>
+                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                            <ConnectWallet required={stepsCurrentStep !== Object.keys(stepList)[0]}>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    {stepList[stepsCurrentStep].component}
+                                </Suspense>
+                            </ConnectWallet>
+                        </ErrorBoundary>
                     </div>
                 </div>
             </div>
