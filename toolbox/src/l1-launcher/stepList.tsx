@@ -31,6 +31,8 @@ const LazyChainParameters = lazy(() => import('./02_Configure/ChainParameters'))
 const LazyTokenomics = lazy(() => import('./02_Configure/Tokenomics'))
 const LazyPermissions = lazy(() => import('./02_Configure/Permissions'))
 const LazyGenesis = lazy(() => import('./02_Configure/Genesis'))
+const LazyPrepareValidators = lazy(() => import('./03_Launch/PrepareValidators'))
+
 export const stepList: StepListType = {
     "welcome": {
         title: "Welcome",
@@ -59,7 +61,7 @@ export const stepList: StepListType = {
     },
     "prepare-validators": {
         title: "Prepare Validators",
-        component: <div>Prepare Validators</div>,
+        component: <LazyPrepareValidators />,
         group: "launch-l1",
     },
     "fund-p-chain-wallet": {

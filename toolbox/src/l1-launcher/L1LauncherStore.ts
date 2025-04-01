@@ -29,6 +29,7 @@ export const initialState = {
     genesisTxAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
     genesisContractDeployerAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
     genesisString: "",
+    nodesCount: 1,
 }
 
 export const useL1LauncherStore = create(
@@ -53,6 +54,7 @@ export const useL1LauncherStore = create(
             setGenesisTxAllowlistConfig: (genesisTxAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisTxAllowlistConfig }),
             setGenesisContractDeployerAllowlistConfig: (genesisContractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisContractDeployerAllowlistConfig }),
             setGenesisString: (genesisString: string) => set({ genesisString }),
+            setNodesCount: (nodesCount: number) => set({ nodesCount }),
 
             reset: () => {
                 if (typeof window !== 'undefined') {
