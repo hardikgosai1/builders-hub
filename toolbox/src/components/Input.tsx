@@ -52,6 +52,7 @@ export function Input({ label, unit, className, onChange, id, helperText, button
             id={id}
             onChange={(e) => onChange?.(e.target.value)}
             className={cn(
+              "flex-1",
               unit ? "pr-12" : "",
               button ? "rounded-r-none" : "",
               className,

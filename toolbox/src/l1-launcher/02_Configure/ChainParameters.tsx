@@ -18,16 +18,8 @@ function isValidL1Name(name: string): boolean {
 
 export default function ChainParameters() {
     const { l1Name, setL1Name, evmChainId, setEvmChainId } = useL1LauncherStore();
-    const initializedRef = useRef(false);
     const [network, setNetwork] = useState("fuji-testnet");
 
-    //Set the L1 name if it's empty
-    useEffect(() => {
-        if (!initializedRef.current && l1Name === "") {
-            setL1Name(`Chain ${evmChainId}`);
-        }
-        initializedRef.current = true;
-    }, [l1Name, evmChainId, setL1Name]);
 
     return (
         <div className="space-y-8">

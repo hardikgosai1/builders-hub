@@ -28,3 +28,19 @@ export const generateEmptyAllowlistPrecompileConfig = (): AllowlistPrecompileCon
     activated: false
   }
 }
+
+export const isValidAllowlistPrecompileConfig = (config: AllowlistPrecompileConfig): boolean => {
+  if (!config.activated) return true;
+
+  //check if at least one role has a valid address that is not required
+  if (
+    config.addresses.Admin.filter(entry => !entry.requiredReason && !entry.error).length === 0
+    && config.addresses.Manager.filter(entry => !entry.requiredReason && !entry.error).length === 0
+    && config.addresses.Enabled.filter(entry => !entry.requiredReason && !entry.error).length === 0
+  ) return false;
+
+  const hasErrors = (entries: AddressEntry[]): boolean =>
+    entries.some(entry => entry.error !== undefined);
+
+  return !Object.values(config.addresses).some(entries => hasErrors(entries as AddressEntry[]));
+}

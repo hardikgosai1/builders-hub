@@ -11,7 +11,10 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../components/ErrorFallback";
 
 export default function L1Launcher() {
-    const { stepsCurrentStep, setStepsCurrentStep, stepsMaxStep, reset } = useL1LauncherStore();
+    const stepsCurrentStep = useL1LauncherStore(state => state.stepsCurrentStep);
+    const stepsMaxStep = useL1LauncherStore(state => state.stepsMaxStep);
+    const setStepsCurrentStep = useL1LauncherStore(state => state.setStepsCurrentStep);
+    const reset = useL1LauncherStore(state => state.reset);
 
     return <>
         <div className="container mx-auto max-w-6xl p-8 ">

@@ -7,13 +7,16 @@ import { useEffect } from "react";
 import { useState } from "react";
 import NextPrev from "../components/NextPrev";
 import AllowlistPrecompileConfigurator from "../../components/genesis/AllowlistPrecompileConfigurator";
+import { isValidAllowlistPrecompileConfig } from "../../components/genesis/types";
 
 export default function Tokenomics() {
-    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations, genesisNativeMinterAllowlistConfig, setGenesisNativeMinterAllowlistConfig } = useL1LauncherStore();
+    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations, genesisNativeMinterAllowlistConfig, setGenesisNativeMinterAllowlistConfig, l1Name } = useL1LauncherStore();
     const { walletEVMAddress } = useWalletStore()
 
     const [initComplete, setInitComplete] = useState(false)
     const [nativeTokenType, setNativeTokenType] = useState("own-token")
+
+
 
     useEffect(() => {
         if (initComplete) return
@@ -21,6 +24,10 @@ export default function Tokenomics() {
 
         if (walletEVMAddress && tokenAllocations.length === 0) {
             setTokenAllocations([{ address: walletEVMAddress, amount: 1_000_000 }])
+        }
+
+        if (!evmTokenSymbol) {
+            setEvmTokenSymbol(l1Name.split(' ').map(word => word[0]).join(''))
         }
     }, [walletEVMAddress, tokenAllocations])
 
@@ -74,7 +81,7 @@ export default function Tokenomics() {
                 radioOptionTrueLabel="I want to be able to mint additional tokens (recommended for production)."
             />
 
-            <NextPrev nextEnabled={Boolean(evmTokenSymbol) && Boolean(tokenAllocations.length > 0) /*&& isValidAllowlistPrecompileConfig(nativeMinterAllowlistConfig)*/} />
+            <NextPrev nextEnabled={Boolean(evmTokenSymbol) && Boolean(tokenAllocations.length > 0) && isValidAllowlistPrecompileConfig(genesisNativeMinterAllowlistConfig)} />
         </div>
     );
 }

@@ -14,6 +14,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "outline" | "danger" | "outline-danger" | "light-danger"
   size?: "default" | "sm" | "lg"
   className?: string
+  stickLeft?: boolean
 }
 
 export function Button({
@@ -26,19 +27,30 @@ export function Button({
   variant = "primary",
   size = "default",
   className,
+  stickLeft = false,
 }: ButtonProps) {
   // Base classes shared by all buttons
   const baseClasses = [
-    "w-full rounded-xl text-sm font-medium shadow-sm",
+    stickLeft ? "whitespace-nowrap" : "w-full", // When stickLeft is true, use minimal width
+    "text-sm font-medium shadow-sm",
     "transition-colors duration-300",
     "flex items-center justify-center gap-2",
   ];
+
+  // Add rounded corners based on stickLeft
+  const roundedClasses = stickLeft ? "rounded-r-xl" : "rounded-xl";
+  baseClasses.push(roundedClasses);
 
   // Size-specific classes
   let sizeClasses = "";
   if (size === "default") sizeClasses = "px-4 py-3";
   else if (size === "sm") sizeClasses = "px-3 py-2 text-xs rounded-sm";
   else if (size === "lg") sizeClasses = "px-6 py-4 text-base";
+
+  // Adjust size-specific rounding
+  if (size === "sm" && stickLeft) {
+    sizeClasses = sizeClasses.replace("rounded-sm", "rounded-r-sm");
+  }
 
   // Variant-specific classes
   let variantClasses = "";

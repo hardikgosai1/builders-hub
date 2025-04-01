@@ -30,6 +30,16 @@ interface AllowlistPrecompileConfiguratorProps {
     radioOptionTrueLabel: string
 }
 
+const simpleHash = (str: string): string => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(16);
+}
+
 export default function AllowlistPrecompileConfigurator({
     title,
     description,
@@ -58,6 +68,7 @@ export default function AllowlistPrecompileConfigurator({
                 value={config.activated ? 'true' : 'false'}
                 onChange={handleActivatedChange}
                 className="space-y-2"
+                idPrefix={`allowlist-${simpleHash(precompileAction)}-`}
                 items={[
                     { value: "false", label: radioOptionFalseLabel },
                     { value: "true", label: radioOptionTrueLabel }

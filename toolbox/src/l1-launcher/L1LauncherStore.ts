@@ -9,24 +9,28 @@ export interface AllocationEntry {
     amount: number;
 }
 
-function randomTicker(length: number) {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += letters.charAt(Math.floor(Math.random() * letters.length));
+const generateRandomName = () => {
+    //makes sure the name doesn't contain a dash
+    const firstLetterUppercase = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
+    for (let i = 0; i < 1000; i++) {
+        const randomName = generateName({ words: 3 }).raw.map(firstLetterUppercase).join(' ');
+        if (!randomName.includes('-')) return randomName;
     }
-    return result;
+    throw new Error("Could not generate a name with a dash after 1000 attempts");
 }
 
 export const initialState = {
     subnetID: "",
     stepsCurrentStep: Object.keys(stepList)[0],
     stepsMaxStep: Object.keys(stepList)[0],
-    l1Name: (generateName().spaced.split('-').join(' ').split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " L1"),
+    l1Name: (generateRandomName() + " L1"),
     evmChainId: Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000,
-    evmTokenSymbol: randomTicker(4),
+    evmTokenSymbol: "",
     tokenAllocations: [] as AllocationEntry[],
-    genesisNativeMinterAllowlistConfig: generateEmptyAllowlistPrecompileConfig()
+    genesisNativeMinterAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    poaOwnerAddress: "",
+    txAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    contractDeployerAllowlistConfig: generateEmptyAllowlistPrecompileConfig()
 }
 
 export const useL1LauncherStore = create(
@@ -46,9 +50,10 @@ export const useL1LauncherStore = create(
             setEvmChainId: (evmChainId: number) => set({ evmChainId }),
             setEvmTokenSymbol: (evmTokenSymbol: string) => set({ evmTokenSymbol }),
             setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
-
             setGenesisNativeMinterAllowlistConfig: (genesisNativeMinterAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisNativeMinterAllowlistConfig }),
-
+            setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
+            setTxAllowlistConfig: (txAllowlistConfig: AllowlistPrecompileConfig) => set({ txAllowlistConfig }),
+            setContractDeployerAllowlistConfig: (contractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ contractDeployerAllowlistConfig }),
 
             reset: () => {
                 if (typeof window !== 'undefined') {

@@ -11,18 +11,17 @@ import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
 
 export const ConnectWallet = ({ children, required }: { children: React.ReactNode; required: boolean }) => {
-  const {
-    setWalletChainId,
-    walletEVMAddress,
-    setWalletEVMAddress,
-    setCoreWalletClient,
-    coreWalletClient,
-    setAvalancheNetworkID,
-    setPChainAddress,
-    pChainAddress,
-    walletChainId,
-    avalancheNetworkID,
-  } = useWalletStore()
+  const setWalletChainId = useWalletStore(state => state.setWalletChainId);
+  const walletEVMAddress = useWalletStore(state => state.walletEVMAddress);
+  const setWalletEVMAddress = useWalletStore(state => state.setWalletEVMAddress);
+  const setCoreWalletClient = useWalletStore(state => state.setCoreWalletClient);
+  const coreWalletClient = useWalletStore(state => state.coreWalletClient);
+  const setAvalancheNetworkID = useWalletStore(state => state.setAvalancheNetworkID);
+  const setPChainAddress = useWalletStore(state => state.setPChainAddress);
+  const pChainAddress = useWalletStore(state => state.pChainAddress);
+  const walletChainId = useWalletStore(state => state.walletChainId);
+  const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
+
   const [hasWallet, setHasWallet] = useState<boolean>(false)
   const [isBrowser, setIsBrowser] = useState<boolean>(false)
   const { showBoundary } = useErrorBoundary()
