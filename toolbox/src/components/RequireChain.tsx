@@ -1,5 +1,5 @@
 import { useWalletStore } from "../lib/walletStore";
-import { avalancheFuji, Chain } from "viem/chains";
+import { Chain } from "viem/chains";
 import { Button } from "./Button";
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
@@ -22,26 +22,42 @@ export function RequireChain({ children, chain }: { children: React.ReactNode, c
     }
 
     if (isSwitching) {
-        return <div>Please confirm the switch in your wallet.</div>
+        return <div className="text-center py-4">Please confirm the switch in your wallet.</div>
     }
 
-    if (walletChainId === avalancheFuji.id) {
+    if (walletChainId === chain.id) {
         return children;
     }
 
-    if (walletChainId !== avalancheFuji.id) {
-        return <>
-            <div className="mb-4">
-                Before you continue, please switch to {avalancheFuji.name} network using form below:
-            </div>
-            <div className="p-4 rounded-lg border border-gray-500">
-                <Button onClick={switchToChain}>
-                    Switch to {avalancheFuji.name}
+    return (
+        <div className="space-y-8 my-16">
+            <div className="max-w-md mx-auto space-y-6">
+                <div className="space-y-2">
+                    <h3 className="text-lg font-medium">Chain Switch Required</h3>
+                    <p className="text-sm text-gray-600">
+                        This action requires the {chain.name} network
+                    </p>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Chain ID:</span>
+                        <span className="font-mono">{chain.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Currency:</span>
+                        <span>{chain.nativeCurrency.symbol}</span>
+                    </div>
+                </div>
+
+                <Button onClick={switchToChain} className="w-full">
+                    Switch to {chain.name}
                 </Button>
             </div>
+
             <div className="opacity-50 pointer-events-none">
                 {children}
             </div>
-        </>
-    }
+        </div>
+    );
 }

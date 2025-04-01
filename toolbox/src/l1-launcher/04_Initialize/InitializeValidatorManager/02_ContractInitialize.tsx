@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createWalletClient, createPublicClient, custom, http, AbiEvent } from 'viem';
 import { useL1LauncherWizardStore } from '../../config/store';
 import { cb58ToHex } from '@/components/tools/common/utils/cb58';
-import PoAValidatorManagerABI from '../../../common/icm-contracts/compiled/PoAValidatorManager.json';
+import ValidatorManagerABI from '../../../common/icm-contracts/compiled/ValidatorManager.json';
 import { statusColors, StepState } from './colors';
 import { PROXY_ADDRESS } from "@/components/tools/common/utils/genGenesis";
 
@@ -45,7 +45,7 @@ export default function ContractInitialize() {
                     transport: http()
                 });
 
-                const initializedEventABI = PoAValidatorManagerABI.abi.find(item => item.type === 'event' && item.name === 'Initialized') as AbiEvent;
+                const initializedEventABI = ValidatorManagerABI.abi.find(item => item.type === 'event' && item.name === 'Initialized') as AbiEvent;
 
                 const logs = await publicClient.getLogs({
                     address: PROXY_ADDRESS,
@@ -116,7 +116,7 @@ export default function ContractInitialize() {
 
             console.log('calling initialize', {
                 address: PROXY_ADDRESS,
-                abi: PoAValidatorManagerABI.abi,
+                abi: ValidatorManagerABI.abi,
                 functionName: 'initialize',
                 args: [settings, address],
                 account: address
@@ -125,7 +125,7 @@ export default function ContractInitialize() {
             // Simulate with metamask address
             const { request } = await publicClient.simulateContract({
                 address: PROXY_ADDRESS,
-                abi: PoAValidatorManagerABI.abi,
+                abi: ValidatorManagerABI.abi,
                 functionName: 'initialize',
                 args: [settings, address],
                 account: address

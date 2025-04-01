@@ -160,7 +160,7 @@ export default function OpenRPCPort() {
 
     useEffect(() => {
         if (rpcLocationType === 'local') {
-            setEvmRpcURL(`http://localhost:8080/ext/bc/${chainId}/rpc`);
+            setEvmRpcURL(`http://localhost:9650/ext/bc/${chainId}/rpc`);
         } else if (rpcDomainType === 'has-domain') {
             setEvmRpcURL(`https://${rpcAddress}/ext/bc/${chainId}/rpc`);
         } else if (rpcDomainType === 'no-domain') {

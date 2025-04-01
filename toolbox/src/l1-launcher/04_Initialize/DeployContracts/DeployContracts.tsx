@@ -3,7 +3,7 @@ import NextPrev from '../../components/NextPrev';
 import { useState } from 'react';
 import { UpgradeProxyForm } from './UpgradeProxy';
 import { ValidatorMessagesDeployer } from './ValidatorMessages';
-import { PoAValidatorManagerDeployer } from './PoAValidatorManager';
+import { ValidatorManagerDeployer } from './ValidatorManager';
 import { RequireChain } from '../../../components/RequireChain';
 
 
@@ -29,23 +29,21 @@ export default function DeployContracts() {
 
     return (
         <RequireChain chain={chain}>
-            <div className="max-w-3xl mx-auto">
-                <h1 className="text-2xl font-medium mb-6 dark:text-gray-200">Deploy Contracts</h1>
+            <h1 className="text-2xl font-medium mb-6 dark:text-gray-200">Deploy Contracts</h1>
 
-                <div className="space-y-6">
-                    {/* Step 1: Deploy ValidatorMessages */}
-                    <ValidatorMessagesDeployer />
+            <div className="space-y-6">
+                {/* Step 1: Deploy ValidatorMessages */}
+                <ValidatorMessagesDeployer />
 
-                    {/* Step 2: Deploy PoAValidatorManager */}
-                    <PoAValidatorManagerDeployer />
+                {/* Step 2: Deploy ValidatorManager */}
+                <ValidatorManagerDeployer />
 
-                    {/* Step 3: Upgrade Proxy */}
-                    <UpgradeProxyForm onUpgradeComplete={setIsProxyUpgraded} />
-                </div>
+                {/* Step 3: Upgrade Proxy */}
+                {/* <UpgradeProxyForm onUpgradeComplete={setIsProxyUpgraded} /> */}
+            </div>
 
-                <div className="mt-6">
-                    <NextPrev nextEnabled={canProceed} />
-                </div>
+            <div className="mt-6">
+                <NextPrev nextEnabled={canProceed} />
             </div>
         </RequireChain>
     );

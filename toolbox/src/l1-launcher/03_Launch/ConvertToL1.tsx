@@ -10,7 +10,8 @@ import { ConvertToL1Params, ConvertToL1Validator } from '../../coreViem/methods/
 import { Success } from '../../components/Success';
 import { Button } from '../../components/Button';
 
-const INITIAL_VALIDATOR_WEIGHT = 100;
+const INITIAL_VALIDATOR_WEIGHT = 100n;
+const INITIAL_VALIDATOR_BALANCE = 10n ** 9n; // 1 AVAX on P chain
 
 const popRequest = `curl -X POST --data '{ 
     "jsonrpc":"2.0", 
@@ -92,8 +93,8 @@ export default function ConvertToL1() {
                 const { nodeID, nodePOP } = JSON.parse(nodePopJsons[i]).result;
                 validators.push({
                     nodeID,
-                    validatorWeight: BigInt(INITIAL_VALIDATOR_WEIGHT),
-                    validatorBalance: 0n,
+                    validatorWeight: INITIAL_VALIDATOR_WEIGHT,
+                    validatorBalance: INITIAL_VALIDATOR_BALANCE,
                     remainingBalanceOwner: {
                         addresses: [pChainAddress],
                         threshold: 1

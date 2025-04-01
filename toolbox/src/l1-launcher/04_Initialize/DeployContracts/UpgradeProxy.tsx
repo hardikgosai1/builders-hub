@@ -240,7 +240,7 @@ export function ProxyStorageReader() {
 }
 
 export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (success: boolean) => void }) {
-    const { evmChainId, chainId, getL1RpcEndpoint, poaValidatorManagerAddress } = useL1LauncherWizardStore();
+    const { evmChainId, chainId, getL1RpcEndpoint, validatorManagerAddress } = useL1LauncherWizardStore();
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -263,8 +263,8 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
                 });
 
                 setCurrentImplementation(implementation as string);
-                if (implementation && poaValidatorManagerAddress &&
-                    (implementation as string).toLowerCase() === poaValidatorManagerAddress.toLowerCase()) {
+                if (implementation && validatorManagerAddress &&
+                    (implementation as string).toLowerCase() === validatorManagerAddress.toLowerCase()) {
                     onUpgradeComplete?.(true);
                 } else {
                     onUpgradeComplete?.(false);
@@ -277,11 +277,11 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
         }
 
         checkCurrentImplementation();
-    }, [evmChainId, chainId, getL1RpcEndpoint, poaValidatorManagerAddress, onUpgradeComplete]);
+    }, [evmChainId, chainId, getL1RpcEndpoint, validatorManagerAddress, onUpgradeComplete]);
 
     const handleUpgrade = async () => {
         try {
-            if (!poaValidatorManagerAddress) {
+            if (!validatorManagerAddress) {
                 throw new Error('PoA Validator Manager address not set');
             }
 
@@ -305,7 +305,7 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
                 address: PROXY_ADMIN_ADDRESS,
                 abi: ProxyAdmin.abi,
                 functionName: 'upgrade',
-                args: [PROXY_ADDRESS, poaValidatorManagerAddress as `0x${string}`],
+                args: [PROXY_ADDRESS, validatorManagerAddress as `0x${string}`],
                 account: address,
             });
 
@@ -316,7 +316,7 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
 
             await publicClient.waitForTransactionReceipt({ hash });
             setSuccessMessage('Proxy implementation upgraded successfully!');
-            setCurrentImplementation(poaValidatorManagerAddress);
+            setCurrentImplementation(validatorManagerAddress);
             onUpgradeComplete?.(true);
         } catch (err) {
             console.error('Error upgrading proxy:', err);
@@ -330,7 +330,7 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
     let status = null;
     if (currentImplementation === UNITIALIZED_PROXY_ADDRESS) {
         status = <div className="mb-4">Proxy is not initialized yet</div>;
-    } else if (currentImplementation?.toLowerCase() === poaValidatorManagerAddress?.toLowerCase()) {
+    } else if (currentImplementation?.toLowerCase() === validatorManagerAddress?.toLowerCase()) {
         status = <div className=" mb-4">Proxy is already pointing to the correct implementation</div>;
     } else if (currentImplementation === null) {
         status = <div className="text-red-600 dark:text-red-400 mb-4">loading...</div>;
@@ -359,14 +359,14 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
                     onClick={handleUpgrade}
                     disabled={
                         isUpgrading ||
-                        !poaValidatorManagerAddress ||
+                        !validatorManagerAddress ||
                         (currentImplementation?.toLowerCase() ===
-                            poaValidatorManagerAddress?.toLowerCase())
+                            validatorManagerAddress?.toLowerCase())
                     }
                     className={`w-full p-2 rounded ${isUpgrading ||
-                        !poaValidatorManagerAddress ||
+                        !validatorManagerAddress ||
                         (currentImplementation?.toLowerCase() ===
-                            poaValidatorManagerAddress?.toLowerCase())
+                            validatorManagerAddress?.toLowerCase())
                         ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
                         : 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
                         }`}

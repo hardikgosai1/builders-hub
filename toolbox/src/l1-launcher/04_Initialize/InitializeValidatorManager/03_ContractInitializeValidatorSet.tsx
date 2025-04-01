@@ -7,7 +7,7 @@ import { StateCreator } from 'zustand';
 import { useL1LauncherWizardStore } from '../../config/store';
 import { cb58ToHex } from '../../../common/utils/cb58';
 import { packWarpIntoAccessList } from '../../../common/utils/packWarp';
-import PoAValidatorManagerABI from '../../../common/icm-contracts/compiled/PoAValidatorManager.json';
+import ValidatorManagerABI from '../../../common/icm-contracts/compiled/ValidatorManager.json';
 import { statusColors, StepState } from './colors';
 import { PROXY_ADDRESS } from '@/components/tools/common/utils/genGenesis';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
@@ -155,7 +155,7 @@ export default function ContractInitializeValidatorSet() {
 
 
                 // Find the InitialValidatorCreated event in ABI
-                const initialValidatorEvent = PoAValidatorManagerABI.abi.find(
+                const initialValidatorEvent = ValidatorManagerABI.abi.find(
                     item => item.type === 'event' && item.name === 'InitialValidatorCreated'
                 ) as AbiEvent;
 
@@ -249,7 +249,7 @@ export default function ContractInitializeValidatorSet() {
             // First simulate the transaction
             const simlation = await publicClient.simulateContract({
                 address: PROXY_ADDRESS,
-                abi: PoAValidatorManagerABI.abi,
+                abi: ValidatorManagerABI.abi,
                 functionName: 'initializeValidatorSet',
                 args: txArgs,
                 accessList,
@@ -304,7 +304,7 @@ export default function ContractInitializeValidatorSet() {
             try {
                 // For this specific case, we got 0x6b2f19e9
                 const errorResult = decodeErrorResult({
-                    abi: PoAValidatorManagerABI.abi as Abi,
+                    abi: ValidatorManagerABI.abi as Abi,
                     data: errorSelector
                 });
                 return `${errorResult.errorName}${errorResult.args ? ': ' + errorResult.args.join(', ') : ''}`;

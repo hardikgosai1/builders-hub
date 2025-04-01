@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPublicClient, http, AbiEvent, Log, decodeEventLog } from 'viem';
 import { useL1LauncherWizardStore } from '../../config/store';
-import PoAValidatorManagerABI from '../../../common/icm-contracts/compiled/PoAValidatorManager.json';
+import ValidatorManagerABI from '../../../common/icm-contracts/compiled/ValidatorManager.json';
 import { PROXY_ADDRESS } from '@/components/tools/common/utils/genGenesis';
 
 const serializeBigInt = (obj: any): any => {
@@ -64,7 +64,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
 
 
             // Get all events from ABI
-            const eventAbis = PoAValidatorManagerABI.abi.filter(
+            const eventAbis = ValidatorManagerABI.abi.filter(
                 item => item.type === 'event'
             ) as AbiEvent[];
 
@@ -83,7 +83,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
             // Process and decode all logs
             const processedLogs = allLogs.flat().map((log: Log) => {
                 const decodedLog = decodeEventLog({
-                    abi: PoAValidatorManagerABI.abi,
+                    abi: ValidatorManagerABI.abi,
                     data: log.data,
                     topics: log.topics,
                 });
@@ -139,7 +139,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
                                 <span className="text-white text-sm">✓</span>
                             )}
                         </div>
-                        <span className="text-gray-700 dark:text-gray-300">PoAValidatorManager emitted Initialized event</span>
+                        <span className="text-gray-700 dark:text-gray-300">ValidatorManager emitted Initialized event</span>
                     </div>
 
                     <div className="flex items-center">
@@ -149,7 +149,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
                                 <span className="text-white text-sm">✓</span>
                             )}
                         </div>
-                        <span className="text-gray-700 dark:text-gray-300">PoAValidatorManager emitted InitialValidatorCreated event</span>
+                        <span className="text-gray-700 dark:text-gray-300">ValidatorManager emitted InitialValidatorCreated event</span>
                     </div>
                 </div>
 
