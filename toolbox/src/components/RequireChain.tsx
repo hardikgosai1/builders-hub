@@ -1,19 +1,19 @@
-import { useWalletStore } from "../../lib/walletStore";
-import { avalancheFuji } from "viem/chains";
-import { Button } from "../../components/Button";
+import { useWalletStore } from "../lib/walletStore";
+import { avalancheFuji, Chain } from "viem/chains";
+import { Button } from "./Button";
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 
-export function RequireChainFuji({ children }: { children: React.ReactNode }) {
+export function RequireChain({ children, chain }: { children: React.ReactNode, chain: Chain }) {
     const { walletChainId, coreWalletClient } = useWalletStore();
     const [isSwitching, setIsSwitching] = useState(false);
     const { showBoundary } = useErrorBoundary();
 
-    async function switchToFuji() {
+    async function switchToChain() {
         try {
             setIsSwitching(true);
-            await coreWalletClient.addChain({ chain: avalancheFuji });
-            await coreWalletClient.switchChain({ id: avalancheFuji.id });
+            await coreWalletClient.addChain({ chain: chain });
+            await coreWalletClient.switchChain({ id: chain.id });
         } catch (error) {
             showBoundary(error);
         } finally {
@@ -32,11 +32,11 @@ export function RequireChainFuji({ children }: { children: React.ReactNode }) {
     if (walletChainId !== avalancheFuji.id) {
         return <>
             <div className="mb-4">
-                Before you continue, please switch to Fuji network using form below:
+                Before you continue, please switch to {avalancheFuji.name} network using form below:
             </div>
             <div className="p-4 rounded-lg border border-gray-500">
-                <Button onClick={switchToFuji}>
-                    Switch to Fuji
+                <Button onClick={switchToChain}>
+                    Switch to {avalancheFuji.name}
                 </Button>
             </div>
             <div className="opacity-50 pointer-events-none">

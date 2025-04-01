@@ -38,6 +38,9 @@ export const initialState = {
     rpcAddress: "",
     rpcVerified: false,
     evmRpcURL: "",
+    evmChainIsTestnet: true,
+    validatorMessagesAddress: "",
+    validatorManagerAddress: "",
 }
 
 export const useL1LauncherStore = create(
@@ -62,7 +65,9 @@ export const useL1LauncherStore = create(
             setRpcAddress: (rpcAddress: string) => set({ rpcAddress }),
             setRpcVerified: (rpcVerified: boolean) => set({ rpcVerified }),
             setEvmRpcURL: (evmRpcURL: string) => set({ evmRpcURL }),
-
+            setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
+            setValidatorMessagesAddress: (validatorMessagesAddress: string) => set({ validatorMessagesAddress }),
+            setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
 
             setStepsCurrentStep: (stepsCurrentStep: string) => {
                 set({ stepsCurrentStep })
@@ -90,4 +95,47 @@ export const useL1LauncherStore = create(
         },
     ),
 )
+
+
+
+import { useShallow } from 'zustand/react/shallow'
+import { useMemo } from 'react'
+
+export function useViemChainStore() {
+    // Use useShallow to select the primitive state values we need
+    const chainData = useL1LauncherStore(
+        useShallow((state) => ({
+            evmChainId: state.evmChainId,
+            evmChainName: state.evmChainName,
+            evmChainRpcUrl: state.evmRpcURL,
+            evmChainCoinName: state.evmTokenSymbol,
+            evmChainIsTestnet: state.evmChainIsTestnet
+        }))
+    );
+
+    // Create the viemChain object with useMemo to prevent unnecessary recreation
+    const viemChain = useMemo(() => {
+        const { evmChainId, evmChainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
+
+        if (!evmChainId || !evmChainRpcUrl) {
+            return null;
+        }
+
+        return {
+            id: evmChainId,
+            name: evmChainName || `Chain #${evmChainId}`,
+            rpcUrls: {
+                default: { http: [evmChainRpcUrl] },
+            },
+            nativeCurrency: {
+                name: evmChainCoinName || evmChainName + " Coin",
+                symbol: evmChainCoinName || evmChainName + " Coin",
+                decimals: 18
+            },
+            isTestnet: evmChainIsTestnet,
+        };
+    }, [chainData]);
+
+    return viemChain;
+}
 

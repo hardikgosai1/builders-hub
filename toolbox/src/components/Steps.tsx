@@ -20,7 +20,7 @@ export interface StepWizardState {
 
 export type StepType<StepGroupListType> = {
     title: string;
-    component: React.LazyExoticComponent<() => ReactElement>;
+    component?: React.LazyExoticComponent<() => ReactElement>;
     group: keyof StepGroupListType;
 }
 

@@ -13,7 +13,7 @@ import SenderOnCChainABI from "../../../contracts/example-contracts/compiled/Sen
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
-import { RequireChainFuji } from "../components/RequireChain";
+import { RequireChain } from "../../components/RequireChain";
 
 const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
 
@@ -103,7 +103,7 @@ export default function DeployReceiver() {
     }
 
     return (
-        <RequireChainFuji>
+        <RequireChain chain={avalancheFuji}>
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Send ICM Message</h2>
 
@@ -193,6 +193,6 @@ export default function DeployReceiver() {
                     />
                 </div>
             </div>
-        </RequireChainFuji>
+        </RequireChain>
     );
 }

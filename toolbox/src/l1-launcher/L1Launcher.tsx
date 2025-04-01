@@ -50,8 +50,8 @@ export default function L1Launcher() {
                             <ConnectWallet required={stepsCurrentStep !== Object.keys(stepList)[0]}>
                                 <Suspense fallback={<div>Loading...</div>}>
                                     {(() => {
-                                        const Component = stepList[stepsCurrentStep].component;
-                                        return <Component />;
+                                        const Component = stepList[stepsCurrentStep]?.component;
+                                        return Component ? <Component /> : null;
                                     })()}
                                 </Suspense>
                             </ConnectWallet>

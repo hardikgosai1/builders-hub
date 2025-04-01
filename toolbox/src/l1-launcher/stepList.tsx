@@ -26,10 +26,6 @@ export const stepGroups: StepGroupListType = {
     },
 }
 
-//What's next
-const LazyComponentTODO = lazy(() => Promise.resolve({ default: () => <div>TODO: implement</div> }))
-
-
 export const stepList: StepListType = {
     "welcome": {
         title: "Welcome",
@@ -91,24 +87,19 @@ export const stepList: StepListType = {
         component: lazy(() => import('./03_Launch/OpenRPCPort')),
         group: "launch-l1",
     },
-    "add-to-wallet": {
-        title: "Add to wallet",
-        component: LazyComponentTODO,
-        group: "initialize",
-    },
     "deploy-contracts": {
         title: "Deploy contracts",
-        component: LazyComponentTODO,
+        component: lazy(() => import('./04_Initialize/DeployContracts/DeployContracts')),
         group: "initialize",
     },
     "initialize-validator-manager": {
         title: "Initialize validator manager",
-        component: LazyComponentTODO,
+        component: undefined,
         group: "initialize",
     },
     "whats-next": {
         title: "What's next?",
-        component: LazyComponentTODO,
+        component: undefined,
         group: "whats-next",
     }
 }
