@@ -83,12 +83,12 @@ export const stepList: StepListType = {
     },
     "launch-rpc-node": {
         title: "Launch an RPC node",
-        component: LazyComponentTODO,
+        component: lazy(() => import('./03_Launch/LaunchRpcNode')),
         group: "launch-l1",
     },
     "open-rpc-port": {
         title: "Open RPC port",
-        component: LazyComponentTODO,
+        component: lazy(() => import('./03_Launch/OpenRPCPort')),
         group: "launch-l1",
     },
     "add-to-wallet": {

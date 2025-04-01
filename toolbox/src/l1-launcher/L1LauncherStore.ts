@@ -32,6 +32,12 @@ export const initialState = {
     subnetId: "",
     tokenAllocations: [] as AllocationEntry[],
     conversionId: "",
+    nodePopJsons: [] as string[],
+    rpcLocationType: "local" as "local" | "remote",
+    rpcDomainType: "has-domain" as "has-domain" | "no-domain" | "manual-ssl",
+    rpcAddress: "",
+    rpcVerified: false,
+    evmRpcURL: "",
 }
 
 export const useL1LauncherStore = create(
@@ -50,6 +56,13 @@ export const useL1LauncherStore = create(
             setSubnetID: (subnetId: string) => set({ subnetId }),
             setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
             setConversionId: (conversionId: string) => set({ conversionId }),
+            setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
+            setRpcLocationType: (rpcLocationType: "local" | "remote") => set({ rpcLocationType }),
+            setRpcDomainType: (rpcDomainType: "has-domain" | "no-domain" | "manual-ssl") => set({ rpcDomainType }),
+            setRpcAddress: (rpcAddress: string) => set({ rpcAddress }),
+            setRpcVerified: (rpcVerified: boolean) => set({ rpcVerified }),
+            setEvmRpcURL: (evmRpcURL: string) => set({ evmRpcURL }),
+
 
             setStepsCurrentStep: (stepsCurrentStep: string) => {
                 set({ stepsCurrentStep })
