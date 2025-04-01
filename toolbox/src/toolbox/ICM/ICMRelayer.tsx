@@ -6,7 +6,7 @@ import { useToolboxStore, useViemChainStore } from '../toolboxStore';
 import { useWalletStore } from '../../lib/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
-import { CodeHighlighter } from '../components/CodeHighlighter';
+import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { useState, useEffect } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
 import { RequireChainToolboxL1 } from '../components/RequireChainToolboxL1';

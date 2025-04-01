@@ -6,7 +6,7 @@ import { Select } from "../components/Select";
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import versions from "../../versions.json";
-import { CodeHighlighter } from "../components/CodeHighlighter";
+import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {

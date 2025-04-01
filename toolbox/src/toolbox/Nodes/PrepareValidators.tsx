@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { Button } from "../../components/Button"
-import { CodeHighlighter } from "../components/CodeHighlighter"
+import { CodeHighlighter } from "../../components/CodeHighlighter"
 
 const dockerInstallInstructions: Record<string, string> = {
   "Ubuntu/Debian": `sudo apt-get update && \\

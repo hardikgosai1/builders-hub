@@ -11,7 +11,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { networkIDs, utils } from '@avalabs/avalanchejs';
 import { RequireChainToolboxL1 } from '../components/RequireChainToolboxL1';
-import { CodeHighlighter } from '../components/CodeHighlighter';
+import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { Container } from '../components/Container';
 import { ResultField } from '../components/ResultField';
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";

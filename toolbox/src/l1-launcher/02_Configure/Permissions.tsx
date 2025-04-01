@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 
 
 export default function Permissions() {
-    const { poaOwnerAddress, setPoaOwnerAddress, txAllowlistConfig, setTxAllowlistConfig, contractDeployerAllowlistConfig, setContractDeployerAllowlistConfig } = useL1LauncherStore();
+    const { poaOwnerAddress, setPoaOwnerAddress, genesisTxAllowlistConfig, setGenesisTxAllowlistConfig, genesisContractDeployerAllowlistConfig, setGenesisContractDeployerAllowlistConfig } = useL1LauncherStore();
     const { walletEVMAddress } = useWalletStore();
     const [initCompleted, setInitCompleted] = useState(false);
 
@@ -68,8 +68,8 @@ export default function Permissions() {
                 title="Transaction Allowlist"
                 description="This precompile restricts which addresses may submit transactions on this blockchain."
                 precompileAction="issue transactions"
-                config={txAllowlistConfig}
-                onUpdateConfig={setTxAllowlistConfig}
+                config={genesisTxAllowlistConfig}
+                onUpdateConfig={setGenesisTxAllowlistConfig}
                 radioOptionFalseLabel="I want anyone to be able to submit transactions on this blockchain."
                 radioOptionTrueLabel="I want only approved addresses to be able to submit transactions on this blockchain."
             />
@@ -78,14 +78,14 @@ export default function Permissions() {
                 title="Contract Deployer Allowlist"
                 description="This precompile restricts which addresses may deploy smart contracts on this blockchain."
                 precompileAction="deploy contracts"
-                config={contractDeployerAllowlistConfig}
-                onUpdateConfig={setContractDeployerAllowlistConfig}
+                config={genesisContractDeployerAllowlistConfig}
+                onUpdateConfig={setGenesisContractDeployerAllowlistConfig}
                 radioOptionFalseLabel="I want anyone to be able to deploy contracts on this blockchain."
                 radioOptionTrueLabel="I want only approved addresses to be able to deploy contracts on this blockchain."
             />
 
             <NextPrev
-                nextEnabled={isAddress(poaOwnerAddress, { strict: false }) && isValidAllowlistPrecompileConfig(txAllowlistConfig) && isValidAllowlistPrecompileConfig(contractDeployerAllowlistConfig)}
+                nextEnabled={isAddress(poaOwnerAddress, { strict: false }) && isValidAllowlistPrecompileConfig(genesisTxAllowlistConfig) && isValidAllowlistPrecompileConfig(genesisContractDeployerAllowlistConfig)}
             />
         </div>
     );

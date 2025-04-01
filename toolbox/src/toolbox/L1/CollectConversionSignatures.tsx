@@ -6,7 +6,7 @@ import { useState } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import { Button } from "../../components/Button";
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
-import { CodeHighlighter } from "../components/CodeHighlighter";
+import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 

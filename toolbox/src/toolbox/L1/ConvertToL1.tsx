@@ -10,7 +10,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { Container } from "../components/Container";
 import { ResultField } from "../components/ResultField";
 import { InputArray } from "../components/InputArray";
-import { CodeHighlighter } from "../components/CodeHighlighter";
+import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { TextareaArray } from "../components/TextareaArray";
 export default function ConvertToL1() {
     const {

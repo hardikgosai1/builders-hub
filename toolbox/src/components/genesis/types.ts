@@ -44,3 +44,12 @@ export const isValidAllowlistPrecompileConfig = (config: AllowlistPrecompileConf
 
   return !Object.values(config.addresses).some(entries => hasErrors(entries as AddressEntry[]));
 }
+
+export const addressEntryArrayToAddressArray = (entries: AddressEntry[]): string[] => {
+  return entries.map(entry => entry.address);
+}
+
+export interface AllocationEntry {
+  address: string;
+  amount: number;
+}

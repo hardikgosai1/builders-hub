@@ -30,6 +30,7 @@ const LazyWelcome = lazy(() => import('./01_Welcome/Welcome'))
 const LazyChainParameters = lazy(() => import('./02_Configure/ChainParameters'))
 const LazyTokenomics = lazy(() => import('./02_Configure/Tokenomics'))
 const LazyPermissions = lazy(() => import('./02_Configure/Permissions'))
+const LazyGenesis = lazy(() => import('./02_Configure/Genesis'))
 export const stepList: StepListType = {
     "welcome": {
         title: "Welcome",
@@ -53,7 +54,7 @@ export const stepList: StepListType = {
     },
     "genesis": {
         title: "Create genesis",
-        component: <div>Genesis</div>,
+        component: <LazyGenesis />,
         group: "configure",
     },
     "prepare-validators": {

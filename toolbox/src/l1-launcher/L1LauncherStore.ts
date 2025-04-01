@@ -1,13 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { stepList } from './stepList'
-import { AllowlistPrecompileConfig, generateEmptyAllowlistPrecompileConfig } from '../components/genesis/types'
+import { AllocationEntry, AllowlistPrecompileConfig, generateEmptyAllowlistPrecompileConfig } from '../components/genesis/types'
 import generateName from 'boring-name-generator'
 
-export interface AllocationEntry {
-    address: string;
-    amount: number;
-}
+
 
 const generateRandomName = () => {
     //makes sure the name doesn't contain a dash
@@ -29,8 +26,9 @@ export const initialState = {
     tokenAllocations: [] as AllocationEntry[],
     genesisNativeMinterAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
     poaOwnerAddress: "",
-    txAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
-    contractDeployerAllowlistConfig: generateEmptyAllowlistPrecompileConfig()
+    genesisTxAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    genesisContractDeployerAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    genesisString: "",
 }
 
 export const useL1LauncherStore = create(
@@ -52,8 +50,9 @@ export const useL1LauncherStore = create(
             setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
             setGenesisNativeMinterAllowlistConfig: (genesisNativeMinterAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisNativeMinterAllowlistConfig }),
             setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
-            setTxAllowlistConfig: (txAllowlistConfig: AllowlistPrecompileConfig) => set({ txAllowlistConfig }),
-            setContractDeployerAllowlistConfig: (contractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ contractDeployerAllowlistConfig }),
+            setGenesisTxAllowlistConfig: (genesisTxAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisTxAllowlistConfig }),
+            setGenesisContractDeployerAllowlistConfig: (genesisContractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisContractDeployerAllowlistConfig }),
+            setGenesisString: (genesisString: string) => set({ genesisString }),
 
             reset: () => {
                 if (typeof window !== 'undefined') {
