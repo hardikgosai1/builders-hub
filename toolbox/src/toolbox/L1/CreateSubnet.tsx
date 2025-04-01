@@ -11,7 +11,7 @@ import { Container } from "../components/Container";
 
 export default function CreateSubnet() {
   const { showBoundary } = useErrorBoundary();
-  const { setSubnetID, subnetID } = useToolboxStore();
+  const { setSubnetID, subnetId } = useToolboxStore();
   const { coreWalletClient, pChainAddress } = useWalletStore();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -51,11 +51,11 @@ export default function CreateSubnet() {
           Create Subnet
         </Button>
       </div>
-      {subnetID && (
+      {subnetId && (
         <ResultField
           label="Subnet ID"
-          value={subnetID}
-          showCheck={!!subnetID}
+          value={subnetId}
+          showCheck={!!subnetId}
         />
       )}
     </Container>

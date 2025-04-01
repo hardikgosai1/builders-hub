@@ -39,7 +39,7 @@ const parseNodeID = (nodeID: string) => {
 
 export default function AddValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { subnetID, proxyAddress, evmChainRpcUrl, evmChainName, evmChainCoinName } = useToolboxStore()
+  const { subnetId, proxyAddress, evmChainRpcUrl, evmChainName, evmChainCoinName } = useToolboxStore()
   const { avalancheNetworkID, walletChainId, pChainAddress } = useWalletStore()
 
   // State variables for form inputs
@@ -224,7 +224,7 @@ export default function AddValidator() {
             network: networkName,
             signatureAggregatorRequest: {
               message: messageToSign,
-              signingSubnetId: subnetID,
+              signingSubnetId: subnetId,
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           })
@@ -330,7 +330,7 @@ export default function AddValidator() {
             signatureAggregatorRequest: {
               message: unsignedPChainWarpMsgHex,
               justification: registerL1ValidatorUnsignedWarpMsg,
-              signingSubnetId: subnetID,
+              signingSubnetId: subnetId,
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           })

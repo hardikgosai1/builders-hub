@@ -11,7 +11,7 @@ export default function CreateChain() {
         genesisString,
         setSubnetID,
         setChainId,
-        subnetID,
+        subnetId,
         chainId,
     } = useL1LauncherStore();
 
@@ -50,7 +50,7 @@ export default function CreateChain() {
         try {
             const chainTxId = await coreWalletClient.createChain({
                 chainName: evmChainName,
-                subnetId: subnetID,
+                subnetId: subnetId,
                 vmId: "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy",
                 fxIds: [],
                 genesisData: genesisString,
@@ -80,7 +80,7 @@ export default function CreateChain() {
             <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
                 <h2 className="text-xl font-medium mb-4">Step 1: Create Subnet</h2>
 
-                {subnetID ? (
+                {subnetId ? (
                     <div className="mb-4">
                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                             <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
@@ -91,12 +91,12 @@ export default function CreateChain() {
                         <div className="mt-2 flex items-center">
                             <span className="font-medium text-gray-700 dark:text-gray-300">Subnet ID:</span>
                             <a
-                                href={`https://subnets-test.avax.network/p-chain/tx/${subnetID}`}
+                                href={`https://subnets-test.avax.network/p-chain/tx/${subnetId}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-mono"
                             >
-                                {subnetID}
+                                {subnetId}
                             </a>
                         </div>
                     </div>
@@ -170,8 +170,8 @@ export default function CreateChain() {
 
                         <button
                             onClick={handleCreateChain}
-                            disabled={isCreatingChain || !subnetID}
-                            className={`px-6 py-2 rounded-md ${isCreatingChain || !subnetID
+                            disabled={isCreatingChain || !subnetId}
+                            className={`px-6 py-2 rounded-md ${isCreatingChain || !subnetId
                                 ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                                 : 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
                                 }`}
@@ -184,7 +184,7 @@ export default function CreateChain() {
                                     </svg>
                                     Creating Chain...
                                 </span>
-                            ) : !subnetID ? 'Create Subnet First' : 'Create Chain'}
+                            ) : !subnetId ? 'Create Subnet First' : 'Create Chain'}
                         </button>
                     </>
                 )}

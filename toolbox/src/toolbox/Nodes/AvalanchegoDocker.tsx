@@ -124,7 +124,7 @@ ${domain}/ext/bc/${chainID}/rpc`
 
 
 export default function AvalanchegoDocker() {
-    const { subnetID, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
+    const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
     const { avalancheNetworkID } = useWalletStore();
 
     const [isRPC, setIsRPC] = useState<"true" | "false">("false");
@@ -134,11 +134,11 @@ export default function AvalanchegoDocker() {
 
     useEffect(() => {
         try {
-            setRpcCommand(generateDockerCommand([subnetID], isRPC === "true", avalancheNetworkID));
+            setRpcCommand(generateDockerCommand([subnetId], isRPC === "true", avalancheNetworkID));
         } catch (error) {
             setRpcCommand((error as Error).message);
         }
-    }, [subnetID, isRPC, avalancheNetworkID]);
+    }, [subnetId, isRPC, avalancheNetworkID]);
 
 
     useEffect(() => {
@@ -165,7 +165,7 @@ export default function AvalanchegoDocker() {
 
                 <Input
                     label="Subnet ID"
-                    value={subnetID}
+                    value={subnetId}
                     onChange={setSubnetID}
                     placeholder="Create a subnet to generate a subnet ID"
                 />

@@ -14,7 +14,7 @@ const randomPrivateKey = generatePrivateKey()
 const MINIMUM_BALANCE = parseEther('100')
 
 export default function ICMRelayer() {
-    const { chainID, setChainID, subnetID, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
+    const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [balance, setBalance] = useState<bigint>(BigInt(0));
     const [isCheckingBalance, setIsCheckingBalance] = useState(true);
@@ -69,7 +69,7 @@ export default function ICMRelayer() {
             <div className="text-lg font-bold">Relayer Configuration</div>
             <Input
                 label="Destination Subnet ID"
-                value={subnetID}
+                value={subnetId}
                 onChange={setSubnetID}
             />
             <Input
@@ -126,7 +126,7 @@ export default function ICMRelayer() {
                     </div>
                     <div className="text-lg font-bold">Write the relayer config file</div>
                     <CodeHighlighter
-                        code={genConfigCommand(subnetID, chainID, evmChainRpcUrl, randomPrivateKey)}
+                        code={genConfigCommand(subnetId, chainID, evmChainRpcUrl, randomPrivateKey)}
                         lang="sh"
                     />
                     <div className="text-lg font-bold">Run the relayer</div>

@@ -14,7 +14,7 @@ import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { TextareaArray } from "../components/TextareaArray";
 export default function ConvertToL1() {
     const {
-        subnetID,
+        subnetId,
         chainID,
         setSubnetID,
         setChainID,
@@ -53,7 +53,7 @@ export default function ConvertToL1() {
 
             const txID = await coreWalletClient.convertToL1({
                 managerAddress,
-                subnetId: subnetID,
+                subnetId: subnetId,
                 chainId: chainID,
                 subnetAuth: [0],
                 validators
@@ -75,7 +75,7 @@ export default function ConvertToL1() {
             <div className="space-y-4">
                 <Input
                     label="Subnet ID"
-                    value={subnetID}
+                    value={subnetId}
                     onChange={setSubnetID}
                     type="text"
                 />

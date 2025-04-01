@@ -14,7 +14,7 @@ import { useWalletStore } from "../../lib/walletStore";
 export default function CreateChain() {
     const { showBoundary } = useErrorBoundary();
     const {
-        subnetID,
+        subnetId,
         evmChainName,
         vmId,
         setVmId,
@@ -43,7 +43,7 @@ export default function CreateChain() {
 
         coreWalletClient.createChain({
             chainName: evmChainName,
-            subnetId: subnetID,
+            subnetId: subnetId,
             vmId,
             fxIds: [],
             genesisData,
@@ -83,7 +83,7 @@ export default function CreateChain() {
 
             <Input
                 label="Subnet ID"
-                value={subnetID}
+                value={subnetId}
                 type="text"
                 onChange={setSubnetID}
                 placeholder="Create a subnet to generate a subnet ID"

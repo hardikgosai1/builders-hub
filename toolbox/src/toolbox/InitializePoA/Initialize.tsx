@@ -14,7 +14,7 @@ import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../components/Container";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
-    const { subnetID, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
+    const { subnetId, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -33,9 +33,9 @@ export default function Initialize() {
 
     let subnetIDHex = "";
     try {
-        subnetIDHex = utils.bufferToHex(utils.base58check.decode(subnetID));
+        subnetIDHex = utils.bufferToHex(utils.base58check.decode(subnetId));
     } catch (error) {
-        console.error('Error decoding subnetID:', error);
+        console.error('Error decoding subnetId:', error);
     }
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function Initialize() {
         try {
             const settings = {
                 admin: adminAddress,
-                subnetID: subnetIDHex,
+                subnetId: subnetIDHex,
                 churnPeriodSeconds: BigInt(churnPeriodSeconds),
                 maximumChurnPercentage: Number(maximumChurnPercentage)
             };
@@ -134,7 +134,7 @@ export default function Initialize() {
 
                     <Input
                         label="Subnet ID"
-                        value={subnetID}
+                        value={subnetId}
                         onChange={setSubnetID}
                     />
                     <Input

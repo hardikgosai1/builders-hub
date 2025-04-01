@@ -69,7 +69,7 @@ export default function InitValidatorSet() {
 
             // Prepare transaction arguments
             const txArgs = [{
-                subnetID: cb58ToHex(signingSubnetId),
+                subnetId: cb58ToHex(signingSubnetId),
                 validatorManagerBlockchainID: cb58ToHex(chainId),
                 validatorManagerAddress: managerAddress as `0x${string}`,
                 initialValidators: validators

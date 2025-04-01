@@ -73,7 +73,7 @@ export const stepList: StepListType = {
     },
     "launch-validators": {
         title: "Launch validators",
-        component: LazyComponentTODO,
+        component: lazy(() => import('./03_Launch/LaunchValidators')),
         group: "launch-l1",
     },
     "convert-to-l1": {

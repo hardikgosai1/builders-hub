@@ -29,7 +29,7 @@ export const initialState = {
     poaOwnerAddress: "",
     stepsCurrentStep: Object.keys(stepList)[0],
     stepsMaxStep: Object.keys(stepList)[0],
-    subnetID: "",
+    subnetId: "",
     tokenAllocations: [] as AllocationEntry[],
 }
 
@@ -46,7 +46,7 @@ export const useL1LauncherStore = create(
             setEvmChainName: (evmChainName: string) => set({ evmChainName }),
             setNodesCount: (nodesCount: number) => set({ nodesCount }),
             setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
-            setSubnetID: (subnetID: string) => set({ subnetID }),
+            setSubnetID: (subnetId: string) => set({ subnetId }),
             setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
 
             setStepsCurrentStep: (stepsCurrentStep: string) => {

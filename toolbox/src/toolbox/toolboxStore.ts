@@ -3,7 +3,7 @@ import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 
 export const initialState = {
-    subnetID: "",
+    subnetId: "",
     chainName: "My Chain",
     vmId: "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy",
     chainID: "",
@@ -34,7 +34,7 @@ export const initialState = {
 export const useToolboxStore = create(
     persist(
         combine(initialState, (set) => ({
-            setSubnetID: (subnetID: string) => set({ subnetID }),
+            setSubnetID: (subnetId: string) => set({ subnetId }),
             setChainName: (chainName: string) => set({ chainName }),
             setVmId: (vmId: string) => set({ vmId }),
             setChainID: (chainID: string) => set({ chainID }),
