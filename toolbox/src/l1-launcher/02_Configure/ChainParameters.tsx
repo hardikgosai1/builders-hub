@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useL1LauncherStore } from '../L1LauncherStore';
 import NextPrev from "../components/NextPrev";
 import Link from 'next/link';

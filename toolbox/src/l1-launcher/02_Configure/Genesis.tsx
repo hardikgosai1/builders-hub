@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import { useL1LauncherStore } from '../L1LauncherStore';
 import NextPrev from "../components/NextPrev";
-import { useErrorBoundary } from 'react-error-boundary';
 import { generateGenesis } from '../../components/genesis/genGenesis';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
 
 export default function Genesis() {
     const { evmChainId, tokenAllocations, genesisTxAllowlistConfig, genesisContractDeployerAllowlistConfig, genesisNativeMinterAllowlistConfig, poaOwnerAddress, setGenesisString, genesisString } = useL1LauncherStore();
-    const { showBoundary } = useErrorBoundary();
 
     const handleGenerateGenesis = () => {
         const genesis = generateGenesis({

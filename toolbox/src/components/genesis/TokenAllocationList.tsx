@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { RawInput } from "../Input"
 import { Trash2, Plus } from 'lucide-react'
-import { AllocationEntry } from '../../l1-launcher/L1LauncherStore'
+import { AllocationEntry } from './types'
 import { isAddress } from 'viem'
 
 export interface TokenAllocationListProps {
