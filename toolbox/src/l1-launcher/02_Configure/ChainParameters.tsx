@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useL1LauncherStore } from '../L1LauncherStore';
 import NextPrev from "../components/NextPrev";
-import Link from 'next/link';
 import { RadioGroup } from "../../components/RadioGroup";
 import { Input } from '../../components/Input';
 
@@ -32,7 +31,7 @@ export default function ChainParameters() {
 
             <div className='space-y-4'>
                 <h3 className="font-medium">EVM Chain ID</h3>
-                <Input type='number' value={evmChainId} onChange={v => setEvmChainId(parseInt(v))} min={0} step={1} label="EVM Chain ID" helperText={<span>Unique identifier for your blockchain network. Check if it's unique <Link href={`https://chainlist.org/?search=${evmChainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</Link>.</span>} />
+                <Input type='number' value={evmChainId} onChange={v => setEvmChainId(parseInt(v))} min={0} step={1} label="EVM Chain ID" helperText={<span>Unique identifier for your blockchain network. Check if it's unique <a href={`https://chainlist.org/?search=${evmChainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</a>.</span>} />
             </div>
 
             <div>
