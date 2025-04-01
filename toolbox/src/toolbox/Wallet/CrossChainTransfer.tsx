@@ -20,11 +20,11 @@ interface AvalancheResponse {
 // Helper function for delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export default function CrossChainTransfer() {
+export default function CrossChainTransfer({ suggestedAmount = "0.0" }: { suggestedAmount?: string }) {
 
   const platformEndpoint = "https://api.avax-test.network";
 
-  const [amount, setAmount] = useState<string>("0.0")
+  const [amount, setAmount] = useState<string>(suggestedAmount)
   const [sourceChain, setSourceChain] = useState<string>("c-chain")
   const [destinationChain, setDestinationChain] = useState<string>("p-chain")
   const [availableBalance, setAvailableBalance] = useState<number>(0)

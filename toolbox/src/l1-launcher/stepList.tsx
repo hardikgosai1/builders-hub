@@ -26,12 +26,32 @@ export const stepGroups: StepGroupListType = {
     },
 }
 
+//Welcome
 const LazyWelcome = lazy(() => import('./01_Welcome/Welcome'))
+
+//Configure
 const LazyChainParameters = lazy(() => import('./02_Configure/ChainParameters'))
 const LazyTokenomics = lazy(() => import('./02_Configure/Tokenomics'))
 const LazyPermissions = lazy(() => import('./02_Configure/Permissions'))
 const LazyGenesis = lazy(() => import('./02_Configure/Genesis'))
+
+//Launch
 const LazyPrepareValidators = lazy(() => import('./03_Launch/PrepareValidators'))
+const LazyFundPChainWallet = lazy(() => import('./03_Launch/FundPChainWallet'))
+const LazyCreateChain = () => <div>TODO: Create chain</div>
+const LazyLaunchValidators = () => <div>TODO: Launch validators</div>
+const LazyConvertToL1 = () => <div>TODO: Convert to L1</div>
+const LazyLaunchRpcNode = () => <div>TODO: Launch RPC node</div>
+const LazyOpenRpcPort = () => <div>TODO: Open RPC port</div>
+
+//Initialize
+const LazyAddToWallet = () => <div>TODO: Add to wallet</div>
+const LazyDeployContracts = () => <div>TODO: Deploy contracts</div>
+const LazyInitializeValidatorManager = () => <div>TODO: Initialize validator manager</div>
+
+//What's next
+const LazyWhatsNext = () => <div>TODO: What's next?</div>
+
 
 export const stepList: StepListType = {
     "welcome": {
@@ -66,52 +86,52 @@ export const stepList: StepListType = {
     },
     "fund-p-chain-wallet": {
         title: "Fund P-chain wallet",
-        component: <div>Fund P-chain wallet</div>,
+        component: <LazyFundPChainWallet />,
         group: "launch-l1",
     },
     "create-chain": {
         title: "Create chain",
-        component: <div>Create chain</div>,
+        component: <LazyCreateChain />,
         group: "launch-l1",
     },
     "launch-validators": {
         title: "Launch validators",
-        component: <div>Launch validators</div>,
+        component: <LazyLaunchValidators />,
         group: "launch-l1",
     },
     "convert-to-l1": {
         title: "Convert to L1",
-        component: <div>Convert to L1</div>,
+        component: <LazyConvertToL1 />,
         group: "launch-l1",
     },
     "launch-rpc-node": {
         title: "Launch an RPC node",
-        component: <div>Launch an RPC node</div>,
+        component: <LazyLaunchRpcNode />,
         group: "launch-l1",
     },
     "open-rpc-port": {
         title: "Open RPC port",
-        component: <div>Open RPC port</div>,
+        component: <LazyOpenRpcPort />,
         group: "launch-l1",
     },
     "add-to-wallet": {
         title: "Add to wallet",
-        component: <div>Add to wallet</div>,
+        component: <LazyAddToWallet />,
         group: "initialize",
     },
     "deploy-contracts": {
         title: "Deploy contracts",
-        component: <div>Deploy contracts</div>,
+        component: <LazyDeployContracts />,
         group: "initialize",
     },
     "initialize-validator-manager": {
         title: "Initialize validator manager",
-        component: <div>Initialize validator manager</div>,
+        component: <LazyInitializeValidatorManager />,
         group: "initialize",
     },
     "whats-next": {
         title: "What's next?",
-        component: <div>What's next?</div>,
+        component: <LazyWhatsNext />,
         group: "whats-next",
     }
 }

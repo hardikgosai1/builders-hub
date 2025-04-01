@@ -28,6 +28,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Add L1s",
             component: lazy(() => import('./Wallet/AddL1s')),
             fileNames: []
+        },
+        {
+            id: 'crossChainTransfer',
+            label: "Cross Chain Transfer",
+            component: lazy(() => import('./Wallet/CrossChainTransfer')),
+            fileNames: ["toolbox/src/toolbox/Wallet/CrossChainTransfer.tsx"]
         }
     ],
     'Conversion': [
