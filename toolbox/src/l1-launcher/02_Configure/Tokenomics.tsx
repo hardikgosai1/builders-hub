@@ -10,7 +10,7 @@ import AllowlistPrecompileConfigurator from "../../components/genesis/AllowlistP
 import { isValidAllowlistPrecompileConfig } from "../../components/genesis/types";
 
 export default function Tokenomics() {
-    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations, genesisNativeMinterAllowlistConfig, setGenesisNativeMinterAllowlistConfig, l1Name } = useL1LauncherStore();
+    const { evmTokenSymbol, setEvmTokenSymbol, tokenAllocations, setTokenAllocations, genesisNativeMinterAllowlistConfig, setGenesisNativeMinterAllowlistConfig, evmChainName } = useL1LauncherStore();
     const { walletEVMAddress } = useWalletStore()
 
     const [initComplete, setInitComplete] = useState(false)
@@ -27,7 +27,7 @@ export default function Tokenomics() {
         }
 
         if (!evmTokenSymbol) {
-            setEvmTokenSymbol(l1Name.split(' ').map(word => word[0]).join(''))
+            setEvmTokenSymbol(evmChainName.split(' ').map(word => word[0]).join(''))
         }
     }, [walletEVMAddress, tokenAllocations])
 

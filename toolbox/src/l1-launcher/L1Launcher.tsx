@@ -49,7 +49,10 @@ export default function L1Launcher() {
                         <ErrorBoundary FallbackComponent={ErrorFallback}>
                             <ConnectWallet required={stepsCurrentStep !== Object.keys(stepList)[0]}>
                                 <Suspense fallback={<div>Loading...</div>}>
-                                    {stepList[stepsCurrentStep].component}
+                                    {(() => {
+                                        const Component = stepList[stepsCurrentStep].component;
+                                        return <Component />;
+                                    })()}
                                 </Suspense>
                             </ConnectWallet>
                         </ErrorBoundary>

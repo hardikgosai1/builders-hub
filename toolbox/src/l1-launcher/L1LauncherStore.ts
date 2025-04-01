@@ -17,25 +17,38 @@ const generateRandomName = () => {
 }
 
 export const initialState = {
-    subnetID: "",
-    stepsCurrentStep: Object.keys(stepList)[0],
-    stepsMaxStep: Object.keys(stepList)[0],
-    l1Name: (generateRandomName() + " L1"),
+    chainId: "",
     evmChainId: Math.floor(Math.random() * (1000000 - 100000 + 1)) + 100000,
     evmTokenSymbol: "",
-    tokenAllocations: [] as AllocationEntry[],
-    genesisNativeMinterAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
-    poaOwnerAddress: "",
-    genesisTxAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
     genesisContractDeployerAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    genesisNativeMinterAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
     genesisString: "",
+    genesisTxAllowlistConfig: generateEmptyAllowlistPrecompileConfig(),
+    evmChainName: (generateRandomName() + " L1"),
     nodesCount: 1,
+    poaOwnerAddress: "",
+    stepsCurrentStep: Object.keys(stepList)[0],
+    stepsMaxStep: Object.keys(stepList)[0],
+    subnetID: "",
+    tokenAllocations: [] as AllocationEntry[],
 }
 
 export const useL1LauncherStore = create(
     persist(
         combine(initialState, (set, get) => ({
+            setChainId: (chainId: string) => set({ chainId }),
+            setEvmChainId: (evmChainId: number) => set({ evmChainId }),
+            setEvmTokenSymbol: (evmTokenSymbol: string) => set({ evmTokenSymbol }),
+            setGenesisContractDeployerAllowlistConfig: (genesisContractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisContractDeployerAllowlistConfig }),
+            setGenesisNativeMinterAllowlistConfig: (genesisNativeMinterAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisNativeMinterAllowlistConfig }),
+            setGenesisString: (genesisString: string) => set({ genesisString }),
+            setGenesisTxAllowlistConfig: (genesisTxAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisTxAllowlistConfig }),
+            setEvmChainName: (evmChainName: string) => set({ evmChainName }),
+            setNodesCount: (nodesCount: number) => set({ nodesCount }),
+            setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
             setSubnetID: (subnetID: string) => set({ subnetID }),
+            setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
+
             setStepsCurrentStep: (stepsCurrentStep: string) => {
                 set({ stepsCurrentStep })
                 const stepsMaxStep = get().stepsMaxStep;
@@ -45,17 +58,6 @@ export const useL1LauncherStore = create(
                     set({ stepsMaxStep: stepsCurrentStep })
                 }
             },
-            setL1Name: (l1Name: string) => set({ l1Name }),
-            setEvmChainId: (evmChainId: number) => set({ evmChainId }),
-            setEvmTokenSymbol: (evmTokenSymbol: string) => set({ evmTokenSymbol }),
-            setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
-            setGenesisNativeMinterAllowlistConfig: (genesisNativeMinterAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisNativeMinterAllowlistConfig }),
-            setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
-            setGenesisTxAllowlistConfig: (genesisTxAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisTxAllowlistConfig }),
-            setGenesisContractDeployerAllowlistConfig: (genesisContractDeployerAllowlistConfig: AllowlistPrecompileConfig) => set({ genesisContractDeployerAllowlistConfig }),
-            setGenesisString: (genesisString: string) => set({ genesisString }),
-            setNodesCount: (nodesCount: number) => set({ nodesCount }),
-
             reset: () => {
                 if (typeof window !== 'undefined') {
                     window.localStorage.removeItem('l1-launcher-storage');

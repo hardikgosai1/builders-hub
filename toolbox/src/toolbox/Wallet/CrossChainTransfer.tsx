@@ -6,10 +6,9 @@ import { Input } from "../../components/Input"
 import { Container } from "../components/Container"
 import { Context, pvm, utils, evm, TransferableOutput } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../../lib/walletStore"
-import { useViemChainStore } from "../toolboxStore"
 import { JsonRpcProvider } from "ethers"
-import { bytesToHex, Chain } from "viem"
-import { createPublicClient, http } from "viem"
+import { bytesToHex } from "viem"
+import { useErrorBoundary } from "react-error-boundary"
 
 // Define the type for window.avalanche response
 interface AvalancheResponse {
@@ -20,7 +19,7 @@ interface AvalancheResponse {
 // Helper function for delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export default function CrossChainTransfer({ suggestedAmount = "0.0" }: { suggestedAmount?: string }) {
+export default function CrossChainTransfer({ suggestedAmount = "0.0" }: { suggestedAmount?: string } = {}) {
 
   const platformEndpoint = "https://api.avax-test.network";
 
@@ -29,57 +28,32 @@ export default function CrossChainTransfer({ suggestedAmount = "0.0" }: { sugges
   const [destinationChain, setDestinationChain] = useState<string>("p-chain")
   const [availableBalance, setAvailableBalance] = useState<number>(0)
   const [pChainAvailableBalance, setPChainAvailableBalance] = useState<number>(0)
-  const [publicClient, setPublicClient] = useState<any>(null)
   const [exportLoading, setExportLoading] = useState<boolean>(false)
   const [importLoading, setImportLoading] = useState<boolean>(false)
   const [exportTxId, setExportTxId] = useState<string>("")
   const [waitingForConfirmation, setWaitingForConfirmation] = useState<boolean>(false)
+  const { showBoundary } = useErrorBoundary()
 
   // Use nullish coalescing to safely access store values
-  const { pChainAddress = '', walletEVMAddress = '', coreWalletClient = null } = useWalletStore() || {}
-  const chain = useViemChainStore()
-
-  // Initialize the client on the client-side only
-  useEffect(() => {
-    if (typeof window !== 'undefined' && chain) {
-      const client = createPublicClient({
-        chain: chain as Chain,
-        transport: http(),
-      })
-      setPublicClient(client)
-    }
-  }, [chain])
+  const { pChainAddress, walletEVMAddress, coreWalletClient, publicClient } = useWalletStore()
 
   // Function to fetch balances from both chains
   const fetchBalances = async () => {
-    if (!publicClient || !walletEVMAddress) return
-
-    // Fetch C-Chain balance
-    try {
-      const availableBalance = await publicClient.getBalance({
+    if (publicClient && walletEVMAddress) {
+      publicClient.getBalance({
         address: walletEVMAddress as `0x${string}`,
-      })
-      setAvailableBalance(Number(availableBalance) / 1e18)
-    } catch (error) {
-      console.error("Error fetching EVM balance:", error)
+      }).then((balance: bigint) => {
+        setAvailableBalance(Number(balance) / 1e18)
+      }).catch(showBoundary)
     }
 
-    // Fetch P-Chain balance
-    if (pChainAddress) {
-      try {
-        const pvmApi = new pvm.PVMApi(platformEndpoint);
-        const balance = await pvmApi.getBalance({
-          addresses: [pChainAddress],
-        })
-        console.log(balance)
-        setPChainAvailableBalance(Number(balance.balance) / 1e9)
-      } catch (error) {
-        console.error("Error fetching P-Chain balance:", error)
-      }
+    if (coreWalletClient && pChainAddress) {
+      coreWalletClient.getPChainBalance().then((balance: bigint) => {
+        setPChainAvailableBalance(Number(balance) / 1e9)
+      }).catch(showBoundary)
     }
   }
 
-  // Initial balance fetching
   useEffect(() => {
     if (publicClient && walletEVMAddress) {
       fetchBalances()

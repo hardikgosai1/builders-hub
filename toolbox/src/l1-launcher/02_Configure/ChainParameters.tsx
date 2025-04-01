@@ -5,7 +5,7 @@ import { RadioGroup } from "../../components/RadioGroup";
 import { Input } from '../../components/Input';
 
 
-function isValidL1Name(name: string): boolean {
+function isValidEvmChainName(name: string): boolean {
     if (name.length < 1) return false;
     if (name.length > 100) return false; // Made up number
     return name.split('').every(char => {
@@ -16,7 +16,7 @@ function isValidL1Name(name: string): boolean {
 }
 
 export default function ChainParameters() {
-    const { l1Name, setL1Name, evmChainId, setEvmChainId } = useL1LauncherStore();
+    const { evmChainName, setEvmChainName, evmChainId, setEvmChainId } = useL1LauncherStore();
     const [network, setNetwork] = useState("fuji-testnet");
 
 
@@ -27,7 +27,7 @@ export default function ChainParameters() {
                 <p>Enter the basic parameters of your L1, such as it's name, it's EVM chain ID, and the network you want to deploy it on.</p>
             </div>
 
-            <Input value={l1Name} onChange={setL1Name} label="L1 Name" error={(l1Name === "" || isValidL1Name(l1Name)) ? "" : "Invalid L1 name. Only letters, numbers, and spaces are allowed."} />
+            <Input value={evmChainName} onChange={setEvmChainName} label="L1 Name" error={(evmChainName === "" || isValidEvmChainName(evmChainName)) ? "" : "Invalid L1 name. Only letters, numbers, and spaces are allowed."} />
 
             <div className='space-y-4'>
                 <h3 className="font-medium">EVM Chain ID</h3>
@@ -51,7 +51,7 @@ export default function ChainParameters() {
                 />
             </div>
 
-            <NextPrev nextEnabled={isValidL1Name(l1Name) && evmChainId > 0} />
+            <NextPrev nextEnabled={isValidEvmChainName(evmChainName) && evmChainId > 0} />
         </div>
     );
 }

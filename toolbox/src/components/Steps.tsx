@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactElement } from "react";
 
 type StepsProps = {
     stepGroups: StepGroupListType;
@@ -20,7 +20,7 @@ export interface StepWizardState {
 
 export type StepType<StepGroupListType> = {
     title: string;
-    component: React.ReactNode;
+    component: React.LazyExoticComponent<() => ReactElement>;
     group: keyof StepGroupListType;
 }
 
