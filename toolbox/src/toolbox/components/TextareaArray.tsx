@@ -1,4 +1,4 @@
-import { Textarea } from "../../components/Textarea";
+import { Textarea } from "../../components/TextArea";
 import { Button } from "../../components/Button";
 import { X } from "lucide-react";
 

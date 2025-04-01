@@ -31,6 +31,7 @@ export const initialState = {
     stepsMaxStep: Object.keys(stepList)[0],
     subnetId: "",
     tokenAllocations: [] as AllocationEntry[],
+    conversionId: "",
 }
 
 export const useL1LauncherStore = create(
@@ -48,6 +49,7 @@ export const useL1LauncherStore = create(
             setPoaOwnerAddress: (poaOwnerAddress: string) => set({ poaOwnerAddress }),
             setSubnetID: (subnetId: string) => set({ subnetId }),
             setTokenAllocations: (tokenAllocations: AllocationEntry[]) => set({ tokenAllocations }),
+            setConversionId: (conversionId: string) => set({ conversionId }),
 
             setStepsCurrentStep: (stepsCurrentStep: string) => {
                 set({ stepsCurrentStep })

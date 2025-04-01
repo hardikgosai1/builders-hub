@@ -38,6 +38,7 @@ export type ConvertToL1PChainOwner = {
 }
 
 export async function convertToL1(client: WalletClient<any, any, any, CoreWalletRpcSchema>, params: ConvertToL1Params): Promise<string> {
+    debugger;
     const rpcEndpoint = getRPCEndpoint(await isTestnet(client));
     const pvmApi = new pvm.PVMApi(rpcEndpoint);
     const feeState = await pvmApi.getFeeState();

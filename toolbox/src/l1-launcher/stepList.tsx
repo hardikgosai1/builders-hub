@@ -78,7 +78,7 @@ export const stepList: StepListType = {
     },
     "convert-to-l1": {
         title: "Convert to L1",
-        component: LazyComponentTODO,
+        component: lazy(() => import('./03_Launch/ConvertToL1')),
         group: "launch-l1",
     },
     "launch-rpc-node": {
