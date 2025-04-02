@@ -27,6 +27,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Add L1s",
             component: lazy(() => import('./Wallet/AddL1s')),
             fileNames: []
+        },
+        {
+            id: "crossChainTransfer",
+            label: "Cross Chain Transfer",
+            component: lazy(() => import('./Wallet/CrossChainTransfer')),
+            fileNames: []
         }
     ],
     'Conversion': [
@@ -115,6 +121,27 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Initialize Validator Set",
             component: lazy(() => import('./InitializePoA/InitValidatorSet')),
             fileNames: ["toolbox/src/toolbox/InitializePoA/InitValidatorSet.tsx"]
+        }
+    ],
+
+    "PoA Validator Management": [
+        {
+            id: "addValidator",
+            label: "Add Validator",
+            component: lazy(() => import('./ValidatorManager/AddValidator')),
+            fileNames: ["toolbox/src/toolbox/ValidatorManager/AddValidator.tsx"]
+        },
+        {
+            id: "removeValidator",
+            label: "Remove Validator",
+            component: lazy(() => import('./ValidatorManager/RemoveValidator')),
+            fileNames: ["toolbox/src/toolbox/ValidatorManager/RemoveValidator.tsx"]
+        },
+        {
+            id: "changeWeight",
+            label: "Change Weight",
+            component: lazy(() => import('./ValidatorManager/ChangeWeight')),
+            fileNames: ["toolbox/src/toolbox/ValidatorManager/ChangeWeight.tsx"]
         }
     ],
     "Nodes": [
