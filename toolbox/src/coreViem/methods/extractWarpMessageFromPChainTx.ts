@@ -94,7 +94,7 @@ export type ExtractWarpMessageFromTxParams = {
 export type ExtractWarpMessageFromTxResponse = {
     message: string;
     justification: string;
-    signingsubnetID: string;
+    signingSubnetId: string;
     networkId: typeof networkIDs.FujiID | typeof networkIDs.MainnetID;
     validators: Validator[];
     chainId: string;
@@ -150,7 +150,7 @@ export async function extractWarpMessageFromPChainTx(client: WalletClient<any, a
     return {
         message: utils.bufferToHex(message),
         justification: utils.bufferToHex(justification),
-        signingsubnetID: data.result.tx.unsignedTx.subnetID,
+        signingSubnetId: data.result.tx.unsignedTx.subnetID,
         networkId,
         validators: data.result.tx.unsignedTx.validators,
         chainId: data.result.tx.unsignedTx.chainID,
