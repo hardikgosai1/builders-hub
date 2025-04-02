@@ -23,6 +23,7 @@ export default function CollectSignatures() {
             const {
                 message,
                 justification,
+                signingSubnetId
             } = await coreWalletClient.extractWarpMessageFromPChainTx({ txId: conversionId });
 
             // Use the new API endpoint for signature aggregation
@@ -36,6 +37,8 @@ export default function CollectSignatures() {
                 body: JSON.stringify({
                     message: message,
                     justification: justification,
+                    quorumPercentage: 67,
+                    signingSubnetId: signingSubnetId
                 })
             });
 

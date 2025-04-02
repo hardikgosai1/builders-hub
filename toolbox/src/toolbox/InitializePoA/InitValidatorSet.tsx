@@ -105,6 +105,9 @@ export default function InitValidatorSet() {
             console.log("Simulated transaction:", sim);
             setSimulationWentThrough(true);
 
+            console.log("sim", JSON.stringify(sim, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+
+
             // Send transaction
             const hash = await coreWalletClient.writeContract(sim.request);
 

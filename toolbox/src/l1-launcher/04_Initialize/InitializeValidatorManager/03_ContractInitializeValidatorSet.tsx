@@ -129,6 +129,8 @@ export default function ContractInitializeValidatorSet() {
                 chain: chain,
             });
 
+            console.log("sim", JSON.stringify(sim, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+
             setSimulationPassed(true);
 
             console.log("sim", sim);
