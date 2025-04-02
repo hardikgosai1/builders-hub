@@ -719,4 +719,3 @@ export default function AddValidator() {
     </Container>
   )
 }
-
