@@ -78,9 +78,15 @@ export default function RemoveValidator() {
     }
   }, [avalancheNetworkID, showBoundary])
 
-  const publicClient = createPublicClient({
-    transport: custom(window.avalanche!),
-  })
+  const [publicClient, setPublicClient] = useState<any>(null)
+  
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.avalanche) {
+      setPublicClient(createPublicClient({
+        transport: custom(window.avalanche),
+      }))
+    }
+  }, [])
 
   // Update step status helper
   const updateStepStatus = (step: keyof RemovalSteps, status: StepStatus["status"], error?: string) => {
@@ -105,6 +111,10 @@ export default function RemoveValidator() {
     try {
       // Convert NodeID to bytes format
       const nodeIDBytes = parseNodeID(nodeID)
+
+      if (!publicClient) {
+        throw new Error("Wallet connection not initialized")
+      }
 
       // Call the registeredValidators function
       const validationID = await publicClient.readContract({
@@ -187,6 +197,10 @@ export default function RemoveValidator() {
           
           console.log("Removal transaction:", removeValidatorTx)
           
+          if (!publicClient) {
+            throw new Error("Wallet connection not initialized")
+          }
+          
           const receipt = await publicClient.waitForTransactionReceipt({
             hash: removeValidatorTx
           })
@@ -246,6 +260,10 @@ export default function RemoveValidator() {
             throw new Error("Signed message is empty. Please try again from the previous step.")
           }
           
+          if (!publicClient) {
+            throw new Error("Wallet connection not initialized")
+          }
+          
           const context = await Context.getContextFromURI(platformEndpoint)
           const pvmApi = new pvm.PVMApi(platformEndpoint)
           const feeState = await pvmApi.getFeeState();
@@ -266,7 +284,7 @@ export default function RemoveValidator() {
           const changeValidatorWeightTxHex = bytesToHex(changeValidatorWeightTxBytes)
           console.log("P-Chain transaction:", changeValidatorWeightTxHex)
 
-          if (!window.avalanche) {
+          if (typeof window === "undefined" || !window.avalanche) {
             throw new Error("Core wallet not found")
           }
 
@@ -363,6 +381,15 @@ export default function RemoveValidator() {
       description="Remove a validator from an Avalanche L1"
     >
       <div className="space-y-4">
+        {typeof window === "undefined" && (
+          <div className="p-3 rounded-md bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-sm">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 text-amber-500 mr-2 flex-shrink-0" />
+              <span>This component requires a browser environment with Core wallet extension.</span>
+            </div>
+          </div>
+        )}
+
         {error && !isProcessing && (
           <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
             <div className="flex items-center">
