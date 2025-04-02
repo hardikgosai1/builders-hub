@@ -1,23 +1,27 @@
 import { useState, useEffect } from 'react';
-import { createWalletClient, createPublicClient, custom, http, AbiEvent } from 'viem';
-import { useL1LauncherWizardStore } from '../../config/store';
-import { cb58ToHex } from '@/components/tools/common/utils/cb58';
-import ValidatorManagerABI from '../../../common/icm-contracts/compiled/ValidatorManager.json';
-import { statusColors, StepState } from './colors';
-import { PROXY_ADDRESS } from "@/components/tools/common/utils/genGenesis";
+import { AbiEvent } from 'viem';
+import { useL1LauncherStore } from '../../L1LauncherStore';
+import { Success } from '../../../components/Success';
+import { Button } from '../../../components/Button';
+import { useErrorBoundary } from 'react-error-boundary';
+import { useWalletStore } from '../../../lib/walletStore';
+import ValidatorManagerABI from '../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import { PROXY_ADDRESS } from '../../../components/genesis/genGenesis';
+import { utils } from '@avalabs/avalanchejs';
+import { useViemChainStore } from '../../L1LauncherStore';
 
 export default function ContractInitialize() {
-    const [status, setStatus] = useState<StepState>('not_started');
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [initialCheckHasRun, setInitialCheckHasRun] = useState(false);
+    const { showBoundary } = useErrorBoundary();
+    const { publicClient, coreWalletClient } = useWalletStore();
+    const chain = useViemChainStore();
+
     const {
-        evmChainId,
-        l1Name,
-        tokenSymbol,
-        getL1RpcEndpoint,
         subnetId,
         convertL1SignedWarpMessage
-    } = useL1LauncherWizardStore();
+    } = useL1LauncherStore();
 
     useEffect(() => {
         if (initialCheckHasRun) return;
@@ -25,27 +29,7 @@ export default function ContractInitialize() {
 
         const fetchLogs = async () => {
             try {
-                const customChain = {
-                    id: evmChainId,
-                    name: l1Name,
-                    network: l1Name.toLowerCase(),
-                    nativeCurrency: {
-                        name: tokenSymbol,
-                        symbol: tokenSymbol,
-                        decimals: 18,
-                    },
-                    rpcUrls: {
-                        default: { http: [getL1RpcEndpoint()] },
-                        public: { http: [getL1RpcEndpoint()] },
-                    },
-                };
-
-                const publicClient = createPublicClient({
-                    chain: customChain,
-                    transport: http()
-                });
-
-                const initializedEventABI = ValidatorManagerABI.abi.find(item => item.type === 'event' && item.name === 'Initialized') as AbiEvent;
+                const initializedEventABI = ValidatorManagerABI.abi.find((item: any) => item.type === 'event' && item.name === 'Initialized') as AbiEvent;
 
                 const logs = await publicClient.getLogs({
                     address: PROXY_ADDRESS,
@@ -54,130 +38,74 @@ export default function ContractInitialize() {
                     toBlock: 'latest'
                 });
 
-                console.log('Contract logs:', logs);
-
-                // If logs exist, contract is already initialized
                 if (logs && logs.length > 0) {
-                    setStatus('success');
+                    setIsInitialized(true);
                 }
             } catch (err) {
-                console.error('Error fetching logs:', err);
-                setStatus('error');
-                setErrorMessage(err instanceof Error ? err.message : String(err));
+                showBoundary(err);
             }
         };
 
         fetchLogs();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     const onInitialize = async () => {
-        if (!window.avalanche) {
-            setStatus('error');
-            setErrorMessage('MetaMask is not installed');
+        setIsLoading(true);
+
+        if (!chain) {
+            showBoundary(new Error('Chain not found'));
             return;
         }
 
-        setStatus('in_progress');
-        setErrorMessage(null);
         try {
-            const customChain = {
-                id: evmChainId,
-                name: l1Name,
-                network: l1Name.toLowerCase(),
-                nativeCurrency: {
-                    name: tokenSymbol,
-                    symbol: tokenSymbol,
-                    decimals: 18,
-                },
-                rpcUrls: {
-                    default: { http: [getL1RpcEndpoint()] },
-                    public: { http: [getL1RpcEndpoint()] },
-                },
-            };
-
-            const publicClient = createPublicClient({
-                chain: customChain,
-                transport: http()
-            });
-
-            // Create wallet client for metamask
-            const walletClient = createWalletClient({
-                chain: customChain,
-                transport: custom(window.avalanche)
-            });
-            const [address] = await walletClient.requestAddresses();
-
+            const [address] = await coreWalletClient.requestAddresses();
 
             const settings = {
-                subnetID: cb58ToHex(subnetId),
+                admin: address,
+                subnetId: utils.bufferToHex(utils.base58check.decode(subnetId)),
                 churnPeriodSeconds: BigInt(0),
                 maximumChurnPercentage: 20
             };
 
-            console.log('calling initialize', {
-                address: PROXY_ADDRESS,
-                abi: ValidatorManagerABI.abi,
-                functionName: 'initialize',
-                args: [settings, address],
-                account: address
-            });
-
-            // Simulate with metamask address
             const { request } = await publicClient.simulateContract({
                 address: PROXY_ADDRESS,
                 abi: ValidatorManagerABI.abi,
                 functionName: 'initialize',
-                args: [settings, address],
-                account: address
+                args: [settings],
+                account: address,
+                chain: chain
             });
 
-            // Execute with metamask wallet
-            const hash = await walletClient.writeContract(request);
-
-            // Wait for transaction receipt
+            const hash = await coreWalletClient.writeContract(request);
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
             if (receipt.status === 'success') {
-                setStatus('success');
+                setIsInitialized(true);
             } else {
                 throw new Error('Transaction failed');
             }
-
         } catch (err) {
-            setStatus('error');
-            console.error('Error:', err);
-            setErrorMessage(err instanceof Error ? err.message : 'An error occurred');
+            showBoundary(err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className={`pt-4 px-4 pb-2 rounded-lg border ${statusColors[status]} mb-4 dark:bg-gray-800`}>
+        <div className="pb-2 mb-4">
             <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium dark:text-white">Call initialize in PoA Validator Manager</h3>
-                <span className={`${status === 'error' ? 'text-red-600 dark:text-red-400' : 'dark:text-gray-300'}`}>
-                    {status === 'not_started' ? 'Not started' :
-                        status === 'in_progress' ? 'In progress...' :
-                            status === 'error' ? 'Failed' : 'Success'}
-                </span>
             </div>
 
-            {errorMessage && (
-                <div className="mb-4 p-3 rounded bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
-                    {errorMessage}
-                </div>
-            )}
+            <Success label="Contract initialized successfully" value={isInitialized ? "Contract has been initialized" : ""} />
 
-            {status === 'not_started' && (
-                <button
+            {!isInitialized && (
+                <Button
                     onClick={onInitialize}
-                    disabled={!convertL1SignedWarpMessage}
-                    className={`mt-2 w-full p-2 mb-2 rounded ${!convertL1SignedWarpMessage
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-                        }`}
+                    disabled={isLoading || !convertL1SignedWarpMessage}
                 >
-                    Call initialize function
-                </button>
+                    {isLoading ? 'Initializing...' : 'Call initialize function'}
+                </Button>
             )}
         </div>
     );
