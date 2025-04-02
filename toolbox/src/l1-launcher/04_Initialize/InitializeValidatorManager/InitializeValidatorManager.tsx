@@ -25,8 +25,8 @@ export default function InitializeValidatorManager() {
             <RequireChain chain={chain}>
                 <CollectSignatures />
                 <ContractInitialize />
-                {/*   <ContractInitializeValidatorSet />
-                <CheckContractLogs onSuccess={() => setIsInitialized(true)} /> */}
+                <ContractInitializeValidatorSet />
+                {/* <CheckContractLogs onSuccess={() => setIsInitialized(true)} /> */}
             </RequireChain>
 
             <NextPrev

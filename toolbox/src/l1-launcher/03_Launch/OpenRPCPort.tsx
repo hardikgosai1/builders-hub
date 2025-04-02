@@ -100,21 +100,20 @@ const CheckRPC = ({ endpoint, onSuccess, evmChainId }: { endpoint: string, onSuc
         <div className="space-y-4">
             <h3 className="font-medium">Verify your setup:</h3>
             <div>
-                <Input
-                    label="Test your endpoint:"
-                    type="button"
-                    value={endpoint}
-                    onClick={testRpcEndpoint}
-                    disabled={true}
-                    button={
+                <div className="space-y-1.5">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Test your endpoint:</label>
+                    <div className="flex">
+                        <div className="flex-1 px-3 py-2 border rounded-l-md bg-gray-50 text-gray-900 dark:bg-gray-800 dark:text-gray-100 font-mono text-sm truncate flex items-center">
+                            {endpoint}
+                        </div>
                         <Button
                             onClick={testRpcEndpoint}
                             stickLeft
                         >
                             {status === 'loading' ? 'Testing...' : 'Test'}
                         </Button>
-                    }
-                />
+                    </div>
+                </div>
             </div>
 
             {

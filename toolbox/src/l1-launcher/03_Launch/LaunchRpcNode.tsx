@@ -130,6 +130,7 @@ function EnableDebug() {
                     <h4 className="font-medium mb-2">To enable these features, run this before launching your RPC node:</h4>
                     <CodeHighlighter lang="bash" code={
                         `sudo mkdir -p $HOME/.avalanchego_rpc/configs/chains/${chainId}
+sudo chown -R $USER:$GROUP $HOME/.avalanchego_rpc/configs/chains/${chainId}
 sudo echo '{
   "log-level": "debug",
   "warp-api-enabled": true,

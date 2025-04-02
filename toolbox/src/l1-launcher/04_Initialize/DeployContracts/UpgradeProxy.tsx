@@ -54,7 +54,7 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
                     onUpgradeComplete?.(false);
                 }
             } catch (err) {
-                showBoundary(err);
+                setCurrentImplementation(null);
             }
         }
 

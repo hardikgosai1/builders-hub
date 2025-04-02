@@ -11,7 +11,7 @@ import { utils } from '@avalabs/avalanchejs';
 import { useViemChainStore } from '../../L1LauncherStore';
 
 export default function ContractInitialize() {
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [initializedTxID, setInitializedTxID] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [initialCheckHasRun, setInitialCheckHasRun] = useState(false);
     const { showBoundary } = useErrorBoundary();
@@ -39,7 +39,7 @@ export default function ContractInitialize() {
                 });
 
                 if (logs && logs.length > 0) {
-                    setIsInitialized(true);
+                    setInitializedTxID(logs[0].transactionHash);
                 }
             } catch (err) {
                 showBoundary(err);
@@ -80,7 +80,7 @@ export default function ContractInitialize() {
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
             if (receipt.status === 'success') {
-                setIsInitialized(true);
+                setInitializedTxID(hash);
             } else {
                 throw new Error('Transaction failed');
             }
@@ -97,9 +97,9 @@ export default function ContractInitialize() {
                 <h3 className="font-medium dark:text-white">Call initialize in PoA Validator Manager</h3>
             </div>
 
-            <Success label="Contract initialized successfully" value={isInitialized ? "Contract has been initialized" : ""} />
+            <Success label="Contract initialized successfully" value={initializedTxID || ""} />
 
-            {!isInitialized && (
+            {!initializedTxID && (
                 <Button
                     onClick={onInitialize}
                     disabled={isLoading || !convertL1SignedWarpMessage}
