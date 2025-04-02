@@ -1,33 +1,129 @@
 "use client"
 
 import { useState } from "react"
+import { useToolboxStore, useWalletStore, useViemChainStore } from "../../utils/store";
 import { Container } from "../../../components/container"
 import { cn } from "../../../../lib/utils"
 import { Input } from "../../../components/input"
 import { Button } from "../../../components/button"
+import validatorManagerAbi from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json"
+import { custom, fromBytes, createPublicClient, bytesToHex } from "viem";
+import { pvm, utils, Context } from "@avalabs/avalanchejs";
+import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
+
+
+const parseNodeID = (nodeID: string) => {
+  const nodeIDWithoutPrefix = nodeID.replace("NodeID-", "");
+  const decodedID = utils.base58.decode(nodeIDWithoutPrefix)
+  const nodeIDHex = fromBytes(decodedID, 'hex')
+  const nodeIDHexTrimmed = nodeIDHex.slice(0, -8)
+  return nodeIDHexTrimmed
+}
 
 export default function RemoveValidator() {
   const [nodeID, setNodeID] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const { proxyAddress } = useToolboxStore()
+  const { coreWalletClient, pChainAddress } = useWalletStore()
+  const viemChain = useViemChainStore()
+
+
+  const publicClient = createPublicClient({
+    transport: custom(window.avalanche!),
+  })
+
+  const getValidationID = async (nodeID: string) => {
+    try {
+      // Convert NodeID to bytes format
+      const nodeIDBytes = parseNodeID(nodeID)
+
+      // Call the registeredValidators function
+      const validationID = await publicClient.readContract({
+        address: proxyAddress as `0x${string}`,
+        abi: validatorManagerAbi.abi,
+        functionName: "registeredValidators",
+        args: [nodeIDBytes]
+      })
+
+      return validationID
+    } catch (error: any) {
+      throw new Error(`Failed to get validation ID: ${error.message}`)
+    }
+
+  }
 
   const handleRemove = async () => {
-    if (!nodeID.trim()) {
+    if (!nodeID) {
       setError("Node ID is required")
       return
     }
 
-    setIsLoading(true)
-    setError(null)
-    setSuccess(null)  
-
     try {
-      // Mock success for demo purposes
-      setSuccess(`Validator with Node ID ${nodeID} has been removed successfully`)
-      setNodeID("")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove validator")
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
+
+      const validationIDHex = await getValidationID(nodeID)
+      console.log(validationIDHex)
+
+      const removeValidatorTx = await coreWalletClient.writeContract({
+        address: proxyAddress as `0x${string}`,
+        abi: validatorManagerAbi.abi,
+        functionName: "initiateValidatorRemoval",
+        args: [validationIDHex],
+        chain: viemChain
+      })
+      console.log(removeValidatorTx)
+      const receipt = await publicClient.waitForTransactionReceipt({
+        hash: removeValidatorTx
+      })
+      console.log(receipt)
+
+      const changeWeightWarpUnsignedWarpMessage = receipt.logs[0].data || ""
+      const { signedMessage } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
+        network: "fuji",
+        signatureAggregatorRequest: {
+          message: changeWeightWarpUnsignedWarpMessage,
+          signingSubnetId: "",
+          quorumPercentage: 67,
+        },
+      })
+      console.log(signedMessage)
+
+      const platformEndpoint = "https://api.avax-test.network"
+      const context = await Context.getContextFromURI(platformEndpoint)
+      const pvmApi = new pvm.PVMApi(platformEndpoint)
+      const feeState = await pvmApi.getFeeState();
+      const { utxos } = await pvmApi.getUTXOs({ addresses: [pChainAddress] });
+      const pChainAddressBytes = utils.bech32ToBytes(pChainAddress)
+      const changeValidatorWeightTx = pvm.e.newSetL1ValidatorWeightTx(
+        {
+          message: new Uint8Array(Buffer.from(signedMessage, 'hex')),
+          feeState,
+          fromAddressesBytes: [pChainAddressBytes],
+          utxos,
+        },
+        context,
+      )
+      const changeValidatorWeightTxBytes = changeValidatorWeightTx.toBytes()
+      const changeValidatorWeightTxHex = bytesToHex(changeValidatorWeightTxBytes)
+      console.log(changeValidatorWeightTxHex)
+
+      const coreTx = await window.avalanche?.request({
+        method: "avalanche_sendTransaction",
+        params: {
+          transactionHex: changeValidatorWeightTxHex,
+          chainAlias: "P"  
+        }
+      })
+      
+      console.log(coreTx)
+      setSuccess(`Validator ${nodeID} successfully removed.`)
+    } catch (err: any) {
+      setError(`Failed to remove validator: ${err.message}`)
+      console.error(err)
     } finally {
       setIsLoading(false)
     }
