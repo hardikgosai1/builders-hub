@@ -94,7 +94,7 @@ export const stepList: StepListType = {
     },
     "initialize-validator-manager": {
         title: "Initialize validator manager",
-        component: undefined,
+        component: lazy(() => import('./04_Initialize/InitializeValidatorManager/InitializeValidatorManager')),
         group: "initialize",
     },
     "whats-next": {

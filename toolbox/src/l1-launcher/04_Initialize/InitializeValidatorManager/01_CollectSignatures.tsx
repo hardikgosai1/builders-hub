@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useL1LauncherWizardStore } from '../../config/store';
+import { useL1LauncherStore } from '../../L1LauncherStore';
 import { statusColors, StepState } from './colors';
-import { packL1ConversionMessage, PackL1ConversionMessageArgs } from '@/components/tools/common/utils/convertWarp';
+import { packL1ConversionMessage, PackL1ConversionMessageArgs, SubnetToL1ConversionValidatorData } from '../../../coreViem/utils/convertWarp';
 import { bytesToHex } from 'viem';
-import { PROXY_ADDRESS } from '@/components/tools/common/utils/genGenesis';
+import { PROXY_ADDRESS } from '../../../components/genesis/genGenesis'
+import { INITIAL_VALIDATOR_WEIGHT } from '../../03_Launch/ConvertToL1';
+import { useWalletStore } from '../../../lib/walletStore';
+import { Success } from '../../../components/Success';
+import { Button } from '../../../components/Button';
 
 // % curl 'https://signature-aggregator-fuji.fly.dev/aggregate-signatures' \
 //   -H 'sec-ch-ua-platform: "macOS"' \
@@ -18,17 +22,16 @@ import { PROXY_ADDRESS } from '@/components/tools/common/utils/genGenesis';
 
 export default function CollectSignatures() {
     const {
-        chainId,
         subnetId,
-        nodePopJsons,
-        nodesCount,
         convertL1SignedWarpMessage,
         setConvertL1SignedWarpMessage,
-    } = useL1LauncherWizardStore();
+        conversionId
+    } = useL1LauncherStore();
 
     const [error, setError] = useState<string | null>(null);
     const [status, setStatus] = useState<StepState>('not_started');
     const [isLoading, setIsLoading] = useState(false);
+    const { coreWalletClient } = useWalletStore();
 
     useEffect(() => {
         if (convertL1SignedWarpMessage) {
@@ -41,33 +44,21 @@ export default function CollectSignatures() {
         setIsLoading(true);
         setError(null);
         try {
-            const pChainChainID = '11111111111111111111111111111111LpoYY'//TODO: unhardcode
-
-            // Pack the message locally using packL1ConversionMessage
-
-            const coversionArgs: PackL1ConversionMessageArgs = {
-                subnetId,
-                managerChainID: chainId,
-                managerAddress: PROXY_ADDRESS,
-                validators: nodePopJsons.slice(0, nodesCount).map(json => JSON.parse(json).result)
-            }
-
-            const [message, justification] = packL1ConversionMessage(coversionArgs, 5, pChainChainID);
+            const {
+                message,
+                justification,
+            } = await coreWalletClient.extractWarpMessageFromPChainTx({ txId: conversionId });
 
             // Use the new API endpoint for signature aggregation
-            // const signResponse = await fetch('https://glacier-api-dev.avax.network/v1/signatureAggregator/aggregateSignatures', {
-            const signResponse = await fetch('https://signature-aggregator-fuji.fly.dev/aggregate-signatures', {
-
+            const signResponse = await fetch('https://glacier-api.avax.network/v1/signatureAggregator/fuji/aggregateSignatures', {
                 method: 'POST',
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    message: bytesToHex(message),
-                    justification: bytesToHex(justification),
-                    'signing-subnet-id': subnetId,
-                    // signingSubnetId: subnetId,
+                    message: message,
+                    justification: justification,
                 })
             });
 
@@ -78,7 +69,7 @@ export default function CollectSignatures() {
 
             // const { signedMessage } = await signResponse.json();
             const respJson = await signResponse.json();
-            const signedMessage = respJson['signed-message'];
+            const signedMessage = respJson['signedMessage'];
             setConvertL1SignedWarpMessage(`0x${signedMessage}`);
             setStatus('success');
         } catch (err) {
@@ -93,42 +84,18 @@ export default function CollectSignatures() {
     return (
         <div className={`pt-4 px-4 pb-2 rounded-lg border ${statusColors[status]} mb-4 dark:bg-gray-800`}>
             <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium dark:text-white">Collect L1 Conversion WARP Signatures</h3>
-                <span className={`${error ? 'text-red-600 dark:text-red-400' : 'dark:text-gray-300'}`}>
-                    {error ? 'Failed' : 'Success'}
-                </span>
+                <h3 className="font-medium dark:text-white">Aggregate L1 Conversion WARP Signatures</h3>
             </div>
 
-            {error && (
-                <div className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</div>
-            )}
+            <Success label="Signatures aggregated successfully" value={convertL1SignedWarpMessage} />
 
-            {convertL1SignedWarpMessage && (
-                <div className="mb-2">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Signature:</div>
-                    <div className="bg-white dark:bg-gray-900 rounded p-2 border border-gray-100 dark:border-gray-700">
-                        <pre className="font-mono text-sm whitespace-pre-wrap break-all dark:text-gray-300">{convertL1SignedWarpMessage}</pre>
-                    </div>
-                    <button
-                        onClick={() => setConvertL1SignedWarpMessage(null)}
-                        className="text-sm text-gray-500 dark:text-gray-400 mb-1"
-                    >
-                        Reset
-                    </button>
-                </div>
-            )}
-
-            {convertL1SignedWarpMessage === null && (
-                <button
+            {!convertL1SignedWarpMessage && (
+                <Button
                     onClick={onCollect}
                     disabled={isLoading}
-                    className={`mt-2 w-full p-2 mb-2 rounded text-white ${isLoading
-                        ? 'bg-blue-400 cursor-not-allowed dark:bg-blue-500'
-                        : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-                        }`}
                 >
                     {isLoading ? 'Collecting Signatures...' : 'Collect Signatures'}
-                </button>
+                </Button>
             )}
         </div>
     );

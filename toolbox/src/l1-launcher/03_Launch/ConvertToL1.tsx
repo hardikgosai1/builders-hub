@@ -10,7 +10,7 @@ import { ConvertToL1Params, ConvertToL1Validator } from '../../coreViem/methods/
 import { Success } from '../../components/Success';
 import { Button } from '../../components/Button';
 
-const INITIAL_VALIDATOR_WEIGHT = 100n;
+export const INITIAL_VALIDATOR_WEIGHT = 100n;
 const INITIAL_VALIDATOR_BALANCE = 10n ** 9n; // 1 AVAX on P chain
 
 const popRequest = `curl -X POST --data '{ 

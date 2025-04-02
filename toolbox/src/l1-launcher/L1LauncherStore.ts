@@ -41,6 +41,7 @@ export const initialState = {
     evmChainIsTestnet: true,
     validatorMessagesAddress: "",
     validatorManagerAddress: "",
+    convertL1SignedWarpMessage: "",
 }
 
 export const useL1LauncherStore = create(
@@ -68,6 +69,7 @@ export const useL1LauncherStore = create(
             setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
             setValidatorMessagesAddress: (validatorMessagesAddress: string) => set({ validatorMessagesAddress }),
             setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
+            setConvertL1SignedWarpMessage: (convertL1SignedWarpMessage: string) => set({ convertL1SignedWarpMessage }),
 
             setStepsCurrentStep: (stepsCurrentStep: string) => {
                 set({ stepsCurrentStep })

@@ -11,7 +11,7 @@ export interface PackL1ConversionMessageArgs {
     validators: SubnetToL1ConversionValidatorData[];
 }
 
-interface SubnetToL1ConversionValidatorData {
+export interface SubnetToL1ConversionValidatorData {
     nodeID: string;
     nodePOP: {
         publicKey: string;
@@ -153,7 +153,6 @@ export const compareNodeIDs = (a: string, b: string) => {
 
 
 export function packL1ConversionMessage(args: PackL1ConversionMessageArgs, networkID: number, sourceChainID: string): [Uint8Array, Uint8Array] {
-    console.log(args);
     const subnetConversionID = subnetToL1ConversionID(args);
 
     const addressedCallPayload = newSubnetToL1Conversion(subnetConversionID)

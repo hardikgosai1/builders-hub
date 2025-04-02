@@ -60,7 +60,7 @@ interface UnsignedTx {
     outputs: Output[];
     inputs: Input[];
     memo: string;
-    subnetId: string;
+    subnetID: string;
     chainID: string;
     address: string;
     validators: Validator[];
@@ -94,7 +94,7 @@ export type ExtractWarpMessageFromTxParams = {
 export type ExtractWarpMessageFromTxResponse = {
     message: string;
     justification: string;
-    signingSubnetId: string;
+    signingsubnetID: string;
     networkId: typeof networkIDs.FujiID | typeof networkIDs.MainnetID;
     validators: Validator[];
     chainId: string;
@@ -126,12 +126,14 @@ export async function extractWarpMessageFromPChainTx(client: WalletClient<any, a
 
     const data = await response.json() as ConversionDataResponse
 
-    if (!data?.result?.tx?.unsignedTx?.subnetId || !data?.result?.tx?.unsignedTx?.chainID || !data?.result?.tx?.unsignedTx?.address || !data?.result?.tx?.unsignedTx?.validators) {
+    if (!data?.result?.tx?.unsignedTx?.subnetID || !data?.result?.tx?.unsignedTx?.chainID || !data?.result?.tx?.unsignedTx?.address || !data?.result?.tx?.unsignedTx?.validators) {
+        console.log('txId', txId)
+        console.log('data', data)
         throw new Error("Invalid transaction data, are you sure this is a conversion transaction?");
     }
 
     const conversionArgs: PackL1ConversionMessageArgs = {
-        subnetId: data.result.tx.unsignedTx.subnetId,
+        subnetId: data.result.tx.unsignedTx.subnetID,
         managerChainID: data.result.tx.unsignedTx.chainID,
         managerAddress: data.result.tx.unsignedTx.address,
         validators: data.result.tx.unsignedTx.validators.map((validator) => {
@@ -148,7 +150,7 @@ export async function extractWarpMessageFromPChainTx(client: WalletClient<any, a
     return {
         message: utils.bufferToHex(message),
         justification: utils.bufferToHex(justification),
-        signingSubnetId: data.result.tx.unsignedTx.subnetId,
+        signingsubnetID: data.result.tx.unsignedTx.subnetID,
         networkId,
         validators: data.result.tx.unsignedTx.validators,
         chainId: data.result.tx.unsignedTx.chainID,

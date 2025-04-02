@@ -1,20 +1,19 @@
 import { useState } from 'react';
-import { useL1LauncherWizardStore } from '../../config/store';
-import NextPrev from "@/components/tools/common/ui/NextPrev";
-import RequireWalletConnection from '@/components/tools/common/ui/RequireWalletConnectionV2';
+import NextPrev from "../../components/NextPrev";
 import CheckContractLogs from './04_CheckContractLogs';
 import CollectSignatures from './01_CollectSignatures';
 import ContractInitialize from './02_ContractInitialize';
 import ContractInitializeValidatorSet from './03_ContractInitializeValidatorSet';
+import { RequireChain } from '../../../components/RequireChain';
+import { useViemChainStore } from '../../L1LauncherStore';
 
 export default function InitializeValidatorManager() {
     const [isInitialized, setIsInitialized] = useState(false);
-    const {
-        goToNextStep,
-        goToPreviousStep,
-        getViemL1Chain
-    } = useL1LauncherWizardStore();
+    const chain = useViemChainStore()
 
+    if (!chain) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="space-y-12">
@@ -23,17 +22,15 @@ export default function InitializeValidatorManager() {
                 <p>This step will initialize your validator manager contract with the required signatures.</p>
             </div>
 
-            <RequireWalletConnection chain={getViemL1Chain()} skipUI={true}>
+            <RequireChain chain={chain}>
                 <CollectSignatures />
-                <ContractInitialize />
+                {/* <ContractInitialize />
                 <ContractInitializeValidatorSet />
-                <CheckContractLogs onSuccess={() => setIsInitialized(true)} />
-            </RequireWalletConnection>
+                <CheckContractLogs onSuccess={() => setIsInitialized(true)} /> */}
+            </RequireChain>
 
             <NextPrev
-                nextDisabled={!isInitialized}
-                onNext={goToNextStep}
-                onPrev={goToPreviousStep}
+                nextEnabled={isInitialized}
             />
         </div>
     );

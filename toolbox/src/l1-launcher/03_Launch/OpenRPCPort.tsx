@@ -100,33 +100,39 @@ const CheckRPC = ({ endpoint, onSuccess, evmChainId }: { endpoint: string, onSuc
         <div className="space-y-4">
             <h3 className="font-medium">Verify your setup:</h3>
             <div>
-                <p className="mb-2">Test your endpoint:</p>
-                <div className="flex items-center gap-2">
-                    <code className="flex-grow bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm break-all">
-                        {endpoint}
-                    </code>
-                    <Button
-                        onClick={testRpcEndpoint}
-                        disabled={status === 'loading'}
-                        size="sm"
-                    >
-                        {status === 'loading' ? 'Testing...' : 'Test'}
-                    </Button>
-                </div>
+                <Input
+                    label="Test your endpoint:"
+                    type="button"
+                    value={endpoint}
+                    onClick={testRpcEndpoint}
+                    disabled={true}
+                    button={
+                        <Button
+                            onClick={testRpcEndpoint}
+                            stickLeft
+                        >
+                            {status === 'loading' ? 'Testing...' : 'Test'}
+                        </Button>
+                    }
+                />
             </div>
 
-            {status === 'error' && (
-                <Note variant="destructive">{errorMessage}</Note>
-            )}
+            {
+                status === 'error' && (
+                    <Note variant="destructive">{errorMessage}</Note>
+                )
+            }
 
-            {status === 'success' && (
-                <Note variant="success">Successfully connected to RPC endpoint!</Note>
-            )}
+            {
+                status === 'success' && (
+                    <Note variant="success">Successfully connected to RPC endpoint!</Note>
+                )
+            }
 
             <p>
                 A successful test means your RPC node is properly configured and accessible.
             </p>
-        </div>
+        </div >
     );
 };
 
@@ -164,7 +170,7 @@ export default function OpenRPCPort() {
         } else if (rpcDomainType === 'has-domain') {
             setEvmRpcURL(`https://${rpcAddress}/ext/bc/${chainId}/rpc`);
         } else if (rpcDomainType === 'no-domain') {
-            setEvmRpcURL(`${rpcAddress}.nip.io/ext/bc/${chainId}/rpc`);
+            setEvmRpcURL(`https://${rpcAddress}.nip.io/ext/bc/${chainId}/rpc`);
         } else if (rpcDomainType === 'manual-ssl') {
             setEvmRpcURL(`https://${rpcAddress}/ext/bc/${chainId}/rpc`);
         } else {
