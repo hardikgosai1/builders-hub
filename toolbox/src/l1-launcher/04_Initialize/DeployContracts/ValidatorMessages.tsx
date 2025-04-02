@@ -43,7 +43,7 @@ export function ValidatorMessagesDeployer() {
     };
 
     return (
-        <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div>
             <h3 className="text-lg font-medium mb-4 dark:text-gray-200">ValidatorMessages Contract</h3>
 
             <Success label="ValidatorMessages contract deployed successfully" value={validatorMessagesAddress} />

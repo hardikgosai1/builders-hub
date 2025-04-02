@@ -17,12 +17,6 @@ export default function DeployContracts() {
 
     const [isProxyUpgraded, setIsProxyUpgraded] = useState(false);
 
-    // Both contracts must be deployed and proxy must be upgraded to proceed
-    const canProceed = validatorMessagesAddress !== null &&
-        validatorManagerAddress !== null &&
-        isProxyUpgraded;
-
-
     if (!chain) {
         return <div>Loading...</div>;
     }
@@ -39,11 +33,13 @@ export default function DeployContracts() {
                 <ValidatorManagerDeployer />
 
                 {/* Step 3: Upgrade Proxy */}
-                {/* <UpgradeProxyForm onUpgradeComplete={setIsProxyUpgraded} /> */}
+                <UpgradeProxyForm onUpgradeComplete={setIsProxyUpgraded} />
             </div>
 
             <div className="mt-6">
-                <NextPrev nextEnabled={canProceed} />
+                <NextPrev nextEnabled={validatorMessagesAddress !== null &&
+                    validatorManagerAddress !== null &&
+                    isProxyUpgraded} />
             </div>
         </RequireChain>
     );
