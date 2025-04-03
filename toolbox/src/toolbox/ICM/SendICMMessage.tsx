@@ -107,14 +107,7 @@ export default function DeployReceiver() {
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Send ICM Message</h2>
 
-                <div className="flex items-start p-4 mb-4 text-sm border rounded-md bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-700/50 dark:text-amber-200">
-                    <AlertTriangle className="w-5 h-5 mr-3 flex-shrink-0" />
-                    <p>
-                        🚧 Heads up! This tool is currently under construction and may not work as expected.
-                        We're actively improving it as we ship fast and iterate. Thanks for your patience as we build better tools! 🚧
-                    </p>
-                </div>
-                <div className="opacity-50 pointer-events-none">
+                <div className="space-y-4">
 
                     <Success
                         label="ICM Receiver Address"
@@ -193,6 +186,6 @@ export default function DeployReceiver() {
                     />
                 </div>
             </div>
-        </RequireChain>
+        </RequireChain >
     );
 }

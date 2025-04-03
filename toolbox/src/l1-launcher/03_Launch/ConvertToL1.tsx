@@ -180,7 +180,7 @@ export default function ConvertToL1() {
                 {!conversionId && (
                     <>
                         <p>
-                            Convert your subnet to an L1 with the specified validators. All validators will have a weight of {INITIAL_VALIDATOR_WEIGHT}. The manager address will be set to {PROXY_ADDRESS}.
+                            Convert your subnet to an L1 with the specified validators. All validators will have a weight of {INITIAL_VALIDATOR_WEIGHT}. The manager address will be set to {PROXY_ADDRESS}. Validators will have 1 month worth of AVAX in their balance.
                         </p>
 
                         <Button

@@ -193,11 +193,12 @@ const genConfigCommand = (destinationSubnetID: string, destinationBlockchainID: 
     return `mkdir -p ~/.icm-relayer && echo '${configStr}' > ~/.icm-relayer/config.json`
 }
 
+import versions from '../../versions.json';
 const relayerDockerCommand = () => {
     return `docker run --name relayer -d \\
     --restart on-failure  \\
     --user=root \\
     -v ~/.icm-relayer/:/icm-relayer/ \\
-    avaplatform/icm-relayer:v1.5.1-rc.4 \\
+    avaplatform/icm-relayer:${versions['avaplatform/icm-relayer']} \\
     --config-file /icm-relayer/config.json`
 }
