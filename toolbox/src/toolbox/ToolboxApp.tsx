@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
 import { useToolboxStore } from '../toolbox/toolboxStore';
@@ -10,7 +12,7 @@ import { ErrorFallback } from "../components/ErrorFallback";
 type ComponentType = {
     id: string;
     label: string;
-    component: React.LazyExoticComponent<() => ReactElement>;
+    component: React.LazyExoticComponent<(props?: any) => ReactElement>;
     fileNames: string[];
     skipWalletConnection?: boolean;
 }
