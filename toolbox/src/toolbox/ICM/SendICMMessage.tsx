@@ -103,6 +103,8 @@ export default function SendICMMessage() {
     async function queryLastMessage() {
         setIsQuerying(true);
         try {
+            if (!viemChain) throw new Error('Invalid chain');
+
             // For CtoL1, we need to query the subnet
             // For L1toC, we need to query the C-Chain
             const targetClient = messageDirection === "CtoL1"
@@ -110,7 +112,10 @@ export default function SendICMMessage() {
                     transport: http(evmChainRpcUrl),
                     chain: viemChain,
                 })
-                : publicClient;
+                : createPublicClient({
+                    transport: http(avalancheFuji.rpcUrls.default.http[0]),
+                    chain: avalancheFuji,
+                });
 
             const targetAddress = messageDirection === "CtoL1"
                 ? icmReceiverAddress as `0x${string}`
@@ -129,11 +134,6 @@ export default function SendICMMessage() {
             setIsQuerying(false);
         }
     }
-
-    // Text based on selected direction
-    const directionText = messageDirection === "CtoL1"
-        ? "C-Chain to Subnet (L1)"
-        : "Subnet (L1) to C-Chain";
 
     const sourceChainText = messageDirection === "CtoL1" ? "C-Chain" : "Subnet (L1)";
     const destinationChainText = messageDirection === "CtoL1" ? "Subnet (L1)" : "C-Chain";
@@ -158,16 +158,18 @@ export default function SendICMMessage() {
             <RequireChain chain={requiredChain}>
                 <div className="space-y-4">
                     {messageDirection === "CtoL1" && (
-                        <Success
+                        <Input
                             label="ICM Receiver Address on Subnet"
                             value={icmReceiverAddress}
+                            disabled
                         />
                     )}
 
                     {messageDirection === "L1toC" && (
-                        <Success
+                        <Input
                             label="C-Chain Receiver Address"
                             value={SENDER_C_CHAIN_ADDRESS}
+                            disabled
                         />
                     )}
 
