@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from 'react';
 import Pre from './Pre';
-
+import { deduplicateEthRequestAccounts } from './deduplicateEthRequestAccounts';
 export interface ChainConfig {
     chainId: string;
     chainName: string;
@@ -73,7 +73,7 @@ export default function RequireWalletConnection({ children, chainConfig, require
             }
 
             // Check if account can be accessed
-            const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
+            const accounts = await deduplicateEthRequestAccounts()
             if (!accounts || accounts.length === 0) {
                 setError('No account detected');
                 return;

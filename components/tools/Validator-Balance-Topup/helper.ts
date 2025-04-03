@@ -3,7 +3,7 @@ import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { Address } from 'micro-eth-signer';
 import { keccak256, toRlp, toBytes, createPublicClient, http, parseEther } from 'viem';
 import { avalancheFuji } from 'viem/chains';
-
+import { deduplicateEthRequestAccounts } from '@/components/tools/common/ui/deduplicateEthRequestAccounts';
 // Type definitions
 declare global {
     interface Window {
@@ -22,7 +22,7 @@ export async function getWalletAddress() {
     if (!window.avalanche) {
         throw new Error('No wallet detected');
     }
-    const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
+    const accounts = await deduplicateEthRequestAccounts()
     if (!accounts || accounts.length === 0) {
         throw new Error('No account found');
     }

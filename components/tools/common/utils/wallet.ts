@@ -1,3 +1,5 @@
+import { deduplicateEthRequestAccounts } from '../ui/deduplicateEthRequestAccounts';
+
 declare global {
     interface Window {
         ethereum?: {
@@ -13,7 +15,7 @@ export async function getWalletAddress() {
         throw new Error('No wallet detected');
     }
 
-    const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
+    const accounts = await deduplicateEthRequestAccounts()
     if (!accounts || accounts.length === 0) {
         throw new Error('No account found');
     }

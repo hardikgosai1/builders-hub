@@ -21,6 +21,7 @@ import {
 
 import { isValidUrl } from '@/components/tools/common/utils/validation';
 import { isAddress } from 'viem';
+import { deduplicateEthRequestAccounts } from '@/components/tools/common/ui/deduplicateEthRequestAccounts';
 
 export default function ChainParameters() {
     const {
@@ -228,7 +229,7 @@ export default function ChainParameters() {
 
         if (!window.avalanche) return;
         // Get connected account from wallet
-        const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
+        const accounts = await deduplicateEthRequestAccounts()
         if (!accounts || accounts.length === 0) return;
 
         // Create public client to read contract
