@@ -5,7 +5,6 @@ import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
-import { AlertTriangle } from "lucide-react";
 import { Success } from "../../components/Success";
 import { createPublicClient, http } from 'viem';
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
