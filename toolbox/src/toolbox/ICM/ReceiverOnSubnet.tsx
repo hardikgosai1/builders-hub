@@ -6,7 +6,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
+import SenderReceiverABI from "../../../contracts/example-contracts/compiled/SenderReceiver.json";
 import { avalancheFuji } from "viem/chains";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
@@ -42,8 +42,8 @@ export default function DeployReceiver() {
         setIcmReceiverAddress("");
         try {
             const hash = await coreWalletClient.deployContract({
-                abi: ReceiverOnSubnetABI.abi,
-                bytecode: ReceiverOnSubnetABI.bytecode.object as `0x${string}`,
+                abi: SenderReceiverABI.abi,
+                bytecode: SenderReceiverABI.bytecode.object as `0x${string}`,
                 chain: viemChain
             });
 

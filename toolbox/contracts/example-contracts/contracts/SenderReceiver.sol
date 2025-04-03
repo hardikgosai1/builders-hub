@@ -1,27 +1,29 @@
-//Original: https://github.com/ava-labs/avalanche-starter-kit/blob/21e0481966167736d616397ff09b52b0b2cc2398/contracts/interchain-messaging/send-receive/senderOnCChain.sol
-//(slight modifications)
+// Original sources:
+// https://github.com/ava-labs/avalanche-starter-kit/blob/21e0481966167736d616397ff09b52b0b2cc2398/contracts/interchain-messaging/send-receive/senderOnCChain.sol
+// https://github.com/ava-labs/avalanche-starter-kit/blob/21e0481966167736d616397ff09b52b0b2cc2398/contracts/interchain-messaging/send-receive/receiverOnSubnet.sol
 
 // (c) 2023, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 // SPDX-License-Identifier: Ecosystem
 
-pragma solidity ^0.8.18;
+pragma solidity 0.8.29;
 
 import "./ITeleporterMessenger.sol";
+import "./ITeleporterReceiver.sol";
 
-// Deployed on Fucji C-Chain testnet at 0x2419133a23EA13EAF3dC3ee2382F083067107386
-// https://subnets-test.avax.network/c-chain/address/0x2419133a23EA13EAF3dC3ee2382F083067107386
-contract SenderOnCChain {
+contract SenderReceiver is ITeleporterReceiver {
     ITeleporterMessenger public immutable messenger =
         ITeleporterMessenger(0x253b2784c75e510dD0fF1da844684a1aC0aa5fcf);
+
+    uint256 public lastMessage;
 
     /**
      * @dev Sends a message to another chain.
      */
     function sendMessage(
         address destinationAddress,
-        string calldata message,
+        uint256 message,
         bytes32 destinationBlockchainID
     ) external {
         messenger.sendCrossChainMessage(
@@ -37,5 +39,20 @@ contract SenderOnCChain {
                 message: abi.encode(message)
             })
         );
+    }
+
+    function receiveTeleporterMessage(
+        bytes32,
+        address,
+        bytes calldata message
+    ) external override {
+        // Only the Teleporter receiver can deliver a message.
+        require(
+            msg.sender == address(messenger),
+            "SenderReceiver: unauthorized TeleporterMessenger"
+        );
+
+        // Store the message.
+        lastMessage = abi.decode(message, (uint256));
     }
 }

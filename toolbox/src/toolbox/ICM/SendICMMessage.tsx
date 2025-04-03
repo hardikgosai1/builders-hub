@@ -7,8 +7,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { createPublicClient, http } from 'viem';
-import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
-import SenderOnCChainABI from "../../../contracts/example-contracts/compiled/SenderOnCChain.json";
+import SenderReceiverABI from "../../../contracts/example-contracts/compiled/SenderReceiver.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
@@ -21,10 +20,10 @@ export default function DeployReceiver() {
     const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
-    const [message, setMessage] = useState(`It is ${new Date().toISOString().slice(11, 16)} in London`);
+    const [message, setMessage] = useState(1234);
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
-    const [lastReceivedMessage, setLastReceivedMessage] = useState<string>();
+    const [lastReceivedMessage, setLastReceivedMessage] = useState<number>();
     const [isQuerying, setIsQuerying] = useState(false);
 
     const chainIDHex = useMemo(() =>
@@ -54,7 +53,7 @@ export default function DeployReceiver() {
         try {
             const { request } = await publicClient.simulateContract({
                 address: SENDER_C_CHAIN_ADDRESS,
-                abi: SenderOnCChainABI.abi,
+                abi: SenderReceiverABI.abi,
                 functionName: 'sendMessage',
                 args: [icmReceiverAddress, message, chainIDHex],
                 chain: avalancheFuji,
@@ -89,11 +88,11 @@ export default function DeployReceiver() {
                 chain: viemChain,
             }).readContract({
                 address: icmReceiverAddress as `0x${string}`,
-                abi: ReceiverOnSubnetABI.abi,
+                abi: SenderReceiverABI.abi,
                 functionName: 'lastMessage',
             });
 
-            setLastReceivedMessage(lastMessage as string);
+            setLastReceivedMessage(lastMessage as number);
         } catch (error) {
             showBoundary(error);
         } finally {
@@ -125,9 +124,10 @@ export default function DeployReceiver() {
                     />
                     <Input
                         label="Message"
-                        value={message}
-                        onChange={setMessage}
+                        value={message.toString()}
+                        onChange={(value) => setMessage(Number(value) || 0)}
                         required
+                        type="number"
                     />
                     <Input
                         label="C-Chain Sender Address"
