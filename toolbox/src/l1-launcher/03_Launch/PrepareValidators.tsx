@@ -36,7 +36,7 @@ import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Note } from "../../components/Note";
 
 export default function PrepareValidators() {
-    const { nodesCount, setNodesCount } = useL1LauncherStore();
+    const { nodesCount } = useL1LauncherStore();
     const [activeOS, setActiveOS] = useState(Object.keys(dockerInstallInstructions)[0]);
 
 

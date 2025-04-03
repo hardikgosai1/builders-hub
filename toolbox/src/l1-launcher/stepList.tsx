@@ -99,7 +99,7 @@ export const stepList: StepListType = {
     },
     "whats-next": {
         title: "What's next?",
-        component: undefined,
+        component: lazy(() => import('./05_WhatsNext/WhatsNext')),
         group: "whats-next",
     }
 }

@@ -39,42 +39,22 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
     const fetchLogs = async () => {
         setIsLoading(true);
         try {
-            // // Get all events from ABI
-            // const eventAbis = ValidatorManagerABI.abi.filter(
-            //     (item: any) => item.type === 'event'
-            // ) as AbiEvent[];
+            // Get all events from ABI
+            const eventAbis = ValidatorManagerABI.abi.filter(
+                (item) => item.type === 'event'
+            ) as AbiEvent[];
 
-            // // Log event names for debugging
-            // console.log("Available events:", eventAbis.map(e => e.name));
-
-            const expectedEvents = [
-                'InitialValidatorCreated',
-                'Initialized',
-            ]
-
-            console.log('abi InitialValidatorCreated', ValidatorManagerABI.abi.find(
-                (item: any) => item.type === 'event' && item.name === 'InitialValidatorCreated'
-            ) as AbiEvent)
-            console.log('abi Initialized', ValidatorManagerABI.abi.find(
-                (item: any) => item.type === 'event' && item.name === 'Initialized'
-            ) as AbiEvent)
-
-            const allLogs = (await publicClient.getLogs({
-                address: PROXY_ADDRESS,
-                fromBlock: 'earliest',
-                toBlock: 'latest'
-            })).map((log) => {
-                const decodedLog = decodeEventLog({
-                    abi: ValidatorManagerABI.abi,
-                    data: log.data,
-                    topics: log.topics,
-                });
-                return decodedLog;
-            })
-
-            console.log('allLogs', allLogs);
-
-            return
+            // Fetch logs for all events
+            const allLogs = await Promise.all(
+                eventAbis.map(eventAbi =>
+                    publicClient.getLogs({
+                        address: PROXY_ADDRESS,
+                        event: eventAbi,
+                        fromBlock: 'earliest',
+                        toBlock: 'latest'
+                    })
+                )
+            );
 
             // Process and decode all logs
             const processedLogs: ContractLog[] = [];
@@ -110,7 +90,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
 
             // Check for specific events
             const initialized = sortedLogs.some(log => log.eventName === 'Initialized');
-            const initialValidator = sortedLogs.some(log => log.eventName === 'InitialValidatorCreated');
+            const initialValidator = sortedLogs.some(log => log.eventName === 'RegisteredInitialValidator');
 
             console.log("Events found:", { initialized, initialValidator });
             setHasInitialized(initialized);
@@ -152,7 +132,7 @@ export default function CheckContractLogs({ onSuccess }: { onSuccess: () => void
                             <span className="text-white text-sm">✓</span>
                         )}
                     </div>
-                    <span className="text-gray-700 dark:text-gray-300">ValidatorManager emitted InitialValidatorCreated event</span>
+                    <span className="text-gray-700 dark:text-gray-300">ValidatorManager emitted RegisteredInitialValidator event</span>
                 </div>
             </div>
 

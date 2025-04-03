@@ -1,31 +1,13 @@
 
 import { useEffect, useState } from 'react';
-import { createPublicClient, http, getAddress, createWalletClient, custom, defineChain } from 'viem';
 import { useL1LauncherStore, useViemChainStore } from '../../L1LauncherStore';
 import { useWalletStore } from '../../../lib/walletStore';
 import ProxyAdmin from "../../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json"
-import { PROXY_ADMIN_ADDRESS, PROXY_ADDRESS, UNITIALIZED_PROXY_ADDRESS } from "../../../components/genesis/genGenesis"
+import { PROXY_ADMIN_ADDRESS, PROXY_ADDRESS } from "../../../components/genesis/genGenesis"
 import { useErrorBoundary } from 'react-error-boundary';
 import { Button } from '../../../components/Button';
 import { Success } from '../../../components/Success';
 
-
-
-function getChainConfig(evmChainId: number, chainId: string, rpcEndpoint: string) {
-    return defineChain({
-        id: Number(evmChainId),
-        name: chainId,
-        nativeCurrency: {
-            decimals: 18,
-            name: 'Native Token',
-            symbol: 'TOKEN',
-        },
-        rpcUrls: {
-            default: { http: [rpcEndpoint] },
-            public: { http: [rpcEndpoint] },
-        },
-    });
-}
 
 export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (success: boolean) => void }) {
     const { evmChainId, chainId, validatorManagerAddress } = useL1LauncherStore();

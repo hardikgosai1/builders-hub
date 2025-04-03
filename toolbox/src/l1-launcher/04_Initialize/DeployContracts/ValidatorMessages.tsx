@@ -7,7 +7,7 @@ import { useErrorBoundary } from 'react-error-boundary';
 import { Button } from '../../../components/Button';
 
 export function ValidatorMessagesDeployer() {
-    const { setValidatorMessagesAddress, validatorMessagesAddress, validatorManagerAddress } = useL1LauncherStore();
+    const { setValidatorMessagesAddress, validatorMessagesAddress } = useL1LauncherStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const chain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);

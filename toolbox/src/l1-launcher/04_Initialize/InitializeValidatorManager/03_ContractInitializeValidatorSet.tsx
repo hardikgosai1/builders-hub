@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { hexToBytes, AbiEvent, formatEther, Abi, decodeErrorResult } from 'viem';
+import { hexToBytes, AbiEvent, Abi, decodeErrorResult } from 'viem';
 import { useWalletStore } from '../../../lib/walletStore';
 import { useL1LauncherStore, useViemChainStore } from '../../L1LauncherStore';
 import { utils } from '@avalabs/avalanchejs';
