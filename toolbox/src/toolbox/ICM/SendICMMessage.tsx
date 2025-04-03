@@ -7,20 +7,19 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { createPublicClient, http } from 'viem';
-import SenderReceiverABI from "../../../contracts/example-contracts/compiled/SenderReceiver.json";
+import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
 import { RequireChain } from "../../components/RequireChain";
-
-const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
+import { SENDER_C_CHAIN_ADDRESS } from "./DeployICMDemo";
 
 export default function DeployReceiver() {
     const { showBoundary } = useErrorBoundary();
     const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
-    const [message, setMessage] = useState(1234);
+    const [message, setMessage] = useState(Math.floor(Math.random() * 10000));
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
     const [lastReceivedMessage, setLastReceivedMessage] = useState<number>();
@@ -53,7 +52,7 @@ export default function DeployReceiver() {
         try {
             const { request } = await publicClient.simulateContract({
                 address: SENDER_C_CHAIN_ADDRESS,
-                abi: SenderReceiverABI.abi,
+                abi: ICMDemoABI.abi,
                 functionName: 'sendMessage',
                 args: [icmReceiverAddress, message, chainIDHex],
                 chain: avalancheFuji,
@@ -88,7 +87,7 @@ export default function DeployReceiver() {
                 chain: viemChain,
             }).readContract({
                 address: icmReceiverAddress as `0x${string}`,
-                abi: SenderReceiverABI.abi,
+                abi: ICMDemoABI.abi,
                 functionName: 'lastMessage',
             });
 
@@ -181,7 +180,7 @@ export default function DeployReceiver() {
                     </Button>
                     <Success
                         label="Last Received Message"
-                        value={lastReceivedMessage ?? ""}
+                        value={lastReceivedMessage?.toString() ?? ""}
                     />
                 </div>
             </div>

@@ -7,11 +7,10 @@ import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
-import { avalancheFuji } from "viem/chains";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 
-const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
+export const SENDER_C_CHAIN_ADDRESS = "0xfD694e233f9D5196CF3747723ed00Bb8386a7FEe";
 
 export default function DeployICMDemo() {
     const { showBoundary } = useErrorBoundary();
@@ -84,7 +83,7 @@ export default function DeployICMDemo() {
                         variant={icmReceiverAddress ? "secondary" : "primary"}
                         onClick={handleDeploy}
                         loading={isDeploying}
-                        disabled={isDeploying || avalancheFuji.id === walletChainId || !isTeleporterDeployed}
+                        disabled={isDeploying || !isTeleporterDeployed}
                     >
                         {icmReceiverAddress ? "Re-Deploy ICMDemo" : "Deploy ICMDemo"}
                     </Button>

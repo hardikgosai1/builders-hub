@@ -7,7 +7,7 @@
 
 // SPDX-License-Identifier: Ecosystem
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.8.28;
 
 import "./ITeleporterMessenger.sol";
 import "./ITeleporterReceiver.sol";
