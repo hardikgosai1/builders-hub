@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react"
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import { createWalletClient, custom, createPublicClient, fromBytes, bytesToHex, hexToBytes } from "viem"
 import { pvm, utils, Context, networkIDs } from "@avalabs/avalanchejs"
@@ -11,7 +11,7 @@ import { packWarpIntoAccessList } from "../InitializePoA/packWarp"
 import { packL1ValidatorRegistration } from "../L1/convertWarp"
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import { AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
 // Define interfaces for step status tracking
@@ -39,7 +39,7 @@ const parseNodeID = (nodeID: string) => {
 
 export default function AddValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { subnetID, proxyAddress, evmChainRpcUrl, evmChainName, evmChainCoinName } = useToolboxStore()
+  const { subnetId, proxyAddress, evmChainRpcUrl, evmChainName, evmChainCoinName } = useToolboxStore()
   const { avalancheNetworkID, walletChainId, pChainAddress } = useWalletStore()
 
   // State variables for form inputs
@@ -224,7 +224,7 @@ export default function AddValidator() {
             network: networkName,
             signatureAggregatorRequest: {
               message: messageToSign,
-              signingSubnetId: subnetID,
+              signingSubnetId: subnetId,
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           })
@@ -330,7 +330,7 @@ export default function AddValidator() {
             signatureAggregatorRequest: {
               message: unsignedPChainWarpMsgHex,
               justification: registerL1ValidatorUnsignedWarpMsg,
-              signingSubnetId: subnetID,
+              signingSubnetId: subnetId,
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           })

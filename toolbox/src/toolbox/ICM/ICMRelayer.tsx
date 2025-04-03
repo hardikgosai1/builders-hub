@@ -2,19 +2,19 @@
 
 import { formatEther, parseEther } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { useToolboxStore, useViemChainStore } from '../../stores/toolboxStore';
-import { useWalletStore } from '../../stores/walletStore';
+import { useToolboxStore, useViemChainStore } from '../toolboxStore';
+import { useWalletStore } from '../../lib/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { useState, useEffect } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
-import { RequireChainL1 } from '../../components/RequireChain';
+import { RequireChainToolboxL1 } from '../components/RequireChainToolboxL1';
 const randomPrivateKey = generatePrivateKey()
 const MINIMUM_BALANCE = parseEther('100')
 
 export default function ICMRelayer() {
-    const { chainID, setChainID, subnetID, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
+    const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [balance, setBalance] = useState<bigint>(BigInt(0));
     const [isCheckingBalance, setIsCheckingBalance] = useState(true);
@@ -64,12 +64,12 @@ export default function ICMRelayer() {
 
     const hasEnoughBalance = balance >= MINIMUM_BALANCE;
 
-    return <RequireChainL1>
+    return <RequireChainToolboxL1>
         <div className="space-y-4">
             <div className="text-lg font-bold">Relayer Configuration</div>
             <Input
                 label="Destination Subnet ID"
-                value={subnetID}
+                value={subnetId}
                 onChange={setSubnetID}
             />
             <Input
@@ -126,7 +126,7 @@ export default function ICMRelayer() {
                     </div>
                     <div className="text-lg font-bold">Write the relayer config file</div>
                     <CodeHighlighter
-                        code={genConfigCommand(subnetID, chainID, evmChainRpcUrl, randomPrivateKey)}
+                        code={genConfigCommand(subnetId, chainID, evmChainRpcUrl, randomPrivateKey)}
                         lang="sh"
                     />
                     <div className="text-lg font-bold">Run the relayer</div>
@@ -144,7 +144,7 @@ export default function ICMRelayer() {
                 </>
             )}
         </div>
-    </RequireChainL1>
+    </RequireChainToolboxL1>
 }
 
 const genConfigCommand = (destinationSubnetID: string, destinationBlockchainID: string, destinationRPC: string, privateKeyhex: string) => {
@@ -193,11 +193,12 @@ const genConfigCommand = (destinationSubnetID: string, destinationBlockchainID: 
     return `mkdir -p ~/.icm-relayer && echo '${configStr}' > ~/.icm-relayer/config.json`
 }
 
+import versions from '../../versions.json';
 const relayerDockerCommand = () => {
     return `docker run --name relayer -d \\
     --restart on-failure  \\
     --user=root \\
     -v ~/.icm-relayer/:/icm-relayer/ \\
-    avaplatform/icm-relayer:v1.5.1-rc.4 \\
+    avaplatform/icm-relayer:${versions['avaplatform/icm-relayer']} \\
     --config-file /icm-relayer/config.json`
 }

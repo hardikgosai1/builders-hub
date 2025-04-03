@@ -1,11 +1,10 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
-import { AlertTriangle } from "lucide-react";
 import { Success } from "../../components/Success";
 import { createPublicClient, http } from 'viem';
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
@@ -13,7 +12,7 @@ import SenderOnCChainABI from "../../../contracts/example-contracts/compiled/Sen
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
-import { RequireChainFuji } from "../../components/RequireChain";
+import { RequireChain } from "../../components/RequireChain";
 
 const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
 
@@ -103,18 +102,11 @@ export default function DeployReceiver() {
     }
 
     return (
-        <RequireChainFuji>
+        <RequireChain chain={avalancheFuji}>
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Send ICM Message</h2>
 
-                <div className="flex items-start p-4 mb-4 text-sm border rounded-md bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-700/50 dark:text-amber-200">
-                    <AlertTriangle className="w-5 h-5 mr-3 flex-shrink-0" />
-                    <p>
-                        🚧 Heads up! This tool is currently under construction and may not work as expected.
-                        We're actively improving it as we ship fast and iterate. Thanks for your patience as we build better tools! 🚧
-                    </p>
-                </div>
-                <div className="opacity-50 pointer-events-none">
+                <div className="space-y-4">
 
                     <Success
                         label="ICM Receiver Address"
@@ -193,6 +185,6 @@ export default function DeployReceiver() {
                     />
                 </div>
             </div>
-        </RequireChainFuji>
+        </RequireChain >
     );
 }

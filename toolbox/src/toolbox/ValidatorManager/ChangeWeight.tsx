@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 import { cn } from "../../lib/utils"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"

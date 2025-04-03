@@ -1,7 +1,7 @@
 "use client"
 
-import { useToolboxStore } from "../../stores/toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useToolboxStore } from "../toolboxStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useState, useEffect } from "react"
 import {
   AlertCircle,
@@ -18,7 +18,7 @@ import {
 import { networkIDs } from "@avalabs/avalanchejs"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 interface SubnetDetails {
   createBlockTimestamp: number
   createBlockIndex: string
@@ -43,7 +43,7 @@ interface SubnetDetails {
 }
 
 export default function SubnetDetails() {
-  const { subnetID, setSubnetID } = useToolboxStore()
+  const { subnetId, setSubnetID } = useToolboxStore()
   const { avalancheNetworkID, setAvalancheNetworkID } = useWalletStore()
   const [subnetDetails, setSubnetDetails] = useState<SubnetDetails | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -58,13 +58,13 @@ export default function SubnetDetails() {
   }
 
   useEffect(() => {
-    if (subnetID) {
+    if (subnetId) {
       fetchSubnetDetails()
     }
-  }, [subnetID, avalancheNetworkID])
+  }, [subnetId, avalancheNetworkID])
 
   async function fetchSubnetDetails() {
-    if (!subnetID) {
+    if (!subnetId) {
       setError("Please enter a subnet ID")
       return
     }
@@ -79,7 +79,7 @@ export default function SubnetDetails() {
         throw new Error("Invalid network selected")
       }
 
-      const response = await fetch(`https://glacier-api.avax.network/v1/networks/${network}/subnets/${subnetID}`)
+      const response = await fetch(`https://glacier-api.avax.network/v1/networks/${network}/subnets/${subnetId}`)
 
       if (!response.ok) {
         throw new Error(`API error: ${response.statusText}`)
@@ -142,7 +142,7 @@ export default function SubnetDetails() {
               <Input
                 label=""
                 type="text"
-                value={subnetID}
+                value={subnetId}
                 onChange={(newValue: string) => setSubnetID(newValue)}
                 placeholder="Enter subnet ID"
                 className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
@@ -180,8 +180,8 @@ export default function SubnetDetails() {
 
           <Button
             onClick={fetchSubnetDetails}
-            disabled={!subnetID || isLoading}
-            className={`w-full py-2 px-4 rounded-md text-sm font-medium flex items-center justify-center ${!subnetID || isLoading
+            disabled={!subnetId || isLoading}
+            className={`w-full py-2 px-4 rounded-md text-sm font-medium flex items-center justify-center ${!subnetId || isLoading
               ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
               : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm hover:shadow transition-all duration-200"
               }`}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
@@ -9,7 +9,7 @@ import { Success } from "../../components/Success";
 import ReceiverOnSubnetABI from "../../../contracts/example-contracts/compiled/ReceiverOnSubnet.json";
 import { avalancheFuji } from "viem/chains";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
-import { RequireChainL1 } from "../../components/RequireChain";
+import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 
 const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
 
@@ -62,7 +62,7 @@ export default function DeployReceiver() {
     }
 
     return (
-        <RequireChainL1>
+        <RequireChainToolboxL1>
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Deploy ReceiverOnSubnet</h2>
                 <div className="space-y-4">
@@ -95,6 +95,6 @@ export default function DeployReceiver() {
                 </div>
 
             </div>
-        </RequireChainL1>
+        </RequireChainToolboxL1>
     );
 }

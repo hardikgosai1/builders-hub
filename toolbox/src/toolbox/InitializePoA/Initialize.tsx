@@ -1,20 +1,20 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { ResultField } from "../../components/ResultField";
+import { ResultField } from "../components/ResultField";
 import { AbiEvent } from 'viem';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
-import { RequireChainL1 } from "../../components/RequireChain";
-import { Container } from "../../components/Container";
+import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
+import { Container } from "../components/Container";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
-    const { subnetID, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
+    const { subnetId, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -33,9 +33,9 @@ export default function Initialize() {
 
     let subnetIDHex = "";
     try {
-        subnetIDHex = utils.bufferToHex(utils.base58check.decode(subnetID));
+        subnetIDHex = utils.bufferToHex(utils.base58check.decode(subnetId));
     } catch (error) {
-        console.error('Error decoding subnetID:', error);
+        console.error('Error decoding subnetId:', error);
     }
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function Initialize() {
         try {
             const settings = {
                 admin: adminAddress,
-                subnetID: subnetIDHex,
+                subnetId: subnetIDHex,
                 churnPeriodSeconds: BigInt(churnPeriodSeconds),
                 maximumChurnPercentage: Number(maximumChurnPercentage)
             };
@@ -109,7 +109,7 @@ export default function Initialize() {
     }
 
     return (
-        <RequireChainL1>
+        <RequireChainToolboxL1>
             <Container
                 title="Initialize Validator Manager"
                 description="This will initialize the ValidatorManager contract."
@@ -134,7 +134,7 @@ export default function Initialize() {
 
                     <Input
                         label="Subnet ID"
-                        value={subnetID}
+                        value={subnetId}
                         onChange={setSubnetID}
                     />
                     <Input
@@ -184,7 +184,7 @@ export default function Initialize() {
                     )}
                 </div>
             </Container>
-        </RequireChainL1>
+        </RequireChainToolboxL1>
     );
 };
 

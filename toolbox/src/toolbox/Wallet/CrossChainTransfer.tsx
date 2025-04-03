@@ -3,13 +3,14 @@ import { useEffect, useState } from "react"
 import { ChevronDown, AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "../../components/Button"
 import { Input } from "../../components/Input"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 import { Context, pvm, utils, evm, TransferableOutput } from "@avalabs/avalanchejs"
-import { useWalletStore } from "../../stores/walletStore"
-import { useViemChainStore } from "../../stores/toolboxStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { JsonRpcProvider } from "ethers"
-import { bytesToHex, Chain } from "viem"
-import { createPublicClient, http } from "viem"
+import { bytesToHex } from "viem"
+import { useErrorBoundary } from "react-error-boundary"
+import { RequireChain } from "../../components/RequireChain"
+import { avalancheFuji } from "viem/chains"
 
 // Define the type for window.avalanche response
 interface AvalancheResponse {
@@ -20,66 +21,41 @@ interface AvalancheResponse {
 // Helper function for delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export default function CrossChainTransfer() {
+export default function CrossChainTransfer({ suggestedAmount = "0.0" }: { suggestedAmount?: string } = {}) {
 
   const platformEndpoint = "https://api.avax-test.network";
 
-  const [amount, setAmount] = useState<string>("0.0")
+  const [amount, setAmount] = useState<string>(suggestedAmount)
   const [sourceChain, setSourceChain] = useState<string>("c-chain")
   const [destinationChain, setDestinationChain] = useState<string>("p-chain")
   const [availableBalance, setAvailableBalance] = useState<number>(0)
   const [pChainAvailableBalance, setPChainAvailableBalance] = useState<number>(0)
-  const [publicClient, setPublicClient] = useState<any>(null)
   const [exportLoading, setExportLoading] = useState<boolean>(false)
   const [importLoading, setImportLoading] = useState<boolean>(false)
   const [exportTxId, setExportTxId] = useState<string>("")
   const [waitingForConfirmation, setWaitingForConfirmation] = useState<boolean>(false)
+  const { showBoundary } = useErrorBoundary()
 
   // Use nullish coalescing to safely access store values
-  const { pChainAddress = '', walletEVMAddress = '', coreWalletClient = null } = useWalletStore() || {}
-  const chain = useViemChainStore()
-
-  // Initialize the client on the client-side only
-  useEffect(() => {
-    if (typeof window !== 'undefined' && chain) {
-      const client = createPublicClient({
-        chain: chain as Chain,
-        transport: http(),
-      })
-      setPublicClient(client)
-    }
-  }, [chain])
+  const { pChainAddress, walletEVMAddress, coreWalletClient, publicClient } = useWalletStore()
 
   // Function to fetch balances from both chains
   const fetchBalances = async () => {
-    if (!publicClient || !walletEVMAddress) return
-
-    // Fetch C-Chain balance
-    try {
-      const availableBalance = await publicClient.getBalance({
+    if (publicClient && walletEVMAddress) {
+      publicClient.getBalance({
         address: walletEVMAddress as `0x${string}`,
-      })
-      setAvailableBalance(Number(availableBalance) / 1e18)
-    } catch (error) {
-      console.error("Error fetching EVM balance:", error)
+      }).then((balance: bigint) => {
+        setAvailableBalance(Number(balance) / 1e18)
+      }).catch(showBoundary)
     }
 
-    // Fetch P-Chain balance
-    if (pChainAddress) {
-      try {
-        const pvmApi = new pvm.PVMApi(platformEndpoint);
-        const balance = await pvmApi.getBalance({
-          addresses: [pChainAddress],
-        })
-        console.log(balance)
-        setPChainAvailableBalance(Number(balance.balance) / 1e9)
-      } catch (error) {
-        console.error("Error fetching P-Chain balance:", error)
-      }
+    if (coreWalletClient && pChainAddress) {
+      coreWalletClient.getPChainBalance().then((balance: bigint) => {
+        setPChainAvailableBalance(Number(balance) / 1e9)
+      }).catch(showBoundary)
     }
   }
 
-  // Initial balance fetching
   useEffect(() => {
     if (publicClient && walletEVMAddress) {
       fetchBalances()
@@ -325,146 +301,148 @@ export default function CrossChainTransfer() {
       title="Cross Chain Transfer"
       description="Transfer tokens between Avalanche chains securely and efficiently."
     >
-      <div className="flex flex-col lg:flex-row gap-6 w-full">
-        <div className="flex-1 flex flex-col justify-center space-y-1">
-          <div className="rounded-md bg-white dark:bg-zinc-900 p-4 border border-zinc-300 dark:border-zinc-700 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Source Chain</span>
-              <div className="flex items-center">
-                {sourceChain === "c-chain" ? (
-                  <>
-                    <div className="bg-red-500 rounded-full p-1.5 flex items-center justify-center mr-2">
-                      <span className="text-white font-bold text-xs">C</span>
-                    </div>
-                    <span className="font-medium text-zinc-800 dark:text-zinc-200">C-Chain</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="bg-gradient-to-r from-red-500 to-blue-500 rounded-full p-1.5 flex items-center justify-center mr-2">
-                      <span className="text-white font-bold text-xs">P</span>
-                    </div>
-                    <span className="font-medium text-zinc-800 dark:text-zinc-200">P-Chain</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center py-0.5">
-            <button
-              onClick={handleSwapChains}
-              className="w-8 h-8 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center bg-white dark:bg-zinc-800 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
-              title="Swap chains"
-            >
-              <ChevronDown className="h-4 w-4 text-zinc-500" />
-            </button>
-          </div>
-
-          <div className="rounded-md bg-white dark:bg-zinc-900 p-4 border border-zinc-300 dark:border-zinc-700 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Destination Chain</span>
-              <div className="flex items-center">
-                {destinationChain === "c-chain" ? (
-                  <>
-                    <div className="bg-red-500 rounded-full p-1.5 flex items-center justify-center mr-2">
-                      <span className="text-white font-bold text-xs">C</span>
-                    </div>
-                    <span className="font-medium text-zinc-800 dark:text-zinc-200">C-Chain</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="bg-gradient-to-r from-red-500 to-blue-500 rounded-full p-1.5 flex items-center justify-center mr-2">
-                      <span className="text-white font-bold text-xs">P</span>
-                    </div>
-                    <span className="font-medium text-zinc-800 dark:text-zinc-200">P-Chain</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1">
-          <div className="rounded-md bg-white dark:bg-zinc-900 p-6 border border-zinc-300 dark:border-zinc-700 h-full shadow-sm">
-            <h2 className="text-xl font-medium mb-4 text-zinc-900 dark:text-zinc-100">Transfer Amount</h2>
-
-            <div className="relative">
-              <Input
-                type="text"
-                value={amount}
-                onChange={setAmount}
-                className="w-full px-3 py-2 h-12 text-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-zinc-900 dark:text-zinc-100 pr-16 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
-                label=""
-              />
-              <Button
-                variant="secondary"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 bg-transparent h-8 w-12 p-0"
-                onClick={handleMaxAmount}
-                disabled={sourceChain !== "c-chain"}
-              >
-                Max
-              </Button>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between p-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+      <RequireChain chain={avalancheFuji}>
+        <div className="flex flex-col lg:flex-row gap-6 w-full">
+          <div className="flex-1 flex flex-col justify-center space-y-1">
+            <div className="rounded-md bg-white dark:bg-zinc-900 p-4 border border-zinc-300 dark:border-zinc-700 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Source Chain</span>
                 <div className="flex items-center">
-                  <span className="text-zinc-700 dark:text-zinc-300">C-Chain</span>
+                  {sourceChain === "c-chain" ? (
+                    <>
+                      <div className="bg-red-500 rounded-full p-1.5 flex items-center justify-center mr-2">
+                        <span className="text-white font-bold text-xs">C</span>
+                      </div>
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">C-Chain</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="bg-gradient-to-r from-red-500 to-blue-500 rounded-full p-1.5 flex items-center justify-center mr-2">
+                        <span className="text-white font-bold text-xs">P</span>
+                      </div>
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">P-Chain</span>
+                    </>
+                  )}
                 </div>
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {availableBalance.toFixed(4)} <span className="text-red-500 dark:text-red-400">AVAX</span>
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center">
-                  <span className="text-zinc-700 dark:text-zinc-300">P-Chain</span>
-                </div>
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {pChainAvailableBalance.toFixed(4)} <span className="text-blue-500 dark:text-blue-400">AVAX</span>
-                </span>
               </div>
             </div>
 
-            <div className="mt-6 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-red-700 dark:text-red-300 text-sm">
-              <div className="flex gap-3">
-                <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                <p>You'll need to sign two transactions (export and import). The import will automatically trigger after export.</p>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <Button
-                variant="primary"
-                onClick={handleExport}
-                disabled={exportLoading || importLoading || waitingForConfirmation}
-                className="w-full py-2 px-4 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            <div className="flex justify-center py-0.5">
+              <button
+                onClick={handleSwapChains}
+                className="w-8 h-8 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center bg-white dark:bg-zinc-800 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                title="Swap chains"
               >
-                {exportLoading ? (
-                  <span className="flex items-center justify-center">
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Exporting...
+                <ChevronDown className="h-4 w-4 text-zinc-500" />
+              </button>
+            </div>
+
+            <div className="rounded-md bg-white dark:bg-zinc-900 p-4 border border-zinc-300 dark:border-zinc-700 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Destination Chain</span>
+                <div className="flex items-center">
+                  {destinationChain === "c-chain" ? (
+                    <>
+                      <div className="bg-red-500 rounded-full p-1.5 flex items-center justify-center mr-2">
+                        <span className="text-white font-bold text-xs">C</span>
+                      </div>
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">C-Chain</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="bg-gradient-to-r from-red-500 to-blue-500 rounded-full p-1.5 flex items-center justify-center mr-2">
+                        <span className="text-white font-bold text-xs">P</span>
+                      </div>
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">P-Chain</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <div className="rounded-md bg-white dark:bg-zinc-900 p-6 border border-zinc-300 dark:border-zinc-700 h-full shadow-sm">
+              <h2 className="text-xl font-medium mb-4 text-zinc-900 dark:text-zinc-100">Transfer Amount</h2>
+
+              <div className="relative">
+                <Input
+                  type="text"
+                  value={amount}
+                  onChange={setAmount}
+                  className="w-full px-3 py-2 h-12 text-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-zinc-900 dark:text-zinc-100 pr-16 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
+                  label=""
+                />
+                <Button
+                  variant="secondary"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 bg-transparent h-8 w-12 p-0"
+                  onClick={handleMaxAmount}
+                  disabled={sourceChain !== "c-chain"}
+                >
+                  Max
+                </Button>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between p-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center">
+                    <span className="text-zinc-700 dark:text-zinc-300">C-Chain</span>
+                  </div>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {availableBalance.toFixed(4)} <span className="text-red-500 dark:text-red-400">AVAX</span>
                   </span>
-                ) : `Transfer ${sourceChain === "c-chain" ? "C→P" : "P→C"}`}
-              </Button>
-
-              {waitingForConfirmation && (
-                <div className="flex items-center justify-center p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin text-yellow-500" />
-                  <span className="text-yellow-700 dark:text-yellow-300 text-sm">Waiting for export confirmation...</span>
                 </div>
-              )}
 
-              {importLoading && (
-                <div className="flex items-center justify-center p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-500" />
-                  <span className="text-blue-700 dark:text-blue-300 text-sm">Importing to {destinationChain === "p-chain" ? "P-Chain" : "C-Chain"}...</span>
+                <div className="flex items-center justify-between p-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center">
+                    <span className="text-zinc-700 dark:text-zinc-300">P-Chain</span>
+                  </div>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {pChainAvailableBalance.toFixed(4)} <span className="text-blue-500 dark:text-blue-400">AVAX</span>
+                  </span>
                 </div>
-              )}
+              </div>
+
+              <div className="mt-6 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-red-700 dark:text-red-300 text-sm">
+                <div className="flex gap-3">
+                  <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p>You'll need to sign two transactions (export and import). The import will automatically trigger after export.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <Button
+                  variant="primary"
+                  onClick={handleExport}
+                  disabled={exportLoading || importLoading || waitingForConfirmation}
+                  className="w-full py-2 px-4 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                >
+                  {exportLoading ? (
+                    <span className="flex items-center justify-center">
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Exporting...
+                    </span>
+                  ) : `Transfer ${sourceChain === "c-chain" ? "C→P" : "P→C"}`}
+                </Button>
+
+                {waitingForConfirmation && (
+                  <div className="flex items-center justify-center p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-yellow-500" />
+                    <span className="text-yellow-700 dark:text-yellow-300 text-sm">Waiting for export confirmation...</span>
+                  </div>
+                )}
+
+                {importLoading && (
+                  <div className="flex items-center justify-center p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-500" />
+                    <span className="text-blue-700 dark:text-blue-300 text-sm">Importing to {destinationChain === "p-chain" ? "P-Chain" : "C-Chain"}...</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </RequireChain>
     </Container>
   )
 }
