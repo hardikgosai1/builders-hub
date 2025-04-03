@@ -3,7 +3,6 @@ import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { Address } from 'micro-eth-signer';
 import { keccak256, toRlp, toBytes, createPublicClient, http, parseEther } from 'viem';
 import { avalancheFuji } from 'viem/chains';
-import { deduplicateEthRequestAccounts } from '../L1Launcher/config/store';
 
 // Type definitions
 declare global {
@@ -20,10 +19,10 @@ export const RPC_ENDPOINT = "https://api.avax-test.network";
 
 // Wallet Functions
 export async function getWalletAddress() {
-    if (!window.ethereum) {
+    if (!window.avalanche) {
         throw new Error('No wallet detected');
     }
-    const accounts = await deduplicateEthRequestAccounts();
+    const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
     if (!accounts || accounts.length === 0) {
         throw new Error('No account found');
     }

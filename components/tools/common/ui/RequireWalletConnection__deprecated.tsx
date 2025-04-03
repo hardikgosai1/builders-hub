@@ -1,6 +1,5 @@
 import { useState, useEffect, ReactNode } from 'react';
 import Pre from './Pre';
-import { deduplicateEthRequestAccounts } from '../../L1Launcher/config/store';
 
 export interface ChainConfig {
     chainId: string;
@@ -68,8 +67,13 @@ export default function RequireWalletConnection({ children, chainConfig, require
             const chainId = await window.ethereum.request({ method: 'eth_chainId' });
             if (chainId !== chainConfig.chainId) return;
 
+            if (!window.avalanche) {
+                setError('No wallet detected');
+                return;
+            }
+
             // Check if account can be accessed
-            const accounts = await deduplicateEthRequestAccounts()
+            const accounts = await window.avalanche.request<string[]>({ method: 'eth_requestAccounts' })
             if (!accounts || accounts.length === 0) {
                 setError('No account detected');
                 return;
