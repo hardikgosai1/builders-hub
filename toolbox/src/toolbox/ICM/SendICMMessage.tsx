@@ -6,7 +6,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import { Chain, createPublicClient, http } from 'viem';
+import { createPublicClient, http } from 'viem';
 import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
@@ -21,7 +21,7 @@ export default function SendICMMessage() {
     const { showBoundary } = useErrorBoundary();
     const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
-    const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const [message, setMessage] = useState(Math.floor(Math.random() * 10000));
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
