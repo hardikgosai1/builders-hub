@@ -169,12 +169,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: ["toolbox/src/toolbox/ICM/ICMRelayer.tsx"]
         },
         {
-            id: "receiverOnSubnet",
-            label: "ReceiverOnSubnet",
-            component: lazy(() => import('./ICM/ReceiverOnSubnet')),
+            id: "deployICMDemo",
+            label: "Deploy ICM Demo",
+            component: lazy(() => import('./ICM/DeployICMDemo')),
             fileNames: [
-                "toolbox/src/toolbox/ICM/ReceiverOnSubnet.tsx",
-                "toolbox/contracts/example-contracts/contracts/receiverOnSubnet.sol",
+                "toolbox/src/toolbox/ICM/DeployICMDemo.tsx",
+                "toolbox/contracts/example-contracts/contracts/ICMDemo.sol",
             ]
         },
         {

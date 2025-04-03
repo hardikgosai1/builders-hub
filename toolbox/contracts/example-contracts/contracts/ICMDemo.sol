@@ -7,12 +7,12 @@
 
 // SPDX-License-Identifier: Ecosystem
 
-pragma solidity 0.8.29;
+pragma solidity ^0.8.25;
 
 import "./ITeleporterMessenger.sol";
 import "./ITeleporterReceiver.sol";
 
-contract SenderReceiver is ITeleporterReceiver {
+contract ICMDemo is ITeleporterReceiver {
     ITeleporterMessenger public immutable messenger =
         ITeleporterMessenger(0x253b2784c75e510dD0fF1da844684a1aC0aa5fcf);
 

@@ -6,14 +6,14 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import SenderReceiverABI from "../../../contracts/example-contracts/compiled/SenderReceiver.json";
+import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { avalancheFuji } from "viem/chains";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 
 const SENDER_C_CHAIN_ADDRESS = "0x2419133a23EA13EAF3dC3ee2382F083067107386";
 
-export default function DeployReceiver() {
+export default function DeployICMDemo() {
     const { showBoundary } = useErrorBoundary();
     const { setIcmReceiverAddress, icmReceiverAddress } = useToolboxStore();
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
@@ -42,8 +42,8 @@ export default function DeployReceiver() {
         setIcmReceiverAddress("");
         try {
             const hash = await coreWalletClient.deployContract({
-                abi: SenderReceiverABI.abi,
-                bytecode: SenderReceiverABI.bytecode.object as `0x${string}`,
+                abi: ICMDemoABI.abi,
+                bytecode: ICMDemoABI.bytecode.object as `0x${string}`,
                 chain: viemChain
             });
 
@@ -64,10 +64,10 @@ export default function DeployReceiver() {
     return (
         <RequireChainToolboxL1>
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Deploy ReceiverOnSubnet</h2>
+                <h2 className="text-lg font-semibold">Deploy ICM Demo contract</h2>
                 <div className="space-y-4">
                     <div className="">
-                        This will deploy the <code>ReceiverOnSubnet</code> contract to your connected network (Chain ID: <code>{walletChainId}</code>). This contract can receive messages from the C-Chain using Avalanche's Inter-Chain Messaging (ICM) protocol. Once deployed, you can use the pre-deployed sender contract on the C-Chain at address <a href={`https://subnets-test.avax.network/c-chain/address/${SENDER_C_CHAIN_ADDRESS}`} target="_blank" className="text-blue-500 hover:underline">{SENDER_C_CHAIN_ADDRESS}</a> to send messages to this receiver.
+                        This will deploy the <code>ICMDemo</code> contract to your connected network (Chain ID: <code>{walletChainId}</code>). This contract can receive messages from the C-Chain using Avalanche's Inter-Chain Messaging (ICM) protocol. Once deployed, you can use the pre-deployed sender contract on the C-Chain at address <a href={`https://subnets-test.avax.network/c-chain/address/${SENDER_C_CHAIN_ADDRESS}`} target="_blank" className="text-blue-500 hover:underline">{SENDER_C_CHAIN_ADDRESS}</a> to send messages to this receiver.
                     </div>
                     <div className="">
                         Read more about the <a href="https://build.avax.network/academy/interchain-messaging/04-icm-basics/04-create-sender-contract" target="_blank" className="text-blue-500 hover:underline">Sender Contract</a> and <a href="https://build.avax.network/academy/interchain-messaging/04-icm-basics/06-create-receiver-contract" target="_blank" className="text-blue-500 hover:underline">Receiver Contract</a> in the Avalanche documentation.
@@ -86,10 +86,10 @@ export default function DeployReceiver() {
                         loading={isDeploying}
                         disabled={isDeploying || avalancheFuji.id === walletChainId || !isTeleporterDeployed}
                     >
-                        {icmReceiverAddress ? "Re-Deploy ReceiverOnSubnet" : "Deploy ReceiverOnSubnet"}
+                        {icmReceiverAddress ? "Re-Deploy ICMDemo" : "Deploy ICMDemo"}
                     </Button>
                     <Success
-                        label="ReceiverOnSubnet Address"
+                        label="ICMDemo Address"
                         value={icmReceiverAddress}
                     />
                 </div>
