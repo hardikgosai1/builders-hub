@@ -196,15 +196,15 @@ const componentGroups: Record<string, ComponentType[]> = {
     "ICTT": [
         {
             id: "deployExampleERC20",
-            label: "Deploy Example ERC20",
+            label: "Example ERC20",
             component: lazy(() => import('./ICTT/DeployExampleERC20')),
             fileNames: ["toolbox/src/toolbox/ICTT/DeployExampleERC20.tsx"]
         },
         {
-            id: "deployHome",
-            label: "Deploy Home",
-            component: lazy(() => import('./ICTT/DeployHome')),
-            fileNames: ["toolbox/src/toolbox/ICTT/DeployHome.tsx"]
+            id: "deployERC20TokenHome",
+            label: "ERC20 Token Home",
+            component: lazy(() => import('./ICTT/DeployERC20TokenHome')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployERC20TokenHome.tsx"]
         }
     ]
 };
