@@ -29,6 +29,7 @@ export const initialState = {
     icmReceiverAddress: "",
     stakingManagerAddress: "",
     rewardCalculatorAddress: "",
+    exampleErc20Address: "",
 }
 
 export const useToolboxStore = create(
@@ -66,6 +67,7 @@ export const useToolboxStore = create(
             setEvmChainId: (evmChainId: number) => set({ evmChainId }),
             setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
+            setExampleErc20Address: (address: string) => set({ exampleErc20Address: address }),
         })),
         {
             name: 'toolbox-storage',

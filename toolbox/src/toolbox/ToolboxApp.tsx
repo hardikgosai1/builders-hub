@@ -191,6 +191,20 @@ const componentGroups: Record<string, ComponentType[]> = {
                 "toolbox/src/toolbox/ICM/SendICMMessage.tsx",
                 "toolbox/contracts/example-contracts/contracts/senderOnCChain.sol",
             ]
+        },
+    ],
+    "ICTT": [
+        {
+            id: "deployExampleERC20",
+            label: "Deploy Example ERC20",
+            component: lazy(() => import('./ICTT/DeployExampleERC20')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployExampleERC20.tsx"]
+        },
+        {
+            id: "deployHome",
+            label: "Deploy Home",
+            component: lazy(() => import('./ICTT/DeployHome')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployHome.tsx"]
         }
     ]
 };
