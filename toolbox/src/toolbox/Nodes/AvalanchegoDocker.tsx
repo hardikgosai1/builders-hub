@@ -1,13 +1,13 @@
 "use client";
 
-import { useToolboxStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
-import { Select } from "../../components/Select";
+import { useToolboxStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
+import { Select } from "../components/Select";
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import versions from "../../versions.json";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
-import { Container } from "../../components/Container";
+import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
@@ -124,7 +124,7 @@ ${domain}/ext/bc/${chainID}/rpc`
 
 
 export default function AvalanchegoDocker() {
-    const { subnetID, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
+    const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
     const { avalancheNetworkID } = useWalletStore();
 
     const [isRPC, setIsRPC] = useState<"true" | "false">("false");
@@ -134,11 +134,11 @@ export default function AvalanchegoDocker() {
 
     useEffect(() => {
         try {
-            setRpcCommand(generateDockerCommand([subnetID], isRPC === "true", avalancheNetworkID));
+            setRpcCommand(generateDockerCommand([subnetId], isRPC === "true", avalancheNetworkID));
         } catch (error) {
             setRpcCommand((error as Error).message);
         }
-    }, [subnetID, isRPC, avalancheNetworkID]);
+    }, [subnetId, isRPC, avalancheNetworkID]);
 
 
     useEffect(() => {
@@ -165,7 +165,7 @@ export default function AvalanchegoDocker() {
 
                 <Input
                     label="Subnet ID"
-                    value={subnetID}
+                    value={subnetId}
                     onChange={setSubnetID}
                     placeholder="Create a subnet to generate a subnet ID"
                 />

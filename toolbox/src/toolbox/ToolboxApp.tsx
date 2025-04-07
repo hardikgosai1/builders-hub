@@ -1,15 +1,18 @@
+"use client";
+
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
-import { useToolboxStore } from '../stores/toolboxStore';
+import { useToolboxStore } from '../toolbox/toolboxStore';
 import { RefreshCw } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
-import { GithubLink } from "../components/GithubLink";
+import { GithubLink } from "./components/GithubLink";
 import { ConnectWallet } from "../components/ConnectWallet";
+import { ErrorFallback } from "../components/ErrorFallback";
 
 type ComponentType = {
     id: string;
     label: string;
-    component: React.LazyExoticComponent<() => ReactElement>;
+    component: React.LazyExoticComponent<(props?: any) => ReactElement>;
     fileNames: string[];
     skipWalletConnection?: boolean;
 }
@@ -29,10 +32,16 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: []
         },
         {
-            id: "crossChainTransfer",
+            id: 'crossChainTransfer',
             label: "Cross Chain Transfer",
             component: lazy(() => import('./Wallet/CrossChainTransfer')),
-            fileNames: []
+            fileNames: ["toolbox/src/toolbox/Wallet/CrossChainTransfer.tsx"]
+        },
+        {
+            id: 'balanceTopup',
+            label: "Validator Balance Topup",
+            component: lazy(() => import('./ValidatorManager/BalanceTopup')),
+            fileNames: ["toolbox/src/toolbox/ValidatorManager/BalanceTopup.tsx"]
         }
     ],
     'Conversion': [
@@ -213,12 +222,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: ["toolbox/src/toolbox/ICM/ICMRelayer.tsx"]
         },
         {
-            id: "receiverOnSubnet",
-            label: "ReceiverOnSubnet",
-            component: lazy(() => import('./ICM/ReceiverOnSubnet')),
+            id: "deployICMDemo",
+            label: "Deploy ICM Demo",
+            component: lazy(() => import('./ICM/DeployICMDemo')),
             fileNames: [
-                "toolbox/src/toolbox/ICM/ReceiverOnSubnet.tsx",
-                "toolbox/contracts/example-contracts/contracts/receiverOnSubnet.sol",
+                "toolbox/src/toolbox/ICM/DeployICMDemo.tsx",
+                "toolbox/contracts/example-contracts/contracts/ICMDemo.sol",
             ]
         },
         {
@@ -229,28 +238,34 @@ const componentGroups: Record<string, ComponentType[]> = {
                 "toolbox/src/toolbox/ICM/SendICMMessage.tsx",
                 "toolbox/contracts/example-contracts/contracts/senderOnCChain.sol",
             ]
+        },
+    ],
+    "ICTT": [
+        {
+            id: "deployExampleERC20",
+            label: "Example ERC20",
+            component: lazy(() => import('./ICTT/DeployExampleERC20')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployExampleERC20.tsx"]
+        },
+        {
+            id: "deployERC20TokenHome",
+            label: "ERC20 Token Home",
+            component: lazy(() => import('./ICTT/DeployERC20TokenHome')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployERC20TokenHome.tsx"]
+        },
+        {
+            id: "deployERC20TokenRemote",
+            label: "ERC20 Token Remote",
+            component: lazy(() => import('./ICTT/DeployERC20TokenRemote')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployERC20TokenRemote.tsx"]
+        },
+        {
+            id: "registerWithHome",
+            label: "Register with Home",
+            component: lazy(() => import('./ICTT/RegisterWithHome')),
+            fileNames: ["toolbox/src/toolbox/ICTT/RegisterWithHome.tsx"]
         }
     ]
-};
-
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error, resetErrorBoundary: () => void }) => {
-    return (
-        <div className="space-y-2">
-            <div className="text-red-500 text-sm">
-                {error.message}
-            </div>
-            {
-                error.message.includes("The error is mostly returned when the client requests") && (
-                    <div className="text-sm text-red-500">
-                        ^ This usually indicates that the core wallet is not in testnet mode. Open settings &gt; Advanced &gt; Testnet mode.
-                    </div>
-                )
-            }
-            <Button onClick={resetErrorBoundary}>
-                Try Again
-            </Button>
-        </div>
-    );
 };
 
 // Loading component for Suspense

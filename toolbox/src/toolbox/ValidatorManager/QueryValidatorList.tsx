@@ -1,10 +1,10 @@
 "use client"
 
-import { useToolboxStore } from "../../stores/toolboxStore"
-import { useWalletStore } from "../../stores/walletStore"
+import { useToolboxStore } from "../toolboxStore"
+import { useWalletStore } from "../../lib/walletStore"
 import { useState, useEffect } from "react"
 import { Calendar, Clock, ChevronRight, Users, ChevronLeft, Coins, Database, Globe, Info } from "lucide-react"
-import { Container } from "../../components/Container"
+import { Container } from "../components/Container"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
 import { networkIDs } from "@avalabs/avalanchejs"
@@ -34,7 +34,7 @@ interface L1ValidatorsResponse {
 }
 
 export default function QueryValidatorList() {
-  const { subnetID, setSubnetID } = useToolboxStore()
+  const { subnetId, setSubnetID } = useToolboxStore()
   const { avalancheNetworkID, setAvalancheNetworkID } = useWalletStore()
   const [validators, setValidators] = useState<Validator[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -53,7 +53,7 @@ export default function QueryValidatorList() {
 
   useEffect(() => {
     fetchValidators()
-  }, [avalancheNetworkID, subnetID])
+  }, [avalancheNetworkID, subnetId])
 
   async function fetchValidators(pageToken?: string, isForwardNavigation = true) {
     setIsLoading(true)
@@ -76,8 +76,8 @@ export default function QueryValidatorList() {
 
       // Build query parameters
       const queryParams = new URLSearchParams()
-      if (subnetID) {
-        queryParams.append("subnetId", subnetID)
+      if (subnetId) {
+        queryParams.append("subnetId", subnetId)
       }
 
       // Add page token if provided
@@ -188,7 +188,7 @@ export default function QueryValidatorList() {
               <Input
                 label=""
                 type="text"
-                value={subnetID}
+                value={subnetId}
                 onChange={setSubnetID}
                 placeholder="Enter subnet ID"
                 className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
