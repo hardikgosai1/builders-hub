@@ -9,7 +9,6 @@ import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
-import { RequireChain } from "../../components/RequireChain";
 import { RadioGroup } from "../../components/RadioGroup";
 import { createPublicClient, http } from "viem";
 import { RequireChainToolbox } from "../components/RequireChainToolboxL1";

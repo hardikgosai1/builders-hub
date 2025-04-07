@@ -10,7 +10,6 @@ import { Success } from "../../components/Success";
 import { Input } from "../../components/Input";
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json"
 import { avalancheFuji } from "viem/chains";
-import { RequireChain } from "../../components/RequireChain";
 import { RadioGroup } from "../../components/RadioGroup";
 import { type DeployOn } from "../toolboxStore";
 import { createPublicClient, http } from "viem";

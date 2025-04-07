@@ -104,7 +104,7 @@ export function ListContractEvents({
             )}
 
             <div className="space-y-4">
-                {events.map((log, index) => {
+                {events.map((log) => {
                     let decodedEvent;
                     try {
                         decodedEvent = decodeEvent(log);
