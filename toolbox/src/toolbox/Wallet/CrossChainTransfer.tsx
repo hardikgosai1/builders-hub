@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { ChevronDown, AlertCircle, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { Button } from "../../components/Button"
 import { Input } from "../../components/Input"
 import { Container } from "../components/Container"
