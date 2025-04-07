@@ -1,0 +1,148 @@
+{
+  "terms": [
+    {
+      "term": "Avalanche Consensus",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A family of consensus protocols that power the Avalanche network, known for high throughput, fast finality, and energy efficiency. The X-Chain uses the core Avalanche consensus protocol, while the P-Chain and C-Chain use the Snowman variant.",
+      "learnMoreUrl": "/academy/avalanche-fundamentals/02-avalanche-consensus-intro/01-avalanche-consensus-intro",
+      "category": "avalanche"
+    },
+    {
+      "term": "Avalanche L1",
+      "abbreviation": "L1",
+      "previousTerm": "Subnet",
+      "description": "An independent, sovereign blockchain network on Avalanche that can have its own validator set, tokenomics, and rules. Avalanche L1s work together to form the broader Avalanche Network.",
+      "learnMoreUrl": "/docs/quick-start/avalanche-l1s",
+      "category": "avalanche"
+    },
+    {
+      "term": "Avalanche Virtual Machine",
+      "abbreviation": "AVM",
+      "previousTerm": null,
+      "description": "The virtual machine implementation that powers the X-Chain, handling operations on Avalanche Native Tokens.",
+      "learnMoreUrl": null,
+      "category": "avalanche"
+    },
+    {
+      "term": "Contract Chain",
+      "abbreviation": "C-Chain",
+      "previousTerm": null,
+      "description": "An implementation of the Ethereum Virtual Machine (EVM) that supports the deployment and execution of smart contracts written in Solidity. Uses the Coreth Virtual Machine.",
+      "learnMoreUrl": "/docs/quick-start/primary-network#c-chain",
+      "category": "avalanche"
+    },
+    {
+      "term": "Coreth",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The virtual machine implementation that powers the C-Chain, enabling Ethereum compatibility on Avalanche.",
+      "learnMoreUrl": null,
+      "category": "avalanche"
+    },
+    {
+      "term": "Exchange Chain",
+      "abbreviation": "X-Chain",
+      "previousTerm": null,
+      "description": "Responsible for operations on digital smart assets known as Avalanche Native Tokens. Uses the Avalanche Virtual Machine (AVM).",
+      "learnMoreUrl": "/docs/quick-start/primary-network#x-chain",
+      "category": "avalanche"
+    },
+    {
+      "term": "Interchain Messaging",
+      "abbreviation": "ICM",
+      "previousTerm": "Teleporter",
+      "description": "A protocol that enables communication between blockchains on Avalanche, allowing for secure message passing between different L1s.",
+      "learnMoreUrl": "/academy/interchain-messaging",
+      "category": "avalanche"
+    },
+    {
+      "term": "Interchain Token Transfer",
+      "abbreviation": "ICTT",
+      "previousTerm": null,
+      "description": "A system that allows tokens to be transferred seamlessly between different Avalanche L1s, enabling greater interoperability within the ecosystem.",
+      "learnMoreUrl": "/academy/interchain-token-transfer",
+      "category": "avalanche"
+    },
+    {
+      "term": "Platform Chain",
+      "abbreviation": "P-Chain",
+      "previousTerm": null,
+      "description": "Responsible for all validator and Avalanche L1-level operations, including staking, creating new blockchains, and other platform-level functions. Uses the Platform Virtual Machine.",
+      "learnMoreUrl": "/docs/quick-start/primary-network#p-chain",
+      "category": "avalanche"
+    },
+    {
+      "term": "Platform Virtual Machine",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The virtual machine implementation that powers the P-Chain, handling staking, validator, and Avalanche L1 operations.",
+      "learnMoreUrl": null,
+      "category": "avalanche"
+    },
+    {
+      "term": "Primary Network",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A special Avalanche L1 that runs three blockchains: the P-Chain, C-Chain, and X-Chain. All validators on the Primary Network must stake at least 2,000 AVAX.",
+      "learnMoreUrl": "/docs/quick-start/primary-network",
+      "category": "avalanche"
+    },
+    {
+      "term": "Snowman Consensus",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A linear chain-optimized variant of the Avalanche consensus protocol used specifically by the P-Chain and C-Chain. Designed for smart contract chains and platform operations.",
+      "learnMoreUrl": "/academy/avalanche-fundamentals/02-avalanche-consensus-intro/03-snowman-consensus",
+      "category": "avalanche"
+    },
+    {
+      "term": "Annual Percentage Rate",
+      "abbreviation": "APR",
+      "previousTerm": null,
+      "description": "The annual return you will receive on an investment, without accounting for the effects of compounding.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Annual Percentage Yield",
+      "abbreviation": "APY",
+      "previousTerm": null,
+      "description": "The annual return you will receive on an investment when returns are compounded. Unlike APR, APY includes the effects of compounding.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Arbitrage",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The practice of buying and selling assets between different markets to profit from price discrepancies. For example, buying a token on one exchange where it's cheaper and selling it on another where it's more expensive.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Automated Market Maker",
+      "abbreviation": "AMM",
+      "previousTerm": null,
+      "description": "A protocol that uses liquidity pools and mathematical formulas to automatically determine asset prices and enable trading without traditional order books.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Block",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A collection of transactions that are grouped together and added to the blockchain. Each block typically contains a reference to the previous block, creating a chain.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Blockchain",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A distributed ledger technology that records transactions across multiple computers in a way that ensures security, transparency, and immutability.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    }
+  ]
+} 
