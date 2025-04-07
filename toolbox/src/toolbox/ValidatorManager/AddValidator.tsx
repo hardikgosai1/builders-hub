@@ -39,8 +39,8 @@ const parseNodeID = (nodeID: string) => {
 
 export default function AddValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { subnetId, proxyAddress, evmChainRpcUrl, evmChainName, evmChainCoinName } = useToolboxStore()
-  const { avalancheNetworkID, walletChainId, pChainAddress } = useWalletStore()
+  const { subnetId, proxyAddress, setProxyAddress } = useToolboxStore()
+  const { avalancheNetworkID, coreWalletClient, pChainAddress } = useWalletStore()
 
   // State variables for form inputs
   const [newNodeID, setNewNodeID] = useState("")
@@ -49,7 +49,7 @@ export default function AddValidator() {
   const [newWeight, setNewWeight] = useState("")
   const [newBalance, setNewBalance] = useState("0.1")
   const [validatorManagerAddress, setValidatorManagerAddress] = useState(proxyAddress || "")
-  const [inputSubnetID, setInputSubnetID] = useState(subnetID || "")
+  const [inputSubnetID, setInputSubnetID] = useState(subnetId || "")
 
   // State for managing the validation process
   const [isAddingValidator, setIsAddingValidator] = useState(false)
