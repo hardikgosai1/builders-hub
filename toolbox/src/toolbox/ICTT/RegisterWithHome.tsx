@@ -29,16 +29,19 @@ export default function RegisterWithHome() {
     const [localError, setLocalError] = useState("");
     const [homeContractAddress, setHomeContractAddress] = useState<string | null>(null);
     const [homeContractClient, setHomeContractClient] = useState<PublicClient | null>(null);
-
+    const [isRegistered, setIsRegistered] = useState(false);
     const deployOnOptions = [
         { label: "L1", value: "L1" },
         { label: "C-Chain", value: "C-Chain" }
     ];
+    const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
 
     useEffect(() => {
         const fetchSettings = async () => {
+            if (isCheckingRegistration) return;
+            setIsCheckingRegistration(true);
             try {
                 const remoteChain = deployOn === "L1" ? viemChain : avalancheFuji;
                 const homeChain = deployOn === "L1" ? avalancheFuji : viemChain;
@@ -71,25 +74,27 @@ export default function RegisterWithHome() {
 
                 const chainIDBase58 = deployOn === "L1" ? chainID : FUJI_C_BLOCKCHAIN_ID;
                 const tokenHomeBlockchainIDHex = utils.bufferToHex(utils.base58check.decode(chainIDBase58));
+                console.log({ deployOn, chainIDBase58, tokenHomeBlockchainIDHex, FUJI_C_BLOCKCHAIN_ID, chainID });
 
                 const remoteSettings = await homePublicClient.readContract({
                     address: tokenHomeAddress as `0x${string}`,
                     abi: ERC20TokenHomeABI.abi,
                     functionName: 'getRemoteTokenTransferrerSettings',
                     args: [tokenHomeBlockchainIDHex, currentRemoteAddress]
-                });
+                }) as { registered: boolean, collateralNeeded: bigint, tokenMultiplier: bigint, multiplyOnRemote: boolean };
 
-                console.log("remoteSettings", remoteSettings);
-
+                setIsRegistered(remoteSettings.registered);
             } catch (error: any) {
                 console.error("Error fetching token home address:", error);
                 setLocalError(`Error fetching token home address: ${error.shortMessage || error.message}`);
                 setHomeContractAddress(null);
+            } finally {
+                setIsCheckingRegistration(false);
             }
         };
 
         fetchSettings();
-    }, [deployOn, erc20TokenRemoteAddress, chainID, viemChain]);
+    }, [deployOn, erc20TokenRemoteAddress, chainID, viemChain, lastTxId]);
 
     async function handleRegister() {
         setLocalError("");
@@ -189,6 +194,23 @@ export default function RegisterWithHome() {
                                 label="Registration Transaction ID"
                                 value={lastTxId ?? ""}
                             />
+                        </div>
+                    )}
+
+                    {isCheckingRegistration && (
+                        <div className=" text-gray-500">
+                            ⏳ Checking registration status...
+                        </div>
+                    )}
+
+                    {!isCheckingRegistration && isRegistered && (
+                        <div className=" ">
+                            ✅ Remote contract is registered with the Home contract
+                        </div>
+                    )}
+                    {!isCheckingRegistration && !isRegistered && (
+                        <div className=" ">
+                            ⚠️ Remote contract is not yet registered with the Home contract
                         </div>
                     )}
 
