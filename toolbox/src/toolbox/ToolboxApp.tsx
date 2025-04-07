@@ -211,6 +211,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "ERC20 Token Remote",
             component: lazy(() => import('./ICTT/DeployERC20TokenRemote')),
             fileNames: ["toolbox/src/toolbox/ICTT/DeployERC20TokenRemote.tsx"]
+        },
+        {
+            id: "registerWithHome",
+            label: "Register with Home",
+            component: lazy(() => import('./ICTT/RegisterWithHome')),
+            fileNames: ["toolbox/src/toolbox/ICTT/RegisterWithHome.tsx"]
         }
     ]
 };

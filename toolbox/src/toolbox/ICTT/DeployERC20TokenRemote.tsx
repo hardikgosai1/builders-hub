@@ -19,9 +19,10 @@ import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20To
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json";
 
 const C_CHAIN_TELEPORTER_REGISTRY_ADDRESS = "0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228";
-const FUJI_C_BLOCKCHAIN_ID = "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp";
+export const FUJI_C_BLOCKCHAIN_ID = "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp";
 
 // Solidity pseudocode for reference
+
 // struct TokenRemoteSettings {
 //     address teleporterRegistryAddress;
 //     address teleporterManager;
@@ -57,7 +58,6 @@ export default function DeployERC20TokenRemote() {
         erc20TokenHomeAddress,
         erc20TokenRemoteAddress,
         setErc20TokenRemoteAddress,
-        L1ID,
         setErc20TokenHomeAddress,
         setTeleporterRegistryAddress,
         chainID,
@@ -68,12 +68,11 @@ export default function DeployERC20TokenRemote() {
     const [isDeploying, setIsDeploying] = useState(false);
     const [deployOn, setDeployOn] = useState<DeployOn>("L1");
     const [teleporterManager, setTeleporterManager] = useState(walletEVMAddress);
+    const [localError, setLocalError] = useState("");
     const [tokenName, setTokenName] = useState("");
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenDecimals, setTokenDecimals] = useState("0");
     const [minTeleporterVersion, setMinTeleporterVersion] = useState("1");
-    const [fetchingDecimalsError, setFetchingDecimalsError] = useState("");
-    const [localError, setLocalError] = useState("");
 
     const deployOnReversed = useMemo(() => {
         return deployOn === "L1" ? "C-Chain" : "L1";
@@ -93,6 +92,7 @@ export default function DeployERC20TokenRemote() {
     useEffect(() => {
         const fetchTokenDecimals = async () => {
             try {
+                setLocalError("");
                 setTokenDecimals("0");
                 setTokenName("loading...");
                 setTokenSymbol("loading...");
@@ -138,6 +138,75 @@ export default function DeployERC20TokenRemote() {
         fetchTokenDecimals();
     }, [deployOnReversed, erc20TokenHomeAddress, viemChain]);
 
+    const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
+
+    async function handleDeploy() {
+        setLocalError(""); // Clear previous errors
+
+        setIsDeploying(true);
+        try {
+            // Re-check requiredChain just in case, though button should prevent this state
+            if (!requiredChain) {
+                throw new Error("Required chain configuration is missing.");
+            }
+
+            // Re-fetch values needed for args, ensuring they are available
+            const homeAddress = erc20TokenHomeAddress?.[deployOnReversed];
+            const registryAddress = deployOn === "L1" ? teleporterRegistryAddress : C_CHAIN_TELEPORTER_REGISTRY_ADDRESS;
+
+            // Double check critical values before proceeding
+            if (!homeAddress || !registryAddress || !tokenHomeBlockchainIDHex || tokenDecimals === "0" || !tokenName || !tokenSymbol) {
+                throw new Error("Critical deployment parameters missing or invalid despite button being enabled. Please refresh and try again.");
+            }
+
+            const publicClient = createPublicClient({
+                chain: requiredChain,
+                transport: http(requiredChain.rpcUrls.default.http[0])
+            });
+
+            // Construct arguments for the contract constructor
+            const constructorArgs = [
+                // 1. settings (struct)
+                {
+                    teleporterRegistryAddress: registryAddress as `0x${string}`,
+                    teleporterManager: teleporterManager || coreWalletClient.account.address,
+                    minTeleporterVersion: BigInt(minTeleporterVersion),
+                    tokenHomeBlockchainID: tokenHomeBlockchainIDHex as `0x${string}`,
+                    tokenHomeAddress: homeAddress as `0x${string}`,
+                    tokenHomeDecimals: parseInt(tokenDecimals) // Decimals from source token
+                },
+                // 2. tokenName (from source token)
+                tokenName,
+                // 3. tokenSymbol (from source token)
+                tokenSymbol,
+                // 4. tokenDecimals (for this new remote token, same as source)
+                parseInt(tokenDecimals)
+            ];
+
+            console.log("Deploying ERC20TokenRemote with args:", constructorArgs);
+
+            const hash = await coreWalletClient.deployContract({
+                abi: ERC20TokenRemote.abi,
+                bytecode: ERC20TokenRemote.bytecode.object as `0x${string}`,
+                args: constructorArgs,
+                chain: requiredChain
+            });
+
+            const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+            if (!receipt.contractAddress) {
+                throw new Error("No contract address in receipt");
+            }
+
+            setErc20TokenRemoteAddress(receipt.contractAddress, deployOn);
+        } catch (error: any) {
+            console.error("Deployment failed:", error);
+            setLocalError(`Deployment failed: ${error.shortMessage || error.message}`);
+            showBoundary(error);
+        } finally {
+            setIsDeploying(false);
+        }
+    }
 
     return (
         <div className="">
@@ -197,6 +266,29 @@ export default function DeployERC20TokenRemote() {
                         disabled
                     />}
 
+                    {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Input
+                            label="Token Name (from source)"
+                            value={tokenName}
+                            disabled
+                        />
+
+                        <Input
+                            label="Token Symbol (from source)"
+                            value={tokenSymbol}
+                            disabled
+                        />
+
+                        <Input
+                            label="Token Decimals (from source)"
+                            value={tokenDecimals}
+                            disabled
+                        />
+                    </div>
+
                     <Input
                         label="L1 Teleporter Manager Address"
                         value={teleporterManager}
@@ -220,23 +312,19 @@ export default function DeployERC20TokenRemote() {
                         required
                     />
 
-                    <Input
-                        label="Token Name"
-                        value={tokenName}
-                        disabled
+                    <Success
+                        label={`ERC20 Token Remote Address (on ${deployOn})`}
+                        value={erc20TokenRemoteAddress?.[deployOn] || ""}
                     />
 
-                    <Input
-                        label="Token Symbol"
-                        value={tokenSymbol}
-                        disabled
-                    />
-
-                    <Input
-                        label="Token Decimals"
-                        value={tokenDecimals}
-                        disabled
-                    />
+                    <Button
+                        variant={erc20TokenRemoteAddress?.[deployOn] ? "secondary" : "primary"}
+                        onClick={handleDeploy}
+                        loading={isDeploying}
+                        disabled={isDeploying || !erc20TokenHomeAddress?.[deployOnReversed] || !tokenHomeBlockchainIDHex || tokenDecimals === "0" || !tokenName || !tokenSymbol || (deployOn === "L1" && !teleporterRegistryAddress)}
+                    >
+                        {erc20TokenRemoteAddress?.[deployOn] ? "Re-Deploy ERC20 Token Remote" : "Deploy ERC20 Token Remote"}
+                    </Button>
 
                 </div>
             </RequireChainToolbox >
