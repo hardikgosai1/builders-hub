@@ -24,7 +24,6 @@ export default function InitValidatorSet() {
         setL1ID,
         L1ConversionSignature,
         setL1ConversionSignature,
-        proxyAddress,
         evmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
@@ -68,38 +67,49 @@ export default function InitValidatorSet() {
 
 
             // Prepare transaction arguments
-            const txArgs = [{
-                subnetId: cb58ToHex(signingSubnetId),
-                validatorManagerBlockchainID: cb58ToHex(chainId),
-                validatorManagerAddress: managerAddress as `0x${string}`,
-                initialValidators: validators
-                    .map(({ nodeID, weight, signer }: { nodeID: string, weight: number, signer: { publicKey: string } }) => {
-                        return {
-                            nodeID: nodeID,
-                            blsPublicKey: signer.publicKey,
-                            weight: weight
-                        };
-                    })
-            }, 0];
+            const txArgs = [
+                {
+                    subnetID: cb58ToHex(signingSubnetId),
+                    validatorManagerBlockchainID: cb58ToHex(chainId),
+                    validatorManagerAddress: managerAddress as `0x${string}`,
+                    initialValidators: validators
+                        .map(({ nodeID, weight, signer }: { nodeID: string, weight: number, signer: { publicKey: string } }) => {
+                            // Ensure nodeID and blsPublicKey are properly formatted
+                            // If nodeID is in BinTools format, convert to hex
+                            const nodeIDBytes = nodeID.startsWith('0x') 
+                                ? nodeID 
+                                : add0x(nodeID);
+                                
+                            // If blsPublicKey is in BinTools format, convert to hex
+                            const blsPublicKeyBytes = signer.publicKey.startsWith('0x') 
+                                ? signer.publicKey 
+                                : add0x(signer.publicKey);
+                                
+                            return {
+                                nodeID: nodeIDBytes,
+                                blsPublicKey: blsPublicKeyBytes,
+                                weight: weight
+                            };
+                        })
+                }, 
+                0 // messageIndex parameter
+            ];
 
 
             setCollectedData({ ...txArgs[0] as any, L1ConversionSignature })
-
-
 
             // Convert signature to bytes and pack into access list
             const signatureBytes = hexToBytes(add0x(L1ConversionSignature));
             const accessList = packWarpIntoAccessList(signatureBytes);
 
             const sim = await publicClient.simulateContract({
-                address: proxyAddress as `0x${string}`,
+                address: managerAddress as `0x${string}`,
                 abi: ValidatorManagerABI.abi,
                 functionName: 'initializeValidatorSet',
                 args: txArgs,
                 accessList,
                 gas: BigInt(1_000_000),
-                // @ts-ignore TODO: after redefining simulateContract, should be gone
-                chain: viemChain,
+                chain: viemChain || undefined,
             });
 
             console.log("Simulated transaction:", sim);
@@ -123,7 +133,23 @@ export default function InitValidatorSet() {
 
         } catch (error) {
             console.error('Transaction error:', error);
-            setError(error instanceof Error ? error.message : 'An unknown error occurred');
+            // More detailed error logging
+            if (error instanceof Error) {
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                
+                // Parse the error message to be more user-friendly
+                let errorMessage = error.message;
+                if (errorMessage.includes('Cannot read properties of undefined')) {
+                    errorMessage = 'Contract function call failed. This may be due to an invalid argument format or missing required parameters.';
+                }
+                setError(errorMessage);
+            } else {
+                setError('An unknown error occurred');
+            }
         } finally {
             setIsInitializing(false);
         }
@@ -225,7 +251,7 @@ const debugTraceAndDecode = async (txHash: string, rpcEndpoint: string) => {
             return `${errorResult.errorName}${errorResult.args ? ': ' + errorResult.args.join(', ') : ''}`;
         } catch (e: unknown) {
             console.error('Error decoding error result:', e);
-            return `Unknown error selector: ${errorSelector}`;
+            return 'Unknown error selector found in trace';
         }
     }
     return 'No error selector found in trace';
