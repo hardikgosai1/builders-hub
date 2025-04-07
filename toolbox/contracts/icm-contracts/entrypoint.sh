@@ -35,6 +35,7 @@ for file in \
     /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.json \
     /teleporter_src/out/ExampleERC20.sol/ExampleERC20.json \
     /teleporter_src/out/ERC20TokenHome.sol/ERC20TokenHome.json \
+    /teleporter_src/out/ERC20TokenRemote.sol/ERC20TokenRemote.json \
 ; do
     filename=$(basename "$file")
     jq '.' "$file" > "/compiled/$filename"

@@ -14,6 +14,7 @@ import { RequireChain } from "../../components/RequireChain";
 import { RadioGroup } from "../../components/RadioGroup";
 import { type DeployOn } from "../toolboxStore";
 import { createPublicClient, http } from "viem";
+import { Note } from "../../components/Note";
 
 export default function DeployERC20TokenHome() {
     const { showBoundary } = useErrorBoundary();
@@ -21,7 +22,8 @@ export default function DeployERC20TokenHome() {
         teleporterRegistryAddress,
         exampleErc20Address,
         setErc20TokenHomeAddress,
-        erc20TokenHomeAddress
+        erc20TokenHomeAddress,
+        setTeleporterRegistryAddress
     } = useToolboxStore();
     const { coreWalletClient, walletChainId, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
@@ -109,11 +111,13 @@ export default function DeployERC20TokenHome() {
                 transport: http(requiredChain.rpcUrls.default.http[0])
             });
 
+            const registryAddress = deployOn === "L1" ? teleporterRegistryAddress : "0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228";
+
             const hash = await coreWalletClient.deployContract({
                 abi: ERC20TokenHome.abi,
                 bytecode: ERC20TokenHome.bytecode.object as `0x${string}`,
                 args: [
-                    teleporterRegistryAddress as `0x${string}`,
+                    registryAddress as `0x${string}`,
                     teleporterManager || coreWalletClient.account.address,
                     BigInt(minTeleporterVersion),
                     tokenAddress as `0x${string}`,
@@ -158,14 +162,28 @@ export default function DeployERC20TokenHome() {
 
                         {localError && <div className="text-red-500">{localError}</div>}
 
-                        <Input
+                        {deployOn === "L1" && <><Input
                             label="Teleporter Registry Address"
                             value={teleporterRegistryAddress}
-                            disabled
+                            onChange={setTeleporterRegistryAddress}
                         />
 
+                            {!teleporterRegistryAddress && <Note variant="warning">
+                                <p>
+                                    Please <a href="#teleporterRegistry" className="text-blue-500">deploy the Teleporter Registry contract first</a>.
+                                </p>
+                            </Note>}
+
+                        </>}
+
+                        {deployOn === "C-Chain" && <Input
+                            label="C-Chain Teleporter Manager Address"
+                            value="0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228"
+                            disabled
+                        />}
+
                         <Input
-                            label="Teleporter Manager Address"
+                            label="L1 Teleporter Manager Address"
                             value={teleporterManager}
                             onChange={setTeleporterManager}
                             placeholder={coreWalletClient?.account?.address}
@@ -206,7 +224,7 @@ export default function DeployERC20TokenHome() {
                             variant={erc20TokenHomeAddress?.[deployOn] ? "secondary" : "primary"}
                             onClick={handleDeploy}
                             loading={isDeploying}
-                            disabled={!teleporterRegistryAddress || !tokenAddress || tokenDecimals === "0"}
+                            disabled={(!teleporterRegistryAddress && deployOn === "L1") || (!tokenAddress || tokenDecimals === "0")}
                         >
                             {erc20TokenHomeAddress?.[deployOn] ? "Re-Deploy ERC20 Token Home" : "Deploy ERC20 Token Home"}
                         </Button>
