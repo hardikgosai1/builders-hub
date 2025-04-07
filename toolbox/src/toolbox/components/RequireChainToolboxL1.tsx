@@ -1,6 +1,8 @@
 import L1Form from "./L1Form";
 import { useToolboxStore, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
+import { avalancheFuji } from "viem/chains";
+import { RequireChain } from "../../components/RequireChain";
 
 export function RequireChainToolboxL1({ children }: { children: React.ReactNode }) {
     const { walletChainId } = useWalletStore();
@@ -22,4 +24,13 @@ export function RequireChainToolboxL1({ children }: { children: React.ReactNode 
             </div>
         </div>
     </>
+}
+
+
+export function RequireChainToolbox({ children, requireChain }: { children: React.ReactNode, requireChain: "L1" | "C-Chain" }) {
+    if (requireChain === "L1") {
+        return <RequireChainToolboxL1>{children}</RequireChainToolboxL1>
+    }
+
+    return <RequireChain chain={avalancheFuji}>{children}</RequireChain>
 }

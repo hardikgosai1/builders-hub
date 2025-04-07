@@ -10,7 +10,7 @@ import { Success } from "../../components/Success";
 import { RequireChain } from "../../components/RequireChain";
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from "viem/chains";
-
+import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
 export default function DeployExampleERC20() {
     const { showBoundary } = useErrorBoundary();
     const { exampleErc20Address, setExampleErc20Address } = useToolboxStore();
@@ -25,7 +25,6 @@ export default function DeployExampleERC20() {
     ];
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
-    if (!requiredChain) return <div>Loading chains...</div>;
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -63,7 +62,7 @@ export default function DeployExampleERC20() {
                     idPrefix="deploy-on-"
                 />
             </div>
-            <RequireChain chain={requiredChain}>
+            <RequireChainToolbox requireChain={deployOn}>
 
                 <div className="space-y-4">
                     <div className="">
@@ -85,7 +84,7 @@ export default function DeployExampleERC20() {
                         value={exampleErc20Address?.[deployOn] || ""}
                     />
                 </div>
-            </RequireChain>
+            </RequireChainToolbox>
 
         </div>
     );

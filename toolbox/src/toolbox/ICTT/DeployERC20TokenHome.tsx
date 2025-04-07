@@ -15,6 +15,9 @@ import { RadioGroup } from "../../components/RadioGroup";
 import { type DeployOn } from "../toolboxStore";
 import { createPublicClient, http } from "viem";
 import { Note } from "../../components/Note";
+import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
+
+const C_CHAIN_TELEPORTER_REGISTRY_ADDRESS = "0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228";
 
 export default function DeployERC20TokenHome() {
     const { showBoundary } = useErrorBoundary();
@@ -34,6 +37,7 @@ export default function DeployERC20TokenHome() {
     const [tokenDecimals, setTokenDecimals] = useState("0");
     const [localError, setLocalError] = useState("");
     const [deployOn, setDeployOn] = useState<DeployOn>("L1");
+    const [deployError, setDeployError] = useState("");
 
     const deployOnOptions = [
         { label: "L1", value: "L1" },
@@ -66,11 +70,12 @@ export default function DeployERC20TokenHome() {
     }, [walletEVMAddress]);
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
-    if (!requiredChain) return <div>Loading chains...</div>;
 
 
     useEffect(() => {
         if (!tokenAddress) return;
+        if (!requiredChain) return;
+
         setLocalError("");
         const publicClient = createPublicClient({
             chain: requiredChain,
@@ -90,13 +95,14 @@ export default function DeployERC20TokenHome() {
 
 
     async function handleDeploy() {
-        if (!teleporterRegistryAddress) {
-            alert("Teleporter Registry address is required. Please deploy it first.");
+        setDeployError("");
+        if (!teleporterRegistryAddress && deployOn === "L1") {
+            setDeployError("Teleporter Registry address is required for L1 deployment. Please deploy it first.");
             return;
         }
 
         if (!tokenAddress) {
-            alert("Token address is required. Please deploy an ERC20 token first.");
+            setDeployError("Token address is required. Please deploy an ERC20 token first.");
             return;
         }
 
@@ -111,7 +117,7 @@ export default function DeployERC20TokenHome() {
                 transport: http(requiredChain.rpcUrls.default.http[0])
             });
 
-            const registryAddress = deployOn === "L1" ? teleporterRegistryAddress : "0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228";
+            const registryAddress = deployOn === "L1" ? teleporterRegistryAddress : C_CHAIN_TELEPORTER_REGISTRY_ADDRESS;
 
             const hash = await coreWalletClient.deployContract({
                 abi: ERC20TokenHome.abi,
@@ -152,7 +158,7 @@ export default function DeployERC20TokenHome() {
                     idPrefix="deploy-on-"
                 />
             </div>
-            <RequireChain chain={requiredChain}>
+            <RequireChainToolbox requireChain={deployOn}>
                 <div className="space-y-4">
                     <div className="space-y-4">
                         <div className="mt-4">
@@ -161,6 +167,7 @@ export default function DeployERC20TokenHome() {
                         </div>
 
                         {localError && <div className="text-red-500">{localError}</div>}
+                        {deployError && <div className="text-red-500 mt-2">{deployError}</div>}
 
                         {deployOn === "L1" && <><Input
                             label="Teleporter Registry Address"
@@ -177,8 +184,8 @@ export default function DeployERC20TokenHome() {
                         </>}
 
                         {deployOn === "C-Chain" && <Input
-                            label="C-Chain Teleporter Manager Address"
-                            value="0xF86Cb19Ad8405AEFa7d09C778215D2Cb6eBfB228"
+                            label="C-Chain Teleporter Registry Address"
+                            value={C_CHAIN_TELEPORTER_REGISTRY_ADDRESS}
                             disabled
                         />}
 
@@ -232,7 +239,7 @@ export default function DeployERC20TokenHome() {
 
                     </div>
                 </div >
-            </RequireChain >
+            </RequireChainToolbox >
         </div >
     );
 } 
