@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
-import { Container } from "../../components/Container"
+import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useWalletStore } from "../../lib/walletStore";
+import { Container } from "../components/Container"
 import { cn } from "../../lib/utils"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
@@ -41,7 +41,7 @@ export default function RemoveValidator() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const { proxyAddress, subnetID } = useToolboxStore()
+  const { proxyAddress, subnetId } = useToolboxStore()
   const { coreWalletClient, pChainAddress, avalancheNetworkID } = useWalletStore()
   const viemChain = useViemChainStore()
   const [networkName, setNetworkName] = useState<"fuji" | "mainnet" | undefined>(undefined)
@@ -233,7 +233,7 @@ export default function RemoveValidator() {
             network: networkName,
             signatureAggregatorRequest: {
               message: messageToSign,
-              signingSubnetId: subnetID || "",
+              signingSubnetId: subnetId || "",
               quorumPercentage: 67,
             },
           })
