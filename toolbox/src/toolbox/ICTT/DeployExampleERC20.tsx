@@ -1,13 +1,15 @@
 "use client";
 
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json"
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
+import { RequireChain } from "../../components/RequireChain";
+import { RadioGroup } from "../../components/RadioGroup";
+import { avalancheFuji } from "viem/chains";
 
 export default function DeployExampleERC20() {
     const { showBoundary } = useErrorBoundary();
@@ -15,16 +17,24 @@ export default function DeployExampleERC20() {
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
+    const [deployOn, setDeployOn] = useState<DeployOn>("L1");
+
+    const deployOnOptions = [
+        { label: "L1", value: "L1" },
+        { label: "C-Chain", value: "C-Chain" }
+    ];
+
+    const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
+    if (!requiredChain) return <div>Loading chains...</div>;
 
     async function handleDeploy() {
         setIsDeploying(true);
-        setExampleErc20Address("");
         try {
             const hash = await coreWalletClient.deployContract({
                 abi: ExampleERC20.abi,
                 bytecode: ExampleERC20.bytecode.object as `0x${string}`,
                 args: [],
-                chain: viemChain
+                chain: requiredChain
             });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
@@ -33,7 +43,7 @@ export default function DeployExampleERC20() {
                 throw new Error('No contract address in receipt');
             }
 
-            setExampleErc20Address(receipt.contractAddress);
+            setExampleErc20Address(receipt.contractAddress, deployOn);
         } catch (error) {
             showBoundary(error);
         } finally {
@@ -42,9 +52,19 @@ export default function DeployExampleERC20() {
     }
 
     return (
-        <RequireChainToolboxL1>
-            <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Deploy ERC20 Token</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Deploy ERC20 Token</h2>
+
+            <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900/50">
+                <RadioGroup
+                    value={deployOn}
+                    onChange={(value) => setDeployOn(value as "L1" | "C-Chain")}
+                    items={deployOnOptions}
+                    idPrefix="deploy-on-"
+                />
+            </div>
+            <RequireChain chain={requiredChain}>
+
                 <div className="space-y-4">
                     <div className="">
                         This will deploy an ERC20 token contract to your connected network (Chain ID: <code>{walletChainId}</code>).
@@ -52,20 +72,21 @@ export default function DeployExampleERC20() {
                     </div>
 
                     <Button
-                        variant={exampleErc20Address ? "secondary" : "primary"}
+                        variant={exampleErc20Address?.[deployOn] ? "secondary" : "primary"}
                         onClick={handleDeploy}
                         loading={isDeploying}
                         disabled={isDeploying}
                     >
-                        {exampleErc20Address ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
+                        {exampleErc20Address?.[deployOn] ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
                     </Button>
 
                     <Success
                         label="ERC20 Token Address"
-                        value={exampleErc20Address}
+                        value={exampleErc20Address?.[deployOn] || ""}
                     />
                 </div>
-            </div>
-        </RequireChainToolboxL1>
+            </RequireChain>
+
+        </div>
     );
 }

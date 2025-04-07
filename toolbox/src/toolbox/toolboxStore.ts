@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 
+export type DeployOn = "L1" | "C-Chain";
+
 export const initialState = {
     subnetId: "",
     chainName: "My Chain",
@@ -29,8 +31,8 @@ export const initialState = {
     icmReceiverAddress: "",
     stakingManagerAddress: "",
     rewardCalculatorAddress: "",
-    exampleErc20Address: "",
-    erc20TokenHomeAddress: "",
+    exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 }
 
 export const useToolboxStore = create(
@@ -68,8 +70,8 @@ export const useToolboxStore = create(
             setEvmChainId: (evmChainId: number) => set({ evmChainId }),
             setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
-            setExampleErc20Address: (address: string) => set({ exampleErc20Address: address }),
-            setErc20TokenHomeAddress: (address: string) => set({ erc20TokenHomeAddress: address }),
+            setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
+            setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
         })),
         {
             name: 'toolbox-storage',
