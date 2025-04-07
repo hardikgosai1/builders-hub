@@ -38,11 +38,6 @@ export default function Initialize() {
         console.error('Error decoding subnetId:', error);
     }
 
-    useEffect(() => {
-        if (proxyAddress) {
-            checkIfInitialized();
-        }
-    }, []);
 
     async function checkIfInitialized() {
         if (!proxyAddress || !window.avalanche) return;
@@ -115,22 +110,23 @@ export default function Initialize() {
                 description="This will initialize the ValidatorManager contract."
             >
                 <div className="space-y-4">
-                    <Input
-                        label="Proxy address"
-                        value={proxyAddress}
-                        onChange={setProxyAddress}
-                        placeholder="Enter proxy address"
-                        button={
-                            <Button
-                                variant="secondary"
-                                onClick={checkIfInitialized}
-                                loading={isChecking}
-                                disabled={!proxyAddress}
-                            >
-                                Check Status
-                            </Button>
-                        }
-                    />
+                    <div className="space-y-2">
+                        <Input
+                            label="Proxy address"
+                            value={proxyAddress}
+                            onChange={setProxyAddress}
+                            placeholder="Enter proxy address"
+                        />
+                        <Button
+                            variant="secondary"
+                            onClick={checkIfInitialized}
+                            loading={isChecking}
+                            disabled={!proxyAddress}
+                            size="sm"
+                        >
+                            Check Status
+                        </Button>
+                    </div>
 
                     <Input
                         label="Subnet ID"
