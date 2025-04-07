@@ -7,7 +7,6 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import { RequireChain } from "../../components/RequireChain";
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from "viem/chains";
 import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
@@ -17,7 +16,7 @@ export default function DeployExampleERC20() {
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
-    const [deployOn, setDeployOn] = useState<DeployOn>("L1");
+    const [deployOn, setDeployOn] = useState<DeployOn>("C-Chain");
 
     const deployOnOptions = [
         { label: "L1", value: "L1" },

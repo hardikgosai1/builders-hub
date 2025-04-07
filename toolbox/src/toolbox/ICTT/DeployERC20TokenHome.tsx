@@ -36,7 +36,7 @@ export default function DeployERC20TokenHome() {
     const [tokenAddress, setTokenAddress] = useState("");
     const [tokenDecimals, setTokenDecimals] = useState("0");
     const [localError, setLocalError] = useState("");
-    const [deployOn, setDeployOn] = useState<DeployOn>("L1");
+    const [deployOn, setDeployOn] = useState<DeployOn>("C-Chain");
     const [deployError, setDeployError] = useState("");
 
     const deployOnOptions = [
