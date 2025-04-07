@@ -79,6 +79,7 @@ export default function AddValidator() {
   let lastValidationID = ""; // Add a variable for validationID
   let lastPChainWarpMsg = ""; // Add a variable for P-Chain warp message
 
+  // needs to be refactored
   const pChainChainID = "11111111111111111111111111111111LpoYY"
   var platformEndpoint = "https://api.avax-test.network"
   useEffect(() => {
@@ -117,19 +118,13 @@ export default function AddValidator() {
     const steps = Object.keys(validationSteps) as Array<keyof ValidationSteps>
     const stepIndex = steps.indexOf(step)
 
-    // Only reset the statuses from the failed step onwards
+    // Reset the statuses from the selected step onwards
     steps.slice(stepIndex).forEach((currentStep) => {
       updateStepStatus(currentStep, "pending")
     })
 
-    // Start the validation process from the failed step
+    // Start the validation process from the selected step
     await addValidator(step)
-
-    // If the retried step succeeds, continue with the next steps
-    const nextStepIndex = stepIndex + 1
-    if (nextStepIndex < steps.length && validationSteps[step].status === "success") {
-      await addValidator(steps[nextStepIndex])
-    }
   }
 
   // Update proxyAddress in the store when validatorManagerAddress changes
@@ -163,6 +158,10 @@ export default function AddValidator() {
       Object.keys(validationSteps).forEach((step) => {
         updateStepStatus(step as keyof ValidationSteps, "pending")
       })
+    } else {
+      // If we're retrying from a specific step, make sure we're in validation mode
+      setIsAddingValidator(true)
+      setIsProcessComplete(false)
     }
 
     try {
@@ -248,18 +247,24 @@ export default function AddValidator() {
           console.log("Subnet ID: ", inputSubnetID)
           console.log("Network name: ", networkName)
           // Sign the unsigned warp message with signature aggregator
-          const { signedMessage } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
+          const response = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
               message: messageToSign,
-              signingSubnetId: subnetId,
+              signingSubnetId: inputSubnetID, // Use inputSubnetID instead of subnetId
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           })
 
-          console.log("Signed message: ", signedMessage)
+          // Ensure we have a valid signedMessage and it's not just zeros
+          const signedMessage = response.signedMessage;
+          if (!signedMessage || signedMessage.length === 0 || /^0*$/.test(signedMessage)) {
+            throw new Error("Received invalid signed message from the signature aggregator. Please try again.");
+          }
+
+          console.log("Signed message: ", signedMessage.substring(0, 20) + "...")
           setSavedSignedMessage(signedMessage)
-          lastSignedMessage = signedMessage; // Store in component variable
+          lastSignedMessage = signedMessage // Store in component variable
           updateStepStatus("signMessage", "success")
 
           if (startFromStep === "signMessage") {
@@ -369,20 +374,35 @@ export default function AddValidator() {
           // Simulate waiting period
           await new Promise((resolve) => setTimeout(resolve, 1000))
 
+          // Ensure we have a valid justification (signed message from previous step)
+          const justification = savedSignedMessage || lastSignedMessage;
+          console.log("Justification for signature aggregation:", justification ? justification.substring(0, 20) + "..." : "None");
+          
+          if (!justification || justification.length === 0 || /^0*$/.test(justification)) {
+            throw new Error("Invalid justification: The signed message from the previous step is empty or only contains zeros. Please retry the signature step.");
+          }
+          
+          // Make sure justification is a proper hex string (add 0x prefix if needed)
+          const formattedJustification = justification.startsWith("0x") ? justification : `0x${justification}`;
+
           // Aggregate signatures
-          const signedMessage = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
+          const response = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
               message: unsignedPChainWarpMsgHex,
-              justification: registerL1ValidatorUnsignedWarpMsg,
-              signingSubnetId: subnetId,
+              justification: formattedJustification,
+              signingSubnetId: inputSubnetID, // Use inputSubnetID instead of subnetId
               quorumPercentage: 67, // Default threshold for subnet validation
             },
-          })
+          });
+          
+          if (!response.signedMessage || response.signedMessage.length === 0 || /^0*$/.test(response.signedMessage)) {
+            throw new Error("Received invalid P-Chain signed message from the signature aggregator. Please try again.");
+          }
 
-          console.log("P-Chain signed message received:", signedMessage.signedMessage.substring(0, 20) + "...");
-          setSavedPChainWarpMsg(signedMessage.signedMessage)
-          lastPChainWarpMsg = signedMessage.signedMessage; // Store in component variable
+          console.log("P-Chain signed message received:", response.signedMessage.substring(0, 20) + "...");
+          setSavedPChainWarpMsg(response.signedMessage)
+          lastPChainWarpMsg = response.signedMessage; // Store in component variable
           updateStepStatus("waitForPChain", "success")
         } catch (error: any) {
           updateStepStatus("waitForPChain", "error", error.message)
@@ -439,21 +459,37 @@ export default function AddValidator() {
     }
   }
 
-  // Step Indicator Component
+  // Custom error message or suggestion based on which step failed
+  const getStepSuggestion = (step: keyof ValidationSteps): string | null => {
+    if (step === "finalizeRegistration" && validationSteps[step].status === "error") {
+      return "If finalization fails, try retrying the 'Aggregate Signatures for P-Chain Warp Message' step first."
+    }
+    return null;
+  }
+
+  // Step Indicator Component, should be refactored to another component
   const StepIndicator = ({
     status,
     label,
     error,
     onRetry,
+    step,
   }: {
     status: StepStatus["status"]
     label: string
     error?: string
     onRetry?: () => void
+    step?: keyof ValidationSteps
   }) => {
+    // Get any suggestion for this step
+    const suggestion = step ? getStepSuggestion(step) : null;
+    
     return (
       <div className="flex flex-col space-y-1 my-2">
-        <div className="flex items-center space-x-2">
+        <div 
+          className={`flex items-center space-x-2 ${onRetry ? 'cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 p-1 -m-1 rounded-md transition-colors' : ''}`}
+          onClick={onRetry}
+        >
           {status === "loading" && (
             <div className="h-5 w-5 flex-shrink-0">
               <Loader2 className="h-5 w-5 animate-spin text-red-500" />
@@ -483,15 +519,10 @@ export default function AddValidator() {
             {error}
           </div>
         )}
-
-        {status === "error" && onRetry && (
-          <div className="ml-7 mt-1">
-            <button
-              onClick={onRetry}
-              className="text-xs px-2 py-1 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800 rounded transition-colors"
-            >
-              Retry
-            </button>
+        
+        {suggestion && status === "error" && (
+          <div className="ml-7 mt-1 p-2 bg-blue-50 dark:bg-blue-900/20 border-l-2 border-blue-500 rounded text-xs text-blue-700 dark:text-blue-300">
+            <span className="font-medium">Suggestion:</span> {suggestion}
           </div>
         )}
       </div>
@@ -684,12 +715,15 @@ export default function AddValidator() {
                 </button>
               )}
             </div>
+            
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2 italic">Click on any step to retry from that point</p>
 
             <StepIndicator
               status={validationSteps.initializeRegistration.status}
               label="Initialize Validator Registration"
               error={validationSteps.initializeRegistration.error}
               onRetry={() => retryStep("initializeRegistration")}
+              step="initializeRegistration"
             />
 
             <StepIndicator
@@ -697,6 +731,7 @@ export default function AddValidator() {
               label="Aggregate Signatures for Warp Message"
               error={validationSteps.signMessage.error}
               onRetry={() => retryStep("signMessage")}
+              step="signMessage"
             />
 
             <StepIndicator
@@ -704,13 +739,15 @@ export default function AddValidator() {
               label="Register Validator on P-Chain"
               error={validationSteps.registerOnPChain.error}
               onRetry={() => retryStep("registerOnPChain")}
+              step="registerOnPChain"
             />
 
             <StepIndicator
               status={validationSteps.waitForPChain.status}
-              label="Wait for P-Chain Confirmation"
+              label="Aggregate Signatures for P-Chain Warp Message"
               error={validationSteps.waitForPChain.error}
               onRetry={() => retryStep("waitForPChain")}
+              step="waitForPChain"
             />
 
             <StepIndicator
@@ -718,6 +755,7 @@ export default function AddValidator() {
               label="Finalize Validator Registration"
               error={validationSteps.finalizeRegistration.error}
               onRetry={() => retryStep("finalizeRegistration")}
+              step="finalizeRegistration"
             />
 
             {!isProcessComplete && (
