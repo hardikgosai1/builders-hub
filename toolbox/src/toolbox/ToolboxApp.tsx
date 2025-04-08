@@ -40,7 +40,7 @@ const componentGroups: Record<string, ComponentType[]> = {
         {
             id: 'balanceTopup',
             label: "Validator Balance Topup",
-            component: lazy(() => import('./ValidatorManager/BalanceTopup')),
+            component: lazy(() => import('./Wallet/BalanceTopup')),
             fileNames: ["toolbox/src/toolbox/ValidatorManager/BalanceTopup.tsx"]
         }
     ],
