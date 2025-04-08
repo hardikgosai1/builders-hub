@@ -143,6 +143,286 @@
       "description": "A distributed ledger technology that records transactions across multiple computers in a way that ensures security, transparency, and immutability.",
       "learnMoreUrl": null,
       "category": "blockchain"
+    },
+    {
+      "term": "Compounding",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The process where earnings from an asset are reinvested to generate additional returns over time, creating exponential growth.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Consensus Mechanism",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The method by which network participants agree on the valid state of the blockchain. Examples include Proof of Work, Proof of Stake, and Avalanche Consensus.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Cross-Chain Interoperability Protocol",
+      "abbreviation": "CCIP",
+      "previousTerm": null,
+      "description": "A protocol that enables communication between different blockchains. Allows for the transfer of messages, tokens, and data across separate blockchain networks. Most commonly associated with Chainlink's cross-chain communication solution.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Cryptocurrency",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A digital or virtual currency that uses cryptography for security and operates independently of a central authority.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Decentralized Application",
+      "abbreviation": "dApp",
+      "previousTerm": null,
+      "description": "An application that runs on a decentralized network rather than being controlled by a single entity or authority.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Decentralized Autonomous Organization",
+      "abbreviation": "DAO",
+      "previousTerm": null,
+      "description": "An organization governed by rules encoded as smart contracts on a blockchain, without centralized leadership. Members collectively make decisions through voting mechanisms.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Decentralized Exchange",
+      "abbreviation": "DEX",
+      "previousTerm": null,
+      "description": "A peer-to-peer marketplace where users can trade cryptocurrencies directly with each other without an intermediary. These exchanges use smart contracts to execute trades.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Decentralized Finance",
+      "abbreviation": "DeFi",
+      "previousTerm": null,
+      "description": "A financial system built on blockchain technology that aims to recreate and improve upon traditional financial services without central authorities or intermediaries.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Gas",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The fee required to perform a transaction or execute a contract on a blockchain network. Gas is used to allocate resources of the blockchain's virtual machine.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Hash",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A function that converts input data to a fixed-size string of characters. Blockchain uses hash functions to ensure data integrity and security.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Liquidity",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The ease with which an asset can be converted to cash or traded without affecting its market price. Higher liquidity means the asset can be exchanged more easily.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Liquidity Pool",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A collection of tokens or assets locked in a smart contract, providing liquidity for decentralized exchanges and other DeFi applications.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Mining",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The process by which new transactions are verified and added to a blockchain using a Proof of Work consensus mechanism. Miners solve complex puzzles to earn rewards.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Multi-signature",
+      "abbreviation": "Multisig",
+      "previousTerm": null,
+      "description": "A security feature that requires multiple signatures (approvals) to execute a transaction. This provides enhanced security for wallets and contracts.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Node",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A computer that participates in a blockchain network by maintaining a copy of the blockchain, relaying information, and validating transactions. Nodes work together to ensure the network's security and functionality.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Non-Fungible Token",
+      "abbreviation": "NFT",
+      "previousTerm": null,
+      "description": "A unique digital asset that represents ownership of a specific item or piece of content on the blockchain. Unlike cryptocurrencies, NFTs are not interchangeable.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Private Key",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A secret code that allows access to cryptocurrency holdings. It's used to sign transactions and should never be shared.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Public Key",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A cryptographic code derived from a private key that serves as a public address where others can send cryptocurrency.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Smart Contract",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "Self-executing code on a blockchain that automatically implements the terms of an agreement when predetermined conditions are met, without requiring intermediaries.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Stablecoin",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A type of cryptocurrency designed to minimize price volatility by pegging its value to a stable asset (like fiat currency) or using algorithmic methods to control supply.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Staking",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The process of actively participating in transaction validation on a proof-of-stake blockchain by locking up cryptocurrency to support network operations.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Token",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A digital asset built on an existing blockchain. Tokens can represent various assets or utilities within a specific ecosystem or platform.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Fungible Token",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A type of token where all units are identical and interchangeable, like cryptocurrencies. Each token has the same value and properties as any other token of the same type.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Validator",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A specialized type of node that actively participates in the consensus process by validating transactions, producing blocks, and securing the network. Validators typically stake cryptocurrency as collateral to ensure honest behavior.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Verifiable Random Function",
+      "abbreviation": "VRF",
+      "previousTerm": null,
+      "description": "A cryptographic function that provides verifiable randomness. Used in blockchain protocols to generate unpredictable but verifiable random values. Important for applications requiring fair random selection like lottery systems, NFT distributions, or validator selection in some consensus mechanisms.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Virtual Machine",
+      "abbreviation": "VM",
+      "previousTerm": null,
+      "description": "A computing environment that executes code and maintains state. In blockchain, VMs define a blockchain's application logic, including state transitions, transaction rules, and smart contract execution. VMs serve as the blueprint for a blockchain's functionality.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Wallet",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A digital tool that allows users to store and manage their cryptocurrency assets. Wallets can be hardware devices, software applications, or services.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Proof of Work",
+      "abbreviation": "PoW",
+      "previousTerm": null,
+      "description": "A consensus mechanism that requires network participants to expend computational energy to solve complex mathematical puzzles in order to validate transactions and create new blocks.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Proof of Stake",
+      "abbreviation": "PoS",
+      "previousTerm": null,
+      "description": "A consensus mechanism where validators are selected to create new blocks based on the amount of cryptocurrency they have staked as collateral, rather than computational work.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Ledger",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A comprehensive record-keeping system that documents all transactions in a chronological and immutable way, ensuring transparency and traceability.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Bitcoin",
+      "abbreviation": "BTC",
+      "previousTerm": null,
+      "description": "The first and most well-known cryptocurrency, created in 2009 by an anonymous person or group using the pseudonym Satoshi Nakamoto.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Ethereum",
+      "abbreviation": "ETH",
+      "previousTerm": null,
+      "description": "A decentralized, open-source blockchain platform that enables smart contracts and decentralized applications (dApps) to be built and run without downtime, fraud, control, or interference from a third party.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Avalanche",
+      "abbreviation": "AVAX",
+      "previousTerm": null,
+      "description": "A high-performance, scalable blockchain platform for decentralized applications and custom blockchain networks, known for its high throughput, low latency, and energy-efficient consensus mechanism.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Slashing",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "A penalty mechanism in Proof of Stake networks where validators lose a portion of their staked cryptocurrency for malicious behavior or failing to follow the protocol rules.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
+    },
+    {
+      "term": "Consensus",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The process by which all nodes in a distributed network agree on the state of the system. In blockchain, consensus ensures all participants have the same copy of the ledger.",
+      "learnMoreUrl": null,
+      "category": "blockchain"
     }
   ]
 } 
