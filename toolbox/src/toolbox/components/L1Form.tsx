@@ -12,9 +12,9 @@ import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
 const knownEvmChainIds = [1, 43114, 43113]
 
-export default function L1Form() {
+export default function L1Form({ onComplete }: { onComplete: () => void }) {
     const [isSwitching, setIsSwitching] = useState(false);
-    const { coreWalletClient, walletChainId } = useWalletStore();
+    const { coreWalletClient } = useWalletStore();
     const {
         evmChainId,
         setEvmChainId,

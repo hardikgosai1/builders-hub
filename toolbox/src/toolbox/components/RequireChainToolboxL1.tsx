@@ -1,24 +1,24 @@
 import L1Form from "./L1Form";
-import { useToolboxStore, useViemChainStore } from "../toolboxStore"
-import { useWalletStore } from "../../lib/walletStore"
+import { useViemChainStore } from "../toolboxStore"
 import { avalancheFuji } from "viem/chains";
 import { RequireChain } from "../../components/RequireChain";
+import { useState } from "react";
 
 export function RequireChainToolboxL1({ children }: { children: React.ReactNode }) {
-    const { walletChainId } = useWalletStore();
-    const { evmChainId } = useToolboxStore();
     const viemChain = useViemChainStore();
 
-    if (walletChainId === evmChainId && !!viemChain) {
+    const [showForm, setShowForm] = useState(!viemChain);
+
+    if (!showForm) {
         return children;
     }
 
     return <>
         <div className="space-y-4">
             <div >
-                Before you continue, please switch Core wallet to your L1 using form below:
+                Before you continue, please fill in your L1 chain details below:
             </div>
-            <L1Form />
+            <L1Form onComplete={() => setShowForm(false)} />
             <div className="opacity-50 pointer-events-none">
                 {children}
             </div>
