@@ -9,6 +9,8 @@ import versions from "../../versions.json";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
+import { Tabs } from "../../components/Tabs";
+
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
     const stakingPort = isRPC ? "9653" : "9651";
@@ -122,6 +124,36 @@ ${domain}/ext/bc/${chainID}/rpc`
     }
 }
 
+const dockerInstallInstructions: Record<string, string> = {
+    'Ubuntu/Debian': `sudo apt-get update && \\
+    sudo apt-get install -y docker.io && \\
+    sudo usermod -aG docker $USER && \\
+    newgrp docker
+
+# Test docker installation
+docker run -it --rm hello-world
+`,
+    'Amazon Linux 2023+': `sudo yum update -y && \\
+    sudo yum install -y docker && \\
+    sudo service docker start && \\
+    sudo usermod -a -G docker $USER && \\
+    newgrp docker
+
+# Test docker installation
+docker run -it --rm hello-world
+`,
+    'Fedora': `sudo dnf update -y && \\
+    sudo dnf -y install docker && \\
+    sudo systemctl start docker && \\
+    sudo usermod -a -G docker $USER && \\
+    newgrp docker
+
+# Test docker installation
+docker run -it --rm hello-world
+`,
+} as const;
+
+type OS = keyof typeof dockerInstallInstructions;
 
 export default function AvalanchegoDocker() {
     const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
@@ -131,6 +163,7 @@ export default function AvalanchegoDocker() {
     const [rpcCommand, setRpcCommand] = useState("");
     const [domain, setDomain] = useState("");
     const [enableDebugTrace, setEnableDebugTrace] = useState<"true" | "false">("false");
+    const [activeOS, setActiveOS] = useState<OS>("Ubuntu/Debian");
 
     useEffect(() => {
         try {
@@ -222,6 +255,44 @@ export default function AvalanchegoDocker() {
                         />
                     </div>
                 )}
+
+                <div className="mt-4">
+                    <h3 className="text-md font-medium mb-2">Docker Installation</h3>
+                    <p className="mb-4">
+                        We will retrieve the binary images of{" "}
+                        <a
+                            href="https://github.com/ava-labs/avalanchego"
+                            target="_blank"
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                            rel="noreferrer"
+                        >
+                            AvalancheGo
+                        </a>{" "}
+                        from the Docker Hub. Make sure you have Docker installed on your system.
+                    </p>
+
+                    <Tabs
+                        tabs={Object.keys(dockerInstallInstructions)}
+                        activeTab={activeOS}
+                        setActiveTab={setActiveOS}
+                        children={(activeTab) => {
+                            return <CodeHighlighter lang="bash" code={dockerInstallInstructions[activeTab]} />
+                        }}
+                    />
+
+                    <p className="mt-4">
+                        If you do not want to use Docker, you can follow the instructions{" "}
+                        <a
+                            href="https://github.com/ava-labs/avalanchego?tab=readme-ov-file#installation"
+                            target="_blank"
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                            rel="noreferrer"
+                        >
+                            here
+                        </a>
+                        .
+                    </p>
+                </div>
 
                 <div className="mt-4">
                     <h3 className="text-md font-medium mb-2">Node Command:</h3>
