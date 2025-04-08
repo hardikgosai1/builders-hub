@@ -3,7 +3,7 @@
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
 import { useToolboxStore } from '../toolbox/toolboxStore';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
 import { ConnectWallet } from "../components/ConnectWallet";
@@ -133,7 +133,7 @@ const componentGroups: Record<string, ComponentType[]> = {
         }
     ],
 
-    "PoA Validator Management": [
+    "ValidatorManager Functions": [
         {
             id: "addValidator",
             label: "Add Validator",
@@ -283,6 +283,19 @@ export default function ToolboxApp() {
         window.location.hash ? window.location.hash.substring(1) : defaultTool
     );
 
+    // State to track expanded/collapsed groups
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+        Object.keys(componentGroups).reduce((acc, key) => ({ ...acc, [key]: false }), {})
+    );
+
+    // Toggle group expansion
+    const toggleGroup = (groupName: string) => {
+        setExpandedGroups(prev => ({ 
+            ...prev, 
+            [groupName]: !prev[groupName] 
+        }));
+    };
+
     // Listen for URL hash changes (e.g. back/forward navigation)
     useEffect(() => {
         const handleHashChange = () => {
@@ -343,23 +356,34 @@ export default function ToolboxApp() {
                 <ul className="space-y-6">
                     {Object.entries(componentGroups).map(([groupName, components]) => (
                         <li key={groupName}>
-                            <h3 className="text-sm font-semibold uppercase tracking-wide mb-3">{groupName}</h3>
-                            <ul className="space-y-1">
-                                {components.map(({ id, label }) => (
-                                    <li key={id}>
-                                        <a
-                                            href={`#${id}`}
-                                            onClick={() => handleComponentClick(id)}
-                                            className={`block cursor-pointer w-full text-left px-3 py-2 text-sm rounded-md transition-all ${selectedTool === id
-                                                ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-medium'
-                                                : ' dark: hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                }`}
-                                        >
-                                            {label}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div 
+                                onClick={() => toggleGroup(groupName)}
+                                className="flex items-center mb-3 cursor-pointer group"
+                            >
+                                {expandedGroups[groupName] 
+                                    ? <ChevronDown className="w-4 h-4 mr-1 text-gray-400 group-hover:text-gray-600" /> 
+                                    : <ChevronRight className="w-4 h-4 mr-1 text-gray-400 group-hover:text-gray-600" />
+                                }
+                                <h3 className="text-sm font-semibold uppercase tracking-wide">{groupName}</h3>
+                            </div>
+                            {expandedGroups[groupName] && (
+                                <ul className="space-y-1">
+                                    {components.map(({ id, label }) => (
+                                        <li key={id}>
+                                            <a
+                                                href={`#${id}`}
+                                                onClick={() => handleComponentClick(id)}
+                                                className={`block cursor-pointer w-full text-left px-3 py-2 text-sm rounded-md transition-all ${selectedTool === id
+                                                    ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-medium'
+                                                    : ' dark: hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                {label}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </li>
                     ))}
                 </ul>
