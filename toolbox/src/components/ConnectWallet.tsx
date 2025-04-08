@@ -11,7 +11,6 @@ import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
 
 export const ConnectWallet = ({ children, required }: { children: React.ReactNode; required: boolean }) => {
-  const setWalletChainId = useWalletStore(state => state.setWalletChainId);
   const walletEVMAddress = useWalletStore(state => state.walletEVMAddress);
   const setWalletEVMAddress = useWalletStore(state => state.setWalletEVMAddress);
   const setCoreWalletClient = useWalletStore(state => state.setCoreWalletClient);
@@ -19,7 +18,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
   const setAvalancheNetworkID = useWalletStore(state => state.setAvalancheNetworkID);
   const setPChainAddress = useWalletStore(state => state.setPChainAddress);
   const pChainAddress = useWalletStore(state => state.pChainAddress);
-  const walletChainId = useWalletStore(state => state.walletChainId);
   const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
 
   const [hasWallet, setHasWallet] = useState<boolean>(false)
@@ -86,7 +84,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
       chainId = Number.parseInt(chainId, 16)
     }
 
-    setWalletChainId(chainId)
     coreWalletClient.getPChainAddress().then(setPChainAddress).catch(showBoundary)
 
     coreWalletClient
@@ -117,10 +114,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
     setWalletEVMAddress(accounts[0] as `0x${string}`)
 
     coreWalletClient.getPChainAddress().then(setPChainAddress).catch(showBoundary)
-
-    if (walletChainId === 0) {
-      coreWalletClient.getChainId().then(onChainChanged).catch(showBoundary)
-    }
   }
 
   async function connectWallet() {
@@ -159,10 +152,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
       setWalletEVMAddress(accounts[0] as `0x${string}`)
 
       coreWalletClient.getPChainAddress().then(setPChainAddress).catch(showBoundary)
-
-      if (walletChainId === 0) {
-        coreWalletClient.getChainId().then(onChainChanged).catch(showBoundary)
-      }
     } catch (error) {
       console.error("Error connecting wallet:", error)
       showBoundary(error)
@@ -175,9 +164,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
     }
   }
 
-  const truncateAddress = (address: string) => {
-    return `${address.substring(0, 12)}...${address.substring(address.length - 4)}`
-  }
 
   // Server-side rendering fallback
   if (!isBrowser) {
@@ -302,14 +288,6 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Chain indicator */}
-              {walletChainId && (
-                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-xs">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-black dark:text-black font-medium">Chain {walletChainId}</span>
-                </div>
-              )}
-
               {/* Network badge */}
               {avalancheNetworkID && (
                 <div
@@ -335,7 +313,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
               <div className="flex items-center">
                 <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mr-2">EVM:</span>
                 <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">
-                  {truncateAddress(walletEVMAddress)}
+                  {walletEVMAddress}
                 </div>
               </div>
               <button
@@ -353,7 +331,7 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
                 <div className="flex items-center">
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mr-2">P-Chain:</span>
                   <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">
-                    {truncateAddress(pChainAddress)}
+                    {pChainAddress}
                   </div>
                 </div>
                 <button
