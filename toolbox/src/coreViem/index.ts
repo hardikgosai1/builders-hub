@@ -1,4 +1,4 @@
-import { createWalletClient, custom, rpcSchema } from 'viem'
+import { createWalletClient, custom, DeployContractParameters, rpcSchema } from 'viem'
 import { addChain, CoreWalletAddChainParameters } from './overrides/addChain'
 import { CoreWalletRpcSchema } from './rpcSchema'
 import { isTestnet } from './methods/isTestnet'
@@ -12,7 +12,7 @@ import { getEthereumChain } from './methods/getEthereumChain'
 import { extractChainInfo, ExtractChainInfoParams } from './methods/extractChainInfo'
 import { getPChainBalance } from './methods/getPChainbalance'
 import { sendTransaction } from './overrides/sendTransaction'
-
+import { deployContract } from './overrides/deployContract'
 //Warning! This api is not stable yet, it will change in the future
 export { type ConvertToL1Validator } from "./methods/convertToL1"
 
@@ -38,6 +38,7 @@ export function createCoreWalletClient(account: `0x${string}`) {
         //override methods
         addChain: (args: CoreWalletAddChainParameters) => addChain(client, args),
         sendTransaction: (args) => sendTransaction(client, args),
+        deployContract: (args: DeployContractParameters) => deployContract(client, args),
 
         //new methods
         isTestnet: () => isTestnet(client),

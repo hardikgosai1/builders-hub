@@ -42,6 +42,13 @@ class AccountTypeNotSupportedError extends BaseError {
     }
 }
 
+const formatTransactionRequestWithChainId = (request: { chainId: number } & TransactionRequest) => {
+    return {
+        ...request,
+        chainId: `0x${request.chainId.toString(16)}`,
+    }
+}
+
 export async function sendTransaction<
     chain extends Chain | undefined,
     account extends Account | undefined,
@@ -67,6 +74,10 @@ export async function sendTransaction<
         value,
         ...rest
     } = parameters
+
+    if (!chain) {
+        throw new Error('Chain is required for sendTransaction')
+    }
 
     if (typeof account_ === 'undefined')
         throw new AccountNotFoundError({
@@ -100,13 +111,14 @@ export async function sendTransaction<
         })()
 
         if (account?.type === 'json-rpc' || account === null) {
-            let chainId: number | undefined
-            if (chain) {
-                chainId = chain.id
-            }
+            let chainId: number = chain.id
+
 
             const chainFormat = client.chain?.formatters?.transactionRequest?.format
-            const format = chainFormat || formatTransactionRequest
+            // const format = chainFormat || formatTransactionRequest
+            const format = chainFormat || formatTransactionRequestWithChainId
+
+            console.log({ chainFormat, formatTransactionRequest, chain, chainId })
 
             const request = format({
                 // Pick out extra data that might exist on the chain's transaction request type.
@@ -125,7 +137,7 @@ export async function sendTransaction<
                 nonce,
                 to,
                 value,
-            } as TransactionRequest)
+            } as { chainId: number } & TransactionRequest)
 
             const method = 'eth_sendTransaction'
 

@@ -12,7 +12,7 @@ import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
 const knownEvmChainIds = [1, 43114, 43113]
 
-export default function L1Form({ onComplete }: { onComplete: () => void }) {
+export default function L1Form({ onComplete }: { onComplete?: () => void }) {
     const [isSwitching, setIsSwitching] = useState(false);
     const { coreWalletClient } = useWalletStore();
     const {
@@ -31,23 +31,6 @@ export default function L1Form({ onComplete }: { onComplete: () => void }) {
     const [isCheckingRpc, setIsCheckingRpc] = useState(false);
     const [success, setSuccess] = useState(false);
     const viemChain = useViemChainStore();
-
-    async function loadFromWallet() {
-        try {
-            setLocalError(null);
-
-            const chain = await coreWalletClient.getEthereumChain()
-            setEvmChainCoinName(chain.nativeCurrency.name)
-            setEvmChainIsTestnet(chain.isTestnet)
-            setEvmChainRpcUrl(chain.rpcUrls[0])
-            refetchChainIdFromRpc()
-        } catch (error) {
-            setLocalError((error as Error)?.message || "Unknown error");
-        } finally {
-            setIsCheckingRpc(false);
-        }
-    }
-
 
     async function refetchChainIdFromRpc() {
         setEvmChainId(0);
@@ -91,6 +74,7 @@ export default function L1Form({ onComplete }: { onComplete: () => void }) {
             await coreWalletClient.addChain({ chain: viemChain })
             await coreWalletClient.switchChain({ id: viemChain.id })
             setSuccess(true)
+            onComplete ? onComplete() : null
         } catch (error) {
             setLocalError((error as Error)?.message || "Unknown error")
         } finally {
@@ -123,10 +107,6 @@ export default function L1Form({ onComplete }: { onComplete: () => void }) {
                 )}
 
                 <div className="space-y-3">
-
-                    {evmChainId !== walletChainId && !knownEvmChainIds.includes(walletChainId) && <Button onClick={loadFromWallet}>Load from wallet</Button>}
-
-
                     <div className="space-y-1">
                         <Input
                             label="Chain Name"
