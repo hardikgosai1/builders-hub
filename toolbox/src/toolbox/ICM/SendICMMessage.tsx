@@ -14,6 +14,7 @@ import { avalancheFuji } from "viem/chains";
 import { RequireChain } from "../../components/RequireChain";
 import { SENDER_C_CHAIN_ADDRESS } from "./DeployICMDemo";
 import { RadioGroup } from "../../components/RadioGroup";
+import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 
 type MessageDirection = "CtoL1" | "L1toC";
 
@@ -21,7 +22,7 @@ export default function SendICMMessage() {
     const { showBoundary } = useErrorBoundary();
     const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
     const viemChain = useViemChainStore();
-    const { coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, customPublicClient, fujiPublicClient } = useWalletStore();
     const [message, setMessage] = useState(Math.floor(Math.random() * 10000));
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
@@ -77,6 +78,10 @@ export default function SendICMMessage() {
         setIsSending(true);
         try {
             if (!requiredChain) throw new Error('Invalid chain');
+
+            const publicClient = messageDirection === "CtoL1"
+                ? fujiPublicClient
+                : customPublicClient;
 
             const { request } = await publicClient.simulateContract({
                 address: sourceAddress,
@@ -155,7 +160,7 @@ export default function SendICMMessage() {
                 />
             </div>
 
-            <RequireChain chain={requiredChain}>
+            <RequireChainToolboxL1>
                 <div className="space-y-4">
                     {messageDirection === "CtoL1" && (
                         <Input
@@ -260,7 +265,7 @@ export default function SendICMMessage() {
                         value={lastReceivedMessage?.toString() ?? ""}
                     />
                 </div>
-            </RequireChain>
+            </RequireChainToolboxL1>
         </div>
     );
 }

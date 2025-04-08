@@ -16,7 +16,7 @@ export function ValidatorManagerDeployer() {
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const { showBoundary } = useErrorBoundary();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
 
     const getLinkedBytecode = () => {
         if (!validatorMessagesAddress) {

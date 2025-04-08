@@ -14,7 +14,7 @@ import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 export default function TeleporterRegistry() {
     const { showBoundary } = useErrorBoundary();
     const { setTeleporterRegistryAddress, teleporterRegistryAddress } = useToolboxStore();
-    const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
+    const { coreWalletClient, customPublicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
 
@@ -34,7 +34,7 @@ export default function TeleporterRegistry() {
                 chain: viemChain,
             });
 
-            const receipt = await publicClient.waitForTransactionReceipt({ hash });
+            const receipt = await customPublicClient.waitForTransactionReceipt({ hash });
 
             if (!receipt.contractAddress) {
                 throw new Error('No contract address in receipt');
@@ -54,7 +54,7 @@ export default function TeleporterRegistry() {
                 <h2 className="text-lg font-semibold">Deploy Teleporter Registry</h2>
                 <div className="space-y-4">
                     <div className="mb-4">
-                        This will deploy the <code>TeleporterRegistry</code> contract to the currently connected EVM network <code>{walletChainId}</code>.
+                        This will deploy the <code>TeleporterRegistry</code> contract to the currently connected EVM network <code>{viemChain.id}</code>.
                         The contract will be initialized with the Teleporter Messenger address <code>{TeleporterMessengerAddress.content.trim()}</code>.
                     </div>
                     <Button

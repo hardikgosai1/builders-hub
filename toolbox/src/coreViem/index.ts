@@ -1,4 +1,4 @@
-import { createWalletClient, custom, DeployContractParameters, rpcSchema } from 'viem'
+import { createWalletClient, custom, DeployContractParameters, rpcSchema, WriteContractParameters } from 'viem'
 import { addChain, CoreWalletAddChainParameters } from './overrides/addChain'
 import { CoreWalletRpcSchema } from './rpcSchema'
 import { isTestnet } from './methods/isTestnet'
@@ -13,6 +13,7 @@ import { extractChainInfo, ExtractChainInfoParams } from './methods/extractChain
 import { getPChainBalance } from './methods/getPChainbalance'
 import { sendTransaction } from './overrides/sendTransaction'
 import { deployContract } from './overrides/deployContract'
+import { writeContract } from './overrides/writeContract'
 //Warning! This api is not stable yet, it will change in the future
 export { type ConvertToL1Validator } from "./methods/convertToL1"
 
@@ -39,6 +40,14 @@ export function createCoreWalletClient(account: `0x${string}`) {
         addChain: (args: CoreWalletAddChainParameters) => addChain(client, args),
         sendTransaction: (args) => sendTransaction(client, args),
         deployContract: (args: DeployContractParameters) => deployContract(client, args),
+        writeContract: <
+            const abi extends import('viem').Abi | readonly unknown[],
+            functionName extends import('viem').ContractFunctionName<abi, "nonpayable" | "payable">,
+            args extends import('viem').ContractFunctionArgs<abi, "nonpayable" | "payable", functionName>,
+            chainOverride extends import('viem').Chain | undefined = undefined
+        >(
+            args: WriteContractParameters<abi, functionName, args, undefined, { address: `0x${string}`; type: "json-rpc"; }, chainOverride>
+        ) => writeContract(client, args),
 
         //new methods
         isTestnet: () => isTestnet(client),

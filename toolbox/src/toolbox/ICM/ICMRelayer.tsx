@@ -16,7 +16,7 @@ const MINIMUM_BALANCE_CCHAIN = parseEther('1')
 
 export default function ICMRelayer() {
     const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
-    const { coreWalletClient, walletChainId } = useWalletStore();
+    const { coreWalletClient, fujiPublicClient, customPublicClient } = useWalletStore();
     const [balanceL1, setBalanceL1] = useState<bigint>(BigInt(0));
     const [balanceCChain, setBalanceCChain] = useState<bigint>(BigInt(0));
     const [isCheckingBalanceL1, setIsCheckingBalanceL1] = useState(true);
@@ -38,26 +38,15 @@ export default function ICMRelayer() {
 
     const relayerAddress = privateKeyToAccount(privateKey).address;
 
-    // Create separate clients for L1 and C-Chain
-    const l1Client = viemChain ? createPublicClient({
-        transport: http(evmChainRpcUrl),
-        chain: viemChain,
-    }) : null;
-
-    const cChainClient = createPublicClient({
-        transport: http(avalancheFuji.rpcUrls.default.http[0]),
-        chain: avalancheFuji,
-    });
-
     const checkBalanceL1 = async () => {
-        if (!evmChainRpcUrl || !l1Client || !viemChain) {
+        if (!evmChainRpcUrl || !viemChain) {
             setIsCheckingBalanceL1(false);
             return;
         }
 
         setIsCheckingBalanceL1(true);
         try {
-            const balance = await l1Client.getBalance({
+            const balance = await customPublicClient.getBalance({
                 address: relayerAddress
             });
 
@@ -72,7 +61,7 @@ export default function ICMRelayer() {
     const checkBalanceCChain = async () => {
         setIsCheckingBalanceCChain(true);
         try {
-            const balance = await cChainClient.getBalance({
+            const balance = await fujiPublicClient.getBalance({
                 address: relayerAddress
             });
 
@@ -103,8 +92,6 @@ export default function ICMRelayer() {
 
         setIsSendingL1(true);
         try {
-            await coreWalletClient.switchChain({ id: viemChain.id });
-
             // Then proceed with transaction
             const hash = await coreWalletClient.sendTransaction({
                 to: relayerAddress,
@@ -112,7 +99,7 @@ export default function ICMRelayer() {
                 chain: viemChain
             });
 
-            await l1Client?.waitForTransactionReceipt({ hash });
+            await customPublicClient.waitForTransactionReceipt({ hash });
             await checkBalanceL1();
         } catch (error) {
             showBoundary(error);
@@ -124,8 +111,6 @@ export default function ICMRelayer() {
     const handleFundCChain = async () => {
         setIsSendingCChain(true);
         try {
-            await coreWalletClient.switchChain({ id: avalancheFuji.id });
-
             // Then proceed with transaction
             const hash = await coreWalletClient.sendTransaction({
                 to: relayerAddress,
@@ -133,7 +118,7 @@ export default function ICMRelayer() {
                 chain: avalancheFuji
             });
 
-            await cChainClient.waitForTransactionReceipt({ hash });
+            await fujiPublicClient.waitForTransactionReceipt({ hash });
             await checkBalanceCChain();
         } catch (error) {
             showBoundary(error);
@@ -145,10 +130,6 @@ export default function ICMRelayer() {
     const hasEnoughBalanceL1 = balanceL1 >= MINIMUM_BALANCE;
     const hasEnoughBalanceCChain = balanceCChain >= MINIMUM_BALANCE_CCHAIN;
     const hasEnoughBalance = hasEnoughBalanceL1 && hasEnoughBalanceCChain;
-
-    const currentChainId = walletChainId;
-    const isOnL1 = viemChain ? currentChainId === viemChain.id : false;
-    const isOnCChain = currentChainId === avalancheFuji.id;
 
     return (
         <div className="space-y-4">
@@ -198,11 +179,6 @@ export default function ICMRelayer() {
                             </div>
                             {!hasEnoughBalanceL1 && (
                                 <>
-                                    {!isOnL1 && (
-                                        <div className="text-blue-600 mb-2">
-                                            Will switch to your L1 subnet chain (ID: {viemChain?.id}) automatically
-                                        </div>
-                                    )}
                                     <Button
                                         variant="primary"
                                         onClick={handleFundL1}
@@ -238,11 +214,6 @@ export default function ICMRelayer() {
                             </div>
                             {!hasEnoughBalanceCChain && (
                                 <>
-                                    {!isOnCChain && (
-                                        <div className="text-blue-600 mb-2">
-                                            Will switch to Fuji C-Chain (ID: {avalancheFuji.id}) automatically
-                                        </div>
-                                    )}
                                     <Button
                                         variant="primary"
                                         onClick={handleFundCChain}
@@ -260,7 +231,7 @@ export default function ICMRelayer() {
             {hasEnoughBalance && (
                 <>
                     <div className="text-sm">
-                        ⚠️ The private key is stored in your browser session storage and will persist until you close the browser.
+                        ⚠️ The private key is stored in your browser session storage and will persist until you close this tab.
                         Please save the address above as you will need to fund it later.
                     </div>
                     <div className="text-lg font-bold">Write the relayer config file</div>

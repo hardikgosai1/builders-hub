@@ -2,7 +2,7 @@
 
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
-import { useToolboxStore } from '../toolbox/toolboxStore';
+import { useToolboxStore, useViemChainStore } from '../toolbox/toolboxStore';
 import { RefreshCw } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
@@ -298,6 +298,7 @@ export default function ToolboxApp() {
         // Optionally update local state immediately
         setSelectedTool(toolId);
     };
+    const viemChain = useViemChainStore();
 
     const renderSelectedComponent = () => {
         const allComponents = Object.values(componentGroups).flat();
@@ -315,7 +316,7 @@ export default function ToolboxApp() {
                     window.location.reload();
                 }}
             >
-                <ConnectWallet required={!comp.skipWalletConnection}>
+                <ConnectWallet required={!comp.skipWalletConnection} customChain={viemChain}>
                     <div className="space-y-4">
                         <Suspense fallback={<ComponentLoader />}>
                             <Component />

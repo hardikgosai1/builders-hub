@@ -13,7 +13,7 @@ export function UpgradeProxyForm({ onUpgradeComplete }: { onUpgradeComplete?: (s
     const { evmChainId, chainId, validatorManagerAddress } = useL1LauncherStore();
     const { showBoundary } = useErrorBoundary();
     const { publicClient, coreWalletClient } = useWalletStore();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
 
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [currentImplementation, setCurrentImplementation] = useState<string | null>(null);

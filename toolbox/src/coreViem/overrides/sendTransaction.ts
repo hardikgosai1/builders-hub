@@ -8,7 +8,7 @@ import { getTransactionError } from 'viem/utils'
 import { extract } from 'viem/utils'
 
 
-class AccountNotFoundError extends BaseError {
+export class AccountNotFoundError extends BaseError {
     constructor({ docsPath }: { docsPath?: string | undefined } = {}) {
         super(
             [
@@ -44,7 +44,7 @@ class AccountTypeNotSupportedError extends BaseError {
 
 const formatTransactionRequestWithChainId = (request: { chainId: number } & TransactionRequest) => {
     return {
-        ...request,
+        ...(formatTransactionRequest(request)),
         chainId: `0x${request.chainId.toString(16)}`,
     }
 }
@@ -118,7 +118,6 @@ export async function sendTransaction<
             // const format = chainFormat || formatTransactionRequest
             const format = chainFormat || formatTransactionRequestWithChainId
 
-            console.log({ chainFormat, formatTransactionRequest, chain, chainId })
 
             const request = format({
                 // Pick out extra data that might exist on the chain's transaction request type.
@@ -141,7 +140,29 @@ export async function sendTransaction<
 
             const method = 'eth_sendTransaction'
 
+            await client.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                    chainId: `0x${chain.id.toString(16)}`,
+                    chainName: chain.name,
+                    rpcUrls: [...chain.rpcUrls.default.http, ...(chain.rpcUrls.default.webSocket || [])],
+                    iconUrls: [],
+                    nativeCurrency: {
+                        name: chain.nativeCurrency.name,
+                        symbol: chain.nativeCurrency.symbol,
+                        decimals: chain.nativeCurrency.decimals
+                    },
+                    blockExplorerUrls: chain.blockExplorers?.default.url ? [chain.blockExplorers?.default.url] : []
+                }]
+            })
+
             try {
+                // Convert BigInt values to strings for proper JSON serialization
+                const requestForLogging = JSON.parse(JSON.stringify(request, (_, value) =>
+                    typeof value === 'bigint' ? value.toString() : value
+                ));
+                console.log(`Calling\nwindow.avalanche.request(${JSON.stringify({ method, params: [requestForLogging] }, null, 2)})`);
+
                 return await client.request(
                     {
                         method,

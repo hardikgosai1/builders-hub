@@ -13,7 +13,7 @@ import { ExtractWarpMessageFromTxResponse } from '../../../coreViem/methods/extr
 
 export default function ContractInitializeValidatorSet() {
     const { coreWalletClient, publicClient } = useWalletStore();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
     const { conversionId, convertL1SignedWarpMessage } = useL1LauncherStore();
     const [initialCheckHasRun, setInitialCheckHasRun] = useState(false);
     const [initializedTxID, setInitializedTxID] = useState<string | null>(null);

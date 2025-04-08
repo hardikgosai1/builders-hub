@@ -10,21 +10,29 @@ export async function addChain<
     account extends Account | undefined,
 >(client: Client<Transport, chain, account>, { chain }: CoreWalletAddChainParameters) {
     const { id, name, nativeCurrency, rpcUrls, blockExplorers } = chain
+
+    const params = {
+        chainId: numberToHex(id),
+        chainName: name,
+        nativeCurrency,
+        rpcUrls: rpcUrls.default.http,
+        blockExplorerUrls: blockExplorers
+            ? Object.values(blockExplorers).map(({ url }) => url)
+            : undefined,
+        isTestnet: chain.isTestnet,
+    }
+    console.log(`calling
+window.avalanche.request({
+        method: 'wallet_addEthereumChain',
+        params: [${JSON.stringify(params)}]
+})
+
+        `)
+
     await client.request(
         {
             method: 'wallet_addEthereumChain',
-            params: [
-                {
-                    chainId: numberToHex(id),
-                    chainName: name,
-                    nativeCurrency,
-                    rpcUrls: rpcUrls.default.http,
-                    blockExplorerUrls: blockExplorers
-                        ? Object.values(blockExplorers).map(({ url }) => url)
-                        : undefined,
-                    isTestnet: chain.isTestnet,
-                },
-            ],
+            params: [params],
         },
         { dedupe: true, retryCount: 0 },
     )

@@ -9,7 +9,7 @@ import { Button } from '../../../components/Button';
 export function ValidatorMessagesDeployer() {
     const { setValidatorMessagesAddress, validatorMessagesAddress } = useL1LauncherStore();
     const { coreWalletClient, publicClient } = useWalletStore();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const { showBoundary } = useErrorBoundary()
 

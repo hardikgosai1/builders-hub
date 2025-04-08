@@ -46,11 +46,11 @@ export default function L1Form({ onComplete }: { onComplete?: () => void }) {
 
         try {
             setLocalError(null);
-            const publicClient = createPublicClient({
+            const tempClient = createPublicClient({
                 transport: evmChainRpcUrl.startsWith("ws") ? webSocket(evmChainRpcUrl) : http(evmChainRpcUrl)
             });
 
-            const chainId = await publicClient.getChainId();
+            const chainId = await tempClient.getChainId();
             setEvmChainId(chainId);
         } catch (error) {
             setLocalError((error as Error)?.message || "Unknown error");

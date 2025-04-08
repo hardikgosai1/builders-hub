@@ -13,16 +13,16 @@ export default function DeployContracts() {
         validatorMessagesAddress,
         validatorManagerAddress,
     } = useL1LauncherStore();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
 
     const [isProxyUpgraded, setIsProxyUpgraded] = useState(false);
 
-    if (!chain) {
+    if (!viemChain) {
         return <div>Loading...</div>;
     }
 
     return (
-        <RequireChain chain={chain}>
+        <RequireChain chain={viemChain}>
             <h1 className="text-2xl font-medium mb-6 dark:text-gray-200">Deploy Contracts</h1>
 
             <div className="space-y-6">

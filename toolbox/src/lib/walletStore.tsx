@@ -14,7 +14,7 @@ export const useWalletStore = create(
         }) as ReturnType<typeof createPublicClient>,
         customPublicClient: createPublicClient({
             //Just a placeholder, replaced by wrappers
-            transport: http(avalancheFuji.rpcUrls.default.http[0]),
+            transport: http("this URL should never be called."),
         }) as ReturnType<typeof createPublicClient>,
         walletEVMAddress: "",
         avalancheNetworkID: networkIDs.FujiID as typeof networkIDs.FujiID | typeof networkIDs.MainnetID,

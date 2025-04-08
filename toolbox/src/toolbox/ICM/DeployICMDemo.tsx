@@ -9,7 +9,6 @@ import { Success } from "../../components/Success";
 import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
-import { avalancheFuji } from "viem/chains";
 export const SENDER_C_CHAIN_ADDRESS = "0xfD694e233f9D5196CF3747723ed00Bb8386a7FEe";
 
 export default function DeployICMDemo() {

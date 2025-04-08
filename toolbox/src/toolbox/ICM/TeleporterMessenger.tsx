@@ -25,7 +25,7 @@ const TopUpComponent = ({
     const [isSending, setIsSending] = useState(false);
     const { showBoundary } = useErrorBoundary();
     const viemChain = useViemChainStore();
-    const { coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, customPublicClient } = useWalletStore();
 
     const handleTopUp = async () => {
         setIsSending(true);
@@ -36,7 +36,7 @@ const TopUpComponent = ({
                 chain: viemChain
             });
 
-            await publicClient.waitForTransactionReceipt({ hash });
+            await customPublicClient.waitForTransactionReceipt({ hash });
             onTopUp();
         } catch (error) {
             showBoundary(error);
@@ -71,12 +71,13 @@ const TopUpComponent = ({
 
 export default function TeleporterMessenger() {
     const { showBoundary } = useErrorBoundary();
-    const { publicClient, coreWalletClient } = useWalletStore();
+    const { customPublicClient, coreWalletClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [deployerBalance, setDeployerBalance] = useState(BigInt(0));
     const [isCheckingBalance, setIsCheckingBalance] = useState(true);
     const [isDeployed, setIsDeployed] = useState(false);
     const [txHash, setTxHash] = useState("");
+    const viemChain = useViemChainStore();
 
     const deployerAddress = TeleporterMessengerDeployerAddress.content as `0x${string}`;
     const expectedContractAddress = TeleporterMessengerAddress.content;
@@ -84,14 +85,14 @@ export default function TeleporterMessenger() {
     const checkDeployerBalance = async () => {
         setIsCheckingBalance(true);
         try {
-            const balance = await publicClient.getBalance({
+            const balance = await customPublicClient.getBalance({
                 address: deployerAddress,
             });
 
             setDeployerBalance(balance);
 
             // Also check if contract is already deployed
-            const code = await publicClient.getBytecode({
+            const code = await customPublicClient.getBytecode({
                 address: expectedContractAddress as `0x${string}`,
             });
 
@@ -113,11 +114,12 @@ export default function TeleporterMessenger() {
             // Send the raw presigned transaction
             const hash = await coreWalletClient.sendRawTransaction({
                 serializedTransaction: TeleporterMessengerDeploymentTransaction.content as `0x${string}`,
+                chain: viemChain
             });
 
             setTxHash(hash);
 
-            await publicClient.waitForTransactionReceipt({ hash });
+            await customPublicClient.waitForTransactionReceipt({ hash });
             setIsDeployed(true);
 
             // Refresh balance after deployment

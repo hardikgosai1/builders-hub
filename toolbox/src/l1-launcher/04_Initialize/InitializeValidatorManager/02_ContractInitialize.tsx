@@ -16,7 +16,7 @@ export default function ContractInitialize() {
     const [initialCheckHasRun, setInitialCheckHasRun] = useState(false);
     const { showBoundary } = useErrorBoundary();
     const { publicClient, coreWalletClient } = useWalletStore();
-    const chain = useViemChainStore();
+    const viemChain = useViemChainStore();
 
     const {
         subnetId,

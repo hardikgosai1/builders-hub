@@ -2,15 +2,17 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { Button } from "./Button"
 import { useErrorBoundary } from "react-error-boundary"
 import { Copy } from "lucide-react"
 import { createCoreWalletClient } from "../coreViem"
 import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
+import { Chain } from "viem/chains"
+import { createPublicClient, http } from "viem"
 
-export const ConnectWallet = ({ children, required }: { children: React.ReactNode; required: boolean }) => {
+export const ConnectWallet = ({ children, required, customChain }: { children: React.ReactNode; required: boolean, customChain?: Chain | null }) => {
   const walletEVMAddress = useWalletStore(state => state.walletEVMAddress);
   const setWalletEVMAddress = useWalletStore(state => state.setWalletEVMAddress);
   const setCoreWalletClient = useWalletStore(state => state.setCoreWalletClient);
@@ -19,10 +21,28 @@ export const ConnectWallet = ({ children, required }: { children: React.ReactNod
   const setPChainAddress = useWalletStore(state => state.setPChainAddress);
   const pChainAddress = useWalletStore(state => state.pChainAddress);
   const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
+  const setCustomPublicClient = useWalletStore(state => state.setCustomPublicClient);
 
   const [hasWallet, setHasWallet] = useState<boolean>(false)
   const [isBrowser, setIsBrowser] = useState<boolean>(false)
   const { showBoundary } = useErrorBoundary()
+
+  const [customChainDedupKey, setCustomChainDedupKey] = useState<string>("")
+
+  useEffect(() => {
+    if (customChain) {
+      const dedupKey = `${customChain.id}-${customChain.rpcUrls.default.http[0]}`
+      if (customChainDedupKey !== dedupKey) {
+        setCustomChainDedupKey(dedupKey)
+        const customClient = createPublicClient({
+          transport: http(customChain.rpcUrls.default.http[0]),
+        })
+        setCustomPublicClient(customClient)
+
+        console.log("Setting custom public client", customClient)
+      }
+    }
+  }, [customChain])
 
   useEffect(() => {
     setIsBrowser(true)
