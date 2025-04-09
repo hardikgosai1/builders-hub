@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import glossaryData from "@/content/glossary.json"
-import { GlossaryTerm as GlossaryTermType } from "@/types/glossary"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
+import glossaryData from "../../content/glossary.json"
+import { GlossaryTerm as GlossaryTermType } from "../../types/glossary"
 
 interface GlossaryTermProps {
   children: React.ReactNode
