@@ -423,6 +423,22 @@
       "description": "The process by which all nodes in a distributed network agree on the state of the system. In blockchain, consensus ensures all participants have the same copy of the ledger.",
       "learnMoreUrl": null,
       "category": "blockchain"
+    },
+    {
+      "term": "Etna Upgrade",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "The largest network upgrade of Avalanche to date, which introduced Layer 1 blockchains (L1s) to replace the Subnet model, allowing validators to operate without staking 2,000 AVAX on the Primary Network and instead pay a continuous fee.",
+      "learnMoreUrl": "/content/common/multi-chain-architecture/etna-upgrade-motivation.mdx",
+      "category": "avalanche"
+    },
+    {
+      "term": "ACP-77",
+      "abbreviation": null,
+      "previousTerm": null,
+      "description": "An Avalanche Community Proposal that outlines a new framework for creating low-cost, independent Layer 1 blockchains that can easily interoperate with each other. It introduced validator management changes allowing L1s to operate with validators that don't need to stake AVAX.",
+      "learnMoreUrl": "https://github.com/avalanche-foundation/ACPs/blob/main/ACPs/77-reinventing-subnets/README.md",
+      "category": "avalanche"
     }
   ]
 } 
