@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { documentation, guide, academy, integration } from '@/lib/source';
+import { documentation, guide, academy, integration } from '../../lib/source';
 import { type TrieveDocument } from 'trieve-fumadocs-adapter/search/sync';
 
 export const revalidate = false;
