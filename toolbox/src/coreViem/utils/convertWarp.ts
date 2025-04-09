@@ -11,7 +11,7 @@ export interface PackL1ConversionMessageArgs {
     validators: SubnetToL1ConversionValidatorData[];
 }
 
-interface SubnetToL1ConversionValidatorData {
+export interface SubnetToL1ConversionValidatorData {
     nodeID: string;
     nodePOP: {
         publicKey: string;
@@ -153,7 +153,6 @@ export const compareNodeIDs = (a: string, b: string) => {
 
 
 export function packL1ConversionMessage(args: PackL1ConversionMessageArgs, networkID: number, sourceChainID: string): [Uint8Array, Uint8Array] {
-    console.log(args);
     const subnetConversionID = subnetToL1ConversionID(args);
 
     const addressedCallPayload = newSubnetToL1Conversion(subnetConversionID)
@@ -170,7 +169,7 @@ export interface PChainOwner {
 }
 
 export interface ValidationPeriod {
-    subnetID: string;
+    subnetId: string;
     nodeID: string;
     blsPublicKey: `0x${string}`;
     registrationExpiry: bigint;
@@ -200,8 +199,8 @@ export function packRegisterL1ValidatorMessage(
     // Add type ID (uint32)
     parts.push(encodeUint32(REGISTER_L1_VALIDATOR_MESSAGE_TYPE_ID));
 
-    // Add subnetID
-    parts.push(utils.base58check.decode(validationPeriod.subnetID));
+    // Add subnetId
+    parts.push(utils.base58check.decode(validationPeriod.subnetId));
 
     // Add nodeID
     const nodeIDBytes = validationPeriod.nodeID.startsWith("NodeID-") ? utils.base58check.decode(validationPeriod.nodeID.split("-")[1]) : utils.hexToBuffer(validationPeriod.nodeID);
