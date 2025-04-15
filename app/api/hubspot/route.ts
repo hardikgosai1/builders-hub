@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     } = {
       fields: fields,
       context: {
-        pageUri: request.headers.get('referer') || 'https://your-website.com/grants',
+        pageUri: request.headers.get('referer') || 'https://build.avax.network',
         pageName: 'Retro9000 Grant Application'
       }
     };
