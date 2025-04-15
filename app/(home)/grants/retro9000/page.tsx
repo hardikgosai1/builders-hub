@@ -1,4 +1,5 @@
 "use client"
+import Image from 'next/image'
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -171,6 +172,30 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <section className="text-center space-y-6 pt-12 pb-16">
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/logo-black.png"
+              alt="Avalanche Logo"
+              width={200}
+              height={50}
+              className="dark:hidden"
+            />
+            <Image
+              src="/logo-white.png"
+              alt="Avalanche Logo"
+              width={200}
+              height={50}
+              className="hidden dark:block"
+            />
+          </div>
+          <h1 className="text-4xl md:text-7xl font-bold tracking-tighter">
+            Retro9000
+            <span className="block pb-1 text-[#EB4C50]">
+              Grants Program
+            </span>
+          </h1>
+        </section>
       {submissionStatus === 'success' ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-semibold text-green-800 mb-4">Application Submitted Successfully!</h2>
