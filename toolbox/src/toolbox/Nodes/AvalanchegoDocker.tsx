@@ -11,6 +11,12 @@ import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 import { Tabs } from "../../components/Tabs";
 
+// Node type descriptions
+const NODE_TYPE_INFO = {
+    "Validator Node": "Participates in consensus and validates transactions. Sufficient for basic validation tasks when you don't need to expose APIs to external services.",
+    "RPC Node": "Exposes APIs for applications to interact with the blockchain. Necessary when building dApps or services that need to query or submit transactions to the network."
+};
+
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
     const stakingPort = isRPC ? "9653" : "9651";
@@ -203,15 +209,35 @@ export default function AvalanchegoDocker() {
                     placeholder="Create a subnet to generate a subnet ID"
                 />
 
-                <Select
-                    label="Node Type"
-                    value={isRPC}
-                    onChange={(value) => setIsRPC(value as "true" | "false")}
-                    options={[
-                        { value: "false", label: "Validator Node" },
-                        { value: "true", label: "RPC Node" },
-                    ]}
-                />
+                <div className="relative">
+                    <div className="flex items-center">
+                        <Tabs
+                            tabs={["Validator Node", "RPC Node"]}
+                            activeTab={isRPC === "false" ? "Validator Node" : "RPC Node"}
+                            setActiveTab={(tab) => setIsRPC(tab === "Validator Node" ? "false" : "true")}
+                        />
+                        <div 
+                            className="ml-2 text-gray-500 cursor-help"
+                            onMouseEnter={() => {
+                                const tooltip = document.getElementById('node-type-tooltip');
+                                if (tooltip) tooltip.style.display = 'block';
+                            }}
+                            onMouseLeave={() => {
+                                const tooltip = document.getElementById('node-type-tooltip');
+                                if (tooltip) tooltip.style.display = 'none';
+                            }}
+                        >
+                            ⓘ
+                            <div 
+                                id="node-type-tooltip"
+                                className="hidden absolute z-50 w-64 p-2 bg-white dark:bg-gray-800 rounded shadow-lg text-sm border border-gray-300 dark:border-gray-700 left-0 mt-1"
+                            >
+                                <p className="mb-2"><strong>Validator Node:</strong> {NODE_TYPE_INFO["Validator Node"]}</p>
+                                <p><strong>RPC Node:</strong> {NODE_TYPE_INFO["RPC Node"]}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {isRPC === "true" && (
                     <>
@@ -319,6 +345,19 @@ export default function AvalanchegoDocker() {
                             code={checkNodeCommand(chainID, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), false)}
                             lang="bash"
                         />
+                    </div>
+                )}
+
+                {isRPC === "false" && (
+                    <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                        <h3 className="text-md font-medium mb-2">Running Multiple Validator Nodes:</h3>
+                        <p>To run multiple validator nodes on the same machine, ensure each node has:</p>
+                        <ul className="list-disc pl-5 mt-1">
+                            <li>Unique container name (change <code>--name</code> parameter)</li>
+                            <li>Different ports (modify <code>AVAGO_HTTP_PORT</code> and <code>AVAGO_STAKING_PORT</code>)</li>
+                            <li>Separate data directories (change the local volume path <code>~/.avalanchego</code> to a unique directory)</li>
+                        </ul>
+                        <p className="mt-1">Example for second node: Use ports 9652/9653 (HTTP/staking), container name "avago2", and data directory "~/.avalanchego2"</p>
                     </div>
                 )}
 
