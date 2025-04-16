@@ -6,6 +6,23 @@ import { createMetadata } from '@/utils/metadata';
 export const metadata: Metadata = createMetadata({
   title: 'Avalanche Academy',
   description: 'The Learning Platform for Avalanche Ecosystem.',
+  openGraph: {
+    url: '/academy',
+    images: {
+      url: '/api/og/academy',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Academy',
+    },
+  },
+  twitter: {
+    images: {
+      url: '/api/og/academy',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Academy',
+    },
+  },
 });
 
 export default function HomePage(): React.ReactElement {
