@@ -46,13 +46,19 @@ const changeWeightStepsConfig: StepsConfig<ChangeWeightStepKey> = {
 export default function ChangeWeight() {
   const { showBoundary } = useErrorBoundary()
 
-  const { proxyAddress, subnetId } = useToolboxStore()
+  const { proxyAddress, subnetId, setProxyAddress, setSubnetID } = useToolboxStore()
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore() 
   const viemChain = useViemChainStore()
 
   // --- Form Input State ---
   const [nodeID, setNodeID] = useState("")
   const [weight, setWeight] = useState("")
+  const [manualProxyAddress, setManualProxyAddress] = useState("")
+  const [manualSubnetId, setManualSubnetId] = useState("")
+
+  // Use manually entered values if they exist, otherwise use store values
+  const effectiveProxyAddress = manualProxyAddress || proxyAddress
+  const effectiveSubnetId = manualSubnetId || subnetId
 
   // --- Intermediate Data State ---
   const [validationIDHex, setValidationIDHex] = useState("")
@@ -118,7 +124,7 @@ export default function ChangeWeight() {
       if (!startFromStep || startFromStep === "getValidationID") {
         updateStepStatus("getValidationID", "loading")
         try {
-          const validationIDResult = await getValidationIdHex(publicClient, proxyAddress as `0x${string}`, nodeID)
+          const validationIDResult = await getValidationIdHex(publicClient, effectiveProxyAddress as `0x${string}`, nodeID)
           // Update local and state
           setValidationIDHex(validationIDResult as string)
           localValidationID = validationIDResult as string;
@@ -143,7 +149,7 @@ export default function ChangeWeight() {
           const weightBigInt = BigInt(weight)
           
           const changeWeightTx = await coreWalletClient.writeContract({
-            address: proxyAddress as `0x${string}`, 
+            address: effectiveProxyAddress as `0x${string}`, 
             abi: validatorManagerAbi.abi, 
             functionName: "initiateValidatorWeightUpdate", 
             args: [validationIDToUse, weightBigInt], // Use potentially updated local ID
@@ -228,7 +234,7 @@ export default function ChangeWeight() {
             network: networkName,
             signatureAggregatorRequest: {
               message: warpMessageToSign, // Use potentially updated local message
-              signingSubnetId: subnetId || "",
+              signingSubnetId: effectiveSubnetId || "",
               quorumPercentage: 67,
             },
           })
@@ -284,13 +290,13 @@ export default function ChangeWeight() {
 
           if (!viemChain) throw new Error("Viem chain configuration is missing.")
           if (!validationIDForJustification) throw new Error("Validation ID is missing. Retry step 1.")
-          if (!subnetId) throw new Error("Subnet ID is missing.")
+          if (!effectiveSubnetId) throw new Error("Subnet ID is missing.")
           if (!eventDataForPacking) throw new Error("Event data missing. Retry step 2.")
 
           const justification = await GetRegistrationJustification(
             nodeID,
             validationIDForJustification,
-            subnetId,
+            effectiveSubnetId,
             publicClient
           )
 
@@ -319,7 +325,7 @@ export default function ChangeWeight() {
             signatureAggregatorRequest: {
               message: bytesToHex(changeWeightMessage),
               justification: bytesToHex(justification),
-              signingSubnetId: subnetId || "",
+              signingSubnetId: effectiveSubnetId || "",
               quorumPercentage: 67,
             },
           })
@@ -350,7 +356,7 @@ export default function ChangeWeight() {
           const signedPChainWarpMsgBytes = hexToBytes(`0x${finalPChainSig}`) // Use potentially updated local sig
           const accessList = packWarpIntoAccessList(signedPChainWarpMsgBytes)
           
-          if (!proxyAddress) throw new Error("Proxy address is not set.")
+          if (!effectiveProxyAddress) throw new Error("Proxy address is not set.")
           if (!coreWalletClient) throw new Error("Core wallet client is not initialized.")
           if (!publicClient) throw new Error("Public client is not initialized.")
           if (!viemChain) throw new Error("Viem chain is not configured.")
@@ -358,7 +364,7 @@ export default function ChangeWeight() {
           let simulationResult
           try {
             simulationResult = await publicClient.simulateContract({
-              address: proxyAddress as `0x${string}`,
+              address: effectiveProxyAddress as `0x${string}`,
               abi: validatorManagerAbi.abi,
               functionName: "completeValidatorWeightUpdate",
               args: [0],
@@ -479,6 +485,58 @@ export default function ChangeWeight() {
             disabled={isProcessing}
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Enter the new weight for this validator</p>
+        </div>
+
+        <div className="space-y-2">
+          <Input
+            id="proxyAddress"
+            type="text"
+            value={manualProxyAddress}
+            onChange={(e) => {
+              setManualProxyAddress(e)
+              if (e) setProxyAddress(e)
+            }}
+            placeholder={proxyAddress || "Enter proxy address"}
+            className={cn(
+              "w-full px-3 py-2 border rounded-md",
+              "text-zinc-900 dark:text-zinc-100",
+              "bg-white dark:bg-zinc-800",
+              "border-zinc-300 dark:border-zinc-700",
+              "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
+              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
+            )}
+            label="Proxy Address (Optional)"
+            disabled={isProcessing}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Override the current proxy address ({proxyAddress?.substring(0, 10)}... or leave empty to use default)
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Input
+            id="subnetId"
+            type="text"
+            value={manualSubnetId}
+            onChange={(e) => {
+              setManualSubnetId(e)
+              if (e) setSubnetID(e)
+            }}
+            placeholder={subnetId || "Enter subnet ID"}
+            className={cn(
+              "w-full px-3 py-2 border rounded-md",
+              "text-zinc-900 dark:text-zinc-100",
+              "bg-white dark:bg-zinc-800",
+              "border-zinc-300 dark:border-zinc-700",
+              "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
+              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
+            )}
+            label="Subnet ID (Optional)"
+            disabled={isProcessing}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Override the current subnet ID (or leave empty to use default)
+          </p>
         </div>
 
         {!isProcessing && (

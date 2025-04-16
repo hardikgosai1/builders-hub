@@ -42,15 +42,21 @@ const removalStepsConfig: StepsConfig<RemovalStepKey> = {
 
 export default function RemoveValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { proxyAddress, subnetId } = useToolboxStore()
+  const { proxyAddress, subnetId, setProxyAddress, setSubnetID } = useToolboxStore()
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
   const viemChain = useViemChainStore()
 
   const [nodeID, setNodeID] = useState("")
+  const [manualProxyAddress, setManualProxyAddress] = useState("")
+  const [manualSubnetId, setManualSubnetId] = useState("")
   const [validationIDHex, setValidationIDHex] = useState("")
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
   const [pChainSignature, setPChainSignature] = useState("")
+
+  // Use manually entered values if they exist, otherwise use store values
+  const effectiveProxyAddress = manualProxyAddress || proxyAddress
+  const effectiveSubnetId = manualSubnetId || subnetId
 
   const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
 
@@ -90,7 +96,7 @@ export default function RemoveValidator() {
       if (!startFromStep || startFromStep === "getValidationID") {
         updateStepStatus("getValidationID", "loading")
         try {
-          const validationIDResult = await getValidationIdHex(publicClient, proxyAddress as `0x${string}`, nodeID)
+          const validationIDResult = await getValidationIdHex(publicClient, effectiveProxyAddress as `0x${string}`, nodeID)
           setValidationIDHex(validationIDResult as string)
           currentValidationID = validationIDResult as string;
           console.log("ValidationID:", validationIDResult)
@@ -110,7 +116,7 @@ export default function RemoveValidator() {
           }
           
           const removeValidatorTx = await coreWalletClient.writeContract({
-            address: proxyAddress as `0x${string}`,
+            address: effectiveProxyAddress as `0x${string}`,
             abi: validatorManagerAbi.abi,
             functionName: "initiateValidatorRemoval",
             args: [currentValidationID],
@@ -152,7 +158,7 @@ export default function RemoveValidator() {
             network: networkName,
             signatureAggregatorRequest: {
               message: currentUnsignedWarpMessage,
-              signingSubnetId: subnetId || "",
+              signingSubnetId: effectiveSubnetId || "",
               quorumPercentage: 67,
             },
           })
@@ -204,13 +210,13 @@ export default function RemoveValidator() {
           if (!currentValidationID) {
              throw new Error("Validation ID is missing. Retrying might be needed.")
           }
-          if (!subnetId) {
+          if (!effectiveSubnetId) {
             throw new Error("Subnet ID is missing.")
           }
           const justification = await GetRegistrationJustification(
             nodeID,
             currentValidationID,
-            subnetId,
+            effectiveSubnetId,
             publicClient
           )
 
@@ -234,7 +240,7 @@ export default function RemoveValidator() {
             signatureAggregatorRequest: {
               message: bytesToHex(removeValidatorMessage),
               justification: bytesToHex(justification),
-              signingSubnetId: subnetId || "",
+              signingSubnetId: effectiveSubnetId || "",
               quorumPercentage: 67,
             },
           })
@@ -260,7 +266,7 @@ export default function RemoveValidator() {
           const signedPChainWarpMsgBytes = hexToBytes(`0x${currentPChainSignature}`)
           const accessList = packWarpIntoAccessList(signedPChainWarpMsgBytes)
           
-          if (!proxyAddress) throw new Error("Proxy address is not set.");
+          if (!effectiveProxyAddress) throw new Error("Proxy address is not set.");
           if (!coreWalletClient) throw new Error("Core wallet client is not initialized.");
           if (!publicClient) throw new Error("Public client is not initialized.");
           if (!viemChain) throw new Error("Viem chain is not configured.");
@@ -268,7 +274,7 @@ export default function RemoveValidator() {
           let simulationResult;
           try {
             simulationResult = await publicClient.simulateContract({
-              address: proxyAddress as `0x${string}`,
+              address: effectiveProxyAddress as `0x${string}`,
               abi: validatorManagerAbi.abi,
               functionName: "completeValidatorRemoval",
               args: [0],
@@ -369,6 +375,58 @@ export default function RemoveValidator() {
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Enter the Node ID of the validator you want to remove
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Input
+            id="proxyAddress"
+            type="text"
+            value={manualProxyAddress}
+            onChange={(e) => {
+              setManualProxyAddress(e)
+              if (e) setProxyAddress(e)
+            }}
+            placeholder={proxyAddress || "Enter proxy address"}
+            className={cn(
+              "w-full px-3 py-2 border rounded-md",
+              "text-zinc-900 dark:text-zinc-100",
+              "bg-white dark:bg-zinc-800",
+              "border-zinc-300 dark:border-zinc-700",
+              "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
+              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
+            )}
+            label="Proxy Address (Optional)"
+            disabled={isProcessing}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Override the current proxy address ({proxyAddress?.substring(0, 10)}... or leave empty to use default)
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Input
+            id="subnetId"
+            type="text"
+            value={manualSubnetId}
+            onChange={(e) => {
+              setManualSubnetId(e)
+              if (e) setSubnetID(e)
+            }}
+            placeholder={subnetId || "Enter subnet ID"}
+            className={cn(
+              "w-full px-3 py-2 border rounded-md",
+              "text-zinc-900 dark:text-zinc-100",
+              "bg-white dark:bg-zinc-800",
+              "border-zinc-300 dark:border-zinc-700",
+              "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
+              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
+            )}
+            label="Subnet ID (Optional)"
+            disabled={isProcessing}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Override the current subnet ID (or leave empty to use default)
           </p>
         </div>
 
