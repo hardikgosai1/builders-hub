@@ -9,6 +9,8 @@ import SummitLondonBanner from '@/public/nav-banner/avalanche_summit_london.png'
 import HackathonLondonBanner from '@/public/nav-banner/hackathon_luma.png';
 import HackathonBBABanner from '@/public/nav-banner/hackathon_bba.png';
 import Team1Banner from '@/public/nav-banner/local_events_team1.jpg';
+import type { Metadata } from 'next';
+import { createMetadata } from '@/utils/metadata';
 
 interface EventCardProps {
   title: string;
@@ -58,6 +60,28 @@ function EventCard({ title, description, icon, image, url, color, arrowColor }: 
     </div>
   )
 }
+
+export const metadata: Metadata = createMetadata({
+  title: 'Avalanche Events',
+  description: 'Discover upcoming Avalanche ecosystem events and hackathons.',
+  openGraph: {
+    url: '/events',
+    images: {
+      url: '/api/og/events',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Events',
+    },
+  },
+  twitter: {
+    images: {
+      url: '/api/og/events',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Events',
+    },
+  },
+});
 
 export default function Page() {
   const { resolvedTheme } = useTheme()
