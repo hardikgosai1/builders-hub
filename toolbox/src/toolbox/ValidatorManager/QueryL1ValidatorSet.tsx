@@ -3,7 +3,7 @@
 import { useToolboxStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useState, useEffect } from "react"
-import { Calendar, Clock, Users, Coins, Database, Globe, Info } from "lucide-react"
+import { Calendar, Clock, Users, Coins, Database, Globe, Info, Copy, Check } from "lucide-react"
 import { Container } from "../components/Container"
 import { Input } from "../../components/Input"
 import { Button } from "../../components/Button"
@@ -18,6 +18,7 @@ export default function QueryL1ValidatorSet() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedValidator, setSelectedValidator] = useState<L1ValidatorDetailsFull | null>(null)
+  const [copiedNodeId, setCopiedNodeId] = useState<string | null>(null)
 
   // Network names for display
   const networkNames: Record<number, GlobalParamNetwork> = {
@@ -86,6 +87,17 @@ export default function QueryL1ValidatorSet() {
 
   const handleViewDetails = (validator: L1ValidatorDetailsFull) => {
     setSelectedValidator(validator)
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopiedNodeId(text)
+        setTimeout(() => setCopiedNodeId(null), 2000) // Reset after 2 seconds
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err)
+      })
   }
 
   return (
@@ -209,7 +221,20 @@ export default function QueryL1ValidatorSet() {
                       {validators.map((validator, index) => (
                         <tr key={index} className="hover:bg-zinc-100 dark:hover:bg-zinc-800">
                           <td className="px-4 py-3 text-sm font-mono truncate max-w-[200px] text-zinc-800 dark:text-zinc-200">
-                            <span title={validator.nodeId}>{validator.nodeId}</span>
+                            <div className="flex items-center">
+                              <span title={validator.nodeId} className="truncate">{validator.nodeId}</span>
+                              <button
+                                onClick={() => copyToClipboard(validator.nodeId)}
+                                className="ml-2 p-1 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                title="Copy Node ID"
+                              >
+                                {copiedNodeId === validator.nodeId ? (
+                                  <Check size={14} className="text-green-500" />
+                                ) : (
+                                  <Copy size={14} className="text-zinc-500 dark:text-zinc-400" />
+                                )}
+                              </button>
+                            </div>
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-sm text-zinc-800 dark:text-zinc-200">
                             {formatAvaxBalance(validator.remainingBalance)}
@@ -278,12 +303,25 @@ export default function QueryL1ValidatorSet() {
 
                 <div>
                   <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Node ID</p>
-                  <p
-                    className="font-mono text-sm break-all text-zinc-800 dark:text-zinc-200"
-                    title={selectedValidator.nodeId}
-                  >
-                    {selectedValidator.nodeId}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p
+                      className="font-mono text-sm break-all text-zinc-800 dark:text-zinc-200"
+                      title={selectedValidator.nodeId}
+                    >
+                      {selectedValidator.nodeId}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(selectedValidator.nodeId)}
+                      className="p-1 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                      title="Copy Node ID"
+                    >
+                      {copiedNodeId === selectedValidator.nodeId ? (
+                        <Check size={16} className="text-green-500" />
+                      ) : (
+                        <Copy size={16} className="text-zinc-500 dark:text-zinc-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div>
