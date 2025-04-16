@@ -10,8 +10,6 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/utils/cn";
-import type { Metadata } from 'next';
-import { createMetadata } from '@/utils/metadata';
 
 const features = [
   {
@@ -47,28 +45,6 @@ const features = [
     href: "https://github.com/ava-labs/avalanche-starter-kit"
   }
 ];
-
-export const metadata: Metadata = createMetadata({
-  title: 'Avalanche Tools',
-  description: 'Discover developer tools for building on Avalanche.',
-  openGraph: {
-    url: '/tools',
-    images: {
-      url: '/api/og/tools',
-      width: 1200,
-      height: 630,
-      alt: 'Avalanche Tools',
-    },
-  },
-  twitter: {
-    images: {
-      url: '/api/og/tools',
-      width: 1200,
-      height: 630,
-      alt: 'Avalanche Tools',
-    },
-  },
-});
 
 export default function Page() {
   return (
