@@ -4,8 +4,6 @@ import type { Metadata } from 'next';
 import { createMetadata } from '@/utils/metadata';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Avalanche Academy',
-  description: 'The Learning Platform for Avalanche Ecosystem.',
   openGraph: {
     url: '/academy',
     images: {

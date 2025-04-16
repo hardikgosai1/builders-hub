@@ -7,8 +7,6 @@ import type { Metadata } from 'next';
 import { createMetadata } from '@/utils/metadata';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Integrations with Avalanche',
-  description: 'Discover best-in-class integrations for your Avalanche L1 and learn how to use them.',
   openGraph: {
     url: '/integrations',
     images: {

@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { createMetadata } from '@/utils/metadata';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Avalanche Events',
-  description: 'Discover upcoming Avalanche ecosystem events and hackathons.',
   openGraph: {
     url: '/events',
     images: {

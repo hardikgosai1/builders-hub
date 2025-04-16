@@ -22,7 +22,7 @@ export async function GET(
   return new ImageResponse(
     OG({
       title: 'Avalanche Docs',
-      description: 'Developer documentation for everything Avalanche.'
+      description: 'Explore Avalanche documentation to build on the Avalanche network.'
     }),
     {
       width: 1280,
