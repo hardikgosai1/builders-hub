@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Zap, Cpu, Code, Coins, Bot, Home } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
+import type { Metadata } from 'next';
+import { createMetadata } from '@/utils/metadata';
 
 interface ProgramCardProps {
   title: string;
@@ -44,6 +46,28 @@ function ProgramCard({ title, description, icon, color, arrowColor }: ProgramCar
     </div>
   )
 }
+
+export const metadata: Metadata = createMetadata({
+  title: 'Avalanche Grants',
+  description: 'Explore grant opportunities in the Avalanche ecosystem.',
+  openGraph: {
+    url: '/grants',
+    images: {
+      url: '/api/og/grants',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Grants',
+    },
+  },
+  twitter: {
+    images: {
+      url: '/api/og/grants',
+      width: 1200,
+      height: 630,
+      alt: 'Avalanche Grants',
+    },
+  },
+});
 
 export default function Page() {
   const { resolvedTheme } = useTheme()
