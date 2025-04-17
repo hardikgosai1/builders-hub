@@ -130,7 +130,7 @@ function OG({
                 />
               </g>
             </svg>
-            <span style={{paddingLeft: "10px"}}>build.avax.network/<span style={{color: "red"}}>tools/l1-toolbox</span></span>
+            <span style={{paddingLeft: "10px"}}>build.avax.network/tools/<span style={{color: "red"}}>l1-toolbox</span></span>
           </div>
         </div>
       </div>
