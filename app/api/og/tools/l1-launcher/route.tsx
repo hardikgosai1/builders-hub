@@ -3,15 +3,15 @@ import type { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
-const medium = fetch(new URL('../../../Geist-Medium.ttf', import.meta.url)).then((res) =>
+const medium = fetch(new URL('../../Geist-Medium.ttf', import.meta.url)).then((res) =>
   res.arrayBuffer(),
 );
 
-const light = fetch(new URL('../../../Geist-Light.ttf', import.meta.url)).then((res) =>
+const light = fetch(new URL('../../Geist-Light.ttf', import.meta.url)).then((res) =>
   res.arrayBuffer(),
 );
 
-const regular = fetch(new URL('../../../GeistMono-Light.ttf', import.meta.url)).then((res) =>
+const regular = fetch(new URL('../../GeistMono-Light.ttf', import.meta.url)).then((res) =>
   res.arrayBuffer(),
 );
 
