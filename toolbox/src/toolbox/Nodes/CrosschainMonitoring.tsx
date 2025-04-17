@@ -384,7 +384,7 @@ export default function CrosschainMonitoring() {
                                 <XAxis dataKey="time" />
                                 <YAxis tickFormatter={(value: number) => value.toFixed(1)} />
                                 <Tooltip formatter={(value: number, name: string) => [`${value.toFixed(1)} tx/s`, shortenUrl(name.replace('_tx', ''))]} />
-                                <Legend formatter={(value) => shortenUrl(value.replace('_tx', ''))} />
+                                {/* <Legend formatter={(value) => shortenUrl(value.replace('_tx', ''))} /> */}
                                 {rpcUrls.map((url, index) => (
                                     <Area
                                         key={url}
@@ -411,7 +411,7 @@ export default function CrosschainMonitoring() {
                                 <XAxis dataKey="time" />
                                 <YAxis tickFormatter={(value: number) => `${(value / 1_000_000).toFixed(1)}M`} />
                                 <Tooltip formatter={(value: number, name: string) => [`${(Number(value) / 1_000_000).toFixed(1)}M gas/s`, shortenUrl(name.replace('_gas', ''))]} />
-                                <Legend formatter={(value) => shortenUrl(value.replace('_gas', ''))} />
+                                {/* <Legend formatter={(value) => shortenUrl(value.replace('_gas', ''))} /> */}
                                 {rpcUrls.map((url, index) => (
                                     <Area
                                         key={url}
@@ -439,7 +439,7 @@ export default function CrosschainMonitoring() {
                                 <XAxis dataKey="time" />
                                 <YAxis tickFormatter={(value: number) => value.toFixed(1)} />
                                 <Tooltip formatter={(value: number, name: string) => [`${value.toFixed(1)} blocks/s`, shortenUrl(name.replace('_blocks', ''))]} />
-                                <Legend formatter={(value) => shortenUrl(value.replace('_blocks', ''))} />
+                                {/* <Legend formatter={(value) => shortenUrl(value.replace('_blocks', ''))} /> */}
                                 {rpcUrls.map((url, index) => (
                                     <Area
                                         key={url}
