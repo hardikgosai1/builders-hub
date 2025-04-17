@@ -8,14 +8,83 @@ icon: BookOpen
 
 To measure blockchain performance we can use two metrics:
 
-- Throughput: How many transaction are finalized per second measured in transactions per second (TPS)
-- Time to Finality: How long does it take a transaction to go from being submitted to validators to being unchangeable. 
+- Throughput: How many transaction are finalized per second measured in transactions per second
+  (TPS). To also account for the complexity of transactions, sometimes gas per second is used.
+- Time to Finality: How long does it take a transaction to go from being submitted to validators to
+  being finalized on chain and it's state changes being irreversible. 
 
 These metrics are very different. Blockchain builders aspire to high throughput and very short time to finality.
 
-## Highway Analogy
+Let's take an analogy of a train. Each passenger represents a transaction and they all travel from a
+train station called "Mempool" to another station calles "Finality". We will use this analogy to
+understand the journey of a transaction from the moment it is created until it is finalized. 
 
-Let's take an analogy of a highway. Each car represents a transaction and they all travel the same speed. When you click *send* in your wallet, you're like a car entering the highway. When the transaction is *finalized* and unchangeable, it's like the car reaching its destination.
+## Step 1: Transaction Issuance
+When you click *send* in your wallet, it's like the transaction is entering the departure station
+"Mempool". There is will wait for the next train (block) to arrive. 
+
+## Step 2: Transaction Inclusion
+When the train arrives, it picks up the passengers (transactions) and starts its journey. The
+transactions have to pay for the journey (transaction fee, also called gas fee) to get on the train.
+
+
+## Transaction Fees
+The transaction fee for a transaction depends on the complexity of the transaction. In our analogy
+this would be similar to the size of the passenger's luggage. The more luggage you have, the more
+you have to pay for the journey.
+
+| Transaction Type | Gas Cost | Description |
+|------------------|----------|-------------|
+| Native ETH Transfer | 21,000 | Simple transfer of ETH from one address to another |
+| ERC-20 Transfer | 65,000 | Standard token transfer using the ERC-20 standard |
+| ERC-721 Transfer | 85,000 | NFT transfer using the ERC-721 standard |
+| Uniswap V3 Swap | 180,000 | Token swap on Uniswap V3 with concentrated liquidity |
+| Contract Deployment | 300,000 | Deploying a new smart contract (simple contract) |
+| DAO Vote | 80,000 | Casting a vote in a DAO governance proposal |
+| Aave Borrow | 190,000 | Borrowing assets from the Aave protocol |
+
+As you can see from the table, the gas cost of a transaction can vary heavily depending on the
+complexity of the transaction. In our analogy this would be similar to some passengers have multiple
+car loads of luggage, while others only have a small backpack.
+
+## Block Capacity / Gas Limit
+Blocks have a limited capacity, just like a train can only carry a certain volume or weight. The number of
+transactions (passengers) that can be included in a block is limited by the `gasLimit` (max mass of
+passengers and luggage the train can carry). 
+
+| Blockchain Network | Block Gas Limit | Block Time |
+|-------------------|-----------------|------------|
+| Ethereum | 30M gas | 12 seconds |
+| Binance Smart Chain (BSC) | 60M gas | 3 seconds |
+| Avalanche C-Chain | 15M gas | 2 seconds |
+
+A blockchain with blocks with a lower limit can have higher throughput than a blockchain with blocks
+with a higher limit, if blocks are produced at a much higher rate.
+
+
+## Block Interval  / Target Block Rate
+For the throughput capacity of the blockchain not only the size of the blocks, but also the interval
+between blocks is relevant. It is the time it takes for the next train to arrive at the station.  These can vary heavily between different blockchains:
+
+| Blockchain Network | Block Time |
+|-------------------|------------|
+| Bitcoin | 10 minutes |
+| Cardano | 20 seconds |
+| Ethereum | 12 seconds |
+| Cosmos (Tendermint) | 6 seconds |
+| Algorand | 3 seconds |
+| Binance Smart Chain (BSC) | 3 seconds |
+| Avalanche C-Chain | 2 seconds |
+| Solana | 400 milliseconds |
+| Avalanche L1 | As low as 350 milliseconds (configurable) |
+
+The block times are not related to the time it takes to finalize a transaction. The block time is
+the worst case a transaction has to wait until it is included in a block. The time to finality is 
+the time it takes until a transaction is finalized (time to travel to finality) and cannot be reverted anymore.
+
+
+When the transaction
+is *finalized* and unchangeable, it's like the car reaching its destination.
 
 ![](/course-images/avalanche-fundamentals/9.png)
 
