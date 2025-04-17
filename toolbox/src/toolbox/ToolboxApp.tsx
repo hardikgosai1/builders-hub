@@ -103,6 +103,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             component: lazy(() => import('./Nodes/PerformanceMonitor')),
             fileNames: ["toolbox/src/toolbox/Nodes/PerformanceMonitor.tsx"],
             skipWalletConnection: true,
+        },
+        {
+            id: "crosschainMonitoring",
+            label: "Crosschain Monitoring",
+            component: lazy(() => import('./Nodes/CrosschainMonitoring')),
+            fileNames: ["toolbox/src/toolbox/Nodes/CrosschainMonitoring.tsx"],
         }
     ],
     "Validator Manager Setup": [
@@ -299,9 +305,9 @@ export default function ToolboxApp() {
 
     // Toggle group expansion
     const toggleGroup = (groupName: string) => {
-        setExpandedGroups(prev => ({ 
-            ...prev, 
-            [groupName]: !prev[groupName] 
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
         }));
     };
 
