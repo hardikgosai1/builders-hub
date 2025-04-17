@@ -11,12 +11,6 @@ import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 import { Tabs } from "../../components/Tabs";
 
-// Node type descriptions
-const NODE_TYPE_INFO = {
-    "Validator Node": "Participates in consensus and validates transactions. Sufficient for basic validation tasks when you don't need to expose APIs to external services.",
-    "RPC Node": "Exposes APIs for applications to interact with the blockchain. Necessary when building dApps or services that need to query or submit transactions to the network."
-};
-
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
     const stakingPort = isRPC ? "9653" : "9651";
