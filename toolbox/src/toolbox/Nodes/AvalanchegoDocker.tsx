@@ -1,6 +1,6 @@
 "use client";
 
-import { useOldToolboxStore } from "../toolboxStore";
+import { useCreateChainStore, useOldToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { Select } from "../components/Select";
 import { useState, useEffect } from "react";
@@ -10,6 +10,12 @@ import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 import { Tabs } from "../../components/Tabs";
+import { queryChainInfo, ChainInfoResult } from "../../coreViem/utils/chainInfo";
+import { Success } from "../../components/Success";
+import { E } from "vitest/dist/chunks/reporters.6vxQttCV.js";
+import { Button } from "../../components/Button";
+import { ArrowRight } from "lucide-react";
+import { TestRPC } from "../../components/TestRPC";
 
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
@@ -155,30 +161,44 @@ docker run -it --rm hello-world
 
 type OS = keyof typeof dockerInstallInstructions;
 
+
 export default function AvalanchegoDocker() {
-    const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useOldToolboxStore();
-    const { avalancheNetworkID } = useWalletStore();
+    const createChainStore = useCreateChainStore();
+    const [chainID, setChainID] = useState(createChainStore.chainID);
+    const { avalancheNetworkID, isTestnet } = useWalletStore();
 
     const [isRPC, setIsRPC] = useState<"true" | "false">("false");
     const [rpcCommand, setRpcCommand] = useState("");
     const [domain, setDomain] = useState("");
     const [enableDebugTrace, setEnableDebugTrace] = useState<"true" | "false">("false");
     const [activeOS, setActiveOS] = useState<OS>("Ubuntu/Debian");
+    const [chainInfo, setChainInfo] = useState<ChainInfoResult | null>(null);
+    const [localError, setLocalError] = useState("");
+    const [rpcUrl, setRpcUrl] = useState("");
 
     useEffect(() => {
-        try {
-            setRpcCommand(generateDockerCommand([subnetId], isRPC === "true", avalancheNetworkID));
-        } catch (error) {
-            setRpcCommand((error as Error).message);
-        }
-    }, [subnetId, isRPC, avalancheNetworkID]);
-
+        setChainInfo(null);
+        setLocalError("");
+        queryChainInfo(chainID, isTestnet!).then(setChainInfo).catch(err => setLocalError(err.message || String(err)));
+    }, [chainID]);
 
     useEffect(() => {
         if (domain && chainID && isRPC === "true") {
-            setEvmChainRpcUrl("https://" + nipify(domain) + "/ext/bc/" + chainID + "/rpc");
+            setRpcUrl("https://" + nipify(domain) + "/ext/bc/" + chainID + "/rpc");
+        } else {
+            setRpcUrl("http://127.0.0.1:" + (isRPC === "true" ? "8080" : "9650") + "/ext/bc/" + chainID + "/rpc");
         }
     }, [domain, chainID, isRPC]);
+
+    useEffect(() => {
+        if (!chainInfo) return;
+
+        try {
+            setRpcCommand(generateDockerCommand([chainInfo.subnetId], isRPC === "true", avalancheNetworkID));
+        } catch (error) {
+            setRpcCommand((error as Error).message);
+        }
+    }, [chainInfo, isRPC, avalancheNetworkID]);
 
     useEffect(() => {
         if (isRPC === "false") {
@@ -230,117 +250,121 @@ export default function AvalanchegoDocker() {
                     </p>
                 </div>
 
-                <div className="relative">
-                    <h3 className="text-md font-medium mb-2 mt-8">Node Setup Command:</h3>
+                <Input label="Chain ID" value={chainID} onChange={setChainID} />
 
-                    <Input
-                        label="Subnet ID"
-                        value={subnetId}
-                        onChange={setSubnetID}
-                        placeholder="Create a subnet to generate a subnet ID"
-                    />
-                    <p className="mt-8 mb-4">Select what kind of Node you want to set up:</p>
-                    <div className="flex items-center">
-                        <Tabs
-                            tabs={["Validator Node", "RPC Node"]}
-                            activeTab={isRPC === "false" ? "Validator Node" : "RPC Node"}
-                            setActiveTab={(tab) => setIsRPC(tab === "Validator Node" ? "false" : "true")}
-                        />
-                    </div>
-                </div>
+                {localError && (
+                    <p className="text-red-500">{localError}</p>
+                )}
 
-                {isRPC === "true" ? (
+                {chainInfo && (
                     <>
-                        <p>RPC nodes are not validators. They expose APIs for applications to interact with the blockchain and are necessary when building dApps or services that need to query or submit transactions to the network.</p>
-                        <Select
-                            label="Enable Debug & Trace"
-                            value={enableDebugTrace}
-                            onChange={(value) => setEnableDebugTrace(value as "true" | "false")}
-                            options={[
-                                { value: "false", label: "Disabled" },
-                                { value: "true", label: "Enabled" },
-                            ]}
-                        />
+                        <Input label="EVM Chain ID" value={chainInfo.evmChainID} disabled />
+                        <Input label="Subnet ID" value={chainInfo.subnetId} disabled />
+                        <Input label="Name" value={chainInfo.name} disabled />
 
-                        {enableDebugTrace === "true" && (
-                            <Input
-                                label="Chain ID"
-                                value={chainID}
-                                onChange={setChainID}
-                                placeholder="Enter Chain ID"
-                            />
+                        <div className="relative">
+                            <h3 className="text-md font-medium mb-2 mt-8">Node Setup Command:</h3>
+
+                            <p className="mt-8 mb-4">Select what kind of Node you want to set up:</p>
+                            <div className="flex items-center">
+                                <Tabs
+                                    tabs={["Validator Node", "RPC Node"]}
+                                    activeTab={isRPC === "false" ? "Validator Node" : "RPC Node"}
+                                    setActiveTab={(tab) => setIsRPC(tab === "Validator Node" ? "false" : "true")}
+                                />
+                            </div>
+                        </div>
+
+                        {isRPC === "true" ? (
+                            <>
+                                <p>RPC nodes are not validators. They expose APIs for applications to interact with the blockchain and are necessary when building dApps or services that need to query or submit transactions to the network.</p>
+                                <Select
+                                    label="Enable Debug & Trace"
+                                    value={enableDebugTrace}
+                                    onChange={(value) => setEnableDebugTrace(value as "true" | "false")}
+                                    options={[
+                                        { value: "false", label: "Disabled" },
+                                        { value: "true", label: "Enabled" },
+                                    ]}
+                                />
+
+                                <Input
+                                    label="Domain or IPv4 address for reverse proxy (optional)"
+                                    value={domain}
+                                    onChange={setDomain}
+                                    placeholder="example.com  or 1.2.3.4"
+                                    helperText="`curl checkip.amazonaws.com` to get your public IP address. Make sure 443 is open on your firewall."
+                                />
+                            </>
+                        ) : (
+                            <p>Validator Nodes participate in consensus and validates transactions. These should not be publicly accessible in production settings.</p>
                         )}
 
-                        <Input
-                            label="Domain or IPv4 address for reverse proxy (optional)"
-                            value={domain}
-                            onChange={setDomain}
-                            placeholder="example.com  or 1.2.3.4"
-                            helperText="`curl checkip.amazonaws.com` to get your public IP address. Make sure 443 is open on your firewall."
-                        />
+                        {chainID && enableDebugTrace === "true" && isRPC === "true" && (
+                            <div className="mt-4">
+                                <h3 className="text-md font-medium mb-2">Debug & Trace Setup Command:</h3>
+                                <p className="text-sm mb-2">Note: Run this before starting the node.</p>
+                                <CodeHighlighter
+                                    code={enableDebugNTraceCommand(chainID)}
+                                    lang="bash"
+                                />
+                            </div>
+                        )}
+
+                        <div className="mt-4">
+                            <CodeHighlighter
+                                code={rpcCommand}
+                                lang="bash"
+                            />
+                        </div>
+
+                        {domain && isRPC === "true" && (
+                            <div className="mt-4">
+                                <h3 className="text-md font-medium mb-2">Reverse Proxy Command:</h3>
+                                <CodeHighlighter
+                                    code={reverseProxyCommand(domain)}
+                                    lang="bash"
+                                />
+                            </div>
+                        )}
+
+                        {chainID && (
+                            <div className="mt-4">
+                                <h3 className="text-md font-medium mb-2">Check Node Command:</h3>
+                                <CodeHighlighter
+                                    code={checkNodeCommand(chainID, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), false)}
+                                    lang="bash"
+                                />
+                            </div>
+                        )}
+
+                        {chainID && isRPC === "true" && enableDebugTrace === "true" && (
+                            <div className="mt-4">
+                                <h3 className="text-md font-medium mb-2">Check that debug & trace is working:</h3>
+                                <CodeHighlighter
+                                    code={checkNodeCommand(chainID, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), true)}
+                                    lang="bash"
+                                />
+                            </div>
+                        )}
+
+                        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h3 className="text-md font-medium mb-2">Running Multiple Nodes on the same machine:</h3>
+                            <p>To run multiple validator nodes on the same machine, ensure each node has:</p>
+                            <ul className="list-disc pl-5 mt-1">
+                                <li>Unique container name (change <code>--name</code> parameter)</li>
+                                <li>Different ports (modify <code>AVAGO_HTTP_PORT</code> and <code>AVAGO_STAKING_PORT</code>)</li>
+                                <li>Separate data directories (change the local volume path <code>~/.avalanchego</code> to a unique directory)</li>
+                            </ul>
+                            <p className="mt-1">Example for second node: Use ports 9652/9653 (HTTP/staking), container name "avago2", and data directory "~/.avalanchego2"</p>
+                        </div>
+
+                        {rpcUrl.indexOf('127.0.0.1') === -1 && <TestRPC rpcUrl={rpcUrl} />}
+                        {rpcUrl.indexOf('127.0.0.1') !== -1 && <Input readOnly label="Your RPC URL" value={rpcUrl} />}
+
                     </>
-                ) : (
-                    <p>Validator Nodes participate in consensus and validates transactions. These should not be publicly accessible in production settings.</p>
                 )}
 
-                {chainID && enableDebugTrace === "true" && isRPC === "true" && (
-                    <div className="mt-4">
-                        <h3 className="text-md font-medium mb-2">Debug & Trace Setup Command:</h3>
-                        <p className="text-sm mb-2">Note: Run this before starting the node.</p>
-                        <CodeHighlighter
-                            code={enableDebugNTraceCommand(chainID)}
-                            lang="bash"
-                        />
-                    </div>
-                )}
-
-                <div className="mt-4">
-                    <CodeHighlighter
-                        code={rpcCommand}
-                        lang="bash"
-                    />
-                </div>
-
-                {domain && isRPC === "true" && (
-                    <div className="mt-4">
-                        <h3 className="text-md font-medium mb-2">Reverse Proxy Command:</h3>
-                        <CodeHighlighter
-                            code={reverseProxyCommand(domain)}
-                            lang="bash"
-                        />
-                    </div>
-                )}
-
-                {chainID && (
-                    <div className="mt-4">
-                        <h3 className="text-md font-medium mb-2">Check Node Command:</h3>
-                        <CodeHighlighter
-                            code={checkNodeCommand(chainID, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), false)}
-                            lang="bash"
-                        />
-                    </div>
-                )}
-
-                {chainID && isRPC === "true" && enableDebugTrace === "true" && (
-                    <div className="mt-4">
-                        <h3 className="text-md font-medium mb-2">Check that debug & trace is working:</h3>
-                        <CodeHighlighter
-                            code={checkNodeCommand(chainID, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), true)}
-                            lang="bash"
-                        />
-                    </div>
-                )}
-
-                <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
-                    <h3 className="text-md font-medium mb-2">Running Multiple Nodes on the same machine:</h3>
-                    <p>To run multiple validator nodes on the same machine, ensure each node has:</p>
-                    <ul className="list-disc pl-5 mt-1">
-                        <li>Unique container name (change <code>--name</code> parameter)</li>
-                        <li>Different ports (modify <code>AVAGO_HTTP_PORT</code> and <code>AVAGO_STAKING_PORT</code>)</li>
-                        <li>Separate data directories (change the local volume path <code>~/.avalanchego</code> to a unique directory)</li>
-                    </ul>
-                    <p className="mt-1">Example for second node: Use ports 9652/9653 (HTTP/staking), container name "avago2", and data directory "~/.avalanchego2"</p>
-                </div>
             </div>
         </Container>
     );

@@ -20,7 +20,10 @@ pre {
   }
 }
 
-select,input, textarea, button {
+select,
+input,
+textarea,
+button {
   @apply dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700;
 }
 
@@ -41,3 +44,6 @@ svg.lucide {
   color: #1f66f4;
 }
 
+button svg.lucide {
+  color: inherit;
+}

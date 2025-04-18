@@ -5,7 +5,7 @@ import { X, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Input } from "../../components/Input";
 import { useWalletStore } from "../../lib/walletStore";
-import { getRPCEndpoint } from "../../coreViem/utils/rpc";
+import { queryChainInfo, ChainInfoResult } from "../../coreViem/utils/chainInfo";
 
 export default function SelectChain({ children }: { children: React.ReactNode }) {
     const { chains, activeChainId, setActiveChain } = useToolboxStore();
@@ -114,7 +114,7 @@ function AddChain() {
     const createChainStore = useCreateChainStore();
     const [chainId, setChainId] = useState(createChainStore.chainID);
 
-    const [chainInfo, setChainInfo] = useState<{ evmChainID: number, subnetId: string, name: string } | null>(null);
+    const [chainInfo, setChainInfo] = useState<ChainInfoResult | null>(null);
 
 
     const handleSubmit = () => {
@@ -127,7 +127,7 @@ function AddChain() {
 
     useEffect(() => {
         setChainInfo(null);
-        queryChainInfo_pleaseRefectorMe(chainId, isTestnet!).then(setChainInfo);
+        queryChainInfo(chainId, isTestnet!).then(setChainInfo);
     }, [chainId]);
 
     return <div>
@@ -156,56 +156,4 @@ function AddChain() {
             </div>
         </div>
     </div>;
-}
-
-async function queryChainInfo_pleaseRefectorMe(chainId: string, isTestnet: boolean): Promise<{ evmChainID: number, subnetId: string, name: string }> {
-    try {
-        const response = await fetch(getRPCEndpoint(isTestnet) + '/ext/bc/P', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                method: 'platform.getTx',
-                params: {
-                    txID: chainId,
-                    encoding: 'json'
-                },
-                id: 1
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Network error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.error) {
-            throw new Error(`API error: ${data.error.message}`);
-        }
-
-        const txData = data.result.tx.unsignedTx;
-
-        // Verify this is a createChain transaction by checking required fields
-        if (!txData.genesisData || !txData.subnetID || !txData.chainName || !txData.vmID) {
-            throw new Error("Not a valid createChain transaction: missing required fields");
-        }
-
-        const genesisDataBase64 = txData.genesisData;
-
-        // Decode and parse genesis data to extract evmChainID
-        const genesisJson = JSON.parse(atob(genesisDataBase64));
-        const evmChainID = parseInt(genesisJson.config.chainId, 16);
-
-        return {
-            evmChainID,
-            subnetId: txData.subnetID,
-            name: txData.chainName
-        };
-    } catch (error) {
-        console.error("Error fetching chain info:", error);
-        throw error;
-    }
 }

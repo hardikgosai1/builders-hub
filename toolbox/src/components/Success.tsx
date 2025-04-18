@@ -3,9 +3,10 @@ import { Check } from "lucide-react";
 interface SuccessProps {
     label: string;
     value: string;
+    notes?: string;
 }
 
-export const Success = ({ label, value }: SuccessProps) => {
+export const Success = ({ label, value, notes }: SuccessProps) => {
     if (!value) return null;
 
     return (
@@ -17,6 +18,9 @@ export const Success = ({ label, value }: SuccessProps) => {
             <div className="bg-white dark:bg-neutral-800 p-3 rounded border border-neutral-200 dark:border-neutral-700">
                 <p className="font-mono text-sm break-all dark:text-neutral-200">{value}</p>
             </div>
+            {notes && (
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">{notes}</p>
+            )}
         </div>
     );
 };
