@@ -1,7 +1,7 @@
 "use client";
 
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json"
-import { useToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import { avalancheFuji } from "viem/chains";
 import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
 export default function DeployExampleERC20() {
     const { showBoundary } = useErrorBoundary();
-    const { exampleErc20Address, setExampleErc20Address } = useToolboxStore();
+    const { exampleErc20Address, setExampleErc20Address } = useOldToolboxStore();
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);

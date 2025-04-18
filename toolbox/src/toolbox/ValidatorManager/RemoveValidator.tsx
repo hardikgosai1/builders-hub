@@ -15,7 +15,7 @@ import { cn } from "../../lib/utils"
 import { packL1ValidatorRegistration } from "../../coreViem/utils/convertWarp"
 import { packWarpIntoAccessList } from "./packWarp"
 import { StepIndicator } from "../components/StepIndicator"
-import { useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import validatorManagerAbi from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 import { getValidationIdHex } from "../../coreViem/hooks/getValidationID"
@@ -42,7 +42,7 @@ const removalStepsConfig: StepsConfig<RemovalStepKey> = {
 
 export default function RemoveValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { proxyAddress, subnetId, setProxyAddress, setSubnetID } = useToolboxStore()
+  const { proxyAddress, subnetId, setProxyAddress, setSubnetID } = useOldToolboxStore()
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
   const viemChain = useViemChainStore()
 
@@ -114,7 +114,7 @@ export default function RemoveValidator() {
           if (!currentValidationID) {
             throw new Error("Validation ID is missing. Retrying might be needed.")
           }
-          
+
           const removeValidatorTx = await coreWalletClient.writeContract({
             address: effectiveProxyAddress as `0x${string}`,
             abi: validatorManagerAbi.abi,
@@ -122,19 +122,19 @@ export default function RemoveValidator() {
             args: [currentValidationID],
             chain: viemChain
           })
-          
+
           console.log("Removal transaction:", removeValidatorTx)
-          
+
           if (!publicClient) {
             throw new Error("Wallet connection not initialized")
           }
-          
+
           const receipt = await publicClient.waitForTransactionReceipt({
             hash: removeValidatorTx
           })
-          
+
           console.log("Receipt:", receipt)
-          
+
           const warpMessageResult = receipt.logs[0].data || ""
           setUnsignedWarpMessage(warpMessageResult)
           currentUnsignedWarpMessage = warpMessageResult;
@@ -153,7 +153,7 @@ export default function RemoveValidator() {
           if (!currentUnsignedWarpMessage || currentUnsignedWarpMessage.length === 0) {
             throw new Error("Warp message is empty. Retrying might be needed.")
           }
-          
+
           const { signedMessage: signedMessageResult } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
@@ -162,7 +162,7 @@ export default function RemoveValidator() {
               quorumPercentage: 67,
             },
           })
-          
+
           console.log("Signed message:", signedMessageResult)
           setSignedWarpMessage(signedMessageResult)
           currentSignedWarpMessage = signedMessageResult;
@@ -181,7 +181,7 @@ export default function RemoveValidator() {
           if (!currentSignedWarpMessage || currentSignedWarpMessage.length === 0) {
             throw new Error("Signed message is empty. Retrying might be needed.")
           }
-          
+
           if (typeof window === "undefined" || !window.avalanche) {
             throw new Error("Core wallet not found")
           }
@@ -190,7 +190,7 @@ export default function RemoveValidator() {
             pChainAddress: pChainAddress!,
             signedWarpMessage: currentSignedWarpMessage,
           })
-          
+
           console.log("P-Chain transaction ID:", pChainTxId)
           updateStepStatus("submitPChainTx", "success")
         } catch (error: any) {
@@ -208,7 +208,7 @@ export default function RemoveValidator() {
             throw new Error("Viem chain configuration is missing.")
           }
           if (!currentValidationID) {
-             throw new Error("Validation ID is missing. Retrying might be needed.")
+            throw new Error("Validation ID is missing. Retrying might be needed.")
           }
           if (!effectiveSubnetId) {
             throw new Error("Subnet ID is missing.")
@@ -234,7 +234,7 @@ export default function RemoveValidator() {
           console.log("Remove Validator Message:", removeValidatorMessage)
           console.log("Remove Validator Message Hex:", bytesToHex(removeValidatorMessage))
           console.log("Justification:", justification)
-          
+
           const signature = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
@@ -265,7 +265,7 @@ export default function RemoveValidator() {
           }
           const signedPChainWarpMsgBytes = hexToBytes(`0x${currentPChainSignature}`)
           const accessList = packWarpIntoAccessList(signedPChainWarpMsgBytes)
-          
+
           if (!effectiveProxyAddress) throw new Error("Proxy address is not set.");
           if (!coreWalletClient) throw new Error("Core wallet client is not initialized.");
           if (!publicClient) throw new Error("Public client is not initialized.");
@@ -289,18 +289,18 @@ export default function RemoveValidator() {
             const reason = baseError?.shortMessage || simError.message || "Simulation failed, reason unknown.";
             throw new Error(`Contract simulation failed: ${reason}`);
           }
-          
+
           console.log("Simulation request:", simulationResult.request)
 
           let txHash;
           try {
-             txHash = await coreWalletClient.writeContract(simulationResult.request)
-             console.log("Transaction sent:", txHash)
+            txHash = await coreWalletClient.writeContract(simulationResult.request)
+            console.log("Transaction sent:", txHash)
           } catch (writeError: any) {
-             console.error("Contract write failed:", writeError);
-             const baseError = writeError.cause || writeError;
-             const reason = baseError?.shortMessage || writeError.message || "Transaction submission failed, reason unknown.";
-             throw new Error(`Submitting transaction failed: ${reason}`);
+            console.error("Contract write failed:", writeError);
+            const baseError = writeError.cause || writeError;
+            const reason = baseError?.shortMessage || writeError.message || "Transaction submission failed, reason unknown.";
+            throw new Error(`Submitting transaction failed: ${reason}`);
           }
 
           let receipt;
@@ -308,22 +308,22 @@ export default function RemoveValidator() {
             receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
             console.log("Transaction receipt:", receipt)
             if (receipt.status !== 'success') {
-               throw new Error(`Transaction failed with status: ${receipt.status}`);
+              throw new Error(`Transaction failed with status: ${receipt.status}`);
             }
           } catch (receiptError: any) {
-             console.error("Failed to get transaction receipt:", receiptError);
-             throw new Error(`Failed waiting for transaction receipt: ${receiptError.message}`);
+            console.error("Failed to get transaction receipt:", receiptError);
+            throw new Error(`Failed waiting for transaction receipt: ${receiptError.message}`);
           }
 
           updateStepStatus("completeRemoval", "success")
           completeProcessing(`Validator ${nodeID} removal process completed successfully.`)
         } catch (error: any) {
-           const message = error instanceof Error ? error.message : String(error);
+          const message = error instanceof Error ? error.message : String(error);
           updateStepStatus("completeRemoval", "error", message)
           return
         }
       }
-        
+
     } catch (err: any) {
       setError(`Failed to remove validator: ${err.message}`)
       console.error(err)

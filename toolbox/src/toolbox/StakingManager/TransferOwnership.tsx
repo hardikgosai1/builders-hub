@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import { Input } from "../../components/Input";
 import { TransactionReceipt } from "viem";
 export default function TransferOwnership() {
     const { showBoundary } = useErrorBoundary();
-    const { stakingManagerAddress, validatorManagerAddress, setStakingManagerAddress, setValidatorManagerAddress } = useToolboxStore();
+    const { stakingManagerAddress, validatorManagerAddress, setStakingManagerAddress, setValidatorManagerAddress } = useOldToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isTransferring, setIsTransferring] = useState(false);
     const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);

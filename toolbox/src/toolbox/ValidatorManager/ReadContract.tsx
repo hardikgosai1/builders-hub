@@ -1,6 +1,6 @@
 "use client"
 
-import { useToolboxStore } from "../toolboxStore"
+import { useOldToolboxStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import type { AbiEvent } from "viem"
@@ -31,7 +31,7 @@ const serializeValue = (value: any): any => {
 
 export default function ReadContract() {
   const { showBoundary } = useErrorBoundary()
-  const { proxyAddress, setProxyAddress } = useToolboxStore()
+  const { proxyAddress, setProxyAddress } = useOldToolboxStore()
   const [viewData, setViewData] = useState<ViewData>({})
   const [isReading, setIsReading] = useState(false)
   const [eventLogs, setEventLogs] = useState<Record<string, any[]>>({})
@@ -127,10 +127,10 @@ export default function ReadContract() {
             placeholder="0x..."
             onChange={(value) => setProxyAddress(value)}
           />
-          <Button 
-            variant="secondary" 
-            onClick={readContractData} 
-            loading={isReading} 
+          <Button
+            variant="secondary"
+            onClick={readContractData}
+            loading={isReading}
             disabled={isReading}
             className="w-full"
           >

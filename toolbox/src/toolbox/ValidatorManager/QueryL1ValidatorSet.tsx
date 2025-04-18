@@ -1,6 +1,6 @@
 "use client"
 
-import { useToolboxStore } from "../toolboxStore"
+import { useOldToolboxStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useState, useEffect } from "react"
 import { Calendar, Clock, Users, Coins, Database, Globe, Info, Copy, Check } from "lucide-react"
@@ -12,7 +12,7 @@ import { GlobalParamNetwork, L1ValidatorDetailsFull } from "@avalabs/avacloud-sd
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 
 export default function QueryL1ValidatorSet() {
-  const { subnetId, setSubnetID } = useToolboxStore()
+  const { subnetId, setSubnetID } = useOldToolboxStore()
   const { avalancheNetworkID, setAvalancheNetworkID } = useWalletStore()
   const [validators, setValidators] = useState<L1ValidatorDetailsFull[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -192,7 +192,7 @@ export default function QueryL1ValidatorSet() {
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
-          ) : <></> }
+          ) : <></>}
           {validators.length > 0 ? (
             <div className="space-y-4">
               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-lg overflow-hidden">

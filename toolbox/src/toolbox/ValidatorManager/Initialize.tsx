@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../components/Container";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
-    const { subnetId, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
+    const { subnetId, proxyAddress, setProxyAddress, setSubnetID } = useOldToolboxStore();
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -79,17 +79,17 @@ export default function Initialize() {
         try {
             const formattedSubnetId = subnetIDHex.startsWith('0x') ? subnetIDHex : `0x${subnetIDHex}`;
             const formattedAdmin = adminAddress as `0x${string}`;
-            
+
             // Create settings object with exact types from the ABI
             const settings = {
                 admin: formattedAdmin,
                 subnetID: formattedSubnetId, // Note: ABI shows it as subnetID (capital ID), not subnetId
                 churnPeriodSeconds: BigInt(churnPeriodSeconds),
-                maximumChurnPercentage: Number(maximumChurnPercentage) 
+                maximumChurnPercentage: Number(maximumChurnPercentage)
             };
-            
+
             console.log("Settings object:", settings);
-            
+
             const hash = await coreWalletClient.writeContract({
                 address: proxyAddress as `0x${string}`,
                 abi: ValidatorManagerABI.abi,

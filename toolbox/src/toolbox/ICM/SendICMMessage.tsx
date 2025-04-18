@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo, useEffect } from "react";
@@ -19,7 +19,7 @@ type MessageDirection = "CtoL1" | "L1toC";
 
 export default function SendICMMessage() {
     const { showBoundary } = useErrorBoundary();
-    const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
+    const { icmReceiverAddress, chainID, setChainID, evmChainRpcUrl, setEvmChainRpcUrl } = useOldToolboxStore();
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [message, setMessage] = useState(Math.floor(Math.random() * 10000));

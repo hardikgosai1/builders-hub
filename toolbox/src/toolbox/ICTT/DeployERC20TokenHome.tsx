@@ -1,7 +1,7 @@
 "use client";
 
 import ERC20TokenHome from "../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
@@ -26,7 +26,7 @@ export default function DeployERC20TokenHome() {
         setErc20TokenHomeAddress,
         erc20TokenHomeAddress,
         setTeleporterRegistryAddress
-    } = useToolboxStore();
+    } = useOldToolboxStore();
     const { coreWalletClient, walletChainId, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
+import { useOldToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useState } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
@@ -16,7 +16,7 @@ export default function CollectConversionSignatures() {
         setL1ConversionSignature,
         L1ID,
         setL1ID,
-    } = useToolboxStore(state => state);
+    } = useOldToolboxStore(state => state);
     const { coreWalletClient } = useWalletStore();
     const [isConverting, setIsConverting] = useState(false);
     const [error, setError] = useState<string | null>(null);

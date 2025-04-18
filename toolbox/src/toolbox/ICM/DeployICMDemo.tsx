@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
@@ -14,7 +14,7 @@ export const SENDER_C_CHAIN_ADDRESS = "0xfD694e233f9D5196CF3747723ed00Bb8386a7FE
 
 export default function DeployICMDemo() {
     const { showBoundary } = useErrorBoundary();
-    const { setIcmReceiverAddress, icmReceiverAddress } = useToolboxStore();
+    const { setIcmReceiverAddress, icmReceiverAddress } = useOldToolboxStore();
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);

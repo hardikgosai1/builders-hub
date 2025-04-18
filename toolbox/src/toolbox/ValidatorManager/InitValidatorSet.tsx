@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
@@ -24,7 +24,7 @@ export default function InitValidatorSet() {
         setL1ID,
         L1ConversionSignature,
         setL1ConversionSignature,
-        evmChainRpcUrl } = useToolboxStore();
+        evmChainRpcUrl } = useOldToolboxStore();
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isInitializing, setIsInitializing] = useState(false);
@@ -76,22 +76,22 @@ export default function InitValidatorSet() {
                         .map(({ nodeID, weight, signer }: { nodeID: string, weight: number, signer: { publicKey: string } }) => {
                             // Ensure nodeID and blsPublicKey are properly formatted
                             // If nodeID is in BinTools format, convert to hex
-                            const nodeIDBytes = nodeID.startsWith('0x') 
-                                ? nodeID 
+                            const nodeIDBytes = nodeID.startsWith('0x')
+                                ? nodeID
                                 : add0x(nodeID);
-                                
+
                             // If blsPublicKey is in BinTools format, convert to hex
-                            const blsPublicKeyBytes = signer.publicKey.startsWith('0x') 
-                                ? signer.publicKey 
+                            const blsPublicKeyBytes = signer.publicKey.startsWith('0x')
+                                ? signer.publicKey
                                 : add0x(signer.publicKey);
-                                
+
                             return {
                                 nodeID: nodeIDBytes,
                                 blsPublicKey: blsPublicKeyBytes,
                                 weight: weight
                             };
                         })
-                }, 
+                },
                 0 // messageIndex parameter
             ];
 
@@ -140,7 +140,7 @@ export default function InitValidatorSet() {
                     stack: error.stack,
                     name: error.name
                 });
-                
+
                 // Parse the error message to be more user-friendly
                 let errorMessage = error.message;
                 if (errorMessage.includes('Cannot read properties of undefined')) {

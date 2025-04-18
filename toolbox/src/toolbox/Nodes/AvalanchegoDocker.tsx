@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
+import { useOldToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { Select } from "../components/Select";
 import { useState, useEffect } from "react";
@@ -156,7 +156,7 @@ docker run -it --rm hello-world
 type OS = keyof typeof dockerInstallInstructions;
 
 export default function AvalanchegoDocker() {
-    const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useToolboxStore();
+    const { subnetId, setSubnetID, chainID, setChainID, setEvmChainRpcUrl } = useOldToolboxStore();
     const { avalancheNetworkID } = useWalletStore();
 
     const [isRPC, setIsRPC] = useState<"true" | "false">("false");
@@ -277,7 +277,7 @@ export default function AvalanchegoDocker() {
                             onChange={setDomain}
                             placeholder="example.com  or 1.2.3.4"
                             helperText="`curl checkip.amazonaws.com` to get your public IP address. Make sure 443 is open on your firewall."
-                    />
+                        />
                     </>
                 ) : (
                     <p>Validator Nodes participate in consensus and validates transactions. These should not be publicly accessible in production settings.</p>
@@ -331,16 +331,16 @@ export default function AvalanchegoDocker() {
                     </div>
                 )}
 
-<div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
-                        <h3 className="text-md font-medium mb-2">Running Multiple Nodes on the same machine:</h3>
-                        <p>To run multiple validator nodes on the same machine, ensure each node has:</p>
-                        <ul className="list-disc pl-5 mt-1">
-                            <li>Unique container name (change <code>--name</code> parameter)</li>
-                            <li>Different ports (modify <code>AVAGO_HTTP_PORT</code> and <code>AVAGO_STAKING_PORT</code>)</li>
-                            <li>Separate data directories (change the local volume path <code>~/.avalanchego</code> to a unique directory)</li>
-                        </ul>
-                        <p className="mt-1">Example for second node: Use ports 9652/9653 (HTTP/staking), container name "avago2", and data directory "~/.avalanchego2"</p>
-                    </div>
+                <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                    <h3 className="text-md font-medium mb-2">Running Multiple Nodes on the same machine:</h3>
+                    <p>To run multiple validator nodes on the same machine, ensure each node has:</p>
+                    <ul className="list-disc pl-5 mt-1">
+                        <li>Unique container name (change <code>--name</code> parameter)</li>
+                        <li>Different ports (modify <code>AVAGO_HTTP_PORT</code> and <code>AVAGO_STAKING_PORT</code>)</li>
+                        <li>Separate data directories (change the local volume path <code>~/.avalanchego</code> to a unique directory)</li>
+                    </ul>
+                    <p className="mt-1">Example for second node: Use ports 9652/9653 (HTTP/staking), container name "avago2", and data directory "~/.avalanchego2"</p>
+                </div>
             </div>
         </Container>
     );

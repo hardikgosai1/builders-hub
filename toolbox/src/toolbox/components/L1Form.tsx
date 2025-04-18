@@ -1,7 +1,7 @@
 "use client"
 
 import { useWalletStore } from "../../lib/walletStore"
-import { useViemChainStore, useToolboxStore } from "../toolboxStore"
+import { useViemChainStore, useOldToolboxStore } from "../toolboxStore"
 import { useState, useEffect } from "react"
 import { createPublicClient, http, webSocket } from "viem"
 import { Button } from "../../components/Button"
@@ -28,7 +28,7 @@ export default function L1Form() {
         setEvmChainCoinName,
         evmChainIsTestnet,
         setEvmChainIsTestnet,
-    } = useToolboxStore();
+    } = useOldToolboxStore();
     const [localError, setLocalError] = useState<string | null>(null);
     const [isCheckingRpc, setIsCheckingRpc] = useState(false);
     const [success, setSuccess] = useState(false);

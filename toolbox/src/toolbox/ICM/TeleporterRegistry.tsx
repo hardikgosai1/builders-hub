@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 
 export default function TeleporterRegistry() {
     const { showBoundary } = useErrorBoundary();
-    const { setTeleporterRegistryAddress, teleporterRegistryAddress } = useToolboxStore();
+    const { setTeleporterRegistryAddress, teleporterRegistryAddress } = useOldToolboxStore();
     const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();

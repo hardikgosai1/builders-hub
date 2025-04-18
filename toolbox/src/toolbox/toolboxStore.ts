@@ -2,12 +2,52 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 
-export type DeployOn = "L1" | "C-Chain";
+// Since we're using immer, we don't need to worry about state immutability as it's handled automatically by immer
+// It feels like magic, mate!
+import { immer } from 'zustand/middleware/immer'
 
-export const initialState = {
+export const DEFAUT_EVM_VM_ID = "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy"
+
+const localStorageWithFallback = () => typeof window !== 'undefined' ? localStorage : {
+    getItem: () => null,
+    setItem: () => { },
+    removeItem: () => { }
+}
+
+export const useCreateChainStore = create(immer(
+    persist(
+        combine({
+            subnetId: "",
+            chainID: "",
+            evmChainId: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
+            genesisData: "",
+            gasLimit: 12 * 1000000,
+            targetBlockRate: 2,
+            vmId: DEFAUT_EVM_VM_ID,
+            evmChainName: "My L1",
+        }, (set) => ({
+            setSubnetID: (subnetId: string) => set({ subnetId }),
+            setChainID: (chainID: string) => set({ chainID }),
+            setEvmChainId: (evmChainId: number) => set({ evmChainId }),
+            setGenesisData: (genesisData: string) => set({ genesisData }),
+            setGasLimit: (gasLimit: number) => set({ gasLimit }),
+            setTargetBlockRate: (targetBlockRate: number) => set({ targetBlockRate }),
+            setVmId: (vmId: string) => set({ vmId }),
+            setEvmChainName: (evmChainName: string) => set({ evmChainName }),
+        })),
+        {
+            name: 'create-chain-store',
+            storage: createJSONStorage(localStorageWithFallback),
+        },
+    ))
+)
+
+
+export type DeployOn = "L1" | "C-Chain";
+const oldInitialState = {
     subnetId: "",
     chainName: "My Chain",
-    vmId: "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy",
+    vmId: DEFAUT_EVM_VM_ID,
     chainID: "",
     nodePopJsons: [""] as string[],
     validatorWeights: Array(100).fill(100) as number[],
@@ -36,9 +76,9 @@ export const initialState = {
     erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 }
 
-export const useToolboxStore = create(
+export const useOldToolboxStore = create(
     persist(
-        combine(initialState, (set) => ({
+        combine(oldInitialState, (set) => ({
             setSubnetID: (subnetId: string) => set({ subnetId }),
             setChainName: (chainName: string) => set({ chainName }),
             setVmId: (vmId: string) => set({ vmId }),
@@ -77,11 +117,7 @@ export const useToolboxStore = create(
         })),
         {
             name: 'toolbox-storage',
-            storage: createJSONStorage(() => typeof window !== 'undefined' ? localStorage : {
-                getItem: () => null,
-                setItem: () => { },
-                removeItem: () => { }
-            }),
+            storage: createJSONStorage(localStorageWithFallback),
         },
     ),
 )
@@ -90,7 +126,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 export function useViemChainStore() {
     // Use useShallow to select the primitive state values we need
-    const chainData = useToolboxStore(
+    const chainData = useOldToolboxStore(
         useShallow((state) => ({
             evmChainId: state.evmChainId,
             evmChainName: state.evmChainName,

@@ -1,7 +1,7 @@
 "use client";
 
 import ERC20TokenRemote from "../../../contracts/icm-contracts/compiled/ERC20TokenRemote.json";
-import { useToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect, useMemo } from "react";
@@ -61,7 +61,7 @@ export default function DeployERC20TokenRemote() {
         setTeleporterRegistryAddress,
         chainID,
         setChainID
-    } = useToolboxStore();
+    } = useOldToolboxStore();
     const { coreWalletClient, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);

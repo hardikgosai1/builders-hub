@@ -2,7 +2,7 @@
 
 import { formatEther, parseEther, createPublicClient, http } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { useToolboxStore, useViemChainStore } from '../toolboxStore';
+import { useOldToolboxStore, useViemChainStore } from '../toolboxStore';
 import { useWalletStore } from '../../lib/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
@@ -15,7 +15,7 @@ const MINIMUM_BALANCE = parseEther('100')
 const MINIMUM_BALANCE_CCHAIN = parseEther('1')
 
 export default function ICMRelayer() {
-    const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
+    const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useOldToolboxStore();
     const { coreWalletClient, walletChainId } = useWalletStore();
     const [balanceL1, setBalanceL1] = useState<bigint>(BigInt(0));
     const [balanceCChain, setBalanceCChain] = useState<bigint>(BigInt(0));

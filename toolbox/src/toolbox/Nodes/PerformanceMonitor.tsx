@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
+import { useOldToolboxStore } from "../toolboxStore";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { Select } from "../components/Select";
@@ -26,7 +26,7 @@ export default function PerformanceMonitor() {
         setChainID,
         subnetId,
         setSubnetID
-    } = useToolboxStore();
+    } = useOldToolboxStore();
 
 
     const [evmChainRpcUrl, setEvmChainRpcUrl] = useState('');

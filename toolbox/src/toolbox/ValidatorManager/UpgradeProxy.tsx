@@ -10,7 +10,7 @@ import { Success } from "../../components/Success";
 import ProxyAdminABI from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
 import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
 import { Container } from "../components/Container";
-import { useToolboxStore } from "../toolboxStore";
+import { useOldToolboxStore } from "../toolboxStore";
 
 export default function UpgradeProxy() {
     const { showBoundary } = useErrorBoundary();
@@ -20,7 +20,7 @@ export default function UpgradeProxy() {
         proxyAdminAddress,
         setProxyAddress,
         setProxyAdminAddress
-    } = useToolboxStore();
+    } = useOldToolboxStore();
     const { walletChainId, coreWalletClient, publicClient } = useWalletStore();
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [currentImplementation, setCurrentImplementation] = useState<string | null>(null);

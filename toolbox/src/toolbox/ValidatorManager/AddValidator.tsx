@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react"
-import { useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import { custom, createPublicClient, fromBytes, bytesToHex, hexToBytes } from "viem"
@@ -38,7 +38,7 @@ const addValidationStepsConfig: StepsConfig<AddValidationStepKey> = {
 
 export default function AddValidator() {
   const { showBoundary } = useErrorBoundary()
-  const { subnetId, proxyAddress, setProxyAddress } = useToolboxStore()
+  const { subnetId, proxyAddress, setProxyAddress } = useOldToolboxStore()
   const { avalancheNetworkID, coreWalletClient, pChainAddress } = useWalletStore()
   const viemChain = useViemChainStore()
 
@@ -261,14 +261,14 @@ export default function AddValidator() {
 
           // Create and sign P-Chain warp message
           const validationIDToUse = localValidationIdHex || validationID;
-          
+
           if (!validationIDToUse || validationIDToUse.length === 0) {
             throw new Error("ValidationID is empty. Retry from step 1.");
           }
-          
+
           console.log("Using validationID:", validationIDToUse);
           const validationIDBytes = hexToBytes(validationIDToUse as `0x${string}`)
-          
+
           const unsignedPChainWarpMsg = packL1ValidatorRegistration(
             validationIDBytes,
             true,
@@ -283,11 +283,11 @@ export default function AddValidator() {
           // Use local var for current run, state is fallback for retry
           const justification = localUnsignedWarpMsg || registerL1ValidatorUnsignedWarpMsg;
           console.log("Justification for signature aggregation:", justification ? justification.substring(0, 20) + "..." : "None");
-          
+
           if (!justification || justification.length === 0 || /^0*$/.test(justification)) {
             throw new Error("Invalid justification for P-Chain warp message. Retry Step 1.");
           }
-          
+
           // Make sure justification is a proper hex string (add 0x prefix if needed)
           const formattedJustification = justification.startsWith("0x") ? justification : `0x${justification}`;
 
@@ -301,7 +301,7 @@ export default function AddValidator() {
               quorumPercentage: 67, // Default threshold for subnet validation
             },
           });
-          
+
           // Update local var and state
           localPChainWarpMsg = response.signedMessage;
           if (!localPChainWarpMsg || localPChainWarpMsg.length === 0 || /^0*$/.test(localPChainWarpMsg)) {
@@ -547,7 +547,7 @@ export default function AddValidator() {
                 </button>
               )}
             </div>
-            
+
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2 italic">Click on any step to retry from that point</p>
 
             {stepKeys.map((stepKey) => (

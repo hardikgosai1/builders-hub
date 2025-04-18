@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
+import { useOldToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useState } from "react";
 import { Button } from "../../components/Button";
@@ -26,7 +26,7 @@ export default function ConvertToL1() {
         setL1ID,
         validatorWeights,
         setValidatorWeights,
-    } = useToolboxStore(state => state);
+    } = useOldToolboxStore(state => state);
     const [isConverting, setIsConverting] = useState(false);
     const [validatorBalances, setValidatorBalances] = useState(Array(100).fill(BigInt(1000000000)) as bigint[]);
     const { coreWalletClient, pChainAddress } = useWalletStore();

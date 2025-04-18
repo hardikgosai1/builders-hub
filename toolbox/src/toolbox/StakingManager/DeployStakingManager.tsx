@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -18,7 +18,7 @@ function calculateLibraryHash(libraryPath: string) {
 }
 export default function DeployStakingManager() {
     const { showBoundary } = useErrorBoundary();
-    const { stakingManagerAddress, setStakingManagerAddress, validatorMessagesLibAddress } = useToolboxStore();
+    const { stakingManagerAddress, setStakingManagerAddress, validatorMessagesLibAddress } = useOldToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();

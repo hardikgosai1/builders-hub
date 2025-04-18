@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { Container } from "../components/Container";
 
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
-    const { stakingManagerAddress, setStakingManagerAddress, managerAddress, setManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
+    const { stakingManagerAddress, setStakingManagerAddress, managerAddress, setManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useOldToolboxStore();
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);

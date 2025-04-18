@@ -2,7 +2,7 @@
 
 import { Button } from "../components/Button";
 import { ErrorBoundary } from "react-error-boundary";
-import { useToolboxStore } from '../toolbox/toolboxStore';
+import { useOldToolboxStore } from '../toolbox/toolboxStore';
 import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
@@ -38,7 +38,7 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: []
         }
     ],
-    'Create an L1': [
+    'Create chain': [
         {
             id: 'createSubnet',
             label: "Create Subnet",
@@ -46,11 +46,20 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: ["toolbox/src/toolbox/L1/CreateSubnet.tsx"]
         },
         {
+            id: 'genesisBuilder',
+            label: "EVM Genesis Builder",
+            component: lazy(() => import('./L1/GenesisBuilder')),
+            fileNames: ["toolbox/src/toolbox/L1/GenesisBuilder.tsx"]
+        },
+        {
             id: 'createChain',
             label: "Create Chain",
             component: lazy(() => import('./L1/CreateChain')),
             fileNames: ["toolbox/src/toolbox/L1/CreateChain.tsx"]
         },
+    ],
+    'Convert to an L1': [
+
         {
             id: 'convertToL1',
             label: "Convert Subnet to L1",
@@ -62,12 +71,6 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Collect conversion signatures",
             component: lazy(() => import('./L1/CollectConversionSignatures')),
             fileNames: ["toolbox/src/toolbox/L1/CollectConversionSignatures.tsx", "toolbox/src/toolbox/L1/convertWarp.ts"]
-        },
-        {
-            id: 'genesisBuilder',
-            label: "EVM Genesis Builder",
-            component: lazy(() => import('./L1/GenesisBuilder')),
-            fileNames: ["toolbox/src/toolbox/L1/GenesisBuilder.tsx"]
         },
         {
             id: 'queryL1Details',
@@ -299,9 +302,9 @@ export default function ToolboxApp() {
 
     // Toggle group expansion
     const toggleGroup = (groupName: string) => {
-        setExpandedGroups(prev => ({ 
-            ...prev, 
-            [groupName]: !prev[groupName] 
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
         }));
     };
 
@@ -400,7 +403,7 @@ export default function ToolboxApp() {
                     <Button
                         onClick={() => {
                             if (window.confirm("Are you sure you want to reset the state?")) {
-                                useToolboxStore.getState().reset();
+                                useOldToolboxStore.getState().reset();
                             }
                         }}
                         className="w-full"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import { Container } from "../components/Container";
 
 export default function DeployValidatorMessages() {
     const { showBoundary } = useErrorBoundary();
-    const { validatorMessagesLibAddress, setValidatorMessagesLibAddress } = useToolboxStore();
+    const { validatorMessagesLibAddress, setValidatorMessagesLibAddress } = useOldToolboxStore();
     const { walletChainId, coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();

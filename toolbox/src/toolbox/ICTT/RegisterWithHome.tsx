@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
+import { useOldToolboxStore, useViemChainStore, type DeployOn } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -20,7 +20,7 @@ import { ListContractEvents } from "../../components/ListContractEvents";
 
 export default function RegisterWithHome() {
     const { showBoundary } = useErrorBoundary();
-    const { erc20TokenRemoteAddress, setErc20TokenRemoteAddress, chainID } = useToolboxStore();
+    const { erc20TokenRemoteAddress, setErc20TokenRemoteAddress, chainID } = useOldToolboxStore();
     const { coreWalletClient } = useWalletStore();
     const viemChain = useViemChainStore();
     const [deployOn, setDeployOn] = useState<DeployOn>("L1");
