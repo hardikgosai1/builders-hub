@@ -43,6 +43,51 @@ export const useCreateChainStore = create(immer(
 )
 
 
+const defaultChainValues = {
+    first: "",
+    second: "",
+    third: ""
+}
+
+export type ChainState = typeof defaultChainValues;
+
+const initialChainState = {
+    chains: {} as Record<string, ChainState>,
+    activeChainId: null as string | null
+}
+
+export const useToolboxStore = create(
+    immer(
+        persist(
+            combine(initialChainState, (set, get) => ({
+                addChain: (chainId: string, chainData: Partial<ChainState> = {}) => set(state => {
+                    state.chains[chainId] = {
+                        ...defaultChainValues,
+                        ...chainData
+                    };
+                }),
+                setActiveChain: (chainId: string) => set(state => {
+                    state.activeChainId = chainId;
+                }),
+                getActiveChain: () => {
+                    const state = get();
+                    return state.activeChainId ? state.chains[state.activeChainId] : undefined;
+                },
+                updateChain: (chainId: string, data: Partial<ChainState>) => set(state => {
+                    if (state.chains[chainId]) {
+                        Object.assign(state.chains[chainId], data);
+                    }
+                })
+            })),
+            {
+                name: 'multi-chain-storage',
+                storage: createJSONStorage(localStorageWithFallback),
+            },
+        )
+    )
+)
+
+
 export type DeployOn = "L1" | "C-Chain";
 const oldInitialState = {
     subnetId: "",

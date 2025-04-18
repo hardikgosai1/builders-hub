@@ -12,6 +12,8 @@ import { ResultField } from "../components/ResultField";
 import { InputArray } from "../components/InputArray";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { TextareaArray } from "../components/TextareaArray";
+import SelectChain from "../components/SelectChain";
+
 export default function ConvertToL1() {
     const {
         subnetId,
@@ -72,72 +74,74 @@ export default function ConvertToL1() {
             title="Convert Subnet to L1"
             description="This will convert your subnet to an L1 chain."
         >
-            <div className="space-y-4">
-                <Input
-                    label="Subnet ID"
-                    value={subnetId}
-                    onChange={setSubnetID}
-                    type="text"
-                />
-                <Input
-                    label="Validator Manager Blockchain ID"
-                    value={chainID}
-                    onChange={setChainID}
-                    type="text"
-                />
-                <Input
-                    label="Validator Manager Contract Address (0x...)"
-                    value={managerAddress}
-                    onChange={setManagerAddress}
-                    placeholder="0x..."
-                    type="text"
-                />
-                <div className="text-xl mt-12">
-                    Initial Validators
-                </div>
+            <SelectChain>
+                <div className="space-y-4">
+                    <Input
+                        label="Subnet ID"
+                        value={subnetId}
+                        onChange={setSubnetID}
+                        type="text"
+                    />
+                    <Input
+                        label="Validator Manager Blockchain ID"
+                        value={chainID}
+                        onChange={setChainID}
+                        type="text"
+                    />
+                    <Input
+                        label="Validator Manager Contract Address (0x...)"
+                        value={managerAddress}
+                        onChange={setManagerAddress}
+                        placeholder="0x..."
+                        type="text"
+                    />
+                    <div className="text-xl mt-12">
+                        Initial Validators
+                    </div>
 
 
-                <TextareaArray
-                    label="Proofs of possession of the initial validators"
-                    values={nodePopJsons}
-                    onChange={setNodePopJsons}
-                    placeholder={'{"result":{"nodeID":"NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg","nodePOP":{"publicKey":"0x...","proofOfPossession":"0x..."}}}'}
-                />
-                <div className="text-sm">
-                    Fetch node credentials:
+                    <TextareaArray
+                        label="Proofs of possession of the initial validators"
+                        values={nodePopJsons}
+                        onChange={setNodePopJsons}
+                        placeholder={'{"result":{"nodeID":"NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg","nodePOP":{"publicKey":"0x...","proofOfPossession":"0x..."}}}'}
+                    />
+                    <div className="text-sm">
+                        Fetch node credentials:
+                    </div>
+                    <CodeHighlighter
+                        code={`curl -X POST --data '{"jsonrpc":"2.0","id":1,"method":"info.getNodeID"}' -H "content-type:application/json;" 127.0.0.1:9650/ext/info`}
+                        lang="bash"
+                    />
+                    <InputArray
+                        label="Validator Weights (in the same order as the validators)"
+                        values={validatorWeights.map(weight => weight.toString()).slice(0, nodePopJsons.length)}
+                        onChange={(weightsStrings) => setValidatorWeights(weightsStrings.map(weight => parseInt(weight)))}
+                        type="number"
+                        disableAddRemove={true}
+                    />
+                    <InputArray
+                        label="Validator Balances (in the same order as the validators)"
+                        values={validatorBalances.map(balance => balance.toString()).slice(0, nodePopJsons.length)}
+                        onChange={(balancesStrings) => setValidatorBalances(balancesStrings.map(balance => BigInt(balance)))}
+                        type="number"
+                        disableAddRemove={true}
+                    />
+                    <Button
+                        variant="primary"
+                        onClick={handleConvertToL1}
+                        disabled={!managerAddress || nodePopJsons.length === 0}
+                        loading={isConverting}
+                    >
+                        Convert to L1
+                    </Button>
                 </div>
-                <CodeHighlighter
-                    code={`curl -X POST --data '{"jsonrpc":"2.0","id":1,"method":"info.getNodeID"}' -H "content-type:application/json;" 127.0.0.1:9650/ext/info`}
-                    lang="bash"
+                <ResultField
+                    label="Transaction ID"
+                    value={L1ID}
+                    showCheck={!!L1ID}
                 />
-                <InputArray
-                    label="Validator Weights (in the same order as the validators)"
-                    values={validatorWeights.map(weight => weight.toString()).slice(0, nodePopJsons.length)}
-                    onChange={(weightsStrings) => setValidatorWeights(weightsStrings.map(weight => parseInt(weight)))}
-                    type="number"
-                    disableAddRemove={true}
-                />
-                <InputArray
-                    label="Validator Balances (in the same order as the validators)"
-                    values={validatorBalances.map(balance => balance.toString()).slice(0, nodePopJsons.length)}
-                    onChange={(balancesStrings) => setValidatorBalances(balancesStrings.map(balance => BigInt(balance)))}
-                    type="number"
-                    disableAddRemove={true}
-                />
-                <Button
-                    variant="primary"
-                    onClick={handleConvertToL1}
-                    disabled={!managerAddress || nodePopJsons.length === 0}
-                    loading={isConverting}
-                >
-                    Convert to L1
-                </Button>
-            </div>
-            <ResultField
-                label="Transaction ID"
-                value={L1ID}
-                showCheck={!!L1ID}
-            />
+            </SelectChain>
         </Container>
     );
 };
