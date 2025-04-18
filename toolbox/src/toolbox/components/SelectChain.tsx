@@ -1,8 +1,11 @@
 import { Button } from "../../components/Button";
-import { useToolboxStore } from "../toolboxStore";
+import { useCreateChainStore, useToolboxStore } from "../toolboxStore";
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { Input } from "../../components/Input";
+import { useWalletStore } from "../../lib/walletStore";
+import { getRPCEndpoint } from "../../coreViem/utils/rpc";
 
 export default function SelectChain({ children }: { children: React.ReactNode }) {
     const { chains, activeChainId, setActiveChain } = useToolboxStore();
@@ -21,23 +24,14 @@ export default function SelectChain({ children }: { children: React.ReactNode })
         chains[activeChainId]?.first || "Select chain" :
         "Select chain";
 
-    // Handle clicking outside the dropdown
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         }
-
-        // Add event listener when dropdown is open
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        // Clean up
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        isOpen && document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [isOpen]);
 
     return <div className="mb-6">
@@ -83,8 +77,7 @@ export default function SelectChain({ children }: { children: React.ReactNode })
 
             <Dialog.Root>
                 <Dialog.Trigger asChild>
-                    <Button className="gap-1">
-                        <Plus className="w-4 h-4" />
+                    <Button className="gap-1 w-fit" icon={<Plus className="w-4 h-4" />}>
                         Add chain
                     </Button>
                 </Dialog.Trigger>
@@ -93,7 +86,7 @@ export default function SelectChain({ children }: { children: React.ReactNode })
                         className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50"
                         onClick={() => setIsOpen(false)}
                     />
-                    <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full z-50">
+                    <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-xl w-full z-50">
                         <div className="flex justify-between items-center mb-4">
                             <Dialog.Title className="text-lg font-medium">Add New Chain</Dialog.Title>
                             <Dialog.Close asChild>
@@ -114,47 +107,28 @@ export default function SelectChain({ children }: { children: React.ReactNode })
 }
 
 function AddChain() {
-    const { addChain, setActiveChain } = useToolboxStore();
-    const [chainName, setChainName] = useState('');
+    // const { addChain, setActiveChain } = useToolboxStore();
     const [rpcUrl, setRpcUrl] = useState('');
-    const [chainId, setChainId] = useState('');
     const [formError, setFormError] = useState('');
+    const { walletChainId, isTestnet } = useWalletStore()
+    const createChainStore = useCreateChainStore();
+    const [chainId, setChainId] = useState(createChainStore.chainID);
+
+    const [chainInfo, setChainInfo] = useState<{ evmChainID: number, subnetId: string, name: string } | null>(null);
+
 
     const handleSubmit = () => {
-        // Basic validation
-        if (!chainName || !rpcUrl || !chainId) {
-            setFormError('All fields are required');
-            return;
-        }
 
-        if (isNaN(parseInt(chainId))) {
-            setFormError('Chain ID must be a number');
-            return;
-        }
-
-        try {
-            // Create a unique ID for the chain
-            const uniqueId = `chain-${Date.now()}`;
-
-            // Add chain to store
-            addChain(uniqueId, {
-                first: chainName,
-                second: rpcUrl,
-                third: chainId
-            });
-
-            // Set as active chain
-            setActiveChain(uniqueId);
-
-            // Close dialog (this relies on the Dialog.Close being triggered programmatically)
-            const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLElement;
-            if (closeButton) {
-                closeButton.click();
-            }
-        } catch (error) {
-            setFormError(`Error adding chain: ${error instanceof Error ? error.message : String(error)}`);
-        }
     };
+
+    const loadRPCFromWallet = () => {
+
+    }
+
+    useEffect(() => {
+        setChainInfo(null);
+        queryChainInfo_pleaseRefectorMe(chainId, isTestnet!).then(setChainInfo);
+    }, [chainId]);
 
     return <div>
         <div className="space-y-4">
@@ -163,39 +137,17 @@ function AddChain() {
                     {formError}
                 </div>
             )}
-            <div className="grid gap-2">
-                <label htmlFor="chain-name" className="text-sm font-medium">Chain Name</label>
-                <input
-                    id="chain-name"
-                    type="text"
-                    className="rounded border p-2 w-full dark:bg-gray-700 dark:border-gray-600"
-                    placeholder="My Chain"
-                    value={chainName}
-                    onChange={(e) => setChainName(e.target.value)}
-                />
-            </div>
-            <div className="grid gap-2">
-                <label htmlFor="rpc-url" className="text-sm font-medium">RPC URL</label>
-                <input
-                    id="rpc-url"
-                    type="text"
-                    className="rounded border p-2 w-full dark:bg-gray-700 dark:border-gray-600"
-                    placeholder="https://api.mychain.network"
-                    value={rpcUrl}
-                    onChange={(e) => setRpcUrl(e.target.value)}
-                />
-            </div>
-            <div className="grid gap-2">
-                <label htmlFor="chain-id" className="text-sm font-medium">Chain ID</label>
-                <input
-                    id="chain-id"
-                    type="text"
-                    className="rounded border p-2 w-full dark:bg-gray-700 dark:border-gray-600"
-                    placeholder="43112"
-                    value={chainId}
-                    onChange={(e) => setChainId(e.target.value)}
-                />
-            </div>
+            <Input label="Avalanche Chain ID" value={chainId} onChange={setChainId} />
+            <Input label="RPC URL" value={rpcUrl} onChange={setRpcUrl} />
+
+            {chainInfo && (
+                <>
+                    <Input label="EVM Chain ID" value={chainInfo.evmChainID} disabled />
+                    <Input label="Subnet ID" value={chainInfo.subnetId} disabled />
+                    <Input label="Name" value={chainInfo.name} disabled />
+                </>
+            )}
+
             <div className="mt-6 flex justify-end gap-3">
                 <Dialog.Close asChild>
                     <Button variant="secondary">Cancel</Button>
@@ -204,4 +156,56 @@ function AddChain() {
             </div>
         </div>
     </div>;
+}
+
+async function queryChainInfo_pleaseRefectorMe(chainId: string, isTestnet: boolean): Promise<{ evmChainID: number, subnetId: string, name: string }> {
+    try {
+        const response = await fetch(getRPCEndpoint(isTestnet) + '/ext/bc/P', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'platform.getTx',
+                params: {
+                    txID: chainId,
+                    encoding: 'json'
+                },
+                id: 1
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(`API error: ${data.error.message}`);
+        }
+
+        const txData = data.result.tx.unsignedTx;
+
+        // Verify this is a createChain transaction by checking required fields
+        if (!txData.genesisData || !txData.subnetID || !txData.chainName || !txData.vmID) {
+            throw new Error("Not a valid createChain transaction: missing required fields");
+        }
+
+        const genesisDataBase64 = txData.genesisData;
+
+        // Decode and parse genesis data to extract evmChainID
+        const genesisJson = JSON.parse(atob(genesisDataBase64));
+        const evmChainID = parseInt(genesisJson.config.chainId, 16);
+
+        return {
+            evmChainID,
+            subnetId: txData.subnetID,
+            name: txData.chainName
+        };
+    } catch (error) {
+        console.error("Error fetching chain info:", error);
+        throw error;
+    }
 }
