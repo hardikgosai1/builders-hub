@@ -11,6 +11,16 @@ Please read this guide before contributing or at least feed this into your Curso
 - State persists in localStorage except when it doesn't make sense to do so like in the Wallet store
 - Use derived stores to simplify dependencies (see `useViemChainStore` example)
 
+### Toolbox stores
+**Create Chain Store**
+Keeps subnetID and genesis data before we have chainID to map values. 
+
+**Main store**
+Keeps all state data keyed by chainID. Once you switch a chain, all values in inputs also change. Stores almost everything that we cannot retrieve from the chain.
+
+**ICTT store**
+Inter-chain store to store token homes and remotes. TODO: we might be able to reuse the main store for that by iterating through all chains. 
+
 ## Errors
 - All async errors should be caught with try/catch blocks
 - Use the `showBoundary` function from `useErrorBoundary` to display errors that should block the whole page
