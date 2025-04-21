@@ -1,6 +1,5 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { Select } from "../components/Select";
@@ -19,14 +18,9 @@ interface BucketedData {
 
 
 export default function PerformanceMonitor() {
-    const {
-        nodeRpcUrl,
-        setNodeRpcUrl,
-        chainID,
-        setChainID,
-        subnetId,
-        setSubnetID
-    } = useToolboxStore();
+    const [nodeRpcUrl, setNodeRpcUrl] = useState('');
+    const [chainID, setChainID] = useState('');
+    const [subnetId, setSubnetID] = useState('');
 
 
     const [evmChainRpcUrl, setEvmChainRpcUrl] = useState('');
