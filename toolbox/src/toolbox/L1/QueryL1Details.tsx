@@ -22,7 +22,7 @@ import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import { GlobalParamNetwork, Subnet } from "@avalabs/avacloud-sdk/models/components"
 
 export default function QueryL1Details() {
-  const { subnetId, setSubnetID } = useToolboxStore()
+  const [subnetId, setSubnetID] = useState("")
   const { avalancheNetworkID, setAvalancheNetworkID } = useWalletStore()
   const [subnetDetails, setSubnetDetails] = useState<Subnet | null>(null)
   const [isLoading, setIsLoading] = useState(false)
