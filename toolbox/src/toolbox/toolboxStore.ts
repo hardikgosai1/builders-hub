@@ -18,6 +18,11 @@ const createChainInitialState = {
     targetBlockRate: 2,
     gasLimit: 12000000,
     evmChainId: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
+    convertToL1TxId: "",
+    validatorWeights: Array(100).fill(100) as number[],
+    nodePopJsons: [""] as string[],
+
+
 }
 
 export const useCreateChainStore = create(
@@ -32,7 +37,9 @@ export const useCreateChainStore = create(
             setTargetBlockRate: (targetBlockRate: number) => set({ targetBlockRate }),
             setGasLimit: (gasLimit: number) => set({ gasLimit }),
             setEvmChainId: (evmChainId: number) => set({ evmChainId }),
-
+            setConvertToL1TxId: (convertToL1TxId: string) => set({ convertToL1TxId }),
+            setValidatorWeights: (validatorWeights: number[]) => set({ validatorWeights }),
+            setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
 
             reset: () => {
                 window?.localStorage.removeItem('create-chain-store');
@@ -47,9 +54,6 @@ export const useCreateChainStore = create(
 )
 
 const toolboxInitialState = {
-    nodePopJsons: [""] as string[],
-    validatorWeights: Array(100).fill(100) as number[],
-    L1ID: "",
     L1ConversionSignature: "",
     validatorMessagesLibAddress: "",
     evmChainRpcUrl: "",
@@ -71,11 +75,8 @@ const toolboxInitialState = {
 export const useToolboxStore = create(
     persist(
         combine(toolboxInitialState, (set) => ({
-            setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
-            setValidatorWeights: (validatorWeights: number[]) => set({ validatorWeights }),
             setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
-            setL1ID: (L1ID: string) => set({ L1ID }),
             setL1ConversionSignature: (L1ConversionSignature: string) => set({ L1ConversionSignature }),
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
             setEvmChainRpcUrl: (evmChainRpcUrl: string) => set({ evmChainRpcUrl }),
@@ -104,43 +105,43 @@ export const useToolboxStore = create(
     ),
 )
 
-import { useShallow } from 'zustand/react/shallow'
+// import { useShallow } from 'zustand/react/shallow'
 
-export function useViemChainStore() {
-    // Use useShallow to select the primitive state values we need
-    const chainData = useToolboxStore(
-        useShallow((state) => ({
-            evmChainId: state.evmChainId,
-            chainName: state.chainName,
-            evmChainRpcUrl: state.evmChainRpcUrl,
-            evmChainCoinName: state.evmChainCoinName,
-            evmChainIsTestnet: state.evmChainIsTestnet
-        }))
-    );
+// export function useViemChainStore() {
+//     // Use useShallow to select the primitive state values we need
+//     const chainData = useToolboxStore(
+//         useShallow((state) => ({
+//             evmChainId: state.evmChainId,
+//             chainName: state.chainName,
+//             evmChainRpcUrl: state.evmChainRpcUrl,
+//             evmChainCoinName: state.evmChainCoinName,
+//             evmChainIsTestnet: state.evmChainIsTestnet
+//         }))
+//     );
 
-    // Create the viemChain object with useMemo to prevent unnecessary recreation
-    const viemChain = useMemo(() => {
-        const { evmChainId, chainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
+//     // Create the viemChain object with useMemo to prevent unnecessary recreation
+//     const viemChain = useMemo(() => {
+//         const { evmChainId, chainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
 
-        if (!evmChainId || !evmChainRpcUrl) {
-            return null;
-        }
+//         if (!evmChainId || !evmChainRpcUrl) {
+//             return null;
+//         }
 
-        return {
-            id: evmChainId,
-            name: chainName || `Chain #${evmChainId}`,
-            rpcUrls: {
-                default: { http: [evmChainRpcUrl] },
-            },
-            nativeCurrency: {
-                name: evmChainCoinName || chainName + " Coin",
-                symbol: evmChainCoinName || chainName + " Coin",
-                decimals: 18
-            },
-            isTestnet: evmChainIsTestnet,
-        };
-    }, [chainData]);
+//         return {
+//             id: evmChainId,
+//             name: chainName || `Chain #${evmChainId}`,
+//             rpcUrls: {
+//                 default: { http: [evmChainRpcUrl] },
+//             },
+//             nativeCurrency: {
+//                 name: evmChainCoinName || chainName + " Coin",
+//                 symbol: evmChainCoinName || chainName + " Coin",
+//                 decimals: 18
+//             },
+//             isTestnet: evmChainIsTestnet,
+//         };
+//     }, [chainData]);
 
-    return viemChain;
-}
+//     return viemChain;
+// }
 
