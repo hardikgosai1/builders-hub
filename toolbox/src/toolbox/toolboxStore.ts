@@ -21,8 +21,6 @@ const createChainInitialState = {
     convertToL1TxId: "",
     validatorWeights: Array(100).fill(100) as number[],
     nodePopJsons: [""] as string[],
-
-
 }
 
 export const useCreateChainStore = create(
@@ -53,8 +51,26 @@ export const useCreateChainStore = create(
     ),
 )
 
+const l1ListState = {
+    l1List: [] as { id: string }[],
+    lastSelectedL1: "",
+}
+
+export const useL1ListStore = create(
+    persist(
+        combine(l1ListState, (set) => ({
+            addL1: (l1: { id: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
+            removeL1: (l1: { id: string }) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1.id) })),
+            setLastSelectedL1: (l1: string) => set({ lastSelectedL1: l1 }),
+        })),
+        {
+            name: 'l1-list-store',
+            storage: createJSONStorage(localStorageComp),
+        },
+    ),
+)
+
 const toolboxInitialState = {
-    L1ConversionSignature: "",
     validatorMessagesLibAddress: "",
     evmChainRpcUrl: "",
     nodeRpcUrl: "",
@@ -72,12 +88,11 @@ const toolboxInitialState = {
     erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 }
 
-export const useToolboxStore = create(
+export const getToolboxStore = (chainId: string) => create(
     persist(
         combine(toolboxInitialState, (set) => ({
             setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
-            setL1ConversionSignature: (L1ConversionSignature: string) => set({ L1ConversionSignature }),
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
             setEvmChainRpcUrl: (evmChainRpcUrl: string) => set({ evmChainRpcUrl }),
             setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
@@ -88,7 +103,7 @@ export const useToolboxStore = create(
             setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
             reset: () => {
                 if (typeof window !== 'undefined') {
-                    window.localStorage.removeItem('toolbox-storage');
+                    window.localStorage.removeItem(`toolbox-storage-${chainId}`);
                     window.location.reload();
                 }
             },
@@ -99,11 +114,19 @@ export const useToolboxStore = create(
             setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
         })),
         {
-            name: 'toolbox-storage',
+            name: `toolbox-storage-${chainId}`,
             storage: createJSONStorage(localStorageComp),
         },
     ),
 )
+
+export function resetAllStores() {
+    useCreateChainStore.getState().reset();
+    const chainIds = useL1ListStore.getState().l1List.map((l1) => l1.id);
+    chainIds.forEach((chainId) => {
+        getToolboxStore(chainId).getState().reset();
+    });
+}
 
 // import { useShallow } from 'zustand/react/shallow'
 

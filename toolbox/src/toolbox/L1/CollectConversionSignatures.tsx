@@ -1,6 +1,5 @@
 "use client";
 
-import { useToolboxStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useEffect, useState } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
@@ -14,7 +13,6 @@ import { getBlockchainInfo, getSubnetInfo } from "../../coreViem/utils/glacier";
 import { ResultField } from "../components/ResultField";
 
 export default function CollectConversionSignatures() {
-    const { } = useToolboxStore(state => state);
     const { coreWalletClient } = useWalletStore();
     const [isConverting, setIsConverting] = useState(false);
     const [error, setError] = useState<string | null>(null);

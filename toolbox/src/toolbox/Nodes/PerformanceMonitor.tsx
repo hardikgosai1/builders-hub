@@ -9,13 +9,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { BlockWatcher, BlockInfo } from "./BlockWatcher";
 import { ChainInfo } from "./chainInfo";
 import { RPCURLInput } from "../components/RPCURLInput";
-// Data structure for bucketed metrics
+
 interface BucketedData {
     transactions: number;
     gasUsed: bigint;
     blockCount: number;
 }
-
 
 export default function PerformanceMonitor() {
     const [nodeRpcUrl, setNodeRpcUrl] = useState('');
