@@ -4,30 +4,62 @@ import { useMemo } from 'react';
 
 export type DeployOn = "L1" | "C-Chain";
 
-export const initialState = {
+const localStorageComp = () => typeof window !== 'undefined' ? localStorage : { getItem: () => null, setItem: () => { }, removeItem: () => { } }
+
+export const EVM_VM_ID = "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy"
+
+const createChainInitialState = {
     subnetId: "",
-    chainName: "My Chain",
-    vmId: "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy",
+    vmId: EVM_VM_ID,
     chainID: "",
+    chainName: "My Chain",
+    managerAddress: "0xfacade0000000000000000000000000000000000",
+    genesisData: "",
+    targetBlockRate: 2,
+    gasLimit: 12000000,
+    evmChainId: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
+}
+
+export const useCreateChainStore = create(
+    persist(
+        combine(createChainInitialState, (set) => ({
+            setSubnetID: (subnetId: string) => set({ subnetId }),
+            setChainName: (chainName: string) => set({ chainName }),
+            setVmId: (vmId: string) => set({ vmId }),
+            setChainID: (chainID: string) => set({ chainID }),
+            setManagerAddress: (managerAddress: string) => set({ managerAddress }),
+            setGenesisData: (genesisData: string) => set({ genesisData }),
+            setTargetBlockRate: (targetBlockRate: number) => set({ targetBlockRate }),
+            setGasLimit: (gasLimit: number) => set({ gasLimit }),
+            setEvmChainId: (evmChainId: number) => set({ evmChainId }),
+
+
+            reset: () => {
+                window?.localStorage.removeItem('create-chain-store');
+                window?.location.reload();
+            },
+        })),
+        {
+            name: 'create-chain-store',
+            storage: createJSONStorage(localStorageComp),
+        },
+    ),
+)
+
+const toolboxInitialState = {
     nodePopJsons: [""] as string[],
     validatorWeights: Array(100).fill(100) as number[],
-    managerAddress: "0xfacade0000000000000000000000000000000000",
     L1ID: "",
     L1ConversionSignature: "",
     validatorMessagesLibAddress: "",
-    evmChainName: "My L1",
     evmChainRpcUrl: "",
     nodeRpcUrl: "",
-    evmChainId: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
     evmChainCoinName: "COIN",
     evmChainIsTestnet: true,
     validatorManagerAddress: "",
     proxyAddress: "0xfacade0000000000000000000000000000000000",
     proxyAdminAddress: "0xdad0000000000000000000000000000000000000" as `0x${string}`,
-    genesisData: "",
     teleporterRegistryAddress: "",
-    gasLimit: 12000000,
-    targetBlockRate: 2,
     icmReceiverAddress: "",
     stakingManagerAddress: "",
     rewardCalculatorAddress: "",
@@ -38,20 +70,14 @@ export const initialState = {
 
 export const useToolboxStore = create(
     persist(
-        combine(initialState, (set) => ({
-            setSubnetID: (subnetId: string) => set({ subnetId }),
-            setChainName: (chainName: string) => set({ chainName }),
-            setVmId: (vmId: string) => set({ vmId }),
-            setChainID: (chainID: string) => set({ chainID }),
+        combine(toolboxInitialState, (set) => ({
             setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
             setValidatorWeights: (validatorWeights: number[]) => set({ validatorWeights }),
-            setManagerAddress: (managerAddress: string) => set({ managerAddress }),
             setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
             setL1ID: (L1ID: string) => set({ L1ID }),
             setL1ConversionSignature: (L1ConversionSignature: string) => set({ L1ConversionSignature }),
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
-            setEvmChainName: (evmChainName: string) => set({ evmChainName }),
             setEvmChainRpcUrl: (evmChainRpcUrl: string) => set({ evmChainRpcUrl }),
             setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
@@ -59,16 +85,12 @@ export const useToolboxStore = create(
             setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
             setProxyAddress: (proxyAddress: string) => set({ proxyAddress }),
             setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
-            setGenesisData: (genesisData: string) => set({ genesisData }),
-            setGasLimit: (gasLimit: number) => set({ gasLimit }),
-            setTargetBlockRate: (targetBlockRate: number) => set({ targetBlockRate }),
             reset: () => {
                 if (typeof window !== 'undefined') {
                     window.localStorage.removeItem('toolbox-storage');
                     window.location.reload();
                 }
             },
-            setEvmChainId: (evmChainId: number) => set({ evmChainId }),
             setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
             setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
@@ -77,11 +99,7 @@ export const useToolboxStore = create(
         })),
         {
             name: 'toolbox-storage',
-            storage: createJSONStorage(() => typeof window !== 'undefined' ? localStorage : {
-                getItem: () => null,
-                setItem: () => { },
-                removeItem: () => { }
-            }),
+            storage: createJSONStorage(localStorageComp),
         },
     ),
 )
@@ -93,7 +111,7 @@ export function useViemChainStore() {
     const chainData = useToolboxStore(
         useShallow((state) => ({
             evmChainId: state.evmChainId,
-            evmChainName: state.evmChainName,
+            chainName: state.chainName,
             evmChainRpcUrl: state.evmChainRpcUrl,
             evmChainCoinName: state.evmChainCoinName,
             evmChainIsTestnet: state.evmChainIsTestnet
@@ -102,7 +120,7 @@ export function useViemChainStore() {
 
     // Create the viemChain object with useMemo to prevent unnecessary recreation
     const viemChain = useMemo(() => {
-        const { evmChainId, evmChainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
+        const { evmChainId, chainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
 
         if (!evmChainId || !evmChainRpcUrl) {
             return null;
@@ -110,13 +128,13 @@ export function useViemChainStore() {
 
         return {
             id: evmChainId,
-            name: evmChainName || `Chain #${evmChainId}`,
+            name: chainName || `Chain #${evmChainId}`,
             rpcUrls: {
                 default: { http: [evmChainRpcUrl] },
             },
             nativeCurrency: {
-                name: evmChainCoinName || evmChainName + " Coin",
-                symbol: evmChainCoinName || evmChainName + " Coin",
+                name: evmChainCoinName || chainName + " Coin",
+                symbol: evmChainCoinName || chainName + " Coin",
                 decimals: 18
             },
             isTestnet: evmChainIsTestnet,

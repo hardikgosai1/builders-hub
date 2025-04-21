@@ -8,7 +8,7 @@ import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
 import { ConnectWallet } from "../components/ConnectWallet";
 import { ErrorFallback } from "../components/ErrorFallback";
-
+import { useCreateChainStore } from "./toolboxStore";
 type ComponentType = {
     id: string;
     label: string;
@@ -46,6 +46,12 @@ const componentGroups: Record<string, ComponentType[]> = {
             fileNames: ["toolbox/src/toolbox/L1/CreateSubnet.tsx"]
         },
         {
+            id: 'genesisBuilder',
+            label: "EVM Genesis Builder",
+            component: lazy(() => import('./L1/GenesisBuilder')),
+            fileNames: ["toolbox/src/toolbox/L1/GenesisBuilder.tsx"]
+        },
+        {
             id: 'createChain',
             label: "Create Chain",
             component: lazy(() => import('./L1/CreateChain')),
@@ -62,12 +68,6 @@ const componentGroups: Record<string, ComponentType[]> = {
             label: "Collect conversion signatures",
             component: lazy(() => import('./L1/CollectConversionSignatures')),
             fileNames: ["toolbox/src/toolbox/L1/CollectConversionSignatures.tsx", "toolbox/src/toolbox/L1/convertWarp.ts"]
-        },
-        {
-            id: 'genesisBuilder',
-            label: "EVM Genesis Builder",
-            component: lazy(() => import('./L1/GenesisBuilder')),
-            fileNames: ["toolbox/src/toolbox/L1/GenesisBuilder.tsx"]
         },
         {
             id: 'queryL1Details',
@@ -299,9 +299,9 @@ export default function ToolboxApp() {
 
     // Toggle group expansion
     const toggleGroup = (groupName: string) => {
-        setExpandedGroups(prev => ({ 
-            ...prev, 
-            [groupName]: !prev[groupName] 
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
         }));
     };
 
@@ -401,6 +401,7 @@ export default function ToolboxApp() {
                         onClick={() => {
                             if (window.confirm("Are you sure you want to reset the state?")) {
                                 useToolboxStore.getState().reset();
+                                useCreateChainStore.getState().reset();
                             }
                         }}
                         className="w-full"
