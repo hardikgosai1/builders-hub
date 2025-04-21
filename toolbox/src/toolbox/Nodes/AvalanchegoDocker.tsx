@@ -1,16 +1,16 @@
 "use client";
 
-import { useCreateChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { Select } from "../components/Select";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
 import versions from "../../versions.json";
 import { CodeHighlighter } from "../../components/CodeHighlighter";
 import { Container } from "../components/Container";
-import { Input, type Suggestion } from "../../components/Input";
+import { Input } from "../../components/Input";
 import { Tabs } from "../../components/Tabs";
-import { queryChainInfo } from "../../coreViem/utils/chainInfo";
+import { getBlockchainInfo } from "../../coreViem/utils/glacier";
+import InputChainId from "../components/SelectChainId";
 
 const generateDockerCommand = (subnets: string[], isRPC: boolean, networkID: number) => {
     const httpPort = isRPC ? "8080" : "9650";
@@ -159,8 +159,7 @@ type OS = keyof typeof dockerInstallInstructions;
 export default function AvalanchegoDocker() {
     const [chainId, setChainId] = useState("");
     const [subnetId, setSubnetId] = useState("");
-    const { avalancheNetworkID, isTestnet } = useWalletStore();
-    const createChainStorechainID = useCreateChainStore(state => state.chainID);
+    const { avalancheNetworkID } = useWalletStore();
 
     const [isRPC, setIsRPC] = useState<"true" | "false">("false");
     const [rpcCommand, setRpcCommand] = useState("");
@@ -168,20 +167,6 @@ export default function AvalanchegoDocker() {
     const [enableDebugTrace, setEnableDebugTrace] = useState<"true" | "false">("false");
     const [activeOS, setActiveOS] = useState<OS>("Ubuntu/Debian");
     const [subnetIdError, setSubnetIdError] = useState<string | null>(null);
-
-    const chainIDSuggestions: Suggestion[] = useMemo(() => {
-        const result: Suggestion[] = [];
-
-        if (createChainStorechainID) {
-            result.push({
-                title: createChainStorechainID,
-                value: createChainStorechainID,
-                description: "From the \"Create Chain\" tool"
-            });
-        }
-
-        return result;
-    }, [createChainStorechainID]);
 
     useEffect(() => {
         try {
@@ -203,7 +188,7 @@ export default function AvalanchegoDocker() {
         setSubnetId("");
         if (!chainId) return
 
-        queryChainInfo(chainId, isTestnet!).then((chainInfo) => {
+        getBlockchainInfo(chainId).then((chainInfo) => {
             setSubnetId(chainInfo.subnetId);
         }).catch((error) => {
             setSubnetIdError((error as Error).message);
@@ -256,11 +241,9 @@ export default function AvalanchegoDocker() {
 
                 <h3 className="text-md font-medium mb-2 mt-8">Node Setup Command:</h3>
 
-                <Input
-                    label="Chain ID"
+                <InputChainId
                     value={chainId}
                     onChange={setChainId}
-                    suggestions={chainIDSuggestions}
                 />
 
                 <Input
