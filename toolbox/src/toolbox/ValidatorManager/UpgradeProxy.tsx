@@ -1,7 +1,7 @@
 "use client";
 
 import { useWalletStore } from "../../lib/walletStore";
-import { useViemChainStore } from "../toolboxStore";
+import { useL1ListStore, useViemChainStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
@@ -11,22 +11,77 @@ import ProxyAdminABI from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdm
 
 import { Container } from "../components/Container";
 import { useToolboxStore } from "../toolboxStore";
+import { getSubnetInfo } from "../../coreViem/utils/glacier";
+
+// Storage slot with the admin of the proxy (following EIP1967)
+const ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
 
 export default function UpgradeProxy() {
     const { showBoundary } = useErrorBoundary();
     const {
         validatorManagerAddress,
-        proxyAddress,
-        proxyAdminAddress,
-        setProxyAddress,
-        setProxyAdminAddress
     } = useToolboxStore();
+    const [proxyAdminAddress, setProxyAdminAddress] = useState<`0x${string}` | null>(null);
+    const { lastSelectedL1, getSelectedL1 } = useL1ListStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [currentImplementation, setCurrentImplementation] = useState<string | null>(null);
     const [desiredImplementation, setDesiredImplementation] = useState<string | null>(null);
     const [contractError, setContractError] = useState<string | null>(null);
+    const [proxySlotAdmin, setProxySlotAdmin] = useState<string | null>(null);
     const viemChain = useViemChainStore();
+
+    const [proxyAddress, setProxyAddress] = useState<string>("");
+
+    useEffect(() => {
+        (async function () {
+            try {
+                const subnetId = getSelectedL1()?.subnetId || "";
+                if (!subnetId) {
+                    throw new Error("No subnet ID found, this should never happen");
+                }
+                const info = await getSubnetInfo(subnetId);
+                const newProxyAddress = info.l1ValidatorManagerDetails?.contractAddress || "";
+                setProxyAddress(newProxyAddress);
+
+                if (!newProxyAddress) return
+                await readProxyAdminSlot(newProxyAddress);
+            } catch (error) {
+                showBoundary(error);
+            }
+        })()
+    }, [lastSelectedL1]);
+
+    // Read the proxy admin from storage slot
+    async function readProxyAdminSlot(address: string) {
+        try {
+            if (!address) return;
+
+            const data = await publicClient.getStorageAt({
+                address: address as `0x${string}`,
+                slot: ADMIN_SLOT as `0x${string}`,
+            });
+
+            if (data) {
+                // Convert the bytes32 value to an address (take the last 20 bytes)
+                const adminAddress = `0x${data.slice(-40)}` as `0x${string}`;
+                setProxySlotAdmin(adminAddress);
+
+                // Update proxy admin in the store if not set
+                if (!proxyAdminAddress) {
+                    setProxyAdminAddress(adminAddress);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to read proxy admin slot:", error);
+        }
+    }
+
+    useEffect(() => {
+        if (proxyAddress) {
+            readProxyAdminSlot(proxyAddress);
+        }
+    }, [proxyAddress]);
 
     useEffect(() => {
         if (validatorManagerAddress && !desiredImplementation && validatorManagerAddress !== desiredImplementation) {
@@ -36,7 +91,8 @@ export default function UpgradeProxy() {
 
     useEffect(() => {
         checkCurrentImplementation();
-    }, [walletChainId, validatorManagerAddress, proxyAddress, proxyAdminAddress]);
+    }, [viemChain, validatorManagerAddress, proxyAddress, proxyAdminAddress]);
+
 
     async function checkCurrentImplementation() {
         try {
@@ -104,9 +160,15 @@ export default function UpgradeProxy() {
             />
             <Input
                 label="Proxy Admin Address"
-                value={proxyAdminAddress}
+                value={proxyAdminAddress || ""}
                 onChange={(value: string) => setProxyAdminAddress(value as `0x${string}`)}
                 placeholder="Enter proxy admin address"
+                error={proxySlotAdmin && proxyAdminAddress !== proxySlotAdmin ?
+                    `Warning: Address doesn't match the admin in storage (${proxySlotAdmin})` : undefined}
+                button={proxySlotAdmin && proxySlotAdmin !== proxyAdminAddress ?
+                    <Button onClick={() => setProxyAdminAddress(proxySlotAdmin as `0x${string}`)} stickLeft>
+                        Use Storage Admin
+                    </Button> : undefined}
             />
             <Input
                 label="Desired Implementation"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useEffect, useState } from 'react';
+import { useL1ListStore, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
@@ -14,16 +14,13 @@ import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { Container } from '../components/Container';
 import { ResultField } from '../components/ResultField';
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk";
+import { getSubnetInfo } from '../../coreViem/utils/glacier';
 
 const cb58ToHex = (cb58: string) => utils.bufferToHex(utils.base58check.decode(cb58));
 const add0x = (hex: string): `0x${string}` => hex.startsWith('0x') ? hex as `0x${string}` : `0x${hex}`;
 export default function InitValidatorSet() {
-    const {
-        L1ID,
-        setL1ID,
-        L1ConversionSignature,
-        setL1ConversionSignature,
-        evmChainRpcUrl } = useToolboxStore();
+    const [conversionTxID, setConversionTxID] = useState<string>("");
+    const [L1ConversionSignature, setL1ConversionSignature] = useState<string>("");
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isInitializing, setIsInitializing] = useState(false);
@@ -32,8 +29,53 @@ export default function InitValidatorSet() {
     const [error, setError] = useState<string | null>(null);
     const [collectedData, setCollectedData] = useState<Record<string, any>>({});
     const [showDebugData, setShowDebugData] = useState(false);
+    const { getSelectedL1 } = useL1ListStore();
+    const [conversionTxIDError, setConversionTxIDError] = useState<string>("");
+    const [L1ConversionSignatureError, setL1ConversionSignatureError] = useState<string>("");
+    const [isAggregating, setIsAggregating] = useState(false);
+
+    async function aggSigs() {
+        setL1ConversionSignatureError("");
+        setIsAggregating(true);
+        try {
+            const { message, justification, signingSubnetId, networkId } = await coreWalletClient.extractWarpMessageFromPChainTx({ txId: conversionTxID });
+
+            const { signedMessage } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
+                network: networkId === networkIDs.FujiID ? "fuji" : "mainnet",
+                signatureAggregatorRequest: {
+                    message: message,
+                    justification: justification,
+                    signingSubnetId: signingSubnetId,
+                    quorumPercentage: 67, // Default threshold for subnet validation
+                },
+            });
+            setL1ConversionSignature(signedMessage);
+        } catch (error) {
+            console.error('Error aggregating signatures:', error);
+            setL1ConversionSignatureError((error as Error)?.message || "Unknown error");
+        } finally {
+            setIsAggregating(false);
+        }
+    }
+
+    useEffect(() => {
+        setConversionTxIDError("");
+        const subnetId = getSelectedL1()?.subnetId;
+        if (!subnetId) return;
+        getSubnetInfo(subnetId).then((subnetInfo) => {
+            setConversionTxID(subnetInfo.l1ConversionTransactionHash);
+        }).catch((error) => {
+            console.error('Error getting subnet info:', error);
+            setConversionTxIDError((error as Error)?.message || "Unknown error");
+        });
+    }, []);
 
     const onInitialize = async (debug: boolean = false) => {
+        if (!conversionTxID) {
+            setError("Conversion Tx ID is required");
+            return;
+        }
+        const evmChainRpcUrl = getSelectedL1()?.rpcUrl;
         if (!evmChainRpcUrl && debug) {
             setError('RPC endpoint is required for debug mode');
             return;
@@ -48,22 +90,7 @@ export default function InitValidatorSet() {
         try {
             if (!coreWalletClient) throw new Error('Core wallet client not found');
 
-            const { validators, message, justification, signingSubnetId, networkId, chainId, managerAddress } = await coreWalletClient.extractWarpMessageFromPChainTx({ txId: L1ID });
-
-
-            if (!L1ConversionSignature) {
-                const { signedMessage } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
-                    network: networkId === networkIDs.FujiID ? "fuji" : "mainnet",
-                    signatureAggregatorRequest: {
-                        message: message,
-                        justification: justification,
-                        signingSubnetId: signingSubnetId,
-                        quorumPercentage: 67, // Default threshold for subnet validation
-                    },
-                });
-                setL1ConversionSignature(signedMessage);
-            }
-
+            const { validators, signingSubnetId, chainId, managerAddress } = await coreWalletClient.extractWarpMessageFromPChainTx({ txId: conversionTxID });
 
             // Prepare transaction arguments
             const txArgs = [
@@ -126,7 +153,7 @@ export default function InitValidatorSet() {
             if (receipt.status === 'success') {
                 setTxHash(hash);
             } else {
-                const decodedError = await debugTraceAndDecode(hash, evmChainRpcUrl);
+                const decodedError = await debugTraceAndDecode(hash, evmChainRpcUrl!);
                 setError(`Transaction failed: ${decodedError}`);
             }
 
@@ -176,10 +203,10 @@ export default function InitValidatorSet() {
 
                 <div className="space-y-4">
                     <Input
-                        label="L1 ID"
-                        value={L1ID}
-                        onChange={setL1ID}
-                        placeholder="Enter L1 ID (CB58 format)"
+                        label="Conversion Tx ID"
+                        value={conversionTxID}
+                        onChange={setConversionTxID}
+                        error={conversionTxIDError}
                     />
                     <Input
                         label="Aggregated Signature"
@@ -187,6 +214,9 @@ export default function InitValidatorSet() {
                         onChange={setL1ConversionSignature}
                         type="textarea"
                         placeholder="0x...."
+                        disabled={!conversionTxID}
+                        button={<Button stickLeft disabled={!conversionTxID || !!L1ConversionSignature} onClick={() => aggSigs()} loading={isAggregating}>Aggregate</Button>}
+                        error={L1ConversionSignatureError}
                     />
                 </div>
 
@@ -213,7 +243,7 @@ export default function InitValidatorSet() {
                     variant="primary"
                     onClick={() => onInitialize(false)}
                     loading={isInitializing}
-                    disabled={!L1ID || !L1ConversionSignature}
+                    disabled={!conversionTxID || !L1ConversionSignature}
                 >
                     Initialize Validator Set
                 </Button>

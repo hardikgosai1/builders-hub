@@ -11,16 +11,16 @@ import { useWalletStore } from "../../lib/walletStore";
 import { Tabs } from "../../components/Tabs";
 import { getBlockchainInfo } from "../../coreViem/utils/glacier";
 import { Select } from "./Select";
-
 export const ConnectWalletToolbox = ({ children, required, chainRequired }: { children: React.ReactNode, required: boolean, chainRequired: boolean }) => {
     const viemChain = useViemChainStore();
 
     return (
         <ConnectWallet required={required} extraElements={chainRequired ? <ChainSelector /> : null} >
-            {(chainRequired && !viemChain) ?
-                <div className="opacity-50 pointer-events-none">{children}</div>
-                : children
-            }
+            {(chainRequired && !viemChain) ? (
+                <div className="p-4 border  rounded-md mb-4">
+                    Please connect to an L1 chain before using this component.
+                </div>
+            ) : children}
         </ConnectWallet>
     );
 };
@@ -55,6 +55,7 @@ function NewChainDialog() {
     const [isTestnet, setIsTestnet] = useState(true);
     const [rpcUrlError, setRpcUrlError] = useState("");
     const [name, setName] = useState("");
+    const [subnetId, setSubnetId] = useState("");
 
     const FROM_RPC = "Enter RPC URL";
     const FROM_CORE_WALLET = "Load RPC URL from Core Wallet";
@@ -79,9 +80,11 @@ function NewChainDialog() {
 
             try {
                 const { ethereumChainId, avalancheChainId } = await fetchChainId(rpcUrl);
+                const subnetId = (await getBlockchainInfo(avalancheChainId)).subnetId;
                 const name = (await getBlockchainInfo(avalancheChainId)).blockchainName
                 setEvmChainId(ethereumChainId);
                 setChainId(avalancheChainId);
+                setSubnetId(subnetId);
                 setName(name);
             } catch (error) {
                 setRpcUrlError((error as Error)?.message || String(error));
@@ -92,7 +95,7 @@ function NewChainDialog() {
     }, [rpcUrl]);
 
     function addChain() {
-        addL1({ id: chainId, name: name || `Chain ${evmChainId}`, rpcUrl: rpcUrl, evmChainId: evmChainId, coinName: coinName, isTestnet: isTestnet });
+        addL1({ id: chainId, name: name || `Chain ${evmChainId}`, rpcUrl: rpcUrl, evmChainId: evmChainId, coinName: coinName, isTestnet: isTestnet, subnetId: subnetId });
         setLastSelectedL1(chainId);
         setOpen(false);
     }

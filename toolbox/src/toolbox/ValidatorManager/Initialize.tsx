@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useL1ListStore, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -12,9 +12,10 @@ import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/Valid
 import { utils } from "@avalabs/avalanchejs";
 
 import { Container } from "../components/Container";
+import { getSubnetInfo } from "../../coreViem/utils/glacier";
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();
-    const { subnetId, proxyAddress, setProxyAddress, setSubnetID } = useToolboxStore();
+    const [proxyAddress, setProxyAddress] = useState<string>("");
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -24,6 +25,7 @@ export default function Initialize() {
     const [maximumChurnPercentage, setMaximumChurnPercentage] = useState("20");
     const [adminAddress, setAdminAddress] = useState("");
     const viemChain = useViemChainStore();
+    const { getSelectedL1 } = useL1ListStore();
 
     useEffect(() => {
         if (walletEVMAddress && !adminAddress) {
@@ -33,10 +35,32 @@ export default function Initialize() {
 
     let subnetIDHex = "";
     try {
-        subnetIDHex = utils.bufferToHex(utils.base58check.decode(subnetId));
+        subnetIDHex = utils.bufferToHex(utils.base58check.decode(getSelectedL1()?.subnetId || ""));
     } catch (error) {
         console.error('Error decoding subnetId:', error);
     }
+
+
+    useEffect(() => {
+        if (proxyAddress) {
+            checkIfInitialized();
+        }
+    }, [proxyAddress]);
+
+    const [contractAddressError, setContractAddressError] = useState<string>("");
+
+    useEffect(() => {
+        setContractAddressError("");
+        const subnetId = getSelectedL1()?.subnetId;
+        if (!subnetId) return;
+        getSubnetInfo(subnetId).then((subnetInfo) => {
+            setProxyAddress(subnetInfo.l1ValidatorManagerDetails?.contractAddress || "");
+        }).catch((error) => {
+            console.error('Error getting subnet info:', error);
+            setContractAddressError((error as Error)?.message || "Unknown error");
+        });
+    }, [getSelectedL1]);
+
 
 
     async function checkIfInitialized() {
@@ -121,6 +145,7 @@ export default function Initialize() {
                         value={proxyAddress}
                         onChange={setProxyAddress}
                         placeholder="Enter proxy address"
+                        error={contractAddressError}
                     />
                     <Button
                         variant="secondary"
@@ -135,8 +160,8 @@ export default function Initialize() {
 
                 <Input
                     label="Subnet ID"
-                    value={subnetId}
-                    onChange={setSubnetID}
+                    value={getSelectedL1()?.subnetId}
+                    disabled
                 />
                 <Input
                     label={`Subnet ID (Hex), ${utils.hexToBuffer(subnetIDHex).length} bytes`}

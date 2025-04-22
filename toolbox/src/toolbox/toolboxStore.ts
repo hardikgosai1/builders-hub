@@ -52,16 +52,19 @@ export const useCreateChainStore = create(
 )
 
 const l1ListState = {
-    l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean }[],
+    l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }[],
     lastSelectedL1: "",
 }
 
 export const useL1ListStore = create(
     persist(
-        combine(l1ListState, (set) => ({
-            addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean }) => set((state) => ({ l1List: [...state.l1List, l1] })),
+        combine(l1ListState, (set, get) => ({
+            addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
             setLastSelectedL1: (l1: string) => set({ lastSelectedL1: l1 }),
+            getSelectedL1: () => {
+                return get().l1List.find((l) => l.id === get().lastSelectedL1);
+            },
             reset: () => {
                 window?.localStorage.removeItem('l1-list-store');
             },
@@ -82,8 +85,6 @@ const toolboxInitialState = {
     // nodeRpcUrl: "",
     // evmChainCoinName: "COIN",
     // evmChainIsTestnet: true,
-    // proxyAddress: "0xfacade0000000000000000000000000000000000",
-    // proxyAdminAddress: "0xdad0000000000000000000000000000000000000" as `0x${string}`,
     // teleporterRegistryAddress: "",
     // icmReceiverAddress: "",
     // stakingManagerAddress: "",
@@ -106,8 +107,7 @@ export const getToolboxStore = (chainId: string) => create(
             // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
             // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
-            // setProxyAddress: (proxyAddress: string) => set({ proxyAddress }),
-            // setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
+
 
             // setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             // setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
