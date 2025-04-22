@@ -3,12 +3,18 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "./Button"
 import { useErrorBoundary } from "react-error-boundary"
-import { Copy } from "lucide-react"
+import { Copy, CheckCircle2 } from "lucide-react"
 import { createCoreWalletClient } from "../coreViem"
 import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
+import { useL1ListStore } from "../toolbox/toolboxStore"
+import { AddChainModal } from "./AddChainModal"
+import { WalletRequiredPrompt } from "./WalletRequiredPrompt"
+import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
+import { RefreshOnMainnetTestnetChange } from "./RefreshOnMainnetTestnetChange"
+import { ChainTile } from "./ChainTile"
+import { createPublicClient, http } from "viem"
 
 export const ConnectWallet = ({ children, required, extraElements }: { children: React.ReactNode; required: boolean; extraElements: React.ReactNode }) => {
     const setWalletChainId = useWalletStore(state => state.setWalletChainId);
@@ -23,9 +29,59 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
     const setIsTestnet = useWalletStore(state => state.setIsTestnet);
 
+    const { l1List, lastSelectedL1, setLastSelectedL1, addL1 } = useL1ListStore();
     const [hasWallet, setHasWallet] = useState<boolean>(false)
     const [isBrowser, setIsBrowser] = useState<boolean>(false)
+    const [selectedL1Balance, setSelectedL1Balance] = useState<string>("0")
+    const [pChainBalance, setPChainBalance] = useState<string>("0")
+    const [isAddChainModalOpen, setIsAddChainModalOpen] = useState(false)
     const { showBoundary } = useErrorBoundary()
+
+    // Get selected L1 details
+    const selectedL1 = l1List.find(l1 => l1.id === lastSelectedL1);
+
+    // Fetch balances
+    useEffect(() => {
+        if (!walletEVMAddress || !coreWalletClient) return;
+
+        const fetchBalances = async () => {
+            try {
+                // If an L1 is selected, fetch its balance
+                if (selectedL1 && selectedL1.rpcUrl) {
+                    try {
+                        const tempPublicClient = createPublicClient({ 
+                            transport: http(selectedL1.rpcUrl), 
+                            // Potentially add chain definition if needed by viem
+                            // chain: { id: selectedL1.evmChainId, name: selectedL1.name, nativeCurrency: { name: selectedL1.coinName, symbol: selectedL1.coinName, decimals: 18 } }
+                        });
+                        const l1Balance = await tempPublicClient.getBalance({
+                            address: walletEVMAddress as `0x${string}`,
+                        });
+                        setSelectedL1Balance((Number(l1Balance) / 1e18).toFixed(2));
+                    } catch (l1Error) {
+                        console.error(`Error fetching balance for ${selectedL1.name}:`, l1Error);
+                        setSelectedL1Balance("Error"); // Indicate error fetching balance
+                    }
+                } else {
+                    // Optionally clear L1 balance or set to 0 if none selected
+                    setSelectedL1Balance("0"); 
+                }
+
+                // Get P-Chain balance
+                if (pChainAddress) {
+                    const pBalance = await coreWalletClient.getPChainBalance();
+                    setPChainBalance((Number(pBalance) / 1e9).toFixed(2));
+                }
+            } catch (error) {
+                console.error("Error fetching balances:", error);
+            }
+        };
+
+        fetchBalances();
+        // Set up polling for balance updates
+        const interval = setInterval(fetchBalances, 30000); // Update every 30 seconds
+        return () => clearInterval(interval);
+    }, [walletEVMAddress, pChainAddress, coreWalletClient, selectedL1]);
 
     useEffect(() => {
         setIsBrowser(true)
@@ -177,6 +233,84 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
         }
     }
 
+    // Updated handleAddChain to accept the full chain object matching the store's addL1 action
+    const handleAddChain = (chain: { 
+        id: string; 
+        name: string; 
+        rpcUrl: string; 
+        evmChainId: number; 
+        coinName: string; 
+        isTestnet: boolean; 
+        subnetId: string; 
+    }) => {
+        // Add the chain to l1List store using the provided object
+        addL1(chain);
+        
+        // Set this as the current chain using the Avalanche Blockchain ID
+        setLastSelectedL1(chain.id);
+    };
+
+    // Function to switch chains in the wallet extension
+    const switchChain = async (chainId: number) => {
+        if (!window.avalanche?.request) {
+            console.error("Wallet extension not available");
+            return;
+        }
+
+        try {
+            // Request wallet to switch to the selected chain
+            await window.avalanche.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: `0x${chainId.toString(16)}` }],
+            });
+        } catch (error: any) {
+            // If the chain is not added to the wallet, we might need to add it first
+            if (error.code === 4902) { // Chain not added error code
+                console.error("Chain not found in wallet. Please add it first.");
+                // You could implement wallet_addEthereumChain here if needed
+            } else {
+                console.error("Error switching chain:", error);
+                showBoundary(error);
+            }
+        }
+    };
+
+    // Handle chain selection with wallet switching
+    const handleChainSelect = async (chainId: string) => {
+        // First update the UI state
+        setLastSelectedL1(chainId);
+        
+        // Then find the chain details and request the wallet to switch
+        const selectedChain = l1List.find(chain => chain.id === chainId);
+        if (selectedChain) {
+            await switchChain(selectedChain.evmChainId);
+        }
+    };
+
+    // Get network badge based on network ID
+    const renderNetworkBadge = () => {
+        if (avalancheNetworkID === networkIDs.FujiID || walletChainId === 5) {
+            return (
+                <div className="inline-flex items-center">
+                    <div className="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 rounded-full inline-flex items-center text-xs tracking-tighter">
+                        <span className="h-1.5 w-1.5 rounded-full bg-orange-400 mr-1 flex-shrink-0"></span>
+                        <span className="flex-shrink-0">Testnet</span>
+                    </div>
+                </div>
+            );
+        } else if (avalancheNetworkID === networkIDs.MainnetID || walletChainId === 1) {
+            return (
+                <div className="inline-flex items-center">
+                    <div className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full inline-flex items-center text-xs tracking-tighter">
+                        <CheckCircle2 className="h-2.5 w-2.5 mr-0.5 flex-shrink-0" />
+                        <span className="flex-shrink-0">Mainnet</span>
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    };
+
     // Server-side rendering fallback
     if (!isBrowser) {
         return (
@@ -187,185 +321,140 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     }
 
     if (required && !hasWallet) {
-        return (
-            <div className="space-y-4 max-w-md mx-auto">
-                <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-700 relative overflow-hidden">
-                    {/* Subtle gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#e5484d]/10 via-transparent to-[#e5484d]/5 dark:from-[#e5484d]/5 dark:via-transparent dark:to-[#e5484d]/2 pointer-events-none"></div>
-
-                    <div className="relative">
-                        <div className="flex items-center justify-center mb-6">
-                            <div className="relative">
-                                <div className="absolute -inset-1 bg-[#e5484d]/20 rounded-full blur-md"></div>
-                                <img src="/small-logo.png" alt="Avalanche Logo" className="h-16 w-auto relative" />
-                            </div>
-                        </div>
-                        <h3 className="text-2xl font-bold text-center text-zinc-800 dark:text-zinc-100 mb-4">
-                            Core Wallet Required
-                        </h3>
-                        <p className="text-zinc-600 dark:text-zinc-300 text-center mb-8 leading-relaxed">
-                            To interact with Avalanche Builders Hub, you'll need to install the Core wallet extension.
-                        </p>
-                        <a
-                            href="https://chromewebstore.google.com/detail/core-crypto-wallet-nft-ex/agoakfejjabomempkjlepdflaleeobhb"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block w-full"
-                        >
-                            <Button className="w-full bg-[#e5484d] hover:bg-[#d13438] text-black font-medium py-4 px-5 rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center">
-                                Download Core Wallet
-                            </Button>
-                        </a>
-                        <p className="text-xs text-center text-zinc-500 dark:text-zinc-400 mt-6">
-                            Core is a secure wallet for managing digital assets on Avalanche
-                        </p>
-                    </div>
-                </div>
-            </div>
-        )
+        return <WalletRequiredPrompt />
     }
 
     if (required && !walletEVMAddress) {
-        return (
-            <div className="space-y-4 max-w-md mx-auto">
-                <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-700 relative overflow-hidden">
-                    {/* Subtle gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#e5484d]/10 via-transparent to-transparent dark:from-[#e5484d]/5 dark:via-transparent pointer-events-none"></div>
-
-                    {/* Decorative elements */}
-                    {/* <div className="absolute top-0 right-0 w-32 h-32 bg-[#e5484d]/5 dark:bg-[#e5484d]/2 rounded-full -mr-16 -mt-16"></div> */}
-                    {/* <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#e5484d]/5 dark:bg-[#e5484d]/2 rounded-full -ml-12 -mb-12"></div> */}
-
-                    <div className="relative">
-                        <div className="flex items-center justify-center mb-6">
-                            <div className="relative">
-                                {/* <div className="absolute -inset-2 bg-[#e5484d]/20 rounded-full blur-md animate-pulse"></div> */}
-                                <img src="/small-logo.png" alt="Avalanche Logo" className="h-20 w-auto relative" />
-                            </div>
-                        </div>
-
-                        <h3 className="text-2xl font-bold text-center text-zinc-800 dark:text-zinc-100 mb-4">
-                            Connect Your Wallet
-                        </h3>
-                        <p className="text-zinc-600 dark:text-zinc-300 text-center mb-8 leading-relaxed">
-                            Connect your Core wallet to access Avalanche Builder Hub and explore the ecosystem.
-                        </p>
-
-                        <Button
-                            onClick={connectWallet}
-                            className="w-full bg-[#e5484d] hover:bg-[#d13438] text-white font-medium py-4 px-5 rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-[1px] transition-all duration-200 flex items-center justify-center relative group"
-                        >
-                            <span className="absolute inset-0 w-full h-full bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                            <span className="relative z-10 text-black dark:text-white">Connect Wallet</span>
-                        </Button>
-
-                        <div className="mt-8 flex items-center justify-center">
-                            <div className="w-full max-w-xs">
-                                <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                                    <div className="flex items-center">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></div>
-                                        <span>Secure connection</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></div>
-                                        <span>No data sharing</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
+        return <ConnectWalletPrompt onConnect={connectWallet} />
     }
 
     return (
         <div className="space-y-4 transition-all duration-300">
             {walletEVMAddress && (
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-xl p-4 relative overflow-hidden">
-                    {/* Subtle gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#e5484d]/10 via-transparent to-transparent dark:from-[#e5484d]/5 dark:via-transparent pointer-events-none"></div>
-
-                    {/* Header with logo, wallet info, and badges */}
-                    <div className="flex items-center justify-between mb-4 relative">
-                        {/* Wider logo and title section with subtitle underneath */}
-                        <div className="flex items-start flex-1">
-                            <div className="bg-[#e5484d]/10 dark:bg-[#e5484d]/20 rounded-lg p-2.5 mr-3 h-[60px] w-[60px] flex items-center justify-center">
-                                <img src="/small-logo.png" alt="Avalanche Logo" className="h-8 w-auto" />
+                    {/* Core Wallet header */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                            <img src="/core.png" alt="Core Logo" className="h-10 w-10" />
+                            <div>
+                                <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Core Wallet</h3>
+                                {renderNetworkBadge()}
                             </div>
-                            <div className="flex flex-col justify-center h-[60px]">
-                                <h3 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">Avalanche Wallet</h3>
-                                <p className="text-xs text-zinc-500 dark:text-zinc-400">Connected to Core</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            {/* Chain indicator */}
-                            {walletChainId && (
-                                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-xs">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                    <span className="text-black dark:text-black font-medium">Chain {walletChainId}</span>
-                                </div>
-                            )}
-
-                            {/* Network badge */}
-                            {avalancheNetworkID && (
-                                <div
-                                    className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center ${avalancheNetworkID === networkIDs.FujiID
-                                        ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200"
-                                        : "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
-                                        }`}
-                                >
-                                    <div
-                                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${avalancheNetworkID === networkIDs.FujiID ? "bg-orange-500" : "bg-green-500"
-                                            }`}
-                                    ></div>
-                                    {avalancheNetworkID === networkIDs.FujiID ? "Testnet" : "Mainnet"}
-                                </div>
-                            )}
                         </div>
                     </div>
 
-                    {/* Wallet addresses in a compact format */}
-                    <div className="space-y-2 relative">
-                        {/* EVM Address */}
-                        <div className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/80 rounded-md p-2.5 border border-zinc-200 dark:border-zinc-700">
-                            <div className="flex items-center">
-                                <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mr-2">EVM:</span>
-                                <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">
-                                    {walletEVMAddress}
+                    {/* Chain cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {/* Selected L1 Chain or Default C-Chain */} 
+                        {selectedL1 ? (
+                            <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-blue-500 dark:border-blue-700 ring-1 ring-blue-500 dark:ring-blue-700">
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="text-zinc-600 dark:text-zinc-300 text-sm font-medium">
+                                        {selectedL1.name}
+                                    </span>
+                                    <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Selected</span>
+                                </div>
+                                <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2">{selectedL1Balance} {selectedL1.coinName}</div>
+                                {/* EVM Address inside the card */}
+                                <div className="flex items-center justify-between">
+                                    <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
+                                        {walletEVMAddress}
+                                    </div>
+                                    <button
+                                        onClick={() => copyToClipboard(walletEVMAddress)}
+                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                        title="Copy address"
+                                    >
+                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                    </button>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => copyToClipboard(walletEVMAddress)}
-                                className="p-1.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                                title="Copy address"
-                            >
-                                <Copy className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-                            </button>
-                        </div>
-
-                        {/* P-Chain Address */}
-                        {pChainAddress && (
-                            <div className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/80 rounded-md p-2.5 border border-zinc-200 dark:border-zinc-700">
-                                <div className="flex items-center">
-                                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mr-2">P-Chain:</span>
-                                    <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">
-                                        {pChainAddress}
-                                    </div>
+                        ) : (
+                            // Fallback: Show a placeholder or default C-Chain info if no L1 is selected
+                            <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 opacity-70">
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="text-zinc-500 dark:text-zinc-500 text-sm font-medium">
+                                        No L1 Selected
+                                    </span>
                                 </div>
-                                <button
-                                    onClick={() => copyToClipboard(pChainAddress)}
-                                    className="p-1.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                                    title="Copy address"
-                                >
-                                    <Copy className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-                                </button>
+                                <div className="text-2xl font-semibold text-zinc-500 dark:text-zinc-500 mb-2">-- AVAX</div>
+                                {/* EVM Address inside the fallback card */}
+                                <div className="flex items-center justify-between mt-2"> {/* Added mt-2 for spacing */} 
+                                    <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
+                                        {walletEVMAddress}
+                                    </div>
+                                    <button
+                                        onClick={() => copyToClipboard(walletEVMAddress)}
+                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                        title="Copy address"
+                                    >
+                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                    </button>
+                                </div>
                             </div>
                         )}
 
-                        {extraElements}
+                        {/* P-Chain */}
+                        <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700">
+                            <div className="flex justify-between items-start mb-2">
+                                <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">P-Chain</span>
+                                <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Always Connected</span>
+                            </div>
+                            <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2">{pChainBalance} AVAX</div>
+                            <div className="flex items-center justify-between">
+                                <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
+                                    {pChainAddress ? pChainAddress : "Loading..."}
+                                </div>
+                                {pChainAddress && (
+                                    <button
+                                        onClick={() => copyToClipboard(pChainAddress)}
+                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                        title="Copy address"
+                                    >
+                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Network section - Always displayed */}
+                    <div className="mb-6">
+                        <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Your Networks</h4>
+                        
+                        {l1List.length > 0 ? (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                {l1List.map((chain) => (
+                                    <ChainTile 
+                                        key={chain.id}
+                                        chain={chain}
+                                        isActive={lastSelectedL1 === chain.id}
+                                        onClick={() => handleChainSelect(chain.id)}
+                                    />
+                                ))}
+                                <ChainTile 
+                                    isAddTile 
+                                    onClick={() => setIsAddChainModalOpen(true)} 
+                                />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                <ChainTile 
+                                    isAddTile 
+                                    onClick={() => setIsAddChainModalOpen(true)} 
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Add Chain Modal */}
+                    <AddChainModal 
+                        isOpen={isAddChainModalOpen}
+                        onClose={() => setIsAddChainModalOpen(false)}
+                        onAddChain={handleAddChain}
+                    />
+
+                    {extraElements}
                 </div>
             )}
 
@@ -375,69 +464,4 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
             </RefreshOnMainnetTestnetChange>
         </div>
     )
-}
-
-function RefreshOnMainnetTestnetChange({ children }: { children: React.ReactNode }) {
-    const isTestnet = useWalletStore(state => state.isTestnet);
-    const [initialTestnetState, setInitialTestnetState] = useState<boolean | null>(null);
-    const [hasChanged, setHasChanged] = useState(false);
-
-    useEffect(() => {
-        console.log("isTestnet", isTestnet)
-        // Set initial testnet state on first render
-        if (initialTestnetState === null && isTestnet !== undefined) {
-            setInitialTestnetState(isTestnet);
-        }
-
-        // Check if testnet status changed after initial value was set
-        if (initialTestnetState !== null && isTestnet !== initialTestnetState) {
-            setHasChanged(true);
-        }
-    }, [isTestnet]);
-
-    const refreshPage = () => {
-        window.location.reload();
-    };
-
-    if (!hasChanged) {
-        return <>{children}</>;
-    }
-
-    if (isTestnet === undefined) {
-        return <></>;
-    }
-
-    return (
-        <div className="space-y-4">
-            {/* Top alert banner */}
-            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div>
-                            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                                Network has changed since page load
-                            </p>
-                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
-                                This may cause unexpected behavior. Please refresh the page.
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={refreshPage}
-                        className="bg-amber-100 hover:bg-amber-200 dark:bg-amber-800 dark:hover:bg-amber-700 text-amber-800 dark:text-amber-200 text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-                    >
-                        Refresh Page
-                    </button>
-                </div>
-            </div>
-
-            {/* Semi-transparent and unclickable content */}
-            <div className="pointer-events-none opacity-50">
-                {children}
-            </div>
-        </div>
-    );
 }
