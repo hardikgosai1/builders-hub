@@ -52,15 +52,15 @@ export const useCreateChainStore = create(
 )
 
 const l1ListState = {
-    l1List: [] as { id: string }[],
+    l1List: [] as { id: string, name: string, rpcUrl: string }[],
     lastSelectedL1: "",
 }
 
 export const useL1ListStore = create(
     persist(
         combine(l1ListState, (set) => ({
-            addL1: (l1: { id: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
-            removeL1: (l1: { id: string }) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1.id) })),
+            addL1: (l1: { id: string, name: string, rpcUrl: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
+            removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
             setLastSelectedL1: (l1: string) => set({ lastSelectedL1: l1 }),
         })),
         {
@@ -72,7 +72,6 @@ export const useL1ListStore = create(
 
 const toolboxInitialState = {
     validatorMessagesLibAddress: "",
-    evmChainRpcUrl: "",
     nodeRpcUrl: "",
     evmChainCoinName: "COIN",
     evmChainIsTestnet: true,
@@ -94,7 +93,6 @@ export const getToolboxStore = (chainId: string) => create(
             setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
-            setEvmChainRpcUrl: (evmChainRpcUrl: string) => set({ evmChainRpcUrl }),
             setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
             setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
@@ -119,6 +117,11 @@ export const getToolboxStore = (chainId: string) => create(
         },
     ),
 )
+
+export const useToolboxStore = () => {
+    const { lastSelectedL1 } = useL1ListStore();
+    return getToolboxStore(lastSelectedL1)();
+}
 
 export function resetAllStores() {
     useCreateChainStore.getState().reset();

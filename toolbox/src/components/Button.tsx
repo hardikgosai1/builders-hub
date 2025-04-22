@@ -44,12 +44,12 @@ export function Button({
   // Size-specific classes
   let sizeClasses = "";
   if (size === "default") sizeClasses = "px-4 py-3";
-  else if (size === "sm") sizeClasses = "px-3 py-2 text-xs rounded-sm";
+  else if (size === "sm") sizeClasses = "px-3 py-2 text-xs rounded-md";
   else if (size === "lg") sizeClasses = "px-6 py-4 text-base";
 
   // Adjust size-specific rounding
   if (size === "sm" && stickLeft) {
-    sizeClasses = sizeClasses.replace("rounded-sm", "rounded-r-sm");
+    sizeClasses = sizeClasses.replace("rounded-md", "rounded-r-md");
   }
 
   // Variant-specific classes

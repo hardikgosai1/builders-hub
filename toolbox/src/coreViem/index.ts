@@ -8,7 +8,7 @@ import { createSubnet, CreateSubnetParams } from './methods/createSubnet'
 import { createChain, CreateChainParams } from './methods/createChain'
 import { convertToL1, ConvertToL1Params } from './methods/convertToL1'
 import { extractWarpMessageFromPChainTx, ExtractWarpMessageFromTxParams } from './methods/extractWarpMessageFromPChainTx'
-// import { getEthereumChain } from './methods/getEthereumChain'
+import { getEthereumChain } from './methods/getEthereumChain'
 import { extractChainInfo, ExtractChainInfoParams } from './methods/extractChainInfo'
 import { getPChainBalance } from './methods/getPChainbalance'
 // import { sendTransaction } from './overrides/sendTransaction'
@@ -47,7 +47,7 @@ export function createCoreWalletClient(account: `0x${string}`) {
         createChain: (args: CreateChainParams) => createChain(client, args),
         convertToL1: (args: ConvertToL1Params) => convertToL1(client, args),
         extractWarpMessageFromPChainTx: (args: ExtractWarpMessageFromTxParams) => extractWarpMessageFromPChainTx(client, args),
-        // getEthereumChain: () => getEthereumChain(client),
+        getEthereumChain: () => getEthereumChain(client),
         extractChainInfo: (args: ExtractChainInfoParams) => extractChainInfo(client, args),
         getPChainBalance: () => getPChainBalance(client),
     }))
