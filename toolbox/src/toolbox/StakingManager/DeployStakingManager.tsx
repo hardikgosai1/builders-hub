@@ -75,7 +75,7 @@ export default function DeployStakingManager() {
         <RequireChainToolboxL1>
             <Container
                 title="Deploy Native Token Staking Manager"
-                description="This will deploy the `NativeTokenStakingManager` contract to the currently connected EVM network."
+                description="This will deploy the `NativeTokenStakingManager` contract to the EVM network."
             >
                 <div className="space-y-4">
                     <Button

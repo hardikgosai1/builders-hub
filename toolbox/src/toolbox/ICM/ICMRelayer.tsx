@@ -16,7 +16,7 @@ const MINIMUM_BALANCE_CCHAIN = parseEther('1')
 
 export default function ICMRelayer() {
     const { chainID, setChainID, subnetId, setSubnetID, evmChainRpcUrl, setEvmChainRpcUrl } = useToolboxStore();
-    const { coreWalletClient, walletChainId } = useWalletStore();
+    const { coreWalletClient } = useWalletStore();
     const [balanceL1, setBalanceL1] = useState<bigint>(BigInt(0));
     const [balanceCChain, setBalanceCChain] = useState<bigint>(BigInt(0));
     const [isCheckingBalanceL1, setIsCheckingBalanceL1] = useState(true);

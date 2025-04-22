@@ -46,7 +46,7 @@ export default function DeployValidatorMessages() {
     return (
         <Container
             title="Deploy Validator Messages Library"
-            description="This will deploy the ValidatorMessages contract to the currently connected EVM network."
+            description="This will deploy the ValidatorMessages contract to the EVM network."
         >
             <div className="space-y-4">
                 <div className="mb-4">

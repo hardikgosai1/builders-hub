@@ -48,7 +48,7 @@ export default function DeployRewardCalculator() {
         <RequireChainToolboxL1>
             <Container
                 title="Deploy Example Reward Calculator"
-                description="This will deploy the ExampleRewardCalculator contract to the currently connected EVM network."
+                description="This will deploy the ExampleRewardCalculator contract to the EVM network."
             >
                 <div className="space-y-4">
                     <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-sm mb-4">

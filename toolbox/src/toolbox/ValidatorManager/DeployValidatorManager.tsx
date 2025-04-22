@@ -19,7 +19,7 @@ function calculateLibraryHash(libraryPath: string) {
 export default function DeployValidatorManager() {
     const { showBoundary } = useErrorBoundary();
     const { validatorMessagesLibAddress, setValidatorManagerAddress, validatorManagerAddress } = useToolboxStore();
-    const { walletChainId, coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
 
@@ -75,12 +75,12 @@ export default function DeployValidatorManager() {
     return (
         <Container
             title="Deploy Validator Manager"
-            description="This will deploy the ValidatorManager contract to the currently connected EVM network."
+            description="This will deploy the ValidatorManager contract to the EVM network."
         >
             <div className="space-y-4">
                 <div className="mb-4">
                     <div className="mb-4">
-                        This will deploy the <code>ValidatorManager</code> contract to the currently connected EVM network <code>{walletChainId}</code>.
+                        This will deploy the <code>ValidatorManager</code> contract to the EVM network <code>{viemChain?.id}</code>.
                     </div>
                     <div className="mb-4">
                         The contract requires the <code>ValidatorMessages</code> library at address: <code>{validatorMessagesLibAddress || "Not deployed"}</code>

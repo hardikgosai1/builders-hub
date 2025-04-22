@@ -9,6 +9,8 @@ import { createPublicClient, http } from "viem";
 import { utils } from "@avalabs/avalanchejs";
 import { useWalletStore } from "../../lib/walletStore";
 import { Tabs } from "../../components/Tabs";
+import { getBlockchainInfo } from "../../coreViem/utils/glacier";
+import { Select } from "./Select";
 
 export const ConnectWalletToolbox = ({ children, required, chainRequired }: { children: React.ReactNode, required: boolean, chainRequired: boolean }) => {
     const viemChain = useViemChainStore();
@@ -42,25 +44,22 @@ const ChainSelector = () => {
     );
 }
 
-import { create } from 'zustand'
-import { combine } from 'zustand/middleware'
-import { getBlockchainInfo } from "../../coreViem/utils/glacier";
-import { Select } from "./Select";
-
 function NewChainDialog() {
     const { setLastSelectedL1, addL1 } = useL1ListStore();
 
     const [open, setOpen] = useState(false);
-    const { chainId, evmChainId, rpcUrl, setChainId, setEvmChainId, coinName, setCoinName, isTestnet, setIsTestnet } = useAddChainTempStore();
+    const [rpcUrl, setRpcUrl] = useState("");
+    const [chainId, setChainId] = useState("");
+    const [evmChainId, setEvmChainId] = useState(0);
+    const [coinName, setCoinName] = useState("COIN");
+    const [isTestnet, setIsTestnet] = useState(true);
     const [rpcUrlError, setRpcUrlError] = useState("");
     const [name, setName] = useState("");
-
 
     const FROM_RPC = "Enter RPC URL";
     const FROM_CORE_WALLET = "Load RPC URL from Core Wallet";
 
     const [activeTab, setActiveTab] = useState<typeof FROM_RPC | typeof FROM_CORE_WALLET>(FROM_RPC);
-
 
     useEffect(() => {
         async function fetchChainData() {
@@ -117,7 +116,15 @@ function NewChainDialog() {
                             setActiveTab={(tab) => setActiveTab(tab as typeof FROM_RPC | typeof FROM_CORE_WALLET)}
                             children={(activeTab) => {
                                 return <>
-                                    {activeTab === FROM_RPC ? <ManualRPC /> : <ChainFromWallet />}
+                                    {activeTab === FROM_RPC ?
+                                        <ManualRPC rpcUrl={rpcUrl} setRpcUrl={setRpcUrl} /> :
+                                        <ChainFromWallet
+                                            rpcUrl={rpcUrl}
+                                            setRpcUrl={setRpcUrl}
+                                            setCoinName={setCoinName}
+                                            setIsTestnet={setIsTestnet}
+                                        />
+                                    }
                                 </>
                             }}
                         />
@@ -161,8 +168,6 @@ function NewChainDialog() {
                             ]}
                         />
 
-
-
                         <Button onClick={() => addChain()}>Add Chain</Button>
                     </div>
 
@@ -180,26 +185,7 @@ function NewChainDialog() {
     )
 }
 
-const useAddChainTempStore = create(
-    combine({
-        rpcUrl: "",
-        chainId: "",
-        evmChainId: 0,
-        coinName: "COIN",
-        isTestnet: true,
-    }, (set) => ({
-        setRpcUrl: (rpcUrl: string) => set({ rpcUrl }),
-        setChainId: (chainId: string) => set({ chainId }),
-        setEvmChainId: (evmChainId: number) => set({ evmChainId }),
-        setCoinName: (coinName: string) => set({ coinName }),
-        setIsTestnet: (isTestnet: boolean) => set({ isTestnet }),
-    })),
-)
-
-
-function ManualRPC() {
-    const { rpcUrl, setRpcUrl } = useAddChainTempStore();
-
+function ManualRPC({ rpcUrl, setRpcUrl }: { rpcUrl: string, setRpcUrl: (url: string) => void }) {
     return (
         <Input
             id="rpcUrl"
@@ -211,13 +197,21 @@ function ManualRPC() {
     )
 }
 
-
-function ChainFromWallet() {
+function ChainFromWallet({
+    rpcUrl,
+    setRpcUrl,
+    setCoinName,
+    setIsTestnet
+}: {
+    rpcUrl: string,
+    setRpcUrl: (url: string) => void,
+    setCoinName: (name: string) => void,
+    setIsTestnet: (isTestnet: boolean) => void
+}) {
     const [anyChainId, setAnyChainId] = useState("");
     const [evmChainId, setEvmChainId] = useState(-1);
     const [localError, setLocalError] = useState("");
     const { walletChainId, coreWalletClient } = useWalletStore();
-    const { rpcUrl, setRpcUrl, setCoinName, setIsTestnet } = useAddChainTempStore();
 
     //tries to extract evmChainId from anyChainId
     useEffect(() => {
@@ -291,7 +285,6 @@ function ChainFromWallet() {
                 error={localError}
             />
 
-
             {(walletChainId === evmChainId) && <Button onClick={fetchFromWallet} disabled={evmChainId === -1}>Fetch from wallet</Button>}
             {(walletChainId !== evmChainId) && <Button onClick={() => { switchToChain(evmChainId) }} disabled={evmChainId === -1}>Switch to chain {evmChainId}</Button>}
 
@@ -307,7 +300,6 @@ function ChainFromWallet() {
         </div >
     )
 }
-
 
 async function fetchChainId(rpcUrl: string): Promise<{ ethereumChainId: number, avalancheChainId: string }> {
     try {

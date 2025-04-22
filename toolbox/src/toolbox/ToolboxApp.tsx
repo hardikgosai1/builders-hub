@@ -326,9 +326,26 @@ export default function ToolboxApp() {
         window.location.hash ? window.location.hash.substring(1) : defaultTool
     );
 
+    // Helper function to find which group contains a specific tool
+    const findParentGroup = (toolId: string): string | null => {
+        for (const [groupName, components] of Object.entries(componentGroups)) {
+            if (components.some(component => component.id === toolId)) {
+                return groupName;
+            }
+        }
+        return null;
+    };
+
+    // Get initial tool from URL hash or default
+    const initialTool = window.location.hash ? window.location.hash.substring(1) : defaultTool;
+    const initialParentGroup = findParentGroup(initialTool);
+
     // State to track expanded/collapsed groups
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-        Object.keys(componentGroups).reduce((acc, key) => ({ ...acc, [key]: false }), {})
+        Object.keys(componentGroups).reduce((acc, key) => ({
+            ...acc,
+            [key]: key === initialParentGroup // Set parent group of selected tool to expanded
+        }), {})
     );
 
     // Toggle group expansion

@@ -13,7 +13,7 @@ import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
 export default function DeployExampleERC20() {
     const { showBoundary } = useErrorBoundary();
     const { exampleErc20Address, setExampleErc20Address } = useToolboxStore();
-    const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [deployOn, setDeployOn] = useState<DeployOn>("C-Chain");

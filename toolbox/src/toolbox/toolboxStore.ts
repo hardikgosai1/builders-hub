@@ -76,12 +76,12 @@ export const useL1ListStore = create(
 const toolboxInitialState = {
     //verified state
     validatorMessagesLibAddress: "",
+    validatorManagerAddress: "",
 
     //unverifyed state - remove after testing
     // nodeRpcUrl: "",
     // evmChainCoinName: "COIN",
     // evmChainIsTestnet: true,
-    // validatorManagerAddress: "",
     // proxyAddress: "0xfacade0000000000000000000000000000000000",
     // proxyAdminAddress: "0xdad0000000000000000000000000000000000000" as `0x${string}`,
     // teleporterRegistryAddress: "",
@@ -98,6 +98,7 @@ export const getToolboxStore = (chainId: string) => create(
         combine(toolboxInitialState, (set) => ({
             //verified methods
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
+            setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
 
             //unverified methods - remove after testing
             // setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
@@ -105,7 +106,6 @@ export const getToolboxStore = (chainId: string) => create(
             // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
             // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
-            // setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
             // setProxyAddress: (proxyAddress: string) => set({ proxyAddress }),
             // setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
 

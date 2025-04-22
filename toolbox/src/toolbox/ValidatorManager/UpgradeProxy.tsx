@@ -21,7 +21,7 @@ export default function UpgradeProxy() {
         setProxyAddress,
         setProxyAdminAddress
     } = useToolboxStore();
-    const { walletChainId, coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [currentImplementation, setCurrentImplementation] = useState<string | null>(null);
     const [desiredImplementation, setDesiredImplementation] = useState<string | null>(null);
