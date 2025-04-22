@@ -1,5 +1,5 @@
 import { ConnectWallet } from "../../components/ConnectWallet";
-import { useL1ListStore } from "../toolboxStore";
+import { useL1ListStore, useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
@@ -11,9 +11,14 @@ import { useWalletStore } from "../../lib/walletStore";
 import { Tabs } from "../../components/Tabs";
 
 export const ConnectWalletToolbox = ({ children, required, chainRequired }: { children: React.ReactNode, required: boolean, chainRequired: boolean }) => {
+    const viemChain = useViemChainStore();
+
     return (
         <ConnectWallet required={required} extraElements={chainRequired ? <ChainSelector /> : null} >
-            {children}
+            {(chainRequired && !viemChain) ?
+                <div className="opacity-50 pointer-events-none">{children}</div>
+                : children
+            }
         </ConnectWallet>
     );
 };
@@ -40,12 +45,13 @@ const ChainSelector = () => {
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 import { getBlockchainInfo } from "../../coreViem/utils/glacier";
+import { Select } from "./Select";
 
 function NewChainDialog() {
-    const { l1List, setLastSelectedL1 } = useL1ListStore();
+    const { setLastSelectedL1, addL1 } = useL1ListStore();
 
     const [open, setOpen] = useState(false);
-    const { chainId, evmChainId, rpcUrl, setChainId, setEvmChainId } = useAddChainTempStore();
+    const { chainId, evmChainId, rpcUrl, setChainId, setEvmChainId, coinName, setCoinName, isTestnet, setIsTestnet } = useAddChainTempStore();
     const [rpcUrlError, setRpcUrlError] = useState("");
     const [name, setName] = useState("");
 
@@ -87,8 +93,9 @@ function NewChainDialog() {
     }, [rpcUrl]);
 
     function addChain() {
-        l1List.push({ id: chainId, name: name || `Chain ${evmChainId}`, rpcUrl: rpcUrl });
+        addL1({ id: chainId, name: name || `Chain ${evmChainId}`, rpcUrl: rpcUrl, evmChainId: evmChainId, coinName: coinName, isTestnet: isTestnet });
         setLastSelectedL1(chainId);
+        setOpen(false);
     }
 
     return (
@@ -137,6 +144,24 @@ function NewChainDialog() {
                             onChange={setName}
                         />
 
+                        <Input
+                            id="coinName"
+                            label="Coin Name"
+                            value={coinName}
+                            onChange={setCoinName}
+                        />
+
+                        <Select
+                            label="Is Testnet"
+                            value={isTestnet ? "Yes" : "No"}
+                            onChange={(value) => setIsTestnet(value === "Yes")}
+                            options={[
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                            ]}
+                        />
+
+
 
                         <Button onClick={() => addChain()}>Add Chain</Button>
                     </div>
@@ -160,10 +185,14 @@ const useAddChainTempStore = create(
         rpcUrl: "",
         chainId: "",
         evmChainId: 0,
+        coinName: "COIN",
+        isTestnet: true,
     }, (set) => ({
         setRpcUrl: (rpcUrl: string) => set({ rpcUrl }),
         setChainId: (chainId: string) => set({ chainId }),
         setEvmChainId: (evmChainId: number) => set({ evmChainId }),
+        setCoinName: (coinName: string) => set({ coinName }),
+        setIsTestnet: (isTestnet: boolean) => set({ isTestnet }),
     })),
 )
 
@@ -188,7 +217,7 @@ function ChainFromWallet() {
     const [evmChainId, setEvmChainId] = useState(-1);
     const [localError, setLocalError] = useState("");
     const { walletChainId, coreWalletClient } = useWalletStore();
-    const { rpcUrl, setRpcUrl } = useAddChainTempStore();
+    const { rpcUrl, setRpcUrl, setCoinName, setIsTestnet } = useAddChainTempStore();
 
     //tries to extract evmChainId from anyChainId
     useEffect(() => {
@@ -244,6 +273,8 @@ function ChainFromWallet() {
             setLocalError("");
             const evmInfo = await coreWalletClient.getEthereumChain()
             setRpcUrl(evmInfo.rpcUrls[0]);
+            setCoinName(evmInfo.nativeCurrency.name);
+            setIsTestnet(evmInfo.isTestnet);
         } catch (error) {
             console.error("Failed to fetch from wallet:", error);
             setLocalError("Failed to fetch from wallet, do you have chain ${evmChainId} added in your wallet?");

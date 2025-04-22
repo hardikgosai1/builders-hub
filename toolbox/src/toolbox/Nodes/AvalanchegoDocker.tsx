@@ -299,13 +299,13 @@ export default function AvalanchegoDocker() {
                             />
                         </div>
 
-                        <Input
+                        {isRPC === "true" && <Input
                             label="Domain or IPv4 address for reverse proxy (optional)"
                             value={domain}
                             onChange={setDomain}
                             placeholder="example.com  or 1.2.3.4"
                             helperText="`curl checkip.amazonaws.com` to get your public IP address. Make sure 443 is open on your firewall."
-                        />
+                        />}
 
                         {domain && isRPC === "true" && (
                             <div className="mt-4">
@@ -321,7 +321,7 @@ export default function AvalanchegoDocker() {
                             <div className="mt-4">
                                 <h3 className="text-md font-medium mb-2">Check Node Command:</h3>
                                 <CodeHighlighter
-                                    code={checkNodeCommand(chainId, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), false)}
+                                    code={isRPC === "true" ? checkNodeCommand(chainId, domain || ("127.0.0.1:8080"), false) : checkNodeCommand(chainId, ("127.0.0.1:9650"), false)}
                                     lang="bash"
                                 />
                             </div>
@@ -331,7 +331,7 @@ export default function AvalanchegoDocker() {
                             <div className="mt-4">
                                 <h3 className="text-md font-medium mb-2">Check that debug & trace is working:</h3>
                                 <CodeHighlighter
-                                    code={checkNodeCommand(chainId, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), true)}
+                                    code={isRPC === "true" ? checkNodeCommand(chainId, domain || ("127.0.0.1:" + (isRPC === "true" ? "8080" : "9650")), true) : checkNodeCommand(chainId, domain || ("127.0.0.1:" + (isRPC === "true" ? "9650" : "9650")), true)}
                                     lang="bash"
                                 />
                             </div>

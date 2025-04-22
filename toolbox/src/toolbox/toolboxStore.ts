@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow'
 
 export type DeployOn = "L1" | "C-Chain";
 
@@ -41,7 +42,6 @@ export const useCreateChainStore = create(
 
             reset: () => {
                 window?.localStorage.removeItem('create-chain-store');
-                window?.location.reload();
             },
         })),
         {
@@ -52,16 +52,19 @@ export const useCreateChainStore = create(
 )
 
 const l1ListState = {
-    l1List: [] as { id: string, name: string, rpcUrl: string }[],
+    l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean }[],
     lastSelectedL1: "",
 }
 
 export const useL1ListStore = create(
     persist(
         combine(l1ListState, (set) => ({
-            addL1: (l1: { id: string, name: string, rpcUrl: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
+            addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean }) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
             setLastSelectedL1: (l1: string) => set({ lastSelectedL1: l1 }),
+            reset: () => {
+                window?.localStorage.removeItem('l1-list-store');
+            },
         })),
         {
             name: 'l1-list-store',
@@ -71,45 +74,54 @@ export const useL1ListStore = create(
 )
 
 const toolboxInitialState = {
+    //verified state
     validatorMessagesLibAddress: "",
-    nodeRpcUrl: "",
-    evmChainCoinName: "COIN",
-    evmChainIsTestnet: true,
-    validatorManagerAddress: "",
-    proxyAddress: "0xfacade0000000000000000000000000000000000",
-    proxyAdminAddress: "0xdad0000000000000000000000000000000000000" as `0x${string}`,
-    teleporterRegistryAddress: "",
-    icmReceiverAddress: "",
-    stakingManagerAddress: "",
-    rewardCalculatorAddress: "",
-    exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+
+    //unverifyed state - remove after testing
+    // nodeRpcUrl: "",
+    // evmChainCoinName: "COIN",
+    // evmChainIsTestnet: true,
+    // validatorManagerAddress: "",
+    // proxyAddress: "0xfacade0000000000000000000000000000000000",
+    // proxyAdminAddress: "0xdad0000000000000000000000000000000000000" as `0x${string}`,
+    // teleporterRegistryAddress: "",
+    // icmReceiverAddress: "",
+    // stakingManagerAddress: "",
+    // rewardCalculatorAddress: "",
+    // exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    // erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    // erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 }
 
 export const getToolboxStore = (chainId: string) => create(
     persist(
         combine(toolboxInitialState, (set) => ({
-            setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
-            setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
+            //verified methods
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
-            setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
-            setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
-            setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
-            setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
-            setProxyAddress: (proxyAddress: string) => set({ proxyAddress }),
-            setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
+
+            //unverified methods - remove after testing
+            // setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
+            // setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
+            // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
+            // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
+            // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
+            // setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
+            // setProxyAddress: (proxyAddress: string) => set({ proxyAddress }),
+            // setProxyAdminAddress: (proxyAdminAddress: `0x${string}`) => set({ proxyAdminAddress }),
+
+            // setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
+            // setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
+            // setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
+            // setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
+            // setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
+
+
             reset: () => {
                 if (typeof window !== 'undefined') {
                     window.localStorage.removeItem(`toolbox-storage-${chainId}`);
                     window.location.reload();
                 }
             },
-            setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
-            setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
-            setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
-            setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
-            setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
         })),
         {
             name: `toolbox-storage-${chainId}`,
@@ -129,45 +141,42 @@ export function resetAllStores() {
     chainIds.forEach((chainId) => {
         getToolboxStore(chainId).getState().reset();
     });
+    useL1ListStore.getState().reset()
+    window?.location.reload();
 }
 
-// import { useShallow } from 'zustand/react/shallow'
+export function useViemChainStore() {
+    const { lastSelectedL1, l1List } = useL1ListStore();
+    const selectedL1 = useMemo(() => l1List.find(l1 => l1.id === lastSelectedL1), [l1List, lastSelectedL1]);
 
-// export function useViemChainStore() {
-//     // Use useShallow to select the primitive state values we need
-//     const chainData = useToolboxStore(
-//         useShallow((state) => ({
-//             evmChainId: state.evmChainId,
-//             chainName: state.chainName,
-//             evmChainRpcUrl: state.evmChainRpcUrl,
-//             evmChainCoinName: state.evmChainCoinName,
-//             evmChainIsTestnet: state.evmChainIsTestnet
-//         }))
-//     );
+    const { chainName } = useCreateChainStore(
+        useShallow(state => ({
+            evmChainId: state.evmChainId,
+            chainName: state.chainName
+        }))
+    );
 
-//     // Create the viemChain object with useMemo to prevent unnecessary recreation
-//     const viemChain = useMemo(() => {
-//         const { evmChainId, chainName, evmChainRpcUrl, evmChainCoinName, evmChainIsTestnet } = chainData;
+    // Create the viemChain object with useMemo to prevent unnecessary recreation
+    const viemChain = useMemo(() => {
+        if (!selectedL1) {
+            return null;
+        }
 
-//         if (!evmChainId || !evmChainRpcUrl) {
-//             return null;
-//         }
+        return {
+            id: selectedL1.evmChainId,
+            name: chainName || `Chain #${selectedL1.evmChainId}`,
+            rpcUrls: {
+                default: { http: [selectedL1.rpcUrl] },
+            },
+            nativeCurrency: {
+                name: selectedL1.coinName,
+                symbol: selectedL1.coinName,
+                decimals: 18
+            },
+            isTestnet: selectedL1.isTestnet,
+        };
+    }, [selectedL1, chainName]);
 
-//         return {
-//             id: evmChainId,
-//             name: chainName || `Chain #${evmChainId}`,
-//             rpcUrls: {
-//                 default: { http: [evmChainRpcUrl] },
-//             },
-//             nativeCurrency: {
-//                 name: evmChainCoinName || chainName + " Coin",
-//                 symbol: evmChainCoinName || chainName + " Coin",
-//                 decimals: 18
-//             },
-//             isTestnet: evmChainIsTestnet,
-//         };
-//     }, [chainData]);
-
-//     return viemChain;
-// }
+    return viemChain;
+}
 
