@@ -11,7 +11,6 @@ import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
 import { RadioGroup } from "../../components/RadioGroup";
 import { createPublicClient, http } from "viem";
-import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
 import { Note } from "../../components/Note";
 import { utils } from "@avalabs/avalanchejs";
 import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
@@ -219,114 +218,112 @@ export default function DeployERC20TokenRemote() {
                     idPrefix="deploy-remote-on-"
                 />
             </div>
-            <RequireChainToolbox requireChain={deployOn}>
-                <div className="space-y-4 mt-4">
-                    <div className="">
-                        This deploys an `ERC20TokenRemote` contract to the selected network. This contract acts as the bridge endpoint on the destination chain for your ERC20 token.
-                    </div>
-
-
-                    {deployOn === "L1" && <><Input
-                        label="Teleporter Registry Address"
-                        value={teleporterRegistryAddress}
-                        onChange={setTeleporterRegistryAddress}
-                    />
-
-                        {!teleporterRegistryAddress && <Note variant="warning">
-                            <p>
-                                Please <a href="#teleporterRegistry" className="text-blue-500">deploy the Teleporter Registry contract first</a>.
-                            </p>
-                        </Note>}
-
-                    </>}
-
-                    {deployOn === "C-Chain" && <Input
-                        label="C-Chain Teleporter Registry Address"
-                        value={C_CHAIN_TELEPORTER_REGISTRY_ADDRESS}
-                        disabled
-                    />}
-
-                    {/* Source ChainID */}
-                    {deployOn === "C-Chain" && <Input
-                        label="L1 Chain ID (source chain)"
-                        value={chainID}
-                        onChange={setChainID}
-                    />}
-
-                    {deployOn === "L1" && <Input
-                        label="C-Chain Chain ID (source chain)"
-                        value={FUJI_C_BLOCKCHAIN_ID}
-                        disabled
-                    />}
-
-                    {<Input
-                        label={`Token Home Blockchain ID, hex (${deployOnReversed} in this case)`}
-                        value={tokenHomeBlockchainIDHex}
-                        disabled
-                    />}
-
-                    {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
-
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Input
-                            label="Token Name (from source)"
-                            value={tokenName}
-                            disabled
-                        />
-
-                        <Input
-                            label="Token Symbol (from source)"
-                            value={tokenSymbol}
-                            disabled
-                        />
-
-                        <Input
-                            label="Token Decimals (from source)"
-                            value={tokenDecimals}
-                            disabled
-                        />
-                    </div>
-
-                    <Input
-                        label="L1 Teleporter Manager Address"
-                        value={teleporterManager}
-                        onChange={setTeleporterManager}
-                        placeholder={coreWalletClient?.account?.address}
-                        helperText="default: your address"
-                    />
-
-                    <Input
-                        label="Min Teleporter Version"
-                        value={minTeleporterVersion}
-                        onChange={setMinTeleporterVersion}
-                        type="number"
-                        required
-                    />
-
-                    <Input
-                        label={`Token Home Address on ${deployOnReversed}`}
-                        value={erc20TokenHomeAddress[deployOnReversed]}
-                        onChange={(value) => setErc20TokenHomeAddress(value, deployOnReversed)}
-                        required
-                    />
-
-                    <Success
-                        label={`ERC20 Token Remote Address (on ${deployOn})`}
-                        value={erc20TokenRemoteAddress?.[deployOn] || ""}
-                    />
-
-                    <Button
-                        variant={erc20TokenRemoteAddress?.[deployOn] ? "secondary" : "primary"}
-                        onClick={handleDeploy}
-                        loading={isDeploying}
-                        disabled={isDeploying || !erc20TokenHomeAddress?.[deployOnReversed] || !tokenHomeBlockchainIDHex || tokenDecimals === "0" || !tokenName || !tokenSymbol || (deployOn === "L1" && !teleporterRegistryAddress)}
-                    >
-                        {erc20TokenRemoteAddress?.[deployOn] ? "Re-Deploy ERC20 Token Remote" : "Deploy ERC20 Token Remote"}
-                    </Button>
-
+            <div className="space-y-4 mt-4">
+                <div className="">
+                    This deploys an `ERC20TokenRemote` contract to the selected network. This contract acts as the bridge endpoint on the destination chain for your ERC20 token.
                 </div>
-            </RequireChainToolbox >
+
+
+                {deployOn === "L1" && <><Input
+                    label="Teleporter Registry Address"
+                    value={teleporterRegistryAddress}
+                    onChange={setTeleporterRegistryAddress}
+                />
+
+                    {!teleporterRegistryAddress && <Note variant="warning">
+                        <p>
+                            Please <a href="#teleporterRegistry" className="text-blue-500">deploy the Teleporter Registry contract first</a>.
+                        </p>
+                    </Note>}
+
+                </>}
+
+                {deployOn === "C-Chain" && <Input
+                    label="C-Chain Teleporter Registry Address"
+                    value={C_CHAIN_TELEPORTER_REGISTRY_ADDRESS}
+                    disabled
+                />}
+
+                {/* Source ChainID */}
+                {deployOn === "C-Chain" && <Input
+                    label="L1 Chain ID (source chain)"
+                    value={chainID}
+                    onChange={setChainID}
+                />}
+
+                {deployOn === "L1" && <Input
+                    label="C-Chain Chain ID (source chain)"
+                    value={FUJI_C_BLOCKCHAIN_ID}
+                    disabled
+                />}
+
+                {<Input
+                    label={`Token Home Blockchain ID, hex (${deployOnReversed} in this case)`}
+                    value={tokenHomeBlockchainIDHex}
+                    disabled
+                />}
+
+                {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
+
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Input
+                        label="Token Name (from source)"
+                        value={tokenName}
+                        disabled
+                    />
+
+                    <Input
+                        label="Token Symbol (from source)"
+                        value={tokenSymbol}
+                        disabled
+                    />
+
+                    <Input
+                        label="Token Decimals (from source)"
+                        value={tokenDecimals}
+                        disabled
+                    />
+                </div>
+
+                <Input
+                    label="L1 Teleporter Manager Address"
+                    value={teleporterManager}
+                    onChange={setTeleporterManager}
+                    placeholder={coreWalletClient?.account?.address}
+                    helperText="default: your address"
+                />
+
+                <Input
+                    label="Min Teleporter Version"
+                    value={minTeleporterVersion}
+                    onChange={setMinTeleporterVersion}
+                    type="number"
+                    required
+                />
+
+                <Input
+                    label={`Token Home Address on ${deployOnReversed}`}
+                    value={erc20TokenHomeAddress[deployOnReversed]}
+                    onChange={(value) => setErc20TokenHomeAddress(value, deployOnReversed)}
+                    required
+                />
+
+                <Success
+                    label={`ERC20 Token Remote Address (on ${deployOn})`}
+                    value={erc20TokenRemoteAddress?.[deployOn] || ""}
+                />
+
+                <Button
+                    variant={erc20TokenRemoteAddress?.[deployOn] ? "secondary" : "primary"}
+                    onClick={handleDeploy}
+                    loading={isDeploying}
+                    disabled={isDeploying || !erc20TokenHomeAddress?.[deployOnReversed] || !tokenHomeBlockchainIDHex || tokenDecimals === "0" || !tokenName || !tokenSymbol || (deployOn === "L1" && !teleporterRegistryAddress)}
+                >
+                    {erc20TokenRemoteAddress?.[deployOn] ? "Re-Deploy ERC20 Token Remote" : "Deploy ERC20 Token Remote"}
+                </Button>
+
+            </div>
         </div >
     );
 } 

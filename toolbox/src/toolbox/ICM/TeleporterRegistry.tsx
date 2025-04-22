@@ -9,7 +9,7 @@ import { Success } from "../../components/Success";
 import TeleporterRegistryBytecode from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterRegistry_Bytecode_v1.0.0.txt.json';
 import TeleporterMessengerAddress from '../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
 import TeleporterRegistryManualyCompiled from '../../../contracts/icm-contracts/compiled/TeleporterRegistry.json';
-import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
+
 
 export default function TeleporterRegistry() {
     const { showBoundary } = useErrorBoundary();
@@ -49,28 +49,28 @@ export default function TeleporterRegistry() {
     }
 
     return (
-        <RequireChainToolboxL1>
+
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Deploy Teleporter Registry</h2>
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Deploy Teleporter Registry</h2>
-                <div className="space-y-4">
-                    <div className="mb-4">
-                        This will deploy the <code>TeleporterRegistry</code> contract to the EVM network <code>{walletChainId}</code>.
-                        The contract will be initialized with the Teleporter Messenger address <code>{TeleporterMessengerAddress.content.trim()}</code>.
-                    </div>
-                    <Button
-                        variant="primary"
-                        onClick={handleDeploy}
-                        loading={isDeploying}
-                        disabled={isDeploying}
-                    >
-                        {teleporterRegistryAddress ? "Redeploy" : "Deploy"} TeleporterRegistry
-                    </Button>
+                <div className="mb-4">
+                    This will deploy the <code>TeleporterRegistry</code> contract to the EVM network <code>{walletChainId}</code>.
+                    The contract will be initialized with the Teleporter Messenger address <code>{TeleporterMessengerAddress.content.trim()}</code>.
                 </div>
-                <Success
-                    label="TeleporterRegistry Address"
-                    value={teleporterRegistryAddress}
-                />
+                <Button
+                    variant="primary"
+                    onClick={handleDeploy}
+                    loading={isDeploying}
+                    disabled={isDeploying}
+                >
+                    {teleporterRegistryAddress ? "Redeploy" : "Deploy"} TeleporterRegistry
+                </Button>
             </div>
-        </RequireChainToolboxL1>
+            <Success
+                label="TeleporterRegistry Address"
+                value={teleporterRegistryAddress}
+            />
+        </div>
+
     );
 }

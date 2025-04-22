@@ -8,7 +8,6 @@ import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from "viem/chains";
-import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
 import ERC20TokenRemoteABI from "../../../contracts/icm-contracts/compiled/ERC20TokenRemote.json";
 import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
 import { Abi, createPublicClient, http, PublicClient, zeroAddress } from "viem";
@@ -162,70 +161,68 @@ export default function RegisterWithHome() {
                 />
             </div>
 
-            <RequireChainToolbox requireChain={deployOn}>
-                <div className="space-y-4">
-                    <p>
-                        This will call the `registerWithHome` function on the deployed ERC20 Token Remote contract
-                        on the selected chain ({deployOn}). This step is necessary to link the remote bridge back to the home bridge.
-                    </p>
+            <div className="space-y-4">
+                <p>
+                    This will call the `registerWithHome` function on the deployed ERC20 Token Remote contract
+                    on the selected chain ({deployOn}). This step is necessary to link the remote bridge back to the home bridge.
+                </p>
 
-                    <Input
-                        label={`ERC20 Token Remote Address (${deployOn})`}
-                        value={erc20TokenRemoteAddress?.[deployOn] || ""}
-                        onChange={(value) => setErc20TokenRemoteAddress(value, deployOn)}
-                        required
-                        error={!erc20TokenRemoteAddress?.[deployOn] ? `Remote address for ${deployOn} not found. Deploy or enter address.` : undefined}
-                    />
+                <Input
+                    label={`ERC20 Token Remote Address (${deployOn})`}
+                    value={erc20TokenRemoteAddress?.[deployOn] || ""}
+                    onChange={(value) => setErc20TokenRemoteAddress(value, deployOn)}
+                    required
+                    error={!erc20TokenRemoteAddress?.[deployOn] ? `Remote address for ${deployOn} not found. Deploy or enter address.` : undefined}
+                />
 
-                    {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
+                {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
 
-                    <Button
-                        variant="primary"
-                        onClick={handleRegister}
-                        loading={isRegistering}
-                        disabled={isRegistering || !erc20TokenRemoteAddress?.[deployOn]}
-                    >
-                        Register Remote on {deployOn} with Home
-                    </Button>
+                <Button
+                    variant="primary"
+                    onClick={handleRegister}
+                    loading={isRegistering}
+                    disabled={isRegistering || !erc20TokenRemoteAddress?.[deployOn]}
+                >
+                    Register Remote on {deployOn} with Home
+                </Button>
 
-                    {lastTxId && (
-                        <div className="space-y-2">
-                            <Success
-                                label="Registration Transaction ID"
-                                value={lastTxId ?? ""}
-                            />
-                        </div>
-                    )}
+                {lastTxId && (
+                    <div className="space-y-2">
+                        <Success
+                            label="Registration Transaction ID"
+                            value={lastTxId ?? ""}
+                        />
+                    </div>
+                )}
 
-                    {isCheckingRegistration && (
-                        <div className=" text-gray-500">
-                            ⏳ Checking registration status...
-                        </div>
-                    )}
+                {isCheckingRegistration && (
+                    <div className=" text-gray-500">
+                        ⏳ Checking registration status...
+                    </div>
+                )}
 
-                    {!isCheckingRegistration && isRegistered && (
-                        <div className=" ">
-                            ✅ Remote contract is registered with the Home contract
-                        </div>
-                    )}
-                    {!isCheckingRegistration && !isRegistered && (
-                        <div className=" ">
-                            ⚠️ Remote contract is not yet registered with the Home contract
-                        </div>
-                    )}
+                {!isCheckingRegistration && isRegistered && (
+                    <div className=" ">
+                        ✅ Remote contract is registered with the Home contract
+                    </div>
+                )}
+                {!isCheckingRegistration && !isRegistered && (
+                    <div className=" ">
+                        ⚠️ Remote contract is not yet registered with the Home contract
+                    </div>
+                )}
 
-                    {homeContractAddress && homeContractClient && (
-                        <div className="mt-8 pt-4 border-t border-gray-200">
-                            <ListContractEvents
-                                contractAddress={homeContractAddress}
-                                contractABI={ERC20TokenHomeABI.abi as Abi}
-                                publicClient={homeContractClient}
-                                title={`Events from Home Contract (${deployOn === "L1" ? "C-Chain" : "L1"})`}
-                            />
-                        </div>
-                    )}
-                </div>
-            </RequireChainToolbox>
-        </div>
+                {homeContractAddress && homeContractClient && (
+                    <div className="mt-8 pt-4 border-t border-gray-200">
+                        <ListContractEvents
+                            contractAddress={homeContractAddress}
+                            contractABI={ERC20TokenHomeABI.abi as Abi}
+                            publicClient={homeContractClient}
+                            title={`Events from Home Contract (${deployOn === "L1" ? "C-Chain" : "L1"})`}
+                        />
+                    </div>
+                )}
+            </div>
+        </div >
     );
 }

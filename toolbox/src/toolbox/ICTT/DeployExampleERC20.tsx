@@ -9,7 +9,7 @@ import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from "viem/chains";
-import { RequireChainToolbox } from "../components/RequireChainToolboxL1";
+
 export default function DeployExampleERC20() {
     const { showBoundary } = useErrorBoundary();
     const { exampleErc20Address, setExampleErc20Address } = useToolboxStore();
@@ -61,30 +61,28 @@ export default function DeployExampleERC20() {
                     idPrefix="deploy-on-"
                 />
             </div>
-            <RequireChainToolbox requireChain={deployOn}>
 
-                <div className="space-y-4">
-                    <div className="">
-                        This will deploy an ERC20 token contract to your connected network (Chain ID: <code>{walletChainId}</code>).
-                        You can use this token for testing token transfers and other ERC20 interactions. <a href="https://github.com/ava-labs/icm-contracts/blob/51dd21550444e7141d938fd721d994e29a58f7af/contracts/mocks/ExampleERC20.sol" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">View the contract source code</a>.
-                    </div>
-
-                    <Button
-                        variant={exampleErc20Address?.[deployOn] ? "secondary" : "primary"}
-                        onClick={handleDeploy}
-                        loading={isDeploying}
-                        disabled={isDeploying}
-                    >
-                        {exampleErc20Address?.[deployOn] ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
-                    </Button>
-
-                    <Success
-                        label="ERC20 Token Address"
-                        value={exampleErc20Address?.[deployOn] || ""}
-                    />
+            <div className="space-y-4">
+                <div className="">
+                    This will deploy an ERC20 token contract to your connected network (Chain ID: <code>{walletChainId}</code>).
+                    You can use this token for testing token transfers and other ERC20 interactions. <a href="https://github.com/ava-labs/icm-contracts/blob/51dd21550444e7141d938fd721d994e29a58f7af/contracts/mocks/ExampleERC20.sol" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">View the contract source code</a>.
                 </div>
-            </RequireChainToolbox>
 
-        </div>
+                <Button
+                    variant={exampleErc20Address?.[deployOn] ? "secondary" : "primary"}
+                    onClick={handleDeploy}
+                    loading={isDeploying}
+                    disabled={isDeploying}
+                >
+                    {exampleErc20Address?.[deployOn] ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
+                </Button>
+
+                <Success
+                    label="ERC20 Token Address"
+                    value={exampleErc20Address?.[deployOn] || ""}
+                />
+            </div>
+
+        </div >
     );
 }

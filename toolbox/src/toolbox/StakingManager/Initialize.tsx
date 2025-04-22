@@ -9,7 +9,7 @@ import { Input } from "../../components/Input";
 import { ResultField } from "../components/ResultField";
 import { AbiEvent, Log, parseEther } from 'viem';
 import NativeTokenStakingManagerABI from "../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
-import { RequireChainToolboxL1 } from "../components/RequireChainToolboxL1";
+
 import { Container } from "../components/Container";
 
 export default function Initialize() {
@@ -148,112 +148,112 @@ export default function Initialize() {
     }
 
     return (
-        <RequireChainToolboxL1>
-            <Container
-                title="Set Initial Staking Manager Configuration"
-                description="This will initialize the NativeTokenStakingManager contract."
-            >
+
+        <Container
+            title="Set Initial Staking Manager Configuration"
+            description="This will initialize the NativeTokenStakingManager contract."
+        >
+            <div className="space-y-4">
+                <Input
+                    label="Staking Manager address"
+                    value={stakingManagerAddress}
+                    onChange={setStakingManagerAddress}
+                    placeholder="Enter staking manager address"
+                    button={
+                        <Button
+                            variant="secondary"
+                            onClick={checkIfInitialized}
+                            loading={isChecking}
+                            disabled={!stakingManagerAddress}
+                        >
+                            Check Status
+                        </Button>
+                    }
+                />
+
                 <div className="space-y-4">
                     <Input
-                        label="Staking Manager address"
-                        value={stakingManagerAddress}
-                        onChange={setStakingManagerAddress}
-                        placeholder="Enter staking manager address"
-                        button={
-                            <Button
-                                variant="secondary"
-                                onClick={checkIfInitialized}
-                                loading={isChecking}
-                                disabled={!stakingManagerAddress}
-                            >
-                                Check Status
-                            </Button>
-                        }
+                        label="ValidatorManager Address"
+                        value={managerAddress}
+                        onChange={setManagerAddress}
+                        placeholder="Enter validator manager address"
                     />
-
-                    <div className="space-y-4">
-                        <Input
-                            label="ValidatorManager Address"
-                            value={managerAddress}
-                            onChange={setManagerAddress}
-                            placeholder="Enter validator manager address"
-                        />
-                        <Input
-                            label="Reward Calculator Address"
-                            value={rewardCalculatorAddress}
-                            onChange={setRewardCalculatorAddress}
-                            placeholder="Enter reward calculator address"
-                        />
-                        <Input
-                            label="Uptime Blockchain ID"
-                            value={uptimeBlockchainID}
-                            onChange={setUptimeBlockchainID}
-                            placeholder="Enter uptime blockchain ID (32 bytes hex)"
-                        />
-                        <Input
-                            label="Minimum Stake Amount (tokens)"
-                            type="number"
-                            value={minimumStakeAmount}
-                            onChange={setMinimumStakeAmount}
-                            placeholder="Enter minimum stake amount in tokens"
-                            helperText="Value will be converted to wei (1 token = 10^18 wei)"
-                        />
-                        <Input
-                            label="Maximum Stake Amount (tokens)"
-                            type="number"
-                            value={maximumStakeAmount}
-                            onChange={setMaximumStakeAmount}
-                            placeholder="Enter maximum stake amount in tokens"
-                            helperText="Value will be converted to wei (1 token = 10^18 wei)"
-                        />
-                        <Input
-                            label="Minimum Stake Duration"
-                            type="number"
-                            value={minimumStakeDuration}
-                            onChange={setMinimumStakeDuration}
-                            placeholder="Enter minimum stake duration"
-                        />
-                        <Input
-                            label="Minimum Delegation Fee (BIPS)"
-                            type="number"
-                            value={minimumDelegationFeeBips}
-                            onChange={setMinimumDelegationFeeBips}
-                            placeholder="Enter minimum delegation fee in BIPS"
-                        />
-                        <Input
-                            label="Maximum Stake Multiplier"
-                            type="number"
-                            value={maximumStakeMultiplier}
-                            onChange={setMaximumStakeMultiplier}
-                            placeholder="Enter maximum stake multiplier"
-                        />
-                        <Input
-                            label="Weight To Value Factor (tokens)"
-                            type="number"
-                            value={weightToValueFactor}
-                            onChange={setWeightToValueFactor}
-                            placeholder="Enter weight to value factor in tokens"
-                            helperText="Value will be converted to wei (1 token = 10^18 wei)"
-                        />
-                        <Button
-                            variant="primary"
-                            onClick={handleInitialize}
-                            loading={isInitializing}
-                            disabled={isInitializing}
-                        >
-                            Initialize Contract
-                        </Button>
-                    </div>
-                    {isInitialized === true && (
-                        <ResultField
-                            label="Initialization Event"
-                            value={jsonStringifyWithBigint(initEvent)}
-                            showCheck={isInitialized}
-                        />
-                    )}
+                    <Input
+                        label="Reward Calculator Address"
+                        value={rewardCalculatorAddress}
+                        onChange={setRewardCalculatorAddress}
+                        placeholder="Enter reward calculator address"
+                    />
+                    <Input
+                        label="Uptime Blockchain ID"
+                        value={uptimeBlockchainID}
+                        onChange={setUptimeBlockchainID}
+                        placeholder="Enter uptime blockchain ID (32 bytes hex)"
+                    />
+                    <Input
+                        label="Minimum Stake Amount (tokens)"
+                        type="number"
+                        value={minimumStakeAmount}
+                        onChange={setMinimumStakeAmount}
+                        placeholder="Enter minimum stake amount in tokens"
+                        helperText="Value will be converted to wei (1 token = 10^18 wei)"
+                    />
+                    <Input
+                        label="Maximum Stake Amount (tokens)"
+                        type="number"
+                        value={maximumStakeAmount}
+                        onChange={setMaximumStakeAmount}
+                        placeholder="Enter maximum stake amount in tokens"
+                        helperText="Value will be converted to wei (1 token = 10^18 wei)"
+                    />
+                    <Input
+                        label="Minimum Stake Duration"
+                        type="number"
+                        value={minimumStakeDuration}
+                        onChange={setMinimumStakeDuration}
+                        placeholder="Enter minimum stake duration"
+                    />
+                    <Input
+                        label="Minimum Delegation Fee (BIPS)"
+                        type="number"
+                        value={minimumDelegationFeeBips}
+                        onChange={setMinimumDelegationFeeBips}
+                        placeholder="Enter minimum delegation fee in BIPS"
+                    />
+                    <Input
+                        label="Maximum Stake Multiplier"
+                        type="number"
+                        value={maximumStakeMultiplier}
+                        onChange={setMaximumStakeMultiplier}
+                        placeholder="Enter maximum stake multiplier"
+                    />
+                    <Input
+                        label="Weight To Value Factor (tokens)"
+                        type="number"
+                        value={weightToValueFactor}
+                        onChange={setWeightToValueFactor}
+                        placeholder="Enter weight to value factor in tokens"
+                        helperText="Value will be converted to wei (1 token = 10^18 wei)"
+                    />
+                    <Button
+                        variant="primary"
+                        onClick={handleInitialize}
+                        loading={isInitializing}
+                        disabled={isInitializing}
+                    >
+                        Initialize Contract
+                    </Button>
                 </div>
-            </Container>
-        </RequireChainToolboxL1>
+                {isInitialized === true && (
+                    <ResultField
+                        label="Initialization Event"
+                        value={jsonStringifyWithBigint(initEvent)}
+                        showCheck={isInitialized}
+                    />
+                )}
+            </div>
+        </Container>
+
     );
 };
 
