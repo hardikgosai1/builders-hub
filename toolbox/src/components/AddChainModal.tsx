@@ -190,6 +190,13 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                             placeholder="MYCHAIN"
                         />
 
+                        <Input
+                            label="Validator Manager Address"
+                            value={validatorManagerAddress}
+                            disabled={true}
+                            placeholder="0x1234567890123456789012345678901234567890"
+                        />
+
                         <Select
                             label="Is Testnet"
                             value={isTestnet ? "Yes" : "No"}
