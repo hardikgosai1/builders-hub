@@ -15,6 +15,7 @@ const regular = fetch(new URL('../../GeistMono-Light.ttf', import.meta.url)).the
   res.arrayBuffer(),
 );
 
+
 // Simplified mapping based on ToolboxApp component structure
 const toolLabels: Record<string, string> = {
   switchChain: "Add L1 to Wallet",
