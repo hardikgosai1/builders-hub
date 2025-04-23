@@ -105,7 +105,7 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 }
             }
 
-            await coreWalletClient.addChain({ chain: viemChain });
+            await coreWalletClient.addChain({ chain: { ...viemChain, isTestnet: isTestnet } });
             await coreWalletClient.switchChain({
                 id: `0x${evmChainId.toString(16)}`,
             });
@@ -160,20 +160,7 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                             placeholder="https://api.mychain.com"
                         />
 
-                        <Input
-                            id="chainId"
-                            label="EVM Chain ID"
-                            value={evmChainId || ""}
-                            disabled={true}
-                            placeholder="Detected EVM chain ID"
-                        />
 
-                        <Input
-                            id="avalancheChainId"
-                            label="Avalanche Chain ID (base58)"
-                            value={chainId}
-                            disabled={true}
-                        />
 
                         <Input
                             id="name"
@@ -188,6 +175,21 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                             value={chainName}
                             onChange={setChainName}
                             placeholder="MYCHAIN"
+                        />
+
+                        <Input
+                            id="chainId"
+                            label="EVM Chain ID"
+                            value={evmChainId || ""}
+                            disabled={true}
+                            placeholder="Detected EVM chain ID"
+                        />
+
+                        <Input
+                            id="avalancheChainId"
+                            label="Avalanche Chain ID (base58)"
+                            value={chainId}
+                            disabled={true}
                         />
 
                         <Input
