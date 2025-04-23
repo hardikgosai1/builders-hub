@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useL1ListStore, useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useL1ListStore, useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';
@@ -29,7 +29,7 @@ export default function InitValidatorSet() {
     const [error, setError] = useState<string | null>(null);
     const [collectedData, setCollectedData] = useState<Record<string, any>>({});
     const [showDebugData, setShowDebugData] = useState(false);
-    const { getSelectedL1 } = useL1ListStore();
+    const selectedL1 = useSelectedL1();
     const [conversionTxIDError, setConversionTxIDError] = useState<string>("");
     const [L1ConversionSignatureError, setL1ConversionSignatureError] = useState<string>("");
     const [isAggregating, setIsAggregating] = useState(false);
@@ -60,7 +60,7 @@ export default function InitValidatorSet() {
 
     useEffect(() => {
         setConversionTxIDError("");
-        const subnetId = getSelectedL1()?.subnetId;
+        const subnetId = selectedL1?.subnetId;
         if (!subnetId) return;
         getSubnetInfo(subnetId).then((subnetInfo) => {
             setConversionTxID(subnetInfo.l1ConversionTransactionHash);
@@ -75,7 +75,7 @@ export default function InitValidatorSet() {
             setError("Conversion Tx ID is required");
             return;
         }
-        const evmChainRpcUrl = getSelectedL1()?.rpcUrl;
+        const evmChainRpcUrl = selectedL1?.rpcUrl;
         if (!evmChainRpcUrl && debug) {
             setError('RPC endpoint is required for debug mode');
             return;

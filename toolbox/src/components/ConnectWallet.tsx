@@ -29,7 +29,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
     const setIsTestnet = useWalletStore(state => state.setIsTestnet);
 
-    const { l1List, lastSelectedL1, setLastSelectedL1, addL1 } = useL1ListStore();
+    const { l1List, addL1 } = useL1ListStore();
     const [hasWallet, setHasWallet] = useState<boolean>(false)
     const [isBrowser, setIsBrowser] = useState<boolean>(false)
     const [selectedL1Balance, setSelectedL1Balance] = useState<string>("0")
@@ -38,7 +38,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const { showBoundary } = useErrorBoundary()
 
     // Get selected L1 details
-    const selectedL1 = l1List.find(l1 => l1.id === lastSelectedL1);
+    const selectedL1 = l1List.find(l1 => l1.evmChainId === walletChainId);
 
     // Fetch balances
     useEffect(() => {
@@ -49,8 +49,8 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                 // If an L1 is selected, fetch its balance
                 if (selectedL1 && selectedL1.rpcUrl) {
                     try {
-                        const tempPublicClient = createPublicClient({ 
-                            transport: http(selectedL1.rpcUrl), 
+                        const tempPublicClient = createPublicClient({
+                            transport: http(selectedL1.rpcUrl),
                             // Potentially add chain definition if needed by viem
                             // chain: { id: selectedL1.evmChainId, name: selectedL1.name, nativeCurrency: { name: selectedL1.coinName, symbol: selectedL1.coinName, decimals: 18 } }
                         });
@@ -64,7 +64,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                     }
                 } else {
                     // Optionally clear L1 balance or set to 0 if none selected
-                    setSelectedL1Balance("0"); 
+                    setSelectedL1Balance("0");
                 }
 
                 // Get P-Chain balance
@@ -234,20 +234,17 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     }
 
     // Updated handleAddChain to accept the full chain object matching the store's addL1 action
-    const handleAddChain = (chain: { 
-        id: string; 
-        name: string; 
-        rpcUrl: string; 
-        evmChainId: number; 
-        coinName: string; 
-        isTestnet: boolean; 
-        subnetId: string; 
+    const handleAddChain = (chain: {
+        id: string;
+        name: string;
+        rpcUrl: string;
+        evmChainId: number;
+        coinName: string;
+        isTestnet: boolean;
+        subnetId: string;
     }) => {
         // Add the chain to l1List store using the provided object
         addL1(chain);
-        
-        // Set this as the current chain using the Avalanche Blockchain ID
-        setLastSelectedL1(chain.id);
     };
 
     // Function to switch chains in the wallet extension
@@ -277,14 +274,10 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
 
     // Handle chain selection with wallet switching
     const handleChainSelect = async (chainId: string) => {
-        // First update the UI state
-        setLastSelectedL1(chainId);
-        
         // Then find the chain details and request the wallet to switch
         const selectedChain = l1List.find(chain => chain.id === chainId);
-        if (selectedChain) {
-            await switchChain(selectedChain.evmChainId);
-        }
+        if (!selectedChain) throw new Error("Chain not found");
+        await switchChain(selectedChain.evmChainId);
     };
 
     // Get network badge based on network ID
@@ -345,7 +338,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
 
                     {/* Chain cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {/* Selected L1 Chain or Default C-Chain */} 
+                        {/* Selected L1 Chain or Default C-Chain */}
                         {selectedL1 ? (
                             <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-blue-500 dark:border-blue-700 ring-1 ring-blue-500 dark:ring-blue-700">
                                 <div className="flex justify-between items-start mb-2">
@@ -379,7 +372,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                                 </div>
                                 <div className="text-2xl font-semibold text-zinc-500 dark:text-zinc-500 mb-2">-- AVAX</div>
                                 {/* EVM Address inside the fallback card */}
-                                <div className="flex items-center justify-between mt-2"> {/* Added mt-2 for spacing */} 
+                                <div className="flex items-center justify-between mt-2"> {/* Added mt-2 for spacing */}
                                     <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
                                         {walletEVMAddress}
                                     </div>
@@ -421,34 +414,34 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                     {/* Network section - Always displayed */}
                     <div className="mb-6">
                         <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Your Networks</h4>
-                        
+
                         {l1List.length > 0 ? (
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                                 {l1List.map((chain) => (
-                                    <ChainTile 
+                                    <ChainTile
                                         key={chain.id}
                                         chain={chain}
-                                        isActive={lastSelectedL1 === chain.id}
+                                        isActive={walletChainId === chain.evmChainId}
                                         onClick={() => handleChainSelect(chain.id)}
                                     />
                                 ))}
-                                <ChainTile 
-                                    isAddTile 
-                                    onClick={() => setIsAddChainModalOpen(true)} 
+                                <ChainTile
+                                    isAddTile
+                                    onClick={() => setIsAddChainModalOpen(true)}
                                 />
                             </div>
                         ) : (
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                                <ChainTile 
-                                    isAddTile 
-                                    onClick={() => setIsAddChainModalOpen(true)} 
+                                <ChainTile
+                                    isAddTile
+                                    onClick={() => setIsAddChainModalOpen(true)}
                                 />
                             </div>
                         )}
                     </div>
 
                     {/* Add Chain Modal */}
-                    <AddChainModal 
+                    <AddChainModal
                         isOpen={isAddChainModalOpen}
                         onClose={() => setIsAddChainModalOpen(false)}
                         onAddChain={handleAddChain}

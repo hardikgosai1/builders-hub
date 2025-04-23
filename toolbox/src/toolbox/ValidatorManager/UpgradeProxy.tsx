@@ -1,7 +1,7 @@
 "use client";
 
 import { useWalletStore } from "../../lib/walletStore";
-import { useL1ListStore, useViemChainStore } from "../toolboxStore";
+import { useL1ListStore, useSelectedL1, useViemChainStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
@@ -22,8 +22,8 @@ export default function UpgradeProxy() {
         validatorManagerAddress,
     } = useToolboxStore();
     const [proxyAdminAddress, setProxyAdminAddress] = useState<`0x${string}` | null>(null);
-    const { lastSelectedL1, getSelectedL1 } = useL1ListStore();
-    const { coreWalletClient, publicClient } = useWalletStore();
+    const selectedL1 = useSelectedL1();
+    const { coreWalletClient, publicClient, walletChainId } = useWalletStore();
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [currentImplementation, setCurrentImplementation] = useState<string | null>(null);
     const [desiredImplementation, setDesiredImplementation] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export default function UpgradeProxy() {
     useEffect(() => {
         (async function () {
             try {
-                const subnetId = getSelectedL1()?.subnetId || "";
+                const subnetId = selectedL1?.subnetId;
                 if (!subnetId) {
                     throw new Error("No subnet ID found, this should never happen");
                 }
@@ -50,7 +50,7 @@ export default function UpgradeProxy() {
                 showBoundary(error);
             }
         })()
-    }, [lastSelectedL1]);
+    }, [walletChainId]);
 
     // Read the proxy admin from storage slot
     async function readProxyAdminSlot(address: string) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useToolboxStore } from "../toolboxStore"
+import { useSelectedL1 } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import type { AbiEvent } from "viem"
@@ -10,6 +10,7 @@ import { Button } from "../../components/Button"
 import { Input } from "../../components/Input"
 import { Container } from "../components/Container"
 import { ChevronDown, ChevronRight } from "lucide-react"
+import { getSubnetInfo } from "../../coreViem/utils/glacier"
 
 type ViewData = {
   [key: string]: any
@@ -30,12 +31,29 @@ const serializeValue = (value: any): any => {
 
 export default function ReadContract() {
   const { showBoundary } = useErrorBoundary()
-  const { proxyAddress, setProxyAddress } = useToolboxStore()
+  const [proxyAddress, setProxyAddress] = useState<string>("");
   const [viewData, setViewData] = useState<ViewData>({})
   const [isReading, setIsReading] = useState(false)
   const [eventLogs, setEventLogs] = useState<Record<string, any[]>>({})
   const { publicClient } = useWalletStore()
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({})
+  const selectedL1 = useSelectedL1();
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const subnetId = selectedL1?.subnetId;
+        if (!subnetId) {
+          throw new Error("No subnet ID found, this should never happen");
+        }
+        const info = await getSubnetInfo(subnetId);
+        const newProxyAddress = info.l1ValidatorManagerDetails?.contractAddress || "";
+        setProxyAddress(newProxyAddress);
+      } catch (error) {
+        showBoundary(error);
+      }
+    })()
+  }, [selectedL1]);
 
   async function readContractData() {
     if (!proxyAddress) {

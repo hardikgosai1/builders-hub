@@ -1,6 +1,6 @@
 "use client";
 
-import { useL1ListStore, useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useL1ListStore, useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ export default function Initialize() {
     const [maximumChurnPercentage, setMaximumChurnPercentage] = useState("20");
     const [adminAddress, setAdminAddress] = useState("");
     const viemChain = useViemChainStore();
-    const { getSelectedL1 } = useL1ListStore();
+    const selectedL1 = useSelectedL1();
 
     useEffect(() => {
         if (walletEVMAddress && !adminAddress) {
@@ -35,7 +35,7 @@ export default function Initialize() {
 
     let subnetIDHex = "";
     try {
-        subnetIDHex = utils.bufferToHex(utils.base58check.decode(getSelectedL1()?.subnetId || ""));
+        subnetIDHex = utils.bufferToHex(utils.base58check.decode(selectedL1?.subnetId || ""));
     } catch (error) {
         console.error('Error decoding subnetId:', error);
     }
@@ -51,7 +51,7 @@ export default function Initialize() {
 
     useEffect(() => {
         setContractAddressError("");
-        const subnetId = getSelectedL1()?.subnetId;
+        const subnetId = selectedL1?.subnetId;
         if (!subnetId) return;
         getSubnetInfo(subnetId).then((subnetInfo) => {
             setProxyAddress(subnetInfo.l1ValidatorManagerDetails?.contractAddress || "");
@@ -59,7 +59,7 @@ export default function Initialize() {
             console.error('Error getting subnet info:', error);
             setContractAddressError((error as Error)?.message || "Unknown error");
         });
-    }, [getSelectedL1]);
+    }, [selectedL1]);
 
 
 
@@ -160,7 +160,7 @@ export default function Initialize() {
 
                 <Input
                     label="Subnet ID"
-                    value={getSelectedL1()?.subnetId}
+                    value={selectedL1?.subnetId}
                     disabled
                 />
                 <Input

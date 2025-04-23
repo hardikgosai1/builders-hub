@@ -7,7 +7,8 @@ import { Button } from "../../components/Button"
 import { Input } from "../../components/Input"
 import { Container } from "../components/Container"
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
-
+import { fetchChainId } from "../../lib/chainId"
+import { getBlockchainInfo } from "../../coreViem/utils/glacier";
 
 export default function L1Form() {
     const [isSwitching, setIsSwitching] = useState(false);
@@ -41,6 +42,10 @@ export default function L1Form() {
 
             const chainId = await publicClient.getChainId();
             setEvmChainId(chainId);
+
+            const { avalancheChainId } = await fetchChainId(evmChainRpcUrl);
+            const blockchainInfo = await getBlockchainInfo(avalancheChainId);
+            setEvmChainName(blockchainInfo.blockchainName);
         } catch (error) {
             setLocalError((error as Error)?.message || "Unknown error");
         } finally {
@@ -107,22 +112,7 @@ export default function L1Form() {
                 )}
 
                 <div className="space-y-3">
-                    {/* 
-                        {evmChainId !== walletChainId && !knownEvmChainIds.includes(walletChainId) && <Button onClick={loadFromWallet}>Load from wallet</Button>}
-                        */}
-
-                    <div className="space-y-1">
-                        <Input
-                            label="Chain Name"
-                            type="text"
-                            value={evmChainName}
-                            onChange={setEvmChainName}
-                            placeholder="Enter chain name"
-                            className="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
-                        />
-                    </div>
-
-                    <div className="space-y-1">
+                    <div className="space-y-4">
                         <Input
                             label="RPC URL"
                             type="text"
@@ -131,9 +121,15 @@ export default function L1Form() {
                             placeholder="Enter RPC URL"
                             className="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
                         />
-                    </div>
+                        <Input
+                            label="Chain Name"
+                            type="text"
+                            value={evmChainName}
+                            onChange={setEvmChainName}
+                            placeholder="Enter chain name"
+                            className="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
+                        />
 
-                    <div className="space-y-1">
                         <Input
                             label="Coin Name"
                             type="text"
@@ -142,9 +138,6 @@ export default function L1Form() {
                             placeholder="Enter coin name"
                             className="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400"
                         />
-                    </div>
-
-                    <div className="space-y-1">
                         <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300">Is Testnet</label>
                         <div className="flex space-x-2">
                             <Button

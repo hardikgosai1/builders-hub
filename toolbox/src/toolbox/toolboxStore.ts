@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow'
+import { useWalletStore } from '../lib/walletStore';
 
 export type DeployOn = "L1" | "C-Chain";
 
@@ -61,10 +62,6 @@ export const useL1ListStore = create(
         combine(l1ListState, (set, get) => ({
             addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
-            setLastSelectedL1: (l1: string) => set({ lastSelectedL1: l1 }),
-            getSelectedL1: () => {
-                return get().l1List.find((l) => l.id === get().lastSelectedL1);
-            },
             reset: () => {
                 window?.localStorage.removeItem('l1-list-store');
             },
@@ -146,8 +143,9 @@ export function resetAllStores() {
 }
 
 export function useViemChainStore() {
-    const { lastSelectedL1, l1List } = useL1ListStore();
-    const selectedL1 = useMemo(() => l1List.find(l1 => l1.id === lastSelectedL1), [l1List, lastSelectedL1]);
+    const { walletChainId } = useWalletStore();
+    const { l1List } = useL1ListStore();
+    const selectedL1 = useMemo(() => l1List.find(l1 => l1.evmChainId === walletChainId), [l1List, walletChainId]);
 
     const { chainName } = useCreateChainStore(
         useShallow(state => ({
@@ -178,5 +176,15 @@ export function useViemChainStore() {
     }, [selectedL1, chainName]);
 
     return viemChain;
+}
+
+export function useSelectedL1() {
+    const { walletChainId } = useWalletStore();
+    const { l1List } = useL1ListStore();
+
+    return useMemo(() =>
+        l1List.find(l1 => l1.evmChainId === walletChainId) || undefined,
+        [l1List, walletChainId]
+    );
 }
 
