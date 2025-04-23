@@ -11,7 +11,7 @@ import { extractWarpMessageFromPChainTx, ExtractWarpMessageFromTxParams } from '
 import { getEthereumChain } from './methods/getEthereumChain'
 import { extractChainInfo, ExtractChainInfoParams } from './methods/extractChainInfo'
 import { getPChainBalance } from './methods/getPChainbalance'
-// import { sendTransaction } from './overrides/sendTransaction'
+import { sendTransaction } from './overrides/sendTransaction'
 
 //Warning! This api is not stable yet, it will change in the future
 export { type ConvertToL1Validator } from "./methods/convertToL1"
@@ -37,7 +37,7 @@ export function createCoreWalletClient(account: `0x${string}`) {
     }).extend((client) => ({
         //override methods
         addChain: (args: CoreWalletAddChainParameters) => addChain(client, args),
-        // sendTransaction: (args) => sendTransaction(client, args),
+        sendTransaction: (args) => sendTransaction(client, args),
 
         //new methods
         isTestnet: () => isTestnet(client),

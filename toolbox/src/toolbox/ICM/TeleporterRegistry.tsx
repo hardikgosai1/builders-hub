@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
@@ -17,6 +17,7 @@ export default function TeleporterRegistry() {
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
+    const selectedL1 = useSelectedL1();
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -54,7 +55,7 @@ export default function TeleporterRegistry() {
             <h2 className="text-lg font-semibold">Deploy Teleporter Registry</h2>
             <div className="space-y-4">
                 <div className="mb-4">
-                    This will deploy the <code>TeleporterRegistry</code> contract to the EVM network <code>{walletChainId}</code>.
+                    This will deploy the <code>TeleporterRegistry</code> contract to the EVM network #<code>{selectedL1?.evmChainId}</code>.
                     The contract will be initialized with the Teleporter Messenger address <code>{TeleporterMessengerAddress.content.trim()}</code>.
                 </div>
                 <Button
