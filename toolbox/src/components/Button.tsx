@@ -15,6 +15,7 @@ interface ButtonProps {
   size?: "default" | "sm" | "lg"
   className?: string
   stickLeft?: boolean
+  error?: string
 }
 
 export function Button({
@@ -28,6 +29,7 @@ export function Button({
   size = "default",
   className,
   stickLeft = false,
+  error,
 }: ButtonProps) {
   // Base classes shared by all buttons
   const baseClasses = [
@@ -79,23 +81,26 @@ export function Button({
   );
 
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={buttonClasses}
-    >
-      {loading ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          {loadingText || "Loading..."}
-        </>
-      ) : (
-        <>
-          {icon && icon}
-          {children}
-        </>
-      )}
-    </button>
+    <>
+      <button
+        onClick={onClick}
+        disabled={disabled || loading}
+        className={buttonClasses}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            {loadingText || "Loading..."}
+          </>
+        ) : (
+          <>
+            {icon && icon}
+            {children}
+          </>
+        )}
+      </button>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+    </>
   )
 }
 
