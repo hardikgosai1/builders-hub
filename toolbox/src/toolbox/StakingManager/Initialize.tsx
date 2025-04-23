@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
@@ -13,8 +13,9 @@ import NativeTokenStakingManagerABI from "../../../contracts/icm-contracts/compi
 import { Container } from "../components/Container";
 
 export default function Initialize() {
+    const selectedL1 = useSelectedL1();
     const { showBoundary } = useErrorBoundary();
-    const { stakingManagerAddress, setStakingManagerAddress, managerAddress, setManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
+    const { stakingManagerAddress, setStakingManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -28,12 +29,7 @@ export default function Initialize() {
     const [weightToValueFactor, setWeightToValueFactor] = useState("1");
     const [uptimeBlockchainID, setUptimeBlockchainID] = useState("");
     const viemChain = useViemChainStore();
-
-    useEffect(() => {
-        if (walletEVMAddress && !managerAddress) {
-            setManagerAddress(walletEVMAddress);
-        }
-    }, [walletEVMAddress, managerAddress]);
+    const [managerAddress, setManagerAddress] = useState(selectedL1?.validatorManagerAddress || "");
 
     useEffect(() => {
         if (stakingManagerAddress) {
@@ -165,6 +161,7 @@ export default function Initialize() {
                             onClick={checkIfInitialized}
                             loading={isChecking}
                             disabled={!stakingManagerAddress}
+                            stickLeft
                         >
                             Check Status
                         </Button>

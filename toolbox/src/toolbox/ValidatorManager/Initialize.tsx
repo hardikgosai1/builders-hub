@@ -153,6 +153,7 @@ export default function Initialize() {
                         loading={isChecking}
                         disabled={!proxyAddress}
                         size="sm"
+                        stickLeft
                     >
                         Check Status
                     </Button>
