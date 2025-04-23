@@ -139,13 +139,6 @@ const componentGroups: Record<string, ComponentType[]> = {
             walletRequired: "with-l1"
         },
         {
-            id: "readContract",
-            label: "Read Proxy Contract",
-            component: lazy(() => import('./ValidatorManager/ReadContract')),
-            fileNames: ["toolbox/src/toolbox/ValidatorManager/ReadContract.tsx"],
-            walletRequired: "with-l1"
-        },
-        {
             id: "initialize",
             label: "Set Initial Configuration",
             component: lazy(() => import('./ValidatorManager/Initialize')),
@@ -158,7 +151,14 @@ const componentGroups: Record<string, ComponentType[]> = {
             component: lazy(() => import('./ValidatorManager/InitValidatorSet')),
             fileNames: ["toolbox/src/toolbox/ValidatorManager/InitValidatorSet.tsx"],
             walletRequired: "with-l1"
-        }
+        },
+        {
+            id: "readContract",
+            label: "Read Validator Manager Contract",
+            component: lazy(() => import('./ValidatorManager/ReadContract')),
+            fileNames: ["toolbox/src/toolbox/ValidatorManager/ReadContract.tsx"],
+            walletRequired: "with-l1"
+        },
     ],
     "Validator Manager Operations": [
         {
