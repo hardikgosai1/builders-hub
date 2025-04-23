@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { X } from 'lucide-react';
-import { createPublicClient, http } from 'viem';
+import { type Chain } from 'viem';
 import { useWalletStore } from '../lib/walletStore';
 import { utils } from "@avalabs/avalanchejs";
-import { Tabs } from './Tabs';
 import { Input } from './Input';
 import { Select } from '../toolbox/components/Select';
-import { getBlockchainInfo } from '../coreViem/utils/glacier';
+import { getBlockchainInfo, getSubnetInfo } from '../coreViem/utils/glacier';
 import * as Dialog from "@radix-ui/react-dialog";
 import { fetchChainId } from '../lib/chainId';
 interface AddChainModalProps {
@@ -21,6 +20,7 @@ interface AddChainModalProps {
         coinName: string;
         isTestnet: boolean;
         subnetId: string;
+        validatorManagerAddress: string;
     }) => void;
 }
 
@@ -30,54 +30,28 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
     onAddChain,
 }) => {
     const [rpcUrl, setRpcUrl] = useState('');
-    const [name, setName] = useState('');
+    const [chainName, setChainName] = useState('');
     const [isTestnet, setIsTestnet] = useState(false);
     const [isAddingChain, setIsAddingChain] = useState(false);
-    const [addChainError, setAddChainError] = useState<string | null>(null);
     const [chainId, setChainId] = useState("");
     const [evmChainId, setEvmChainId] = useState(0);
     const [coinName, setCoinName] = useState("COIN");
-    const [activeTab, setActiveTab] = useState<"RPC_URL" | "CORE_WALLET">("RPC_URL");
     const [subnetId, setSubnetId] = useState("");
-
-    // For Core Wallet tab
-    const [anyChainId, setAnyChainId] = useState("");
+    const [validatorManagerAddress, setValidatorManagerAddress] = useState("");
     const [localError, setLocalError] = useState("");
-    const { walletChainId, coreWalletClient } = useWalletStore();
-
-    const FROM_RPC = "Enter RPC URL";
-    const FROM_CORE_WALLET = "Load from Core Wallet";
-
-    // Clear form when closed
-    useEffect(() => {
-        if (!isOpen) {
-            setRpcUrl('');
-            setName('');
-            setIsTestnet(true);
-            setAddChainError(null);
-            setChainId("");
-            setEvmChainId(0);
-            setCoinName("COIN");
-            setAnyChainId("");
-            setLocalError("");
-            setActiveTab("RPC_URL");
-        }
-    }, [isOpen]);
+    const { coreWalletClient } = useWalletStore();
 
     // Fetch chain data when RPC URL changes
     useEffect(() => {
         async function fetchChainData() {
-            setAddChainError(null);
             setEvmChainId(0);
             setChainId("");
-            setName("");
+            setChainName("");
+            setLocalError("");
 
-            if (!rpcUrl) {
-                return;
-            }
-
+            if (!rpcUrl) return;
             if (!rpcUrl.startsWith("https://")) {
-                setAddChainError("The RPC URL must start with https://");
+                setLocalError("The RPC URL must start with https://");
                 return;
             }
 
@@ -86,246 +60,61 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 setEvmChainId(ethereumChainId);
                 setChainId(avalancheChainId);
 
-                try {
-                    const blockchainInfo = await getBlockchainInfo(avalancheChainId);
-                    setSubnetId(blockchainInfo.subnetId);
-                    setName(blockchainInfo.blockchainName || "");
-                    setIsTestnet(blockchainInfo.isTestnet);
-                } catch (infoError) {
-                    console.warn("Could not fetch blockchain info:", infoError);
-                    // Non-fatal error, continue with what we have
-                }
+                const blockchainInfo = await getBlockchainInfo(avalancheChainId);
+                setSubnetId(blockchainInfo.subnetId);
+                setChainName(blockchainInfo.blockchainName || "");
+                setIsTestnet(blockchainInfo.isTestnet);
+                const subnetInfo = await getSubnetInfo(blockchainInfo.subnetId);
+                setValidatorManagerAddress(subnetInfo.l1ValidatorManagerDetails?.contractAddress || "");
             } catch (error) {
-                setAddChainError((error as Error)?.message || String(error));
+                //Fatal error, toolbox has a hard dependency on glacier
+                setLocalError((error as Error)?.message || String(error));
             }
         }
 
-        if (activeTab === "RPC_URL") {
-            fetchChainData();
-        }
-    }, [rpcUrl, activeTab]);
+        fetchChainData();
+    }, [rpcUrl]);
 
-    // For Core Wallet tab: try to extract EVM Chain ID from any Chain ID
-    useEffect(() => {
-        (async function () {
-            setLocalError("");
-            setEvmChainId(-1);
-            if (!anyChainId) return;
-
-            try {
-                const parsed = parseInt(anyChainId, 10);
-                if (!isNaN(parsed)) {
-                    setEvmChainId(parsed);
-                    return;
-                }
-            } catch (e) {
-                console.log('error parsing as number:', e);
-            }
-
-            try {
-                utils.base58check.decode(anyChainId); // Validate Avalanche Chain ID format
-                const chain = await getBlockchainInfo(anyChainId);
-                setEvmChainId(chain.evmChainId);
-                setChainId(anyChainId);
-                setSubnetId(chain.subnetId);
-                setName(chain.blockchainName || "");
-            } catch (error) {
-                console.error("Failed to fetch chain info:", error);
-                setLocalError("Invalid chain ID. Please enter either a valid EVM chain ID number or an Avalanche blockchain ID in base58 format.");
-            }
-        })();
-    }, [anyChainId]);
-
-    // Switch to chain in Core Wallet
-    async function switchToChain(targetEvmChainId: number) {
+    async function handleAddChain() {
         try {
-            setLocalError("");
+            setIsAddingChain(true)
 
-            if (!window.avalanche || !window.avalanche.request) {
-                throw new Error("Core Wallet extension not found or request method missing.");
+            const viemChain: Chain = {
+                id: evmChainId,
+                name: chainName,
+                rpcUrls: {
+                    default: { http: [rpcUrl] },
+                },
+                nativeCurrency: {
+                    name: coinName,
+                    symbol: coinName,
+                    decimals: 18,
+                }
             }
 
-            const chainIdHex = `0x${parseInt(targetEvmChainId.toString()).toString(16)}`;
-
-            await window.avalanche.request({
-                method: "wallet_switchEthereumChain",
-                params: [{ chainId: chainIdHex }],
+            await coreWalletClient.addChain({ chain: viemChain });
+            await coreWalletClient.switchChain({
+                id: `0x${evmChainId.toString(16)}`,
             });
+
+            await onAddChain({
+                id: chainId,
+                name: chainName,
+                rpcUrl: rpcUrl,
+                evmChainId: evmChainId,
+                coinName: coinName,
+                isTestnet: isTestnet,
+                subnetId: subnetId,
+                validatorManagerAddress: validatorManagerAddress,
+            });
+            onClose();
         } catch (error) {
-            console.error("Failed to switch to chain:", error);
-            setLocalError(`Failed to switch to chain. Do you have chain ${targetEvmChainId} added in your wallet? Original error: ${(error as Error)?.message || String(error)}`);
+            console.error("Failed to add chain:", error);
+            setLocalError((error as Error)?.message || String(error));
+        } finally {
+            setIsAddingChain(false);
         }
     }
-
-    // Fetch current chain info from Core Wallet
-    async function fetchFromWallet() {
-        try {
-            setLocalError("");
-
-            if (!coreWalletClient) {
-                throw new Error("Core Wallet client not found.");
-            }
-
-            const evmInfo = await coreWalletClient.getEthereumChain();
-            setRpcUrl(evmInfo.rpcUrls[0]);
-            setCoinName(evmInfo.nativeCurrency.name);
-            setIsTestnet(evmInfo.isTestnet);
-            setEvmChainId(evmInfo.id);
-
-            // We need to get the Avalanche chain ID if possible
-            try {
-                const publicClient = createPublicClient({
-                    transport: http(evmInfo.rpcUrls[0])
-                });
-                const { avalancheChainId } = await fetchChainId(evmInfo.rpcUrls[0]);
-                setChainId(avalancheChainId);
-            } catch (chainIdError) {
-                console.warn("Could not fetch Avalanche Chain ID:", chainIdError);
-                // This is not fatal
-            }
-        } catch (error) {
-            console.error("Failed to fetch from wallet:", error);
-            setLocalError(`Failed to fetch from wallet: ${(error as Error)?.message || String(error)}`);
-        }
-    }
-
-    const handleSubmit = (e?: React.FormEvent) => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        setAddChainError(null);
-        setIsAddingChain(true);
-
-        (async () => {
-            try {
-                if (!window.avalanche || !window.avalanche.request) {
-                    throw new Error("Core Wallet extension not found or request method missing.");
-                }
-
-                // Use existing data if available, otherwise fetch if necessary
-                let finalEvmChainId = evmChainId;
-                let finalAvalancheChainId = chainId;
-                let finalRpcUrl = rpcUrl;
-                let finalSubnetId = subnetId;
-                let finalName = name;
-                let finalCoinName = coinName;
-                let finalIsTestnet = isTestnet;
-
-                if (activeTab === "RPC_URL") {
-                    if (!finalEvmChainId || !finalAvalancheChainId) {
-                        const { ethereumChainId, avalancheChainId } = await fetchChainId(finalRpcUrl);
-                        finalEvmChainId = ethereumChainId;
-                        finalAvalancheChainId = avalancheChainId;
-                    }
-                    if (!finalSubnetId || !finalName) {
-                        try {
-                            const blockchainInfo = await getBlockchainInfo(finalAvalancheChainId);
-                            finalSubnetId = blockchainInfo.subnetId;
-                            // Prioritize user input name if available
-                            finalName = finalName || blockchainInfo.blockchainName || "";
-                        } catch (infoError) {
-                            console.warn("Could not fetch blockchain info during submit:", infoError);
-                        }
-                    }
-                } else { // CORE_WALLET tab
-                    // Ensure data fetched from wallet is used if available and submit is triggered
-                    if (!finalRpcUrl || !finalCoinName) {
-                        // Attempt to fetch again if needed, though ideally fetchFromWallet was called
-                        try {
-                            const evmInfo = await coreWalletClient!.getEthereumChain();
-                            finalRpcUrl = evmInfo.rpcUrls[0];
-                            finalCoinName = evmInfo.nativeCurrency.name;
-                            finalIsTestnet = evmInfo.isTestnet;
-                            finalEvmChainId = evmInfo.id;
-                            // Re-fetch Avalanche Chain ID if missing
-                            if (!finalAvalancheChainId) {
-                                const { avalancheChainId: fetchedAvaxId } = await fetchChainId(finalRpcUrl);
-                                finalAvalancheChainId = fetchedAvaxId;
-                            }
-                            // Re-fetch Subnet ID and Name if missing
-                            if (!finalSubnetId || !finalName) {
-                                const blockchainInfo = await getBlockchainInfo(finalAvalancheChainId);
-                                finalSubnetId = blockchainInfo.subnetId;
-                                // Prioritize user input name if available
-                                finalName = finalName || blockchainInfo.blockchainName || "";
-                            }
-                        } catch (fetchErr) {
-                            throw new Error(`Failed to fetch necessary chain info from wallet: ${fetchErr}`);
-                        }
-                    }
-                }
-
-                console.log("handleSubmit: finalEvmChainId =", finalEvmChainId);
-                console.log("handleSubmit: finalAvalancheChainId =", finalAvalancheChainId);
-                console.log("handleSubmit: finalRpcUrl =", finalRpcUrl);
-
-                if (!finalEvmChainId || !finalAvalancheChainId) {
-                    throw new Error("Could not determine necessary Chain IDs. Please ensure RPC URL is correct or Core Wallet is connected properly.");
-                }
-
-                if (!finalRpcUrl) {
-                    throw new Error("RPC URL is missing.");
-                }
-
-                // Check if chain already exists in wallet extension
-                let chainExistsInExtension = false;
-                try {
-                    // Attempt to switch - will error if chain doesn't exist
-                    await window.avalanche.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: `0x${finalEvmChainId.toString(16)}` }],
-                    });
-                    chainExistsInExtension = true;
-                } catch (switchError: any) {
-                    if (switchError.code !== 4902) { // 4902: Unrecognized chain ID
-                        console.warn("Error checking chain existence:", switchError);
-                        // Don't throw, just assume it doesn't exist if code isn't 4902
-                    }
-                }
-
-                // Add chain to wallet extension if it doesn't exist
-                if (!chainExistsInExtension) {
-                    const formattedChainName = `${finalName || finalCoinName}${finalIsTestnet ? ' Testnet' : ''}`;
-                    await window.avalanche.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: `0x${finalEvmChainId.toString(16)}`,
-                            chainName: formattedChainName,
-                            nativeCurrency: {
-                                name: finalName || finalCoinName,
-                                symbol: (finalCoinName).toUpperCase(),
-                                decimals: 18,
-                            },
-                            rpcUrls: [finalRpcUrl],
-                        }],
-                    });
-                }
-
-                // Call onAddChain with the complete chain object
-                const chainToAdd = {
-                    id: finalAvalancheChainId, // Avalanche Blockchain ID is the primary ID
-                    name: finalName || `Chain ${finalEvmChainId}`, // Use fetched/entered name or fallback
-                    rpcUrl: finalRpcUrl,
-                    evmChainId: finalEvmChainId,
-                    coinName: finalCoinName.toUpperCase(), // Ensure symbol is uppercase
-                    isTestnet: finalIsTestnet,
-                    subnetId: finalSubnetId || "", // Ensure subnetId is provided, fallback to empty string
-                };
-
-                onAddChain(chainToAdd);
-
-                // Reset form
-                onClose();
-
-            } catch (err) {
-                console.error("Error adding chain:", err);
-                setAddChainError(err instanceof Error ? err.message : 'Failed to add or switch chain.');
-            } finally {
-                setIsAddingChain(false);
-            }
-        })();
-    };
 
     if (!isOpen) return null;
 
@@ -335,108 +124,71 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-overlayShow" />
                 <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-lg focus:outline-none w-[90vw] max-w-md">
                     <Dialog.Title className="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100">
-                        Add Custom EVM Chain
+                        Add an existing Avalanche L1
                     </Dialog.Title>
 
-                    <Tabs
-                        tabs={[FROM_RPC, FROM_CORE_WALLET]}
-                        activeTab={activeTab === "RPC_URL" ? FROM_RPC : FROM_CORE_WALLET}
-                        setActiveTab={(tab) => setActiveTab(tab === FROM_RPC ? "RPC_URL" : "CORE_WALLET")}
-                    >
-                        {activeTab === "RPC_URL" ? (
-                            // RPC URL tab content
-                            <div className="space-y-4">
-                                <Input
-                                    id="rpcUrl"
-                                    label="RPC URL"
-                                    value={rpcUrl}
-                                    onChange={setRpcUrl}
-                                    placeholder="https://api.mychain.com"
-                                    error={addChainError || ""}
-                                />
+                    <div className="space-y-4">
+                        <LoadFromCoreWallet onLookup={({ rpcUrl, coinName }: { rpcUrl: string, coinName: string }) => {
+                            setRpcUrl(rpcUrl);
+                            setCoinName(coinName);
+                        }} />
 
-                                <Input
-                                    id="chainId"
-                                    label="EVM Chain ID"
-                                    value={evmChainId || ""}
-                                    disabled={true}
-                                    placeholder="Detected EVM chain ID"
-                                />
-
-                                {chainId && (
-                                    <Input
-                                        id="avalancheChainId"
-                                        label="Avalanche Chain ID (base58)"
-                                        value={chainId}
-                                        disabled={true}
-                                    />
-                                )}
-
-                                <Input
-                                    id="name"
-                                    label="Coin Name (Symbol)"
-                                    value={name}
-                                    onChange={setName}
-                                    placeholder="MYC"
-                                />
-
-                                <Select
-                                    label="Is Testnet"
-                                    value={isTestnet ? "Yes" : "No"}
-                                    onChange={() => { }}
-                                    disabled={true}
-                                    options={[
-                                        { label: "Yes", value: "Yes" },
-                                        { label: "No", value: "No" },
-                                    ]}
-                                />
-                            </div>
-                        ) : (
-                            // Core Wallet tab content
-                            <div className="space-y-4">
-                                <Input
-                                    id="anyChainId"
-                                    label="Chain ID (EVM number or Avalanche base58 format)"
-                                    value={anyChainId}
-                                    onChange={setAnyChainId}
-                                    placeholder="e.g. 43114 or 2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
-                                    error={localError}
-                                />
-
-                                {evmChainId > 0 && (
-                                    <>
-                                        {walletChainId === evmChainId ? (
-                                            <Button onClick={fetchFromWallet}>
-                                                Fetch from wallet
-                                            </Button>
-                                        ) : (
-                                            <Button onClick={() => switchToChain(evmChainId)}>
-                                                Switch to chain {evmChainId}
-                                            </Button>
-                                        )}
-
-                                        <Input
-                                            id="cw-coinName"
-                                            label="Coin Name"
-                                            value={coinName}
-                                            onChange={setCoinName}
-                                        />
-
-                                        <Select
-                                            label="Is Testnet"
-                                            value={isTestnet ? "Yes" : "No"}
-                                            disabled={true}
-                                            onChange={() => { }}
-                                            options={[
-                                                { label: "Yes", value: "Yes" },
-                                                { label: "No", value: "No" },
-                                            ]}
-                                        />
-                                    </>
-                                )}
+                        {localError && (
+                            <div className="text-red-500 mb-4">
+                                {localError}
                             </div>
                         )}
-                    </Tabs>
+
+                        <Input
+                            id="rpcUrl"
+                            label="RPC URL"
+                            value={rpcUrl}
+                            onChange={setRpcUrl}
+                            placeholder="https://api.mychain.com"
+                        />
+
+                        <Input
+                            id="chainId"
+                            label="EVM Chain ID"
+                            value={evmChainId || ""}
+                            disabled={true}
+                            placeholder="Detected EVM chain ID"
+                        />
+
+                        <Input
+                            id="avalancheChainId"
+                            label="Avalanche Chain ID (base58)"
+                            value={chainId}
+                            disabled={true}
+                        />
+
+                        <Input
+                            id="name"
+                            label="Coin Name (Symbol)"
+                            value={coinName}
+                            onChange={setCoinName}
+                            placeholder="MYCOIN"
+                        />
+
+                        <Input
+                            label="Chain Name"
+                            value={chainName}
+                            onChange={setChainName}
+                            placeholder="MYCHAIN"
+                        />
+
+                        <Select
+                            label="Is Testnet"
+                            value={isTestnet ? "Yes" : "No"}
+                            onChange={() => { }}
+                            disabled={true}
+                            options={[
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                            ]}
+                        />
+                    </div>
+
 
                     <div className="flex justify-end space-x-3 mt-6">
                         <Button
@@ -446,11 +198,12 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                             Cancel
                         </Button>
                         <Button
-                            onClick={() => handleSubmit()}
+                            onClick={handleAddChain}
                             className="bg-black hover:bg-zinc-800 text-white"
-                            disabled={isAddingChain || (activeTab === "CORE_WALLET" && evmChainId <= 0)}
+                            loading={isAddingChain}
+                            disabled={!chainName || !coinName || !rpcUrl || !chainId || !evmChainId}
                         >
-                            {isAddingChain ? 'Adding...' : 'Add Chain'}
+                            Add Chain
                         </Button>
                     </div>
 
@@ -464,6 +217,77 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                     </Dialog.Close>
                 </Dialog.Content>
             </Dialog.Portal>
-        </Dialog.Root>
+        </Dialog.Root >
     );
 };
+function LoadFromCoreWallet({ onLookup }: { onLookup: ({ rpcUrl, coinName }: { rpcUrl: string, coinName: string }) => void }) {
+    const [anyChainId, setAnyChainId] = useState("");
+    const [localError, setLocalError] = useState("");
+    const { coreWalletClient, walletChainId } = useWalletStore();
+    const [isOpen, setIsOpen] = useState(false);
+    const [isLookingUp, setIsLookingUp] = useState(false);
+
+    useEffect(() => {
+        setAnyChainId(walletChainId.toString());
+    }, [walletChainId]);
+
+    async function lookup() {
+        setLocalError("");
+        setIsLookingUp(true);
+        try {
+            let evmChainId: number;
+
+            if (/^[0-9]+$/.test(anyChainId)) {
+                evmChainId = parseInt(anyChainId, 10);
+            } else {
+                try {
+                    utils.base58check.decode(anyChainId); // Validate Avalanche Chain ID format
+                    const chain = await getBlockchainInfo(anyChainId);
+                    evmChainId = chain.evmChainId;
+                } catch (e) {
+                    console.error("Failed to lookup chain:", e);
+                    setLocalError("Invalid chain ID. Please enter either a valid EVM chain ID number or an Avalanche blockchain ID in base58 format.");
+                    return;
+                }
+            }
+
+            await coreWalletClient.switchChain({
+                id: `0x${evmChainId.toString(16)}`,
+            });
+
+            const evmInfo = await coreWalletClient.getEthereumChain();
+            onLookup({ rpcUrl: evmInfo.rpcUrls[0], coinName: evmInfo.nativeCurrency.name });
+            setIsOpen(false);
+        } catch (e) {
+            console.error("Failed to lookup chain:", e);
+            setLocalError("Failed to lookup chain. Please try again.");
+        } finally {
+            setIsLookingUp(false);
+        }
+    }
+
+    return (
+        <div>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-blue-500 border-b border-dashed border-blue-500 hover:text-blue-700 focus:outline-none"
+            >
+                {isOpen ? "Hide lookup form" : "Lookup from Core Wallet"}
+            </button>
+
+            {isOpen && (
+                <div className="mt-3">
+                    <Input
+                        id="anyChainId"
+                        label="Chain ID (EVM number or Avalanche base58 format)"
+                        value={anyChainId}
+                        onChange={setAnyChainId}
+                        placeholder="e.g. 43114 or 2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
+                        error={localError}
+                        button={<Button stickLeft onClick={lookup} loading={isLookingUp}>Lookup</Button>}
+                    />
+                </div>
+            )}
+        </div>
+    );
+}

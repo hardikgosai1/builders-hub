@@ -53,13 +53,13 @@ export const useCreateChainStore = create(
 )
 
 const l1ListState = {
-    l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }[],
+    l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string, validatorManagerAddress: string }[],
 }
 
 export const useL1ListStore = create(
     persist(
         combine(l1ListState, (set, get) => ({
-            addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
+            addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string, validatorManagerAddress: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
             reset: () => {
                 window?.localStorage.removeItem('l1-list-store');

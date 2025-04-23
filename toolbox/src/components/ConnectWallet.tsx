@@ -242,6 +242,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
         coinName: string;
         isTestnet: boolean;
         subnetId: string;
+        validatorManagerAddress: string;
     }) => {
         // Add the chain to l1List store using the provided object
         addL1(chain);
