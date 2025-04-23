@@ -41,6 +41,19 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
     const [localError, setLocalError] = useState("");
     const { coreWalletClient } = useWalletStore();
 
+    useEffect(() => {
+        if (!isOpen) {
+            setRpcUrl("");
+            setChainName("");
+            setChainId("");
+            setEvmChainId(0);
+            setCoinName("COIN");
+            setSubnetId("");
+            setValidatorManagerAddress("");
+            setLocalError("");
+        }
+    }, [isOpen]);
+
     // Fetch chain data when RPC URL changes
     useEffect(() => {
         async function fetchChainData() {
