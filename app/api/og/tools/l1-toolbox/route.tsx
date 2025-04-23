@@ -15,14 +15,65 @@ const regular = fetch(new URL('../../GeistMono-Light.ttf', import.meta.url)).the
   res.arrayBuffer(),
 );
 
+// Simplified mapping based on ToolboxApp component structure
+const toolLabels: Record<string, string> = {
+  switchChain: "Add L1 to Wallet",
+  crossChainTransfer: "C- & P-Chain Bridge",
+  addL1s: "Add popular L1s",
+  createSubnet: "Create Subnet",
+  createChain: "Create Chain",
+  convertToL1: "Convert Subnet to L1",
+  collectConversionSignatures: "Collect conversion signatures",
+  genesisBuilder: "EVM Genesis Builder",
+  queryL1Details: "Query L1 Details",
+  avalanchegoDocker: "Node Setup with Docker",
+  balanceTopup: "L1 Validator Balance Topup",
+  rpcMethodsCheck: "RPC Methods Check",
+  performanceMonitor: "Performance Monitor",
+  deployValidatorMessages: "Deploy Validator Messages Library",
+  deployValidatorManager: "Deploy Validator Manager Contract",
+  upgradeProxy: "Upgrade Proxy Contract",
+  readContract: "Read Proxy Contract",
+  initialize: "Set Initial Configuration",
+  initValidatorSet: "Initialize Validator Set",
+  addValidator: "Add L1 Validator",
+  removeValidator: "Remove L1 Validator",
+  changeWeight: "Change L1 Validator Weight",
+  queryL1ValidatorSet: "Query L1 Validator Set",
+  deployRewardCalculator: "Deploy Reward Calculator",
+  deployStakingManager: "Deploy Staking Manager",
+  initializeStakingManager: "Set Initial Configuration",
+  transferOwnership: "Transfer Validator Manager Ownership",
+  teleporterMessenger: "Deploy Teleporter Messenger",
+  teleporterRegistry: "Deploy Teleporter Registry",
+  icmRelayer: "ICM Relayer Setup",
+  deployICMDemo: "Deploy ICM Demo",
+  sendICMMessage: "Send ICM Message",
+  deployExampleERC20: "Deploy Example ERC20",
+  deployERC20TokenHome: "Deploy ERC20 Token Home Contract",
+  deployERC20TokenRemote: "Deploy ERC20 Token Remote Contract",
+  registerWithHome: "Register Token Remote with Home",
+  formatConverter: "Format Converter",
+  unitConverter: "AVAX Unit Converter",
+};
+
+const defaultTitle = 'Avalanche L1 Toolbox';
+const defaultDescription = 'Manage your L1 with a highly granular set of tools for the Avalanche ecosystem.';
+
 export async function GET(
   request: NextRequest,
 ): Promise<ImageResponse> {
+  const { searchParams } = new URL(request.url);
+  const toolId = searchParams.get('tool');
+
+  const title = toolId && toolLabels[toolId] ? toolLabels[toolId] : defaultTitle;
+  // Keep description generic or make it dynamic if needed
+  const description = defaultDescription; 
 
   return new ImageResponse(
     OG({
-      title: 'Avalanche L1 Toolbox',
-      description: 'Manage your L1 with a highly granular set of tools for the Avalanche ecosystem.'
+      title,
+      description,
     }),
     {
       width: 1200,
