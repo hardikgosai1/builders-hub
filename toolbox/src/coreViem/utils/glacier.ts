@@ -12,10 +12,10 @@ interface BlockchainInfo {
 
 type Network = "testnet" | "mainnet";
 
-export async function getBlockchainInfo(blockchainId: string): Promise<BlockchainInfo> {
+export async function getBlockchainInfo(blockchainId: string): Promise<BlockchainInfo & { isTestnet: boolean }> {
     return Promise.any([
-        getBlockchainInfoForNetwork("testnet", blockchainId),
-        getBlockchainInfoForNetwork("mainnet", blockchainId),
+        getBlockchainInfoForNetwork("testnet", blockchainId).then(info => ({ ...info, isTestnet: true })),
+        getBlockchainInfoForNetwork("mainnet", blockchainId).then(info => ({ ...info, isTestnet: false })),
     ]);
 }
 

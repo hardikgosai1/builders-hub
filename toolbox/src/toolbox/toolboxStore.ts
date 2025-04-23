@@ -54,7 +54,6 @@ export const useCreateChainStore = create(
 
 const l1ListState = {
     l1List: [] as { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string }[],
-    lastSelectedL1: "",
 }
 
 export const useL1ListStore = create(
@@ -128,8 +127,8 @@ export const getToolboxStore = (chainId: string) => create(
 )
 
 export const useToolboxStore = () => {
-    const { lastSelectedL1 } = useL1ListStore();
-    return getToolboxStore(lastSelectedL1)();
+    const selectedL1 = useSelectedL1();
+    return getToolboxStore(selectedL1?.id || "")();
 }
 
 export function resetAllStores() {
