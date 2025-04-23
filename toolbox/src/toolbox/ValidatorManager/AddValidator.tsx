@@ -38,7 +38,6 @@ const addValidationStepsConfig: StepsConfig<AddValidationStepKey> = {
 
 export default function AddValidator() {
     const { showBoundary } = useErrorBoundary()
-    const { proxyAddress, setProxyAddress } = useToolboxStore()
     const selectedL1 = useSelectedL1();
     const { avalancheNetworkID, coreWalletClient, pChainAddress } = useWalletStore()
     const viemChain = useViemChainStore()
@@ -49,7 +48,7 @@ export default function AddValidator() {
     const [newBlsProofOfPossession, setNewBlsProofOfPossession] = useState("")
     const [newWeight, setNewWeight] = useState("")
     const [newBalance, setNewBalance] = useState("0.1")
-    const [validatorManagerAddress, setValidatorManagerAddress] = useState(proxyAddress || "")
+    const [validatorManagerAddress, setValidatorManagerAddress] = useState(selectedL1?.validatorManagerAddress || "")
 
     // State for temp account and warp messages
     const [registerL1ValidatorUnsignedWarpMsg, setRegisterL1ValidatorUnsignedWarpMsg] = useState("")
@@ -78,12 +77,6 @@ export default function AddValidator() {
     const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
     const pvmApi = new pvm.PVMApi(platformEndpoint)
 
-    // Update proxyAddress in the store when validatorManagerAddress changes
-    useEffect(() => {
-        if (validatorManagerAddress) {
-            setProxyAddress(validatorManagerAddress)
-        }
-    }, [validatorManagerAddress, setProxyAddress])
 
     // Main function to add a validator
     const addValidator = async (startFromStep?: AddValidationStepKey) => {
@@ -508,9 +501,10 @@ export default function AddValidator() {
                     {!isProcessing && (
                         <Button
                             onClick={() => addValidator()}
-                            disabled={!validatorManagerAddress || !inputSubnetID}
+                            disabled={!validatorManagerAddress || !selectedL1?.subnetId}
+                            error={!validatorManagerAddress || !selectedL1?.subnetId ? "Set Required Fields First" : ""}
                         >
-                            {!validatorManagerAddress || !inputSubnetID ? "Set Required Fields First" : "Add Validator"}
+                            Add Validator
                         </Button>
                     )}
 
@@ -564,6 +558,7 @@ export default function AddValidator() {
                         </div>
                     )}
                 </div>
+            </div>
         </Container>
     )
 }
