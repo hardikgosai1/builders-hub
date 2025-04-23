@@ -389,7 +389,7 @@ export default function RemoveValidator() {
               "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
               "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
             )}
-            label="Proxy Address (Optional)"
+            label="Proxy Address"
             disabled={isProcessing}
           />
         </div>
@@ -409,7 +409,7 @@ export default function RemoveValidator() {
               "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
               "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
             )}
-            label="Subnet ID (Optional)"
+            label="Subnet ID"
             disabled={isProcessing}
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
