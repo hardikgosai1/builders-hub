@@ -12,7 +12,7 @@ import { getEthereumChain } from './methods/getEthereumChain'
 import { extractChainInfo, ExtractChainInfoParams } from './methods/extractChainInfo'
 import { getPChainBalance } from './methods/getPChainbalance'
 import { sendTransaction } from './overrides/sendTransaction'
-
+import { writeContract } from './overrides/writeContract'
 //Warning! This api is not stable yet, it will change in the future
 export { type ConvertToL1Validator } from "./methods/convertToL1"
 
@@ -38,6 +38,7 @@ export function createCoreWalletClient(account: `0x${string}`) {
         //override methods
         addChain: (args: CoreWalletAddChainParameters) => addChain(client, args),
         sendTransaction: (args) => sendTransaction(client, args),
+        writeContract: (args) => writeContract(client, args),
 
         //new methods
         isTestnet: () => isTestnet(client),

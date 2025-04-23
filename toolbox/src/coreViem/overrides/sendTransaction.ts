@@ -7,7 +7,7 @@ import { getTransactionError } from 'viem/utils'
 import { extract } from 'viem/utils'
 
 
-class AccountNotFoundError extends BaseError {
+export class AccountNotFoundError extends BaseError {
     constructor({ docsPath }: { docsPath?: string | undefined } = {}) {
         super(
             [

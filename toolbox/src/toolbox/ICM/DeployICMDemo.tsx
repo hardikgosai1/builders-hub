@@ -1,6 +1,6 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useToolboxStore, useViemChainStore, useSelectedL1 } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
@@ -18,6 +18,7 @@ export default function DeployICMDemo() {
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [isTeleporterDeployed, setIsTeleporterDeployed] = useState(false);
+    const selectedL1 = useSelectedL1();
 
     useEffect(() => {
         async function checkTeleporterExists() {
@@ -33,7 +34,7 @@ export default function DeployICMDemo() {
         }
 
         checkTeleporterExists();
-    }, [walletChainId]);
+    }, [selectedL1?.evmChainId]);
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -64,7 +65,7 @@ export default function DeployICMDemo() {
             <h2 className="text-lg font-semibold">Deploy ICM Demo contract</h2>
             <div className="space-y-4">
                 <div className="">
-                    This will deploy the <code>ICMDemo</code> contract to your connected network (Chain ID: <code>{walletChainId}</code>). This contract can receive messages from the C-Chain using Avalanche's Inter-Chain Messaging (ICM) protocol. Once deployed, you can use the pre-deployed sender contract on the C-Chain at address <a href={`https://subnets-test.avax.network/c-chain/address/${SENDER_C_CHAIN_ADDRESS}`} target="_blank" className="text-blue-500 hover:underline">{SENDER_C_CHAIN_ADDRESS}</a> to send messages to this receiver.
+                    This will deploy the <code>ICMDemo</code> contract to your connected network (Chain ID: <code>{selectedL1?.evmChainId}</code>). This contract can receive messages from the C-Chain using Avalanche's Inter-Chain Messaging (ICM) protocol. Once deployed, you can use the pre-deployed sender contract on the C-Chain at address <a href={`https://subnets-test.avax.network/c-chain/address/${SENDER_C_CHAIN_ADDRESS}`} target="_blank" className="text-blue-500 hover:underline">{SENDER_C_CHAIN_ADDRESS}</a> to send messages to this receiver.
                 </div>
                 <div className="">
                     Read more about the <a href="https://build.avax.network/academy/interchain-messaging/04-icm-basics/04-create-sender-contract" target="_blank" className="text-blue-500 hover:underline">Sender Contract</a> and <a href="https://build.avax.network/academy/interchain-messaging/04-icm-basics/06-create-receiver-contract" target="_blank" className="text-blue-500 hover:underline">Receiver Contract</a> in the Avalanche documentation.
