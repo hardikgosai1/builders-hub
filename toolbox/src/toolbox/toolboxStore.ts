@@ -77,6 +77,7 @@ const toolboxInitialState = {
     validatorMessagesLibAddress: "",
     validatorManagerAddress: "",
     rewardCalculatorAddress: "",
+    stakingManagerAddress: "",
 
     //unverifyed state - remove after testing
     // nodeRpcUrl: "",
@@ -84,7 +85,6 @@ const toolboxInitialState = {
     // evmChainIsTestnet: true,
     // teleporterRegistryAddress: "",
     // icmReceiverAddress: "",
-    // stakingManagerAddress: "",
     // exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
     // erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
     // erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
@@ -97,9 +97,9 @@ export const getToolboxStore = (chainId: string) => create(
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
             setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
+            setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
 
             //unverified methods - remove after testing
-            // setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
             // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
