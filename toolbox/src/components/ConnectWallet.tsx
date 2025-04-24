@@ -12,7 +12,7 @@ import { WalletRequiredPrompt } from "./WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RefreshOnMainnetTestnetChange } from "./RefreshOnMainnetTestnetChange"
 
-export const ConnectWallet = ({ children, required, extraElements }: { children: React.ReactNode; required: boolean; extraElements: React.ReactNode }) => {
+export const ConnectWallet = ({ children, required, extraElements }: { children: React.ReactNode; required: boolean; extraElements?: React.ReactNode }) => {
     const setWalletChainId = useWalletStore(state => state.setWalletChainId);
     const walletEVMAddress = useWalletStore(state => state.walletEVMAddress);
     const setWalletEVMAddress = useWalletStore(state => state.setWalletEVMAddress);
@@ -349,7 +349,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                         </div>
                     </div>
 
-                    {extraElements}
+                    {extraElements && extraElements}
                 </div>
             )}
 

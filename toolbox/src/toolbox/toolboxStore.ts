@@ -58,7 +58,7 @@ const l1ListState = {
 
 export const useL1ListStore = create(
     persist(
-        combine(l1ListState, (set, get) => ({
+        combine(l1ListState, (set) => ({
             addL1: (l1: { id: string, name: string, rpcUrl: string, evmChainId: number, coinName: string, isTestnet: boolean, subnetId: string, validatorManagerAddress: string }) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1) })),
             reset: () => {

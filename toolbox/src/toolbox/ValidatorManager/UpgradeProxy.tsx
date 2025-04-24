@@ -1,7 +1,7 @@
 "use client";
 
 import { useWalletStore } from "../../lib/walletStore";
-import { useL1ListStore, useSelectedL1, useViemChainStore } from "../toolboxStore";
+import { useSelectedL1, useViemChainStore } from "../toolboxStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";

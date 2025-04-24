@@ -26,18 +26,6 @@ export const ChainTile: React.FC<ChainTileProps> = ({
     isAddTile = false,
     onClick
 }) => {
-    // Extract chain ID number for display if name is very long
-    const getShortName = (chain: ChainInfo): string => {
-        if (chain.name.length <= 10) return chain.name;
-
-        // If the name contains Chain/Network and a number, extract that
-        const match = chain.name.match(/(?:Chain|Network)\s*#?(\d+)/i);
-        if (match) return `Chain ${match[1]}`;
-
-        // Otherwise use the chain ID
-        return `Chain ${chain.evmChainId}`;
-    };
-
     return (
         <div
             onClick={onClick}
