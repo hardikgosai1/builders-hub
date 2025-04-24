@@ -26,7 +26,7 @@ export default function DeployERC20TokenHome() {
         erc20TokenHomeAddress,
         setTeleporterRegistryAddress
     } = useToolboxStore();
-    const { coreWalletClient, walletEVMAddress } = useWalletStore();
+    const { coreWalletClient, walletEVMAddress, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [teleporterManager, setTeleporterManager] = useState("");

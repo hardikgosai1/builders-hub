@@ -81,13 +81,13 @@ const toolboxInitialState = {
     teleporterRegistryAddress: "",
     icmReceiverAddress: "",
     exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 
     //unverifyed state - remove after testing
     // nodeRpcUrl: "",
     // evmChainCoinName: "COIN",
     // evmChainIsTestnet: true,
-    // erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    // erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 }
 
 export const getToolboxStore = (chainId: string) => create(
@@ -101,15 +101,14 @@ export const getToolboxStore = (chainId: string) => create(
             setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
             setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
+            setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
+            setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
+
 
             //unverified methods - remove after testing
             // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
             // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
             // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
-
-
-            // setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
-            // setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
 
 
             reset: () => {
