@@ -82,7 +82,8 @@ export default function SendICMMessage() {
             });
 
             const hash = await coreWalletClient.writeContract(request);
-            await publicClient.waitForTransactionReceipt({ hash });
+            console.log("hash", hash);
+            await selectedPublicClient.waitForTransactionReceipt({ hash });
             setLastTxId(hash);
         } catch (error) {
             showBoundary(error);
