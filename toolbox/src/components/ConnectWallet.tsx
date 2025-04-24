@@ -39,15 +39,13 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
         setIsClient(true)
     }, [])
 
-    // Fetch balances
+    // Fetch EVM balance
     useEffect(() => {
-        if (!walletEVMAddress || !coreWalletClient || !walletChainId || !pChainAddress) return;
+        if (!walletEVMAddress || !walletChainId) return;
 
-        const fetchBalances = async () => {
+        const fetchEVMBalance = async () => {
             setSelectedL1Balance("...");
-            setPChainBalance("...");
 
-            console.log("Fetching balances", walletEVMAddress, pChainAddress, walletChainId)
             try {
                 const l1Balance = await publicClient.getBalance({
                     address: walletEVMAddress as `0x${string}`,
@@ -57,6 +55,20 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                 console.error(`Error fetching balance for ${walletChainId}:`, l1Error);
                 setSelectedL1Balance("?"); // Indicate error fetching balance
             }
+        }
+
+        fetchEVMBalance();
+        // Set up polling for balance updates
+        const interval = setInterval(fetchEVMBalance, 30000); // Update every 30 seconds
+        return () => clearInterval(interval);
+    }, [walletEVMAddress, walletChainId, publicClient]);
+
+    // Fetch P-Chain balance
+    useEffect(() => {
+        if (!pChainAddress || !coreWalletClient) return;
+
+        const fetchPChainBalance = async () => {
+            setPChainBalance("...");
 
             try {
                 const pBalance = await coreWalletClient.getPChainBalance();
@@ -67,11 +79,11 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
             }
         }
 
-        fetchBalances();
+        fetchPChainBalance();
         // Set up polling for balance updates
-        const interval = setInterval(fetchBalances, 30000); // Update every 30 seconds
+        const interval = setInterval(fetchPChainBalance, 30000); // Update every 30 seconds
         return () => clearInterval(interval);
-    }, [walletEVMAddress, pChainAddress, coreWalletClient, walletChainId]);
+    }, [pChainAddress, coreWalletClient]);
 
     useEffect(() => {
         if (!isClient) return;
