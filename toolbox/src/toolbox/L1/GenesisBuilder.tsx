@@ -282,8 +282,8 @@ export default function GenesisBuilder() {
         if (!input.trim()) return [];
         return input.split(',')
             .map(addr => addr.trim())
-            .filter(addr => /^0x[a-fA-F0-9]{40}$/.test(addr))
-            .map(addr => addr.replace('0x', '')); // Remove 0x prefix
+            .filter(addr => /^0x[a-fA-F0-9]{40}$/.test(addr));
+            // Keep the 0x prefix for precompile addresses
     }
 
     const formatAddressList = (addresses: string[]): string => {
