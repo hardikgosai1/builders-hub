@@ -13,7 +13,7 @@ import { ConnectWalletToolbox } from "./components/ConnectWalletToolbox/ConnectW
 type ComponentType = {
     id: string;
     label: string;
-    component: React.LazyExoticComponent<(props?: any) => ReactElement>;
+    component: React.LazyExoticComponent<(props?: any) => ReactElement | null>;
     fileNames: string[];
     walletRequired: "not-required" | "required" | "with-l1";
 }

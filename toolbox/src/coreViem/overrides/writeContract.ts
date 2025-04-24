@@ -1,6 +1,6 @@
 import { ContractFunctionName, BaseError, ContractFunctionArgs, WriteContractParameters, WriteContractReturnType, EncodeFunctionDataParameters } from "viem"
 
-import { encodeFunctionData, getAction, parseAccount } from "viem/utils"
+import { encodeFunctionData, parseAccount } from "viem/utils"
 
 import { Abi } from "viem"
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react"
-import { useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useState } from "react"
+import { useSelectedL1, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import { custom, createPublicClient, fromBytes, bytesToHex, hexToBytes } from "viem"

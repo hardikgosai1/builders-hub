@@ -59,7 +59,7 @@ export default function DeployERC20TokenRemote() {
         setErc20TokenHomeAddress,
         setTeleporterRegistryAddress,
     } = useToolboxStore();
-    const { coreWalletClient, walletEVMAddress, walletChainId } = useWalletStore();
+    const { coreWalletClient, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [deployOn, setDeployOn] = useState<DeployOn>("L1");

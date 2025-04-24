@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useL1ListStore, useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore";
+import { useSelectedL1, useViemChainStore } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from './packWarp';

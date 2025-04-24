@@ -16,7 +16,7 @@ export default function Initialize() {
     const selectedL1 = useSelectedL1();
     const { showBoundary } = useErrorBoundary();
     const { stakingManagerAddress, setStakingManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
-    const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
     const [isInitialized, setIsInitialized] = useState<boolean | null>(null);

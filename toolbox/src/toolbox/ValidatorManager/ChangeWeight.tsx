@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useErrorBoundary } from "react-error-boundary"
 
-import { useSelectedL1, useToolboxStore, useViemChainStore } from "../toolboxStore"
+import { useSelectedL1, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 
 import { Container } from "../components/Container"

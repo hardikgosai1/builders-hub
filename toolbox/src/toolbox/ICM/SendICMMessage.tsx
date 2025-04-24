@@ -3,7 +3,7 @@
 import { useToolboxStore, useViemChainStore, useSelectedL1 } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { createPublicClient, http } from 'viem';
@@ -11,7 +11,6 @@ import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.js
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
-import { RequireChain } from "../../components/RequireChain";
 import { SENDER_C_CHAIN_ADDRESS } from "./DeployICMDemo";
 import { RadioGroup } from "../../components/RadioGroup";
 
@@ -21,7 +20,7 @@ export default function SendICMMessage() {
     const { showBoundary } = useErrorBoundary();
     const { icmReceiverAddress } = useToolboxStore();
     const viemChain = useViemChainStore();
-    const { coreWalletClient, publicClient } = useWalletStore();
+    const { coreWalletClient } = useWalletStore();
     const [message, setMessage] = useState(Math.floor(Math.random() * 10000));
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
