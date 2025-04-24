@@ -8,13 +8,9 @@ import { Copy, CheckCircle2 } from "lucide-react"
 import { createCoreWalletClient } from "../coreViem"
 import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
-import { useL1ListStore } from "../toolbox/toolboxStore"
-import { AddChainModal } from "./AddChainModal"
 import { WalletRequiredPrompt } from "./WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RefreshOnMainnetTestnetChange } from "./RefreshOnMainnetTestnetChange"
-import { ChainTile } from "./ChainTile"
-import { createPublicClient, http } from "viem"
 
 export const ConnectWallet = ({ children, required, extraElements }: { children: React.ReactNode; required: boolean; extraElements: React.ReactNode }) => {
     const setWalletChainId = useWalletStore(state => state.setWalletChainId);
@@ -28,63 +24,57 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const walletChainId = useWalletStore(state => state.walletChainId);
     const avalancheNetworkID = useWalletStore(state => state.avalancheNetworkID);
     const setIsTestnet = useWalletStore(state => state.setIsTestnet);
+    const publicClient = useWalletStore(state => state.publicClient);
+    const setEvmChainName = useWalletStore(state => state.setEvmChainName);
+    const evmChainName = useWalletStore(state => state.evmChainName);
 
-    const { l1List, addL1 } = useL1ListStore();
     const [hasWallet, setHasWallet] = useState<boolean>(false)
-    const [isBrowser, setIsBrowser] = useState<boolean>(false)
+    const [isClient, setIsClient] = useState<boolean>(false)
     const [selectedL1Balance, setSelectedL1Balance] = useState<string>("0")
     const [pChainBalance, setPChainBalance] = useState<string>("0")
-    const [isAddChainModalOpen, setIsAddChainModalOpen] = useState(false)
     const { showBoundary } = useErrorBoundary()
 
-    // Get selected L1 details
-    const selectedL1 = l1List.find(l1 => l1.evmChainId === walletChainId);
+    // Set isClient to true once component mounts (client-side only)
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
 
     // Fetch balances
     useEffect(() => {
-        if (!walletEVMAddress || !coreWalletClient) return;
+        if (!walletEVMAddress || !coreWalletClient || !walletChainId || !pChainAddress) return;
 
         const fetchBalances = async () => {
-            try {
-                // If an L1 is selected, fetch its balance
-                if (selectedL1 && selectedL1.rpcUrl) {
-                    try {
-                        const tempPublicClient = createPublicClient({
-                            transport: http(selectedL1.rpcUrl),
-                            // Potentially add chain definition if needed by viem
-                            // chain: { id: selectedL1.evmChainId, name: selectedL1.name, nativeCurrency: { name: selectedL1.coinName, symbol: selectedL1.coinName, decimals: 18 } }
-                        });
-                        const l1Balance = await tempPublicClient.getBalance({
-                            address: walletEVMAddress as `0x${string}`,
-                        });
-                        setSelectedL1Balance((Number(l1Balance) / 1e18).toFixed(2));
-                    } catch (l1Error) {
-                        console.error(`Error fetching balance for ${selectedL1.name}:`, l1Error);
-                        setSelectedL1Balance("Error"); // Indicate error fetching balance
-                    }
-                } else {
-                    // Optionally clear L1 balance or set to 0 if none selected
-                    setSelectedL1Balance("0");
-                }
+            setSelectedL1Balance("...");
+            setPChainBalance("...");
 
-                // Get P-Chain balance
-                if (pChainAddress) {
-                    const pBalance = await coreWalletClient.getPChainBalance();
-                    setPChainBalance((Number(pBalance) / 1e9).toFixed(2));
-                }
-            } catch (error) {
-                console.error("Error fetching balances:", error);
+            console.log("Fetching balances", walletEVMAddress, pChainAddress, walletChainId)
+            try {
+                const l1Balance = await publicClient.getBalance({
+                    address: walletEVMAddress as `0x${string}`,
+                });
+                setSelectedL1Balance((Number(l1Balance) / 1e18).toFixed(2));
+            } catch (l1Error) {
+                console.error(`Error fetching balance for ${walletChainId}:`, l1Error);
+                setSelectedL1Balance("?"); // Indicate error fetching balance
             }
-        };
+
+            try {
+                const pBalance = await coreWalletClient.getPChainBalance();
+                setPChainBalance((Number(pBalance) / 1e9).toFixed(2));
+            } catch (pChainError) {
+                console.error("Error fetching P-Chain balance:", pChainError);
+                setPChainBalance("?"); // Indicate error fetching balance
+            }
+        }
 
         fetchBalances();
         // Set up polling for balance updates
         const interval = setInterval(fetchBalances, 30000); // Update every 30 seconds
         return () => clearInterval(interval);
-    }, [walletEVMAddress, pChainAddress, coreWalletClient, selectedL1]);
+    }, [walletEVMAddress, pChainAddress, coreWalletClient, walletChainId]);
 
     useEffect(() => {
-        setIsBrowser(true)
+        if (!isClient) return;
 
         async function init() {
             try {
@@ -121,13 +111,11 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
             }
         }
 
-        if (isBrowser) {
-            init()
-        }
+        init()
 
         // Clean up event listeners
         return () => {
-            if (isBrowser && window.avalanche?.removeListener) {
+            if (window.avalanche?.removeListener) {
                 try {
                     window.avalanche.removeListener("accountsChanged", () => { })
                     window.avalanche.removeListener("chainChanged", () => { })
@@ -136,7 +124,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                 }
             }
         }
-    }, [isBrowser])
+    }, [isClient])
 
     const onChainChanged = (chainId: string | number) => {
         if (typeof chainId === "string") {
@@ -147,10 +135,11 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
         coreWalletClient.getPChainAddress().then(setPChainAddress).catch(showBoundary)
 
         coreWalletClient
-            .isTestnet()
-            .then((isTestnet: boolean) => {
+            .getEthereumChain()
+            .then(({ isTestnet, chainName }: { isTestnet: boolean, chainName: string }) => {
                 setAvalancheNetworkID(isTestnet ? networkIDs.FujiID : networkIDs.MainnetID)
                 setIsTestnet(isTestnet)
+                setEvmChainName(chainName)
             })
             .catch(showBoundary)
     }
@@ -182,7 +171,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     }
 
     async function connectWallet() {
-        if (!isBrowser) return
+        if (!isClient) return
 
         console.log("Connecting wallet")
         try {
@@ -228,58 +217,10 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     }
 
     const copyToClipboard = (text: string) => {
-        if (isBrowser) {
+        if (isClient) {
             navigator.clipboard.writeText(text)
         }
     }
-
-    // Updated handleAddChain to accept the full chain object matching the store's addL1 action
-    const handleAddChain = (chain: {
-        id: string;
-        name: string;
-        rpcUrl: string;
-        evmChainId: number;
-        coinName: string;
-        isTestnet: boolean;
-        subnetId: string;
-        validatorManagerAddress: string;
-    }) => {
-        // Add the chain to l1List store using the provided object
-        addL1(chain);
-    };
-
-    // Function to switch chains in the wallet extension
-    const switchChain = async (chainId: number) => {
-        if (!window.avalanche?.request) {
-            console.error("Wallet extension not available");
-            return;
-        }
-
-        try {
-            // Request wallet to switch to the selected chain
-            await window.avalanche.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: `0x${chainId.toString(16)}` }],
-            });
-        } catch (error: any) {
-            // If the chain is not added to the wallet, we might need to add it first
-            if (error.code === 4902) { // Chain not added error code
-                console.error("Chain not found in wallet. Please add it first.");
-                // You could implement wallet_addEthereumChain here if needed
-            } else {
-                console.error("Error switching chain:", error);
-                showBoundary(error);
-            }
-        }
-    };
-
-    // Handle chain selection with wallet switching
-    const handleChainSelect = async (chainId: string) => {
-        // Then find the chain details and request the wallet to switch
-        const selectedChain = l1List.find(chain => chain.id === chainId);
-        if (!selectedChain) throw new Error("Chain not found");
-        await switchChain(selectedChain.evmChainId);
-    };
 
     // Get network badge based on network ID
     const renderNetworkBadge = () => {
@@ -305,10 +246,14 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
         return null;
     };
 
-    // Server-side rendering fallback
-    if (!isBrowser) {
+    // Server-side rendering placeholder
+    if (!isClient) {
         return (
             <div className="space-y-4 transition-all duration-300">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-xl p-4 relative overflow-hidden animate-pulse">
+                    <div className="h-10 bg-zinc-200 dark:bg-zinc-800 rounded mb-4 w-1/3"></div>
+                    <div className="h-32 bg-zinc-100 dark:bg-zinc-800 rounded-xl mb-4"></div>
+                </div>
                 <div className="transition-all duration-300">{children}</div>
             </div>
         )
@@ -339,54 +284,33 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
 
                     {/* Chain cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {/* Selected L1 Chain or Default C-Chain */}
-                        {selectedL1 ? (
-                            <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-blue-500 dark:border-blue-700 ring-1 ring-blue-500 dark:ring-blue-700">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-zinc-600 dark:text-zinc-300 text-sm font-medium">
-                                        {selectedL1.name}
-                                    </span>
+                        {/* L1 Chain Card */}
+                        <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700">
+                            <div className="flex justify-between items-start mb-2">
+                                <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">
+                                    {evmChainName}
+                                </span>
+                                {walletChainId && (
                                     <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Selected</span>
-                                </div>
-                                <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2">{selectedL1Balance} {selectedL1.coinName}</div>
-                                {/* EVM Address inside the card */}
-                                <div className="flex items-center justify-between">
-                                    <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
-                                        {walletEVMAddress}
-                                    </div>
-                                    <button
-                                        onClick={() => copyToClipboard(walletEVMAddress)}
-                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
-                                        title="Copy address"
-                                    >
-                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
-                                    </button>
-                                </div>
+                                )}
                             </div>
-                        ) : (
-                            // Fallback: Show a placeholder or default C-Chain info if no L1 is selected
-                            <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 opacity-70">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-zinc-500 dark:text-zinc-500 text-sm font-medium">
-                                        No L1 Selected
-                                    </span>
-                                </div>
-                                <div className="text-2xl font-semibold text-zinc-500 dark:text-zinc-500 mb-2">-- AVAX</div>
-                                {/* EVM Address inside the fallback card */}
-                                <div className="flex items-center justify-between mt-2"> {/* Added mt-2 for spacing */}
-                                    <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
-                                        {walletEVMAddress}
-                                    </div>
-                                    <button
-                                        onClick={() => copyToClipboard(walletEVMAddress)}
-                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
-                                        title="Copy address"
-                                    >
-                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
-                                    </button>
-                                </div>
+                            <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2">
+                                {selectedL1Balance} {walletChainId ? "AVAX" : "--"}
                             </div>
-                        )}
+                            {/* EVM Address inside the card */}
+                            <div className="flex items-center justify-between">
+                                <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2">
+                                    {walletEVMAddress}
+                                </div>
+                                <button
+                                    onClick={() => copyToClipboard(walletEVMAddress)}
+                                    className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                    title="Copy address"
+                                >
+                                    <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                </button>
+                            </div>
+                        </div>
 
                         {/* P-Chain */}
                         <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700">
@@ -411,42 +335,6 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                             </div>
                         </div>
                     </div>
-
-                    {/* Network section - Always displayed */}
-                    <div className="mb-6">
-                        <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Your Networks</h4>
-
-                        {l1List.length > 0 ? (
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                                {l1List.map((chain) => (
-                                    <ChainTile
-                                        key={chain.id}
-                                        chain={chain}
-                                        isActive={walletChainId === chain.evmChainId}
-                                        onClick={() => handleChainSelect(chain.id)}
-                                    />
-                                ))}
-                                <ChainTile
-                                    isAddTile
-                                    onClick={() => setIsAddChainModalOpen(true)}
-                                />
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                                <ChainTile
-                                    isAddTile
-                                    onClick={() => setIsAddChainModalOpen(true)}
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Add Chain Modal */}
-                    <AddChainModal
-                        isOpen={isAddChainModalOpen}
-                        onClose={() => setIsAddChainModalOpen(false)}
-                        onAddChain={handleAddChain}
-                    />
 
                     {extraElements}
                 </div>

@@ -7,7 +7,7 @@ import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
 import { ErrorFallback } from "../components/ErrorFallback";
-import { ConnectWalletToolbox } from "./components/ConnectWalletToolbox";
+import { ConnectWalletToolbox } from "./components/ConnectWalletToolbox/ConnectWalletToolbox";
 
 
 type ComponentType = {

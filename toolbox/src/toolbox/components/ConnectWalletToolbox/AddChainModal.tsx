@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './Button';
+import { Button } from '../../../components/Button';
 import { X } from 'lucide-react';
 import { type Chain } from 'viem';
-import { useWalletStore } from '../lib/walletStore';
+import { useWalletStore } from '../../../lib/walletStore';
 import { utils } from "@avalabs/avalanchejs";
-import { Input } from './Input';
-import { Select } from '../toolbox/components/Select';
-import { getBlockchainInfo, getSubnetInfo } from '../coreViem/utils/glacier';
+import { Input } from '../../../components/Input';
+import { Select } from '../Select';
+import { getBlockchainInfo, getSubnetInfo } from '../../../coreViem/utils/glacier';
 import * as Dialog from "@radix-ui/react-dialog";
-import { fetchChainId } from '../lib/chainId';
+import { fetchChainId } from '../../../lib/chainId';
 interface AddChainModalProps {
     isOpen: boolean;
     onClose: () => void;
