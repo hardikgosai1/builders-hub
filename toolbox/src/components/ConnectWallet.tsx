@@ -43,9 +43,9 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     useEffect(() => {
         if (!walletEVMAddress || !walletChainId) return;
 
-        const fetchEVMBalance = async () => {
-            setSelectedL1Balance("...");
+        setSelectedL1Balance("...");
 
+        const fetchEVMBalance = async () => {
             try {
                 const l1Balance = await publicClient.getBalance({
                     address: walletEVMAddress as `0x${string}`,
@@ -67,8 +67,9 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     useEffect(() => {
         if (!pChainAddress || !coreWalletClient) return;
 
+        setPChainBalance("...");
+
         const fetchPChainBalance = async () => {
-            setPChainBalance("...");
 
             try {
                 const pBalance = await coreWalletClient.getPChainBalance();
