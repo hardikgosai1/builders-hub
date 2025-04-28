@@ -12,7 +12,7 @@ interface GlossaryTermProps {
   className?: string
 }
 
-export function GlossaryTerm({ 
+function GlossaryTerm({ 
   children, 
   termKey, 
   className = "" 
