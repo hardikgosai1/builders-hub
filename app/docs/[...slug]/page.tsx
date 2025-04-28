@@ -25,6 +25,7 @@ import { AutoTypeTable } from '@/components/content-design/type-table';
 import { BackToTop } from '@/components/ui/back-to-top';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import Mermaid from "@/components/content-design/mermaid";
+import GlossaryTerm from "@/components/content-design/glossary-term";
 import type { MDXComponents } from 'mdx/types';
 import YouTube from '@/components/content-design/youtube';
 import { Feedback } from '@/components/ui/feedback';
@@ -74,6 +75,7 @@ export default async function Page(props: {
             Step,
             Steps,
             YouTube,
+            GlossaryTerm,
             Mermaid,
             TypeTable,
             AutoTypeTable,

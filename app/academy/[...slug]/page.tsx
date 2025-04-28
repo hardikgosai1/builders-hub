@@ -26,6 +26,7 @@ import { Heading } from 'fumadocs-ui/components/heading';
 import Quiz from '@/components/quizzes/quiz';
 import YouTube from "@/components/content-design/youtube";
 import Gallery from "@/components/content-design/gallery";
+import GlossaryTerm from "@/components/content-design/glossary-term";
 import {
   CodeBlock,
   type CodeBlockProps,
@@ -79,7 +80,7 @@ export default async function Page(props: {
           h4: (props) => <Heading as="h4" {...props} />,
           h5: (props) => <Heading as="h5" {...props} />,
           h6: (props) => <Heading as="h6" {...props} />,
-          Cards, Card, Callout, Accordion, Accordions, AutoTypeTable, Gallery, Mermaid, Quiz, Popup, PopupContent, PopupTrigger, Step, Steps, Tab, Tabs, TypeTable, YouTube, 
+          Cards, Card, Callout, Accordion, Accordions, AutoTypeTable, Gallery, GlossaryTerm, Mermaid, Quiz, Popup, PopupContent, PopupTrigger, Step, Steps, Tab, Tabs, TypeTable, YouTube, 
           pre: ({ title, className, icon, allowCopy, ...props }: CodeBlockProps) => (
             <CodeBlock title={title} icon={icon} allowCopy={allowCopy}>
               <Pre className={cn("max-h-[1200px]", className)} {...props} />
