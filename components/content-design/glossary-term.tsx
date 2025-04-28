@@ -12,7 +12,7 @@ interface GlossaryTermProps {
   className?: string
 }
 
-function GlossaryTerm({ 
+export default function GlossaryTerm({ 
   children, 
   termKey, 
   className = "" 
@@ -73,5 +73,3 @@ function GlossaryTerm({
     </Tooltip>
   )
 }
-
-export default GlossaryTerm 
