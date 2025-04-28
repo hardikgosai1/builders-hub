@@ -3,6 +3,6 @@ export interface GlossaryTerm {
   abbreviation?: string | null;
   previousTerm?: string | null;
   description: string;
-  learnMoreUrl?: string;
+  learnMoreUrl?: string | null;
   category: string;
 } 
