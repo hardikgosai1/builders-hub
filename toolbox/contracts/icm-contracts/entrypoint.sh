@@ -37,6 +37,7 @@ for file in \
     /teleporter_src/out/ERC20TokenHome.sol/ERC20TokenHome.json \
     /teleporter_src/out/ERC20TokenRemote.sol/ERC20TokenRemote.json \
     /teleporter_src/out/ExampleRewardCalculator.sol/ExampleRewardCalculator.json \
+    /teleporter_src/out/NativeTokenRemote.sol/NativeTokenRemote.json \
 ; do
     filename=$(basename "$file")
     jq '.' "$file" > "/compiled/$filename"
@@ -44,7 +45,6 @@ done
 
 # Commented out files:
 # /teleporter_src/out/ERC20TokenRemote.sol/ERC20TokenRemote.json
-# /teleporter_src/out/NativeTokenRemote.sol/NativeTokenRemote.json
 # /teleporter_src/out/NativeTokenHome.sol/NativeTokenHome.json
 
 chown -R $HOST_UID:$HOST_GID /compiled /teleporter_src

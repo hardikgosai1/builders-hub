@@ -286,6 +286,13 @@ const componentGroups: Record<string, ComponentType[]> = {
             walletRequired: "with-l1"
         },
         {
+            id: "deployNativeTokenRemote",
+            label: "Deploy Native Token Remote Contract",
+            component: lazy(() => import('./ICTT/DeployNativeTokenRemote')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployNativeTokenRemote.tsx"],
+            walletRequired: "with-l1"
+        },
+        {
             id: "registerWithHome",
             label: "Register Token Remote with Home",
             component: lazy(() => import('./ICTT/RegisterWithHome')),
