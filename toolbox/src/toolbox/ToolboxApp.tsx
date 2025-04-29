@@ -298,6 +298,13 @@ const componentGroups: Record<string, ComponentType[]> = {
             component: lazy(() => import('./ICTT/RegisterWithHome')),
             fileNames: ["toolbox/src/toolbox/ICTT/RegisterWithHome.tsx"],
             walletRequired: "with-l1"
+        },
+        {
+            id: "tempNativeMinter",
+            label: "Enable Native Minting",
+            component: lazy(() => import('./ICTT/TempNativeMinter')),
+            fileNames: ["toolbox/src/toolbox/ICTT/TempNativeMinter.tsx"],
+            walletRequired: "with-l1"
         }
     ],
     'Conversion Utils': [
