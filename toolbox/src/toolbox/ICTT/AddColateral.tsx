@@ -10,7 +10,7 @@ import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from "viem/chains";
 import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
 import ExampleERC20ABI from "../../../contracts/icm-contracts/compiled/ExampleERC20.json";
-import { Abi, createPublicClient, http, PublicClient, zeroAddress, formatUnits, parseUnits, Address } from "viem";
+import { createPublicClient, http, formatUnits, parseUnits, Address } from "viem";
 import { Input, Suggestion } from "../../components/Input";
 import { utils } from "@avalabs/avalanchejs";
 import { FUJI_C_BLOCKCHAIN_ID } from "./DeployERC20TokenRemote";
@@ -143,7 +143,7 @@ export default function AddColateral() {
                         stateMutability: 'view'
                     }],
                     functionName: 'getIsCollateralized'
-                }).catch(async (err) => {
+                }).catch(async () => {
                     // If that fails, try with isCollateralized which might be in other contract types
                     return await remotePublicClient.readContract({
                         address: remoteContractAddress as Address,
