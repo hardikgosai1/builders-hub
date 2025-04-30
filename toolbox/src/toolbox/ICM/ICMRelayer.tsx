@@ -88,7 +88,7 @@ export default function ICMRelayer() {
         if (viemChain && selectedL1?.rpcUrl) {
             checkBalanceL1();
         }
-    }, [selectedL1?.rpcUrl, viemChain]);
+    }, [selectedL1?.rpcUrl, viemChain?.id]);
 
     useEffect(() => {
         checkBalanceCChain();
