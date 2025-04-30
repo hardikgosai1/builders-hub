@@ -79,7 +79,7 @@ export default function DeployERC20TokenRemote() {
         { label: "C-Chain", value: "C-Chain" }
     ];
 
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     if (!selectedL1) return null;
 
     const tokenHomeBlockchainIDHex = useMemo(() => {

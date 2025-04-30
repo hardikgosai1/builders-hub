@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow'
 import { useWalletStore } from '../lib/walletStore';
 
 export type DeployOn = "L1" | "C-Chain";

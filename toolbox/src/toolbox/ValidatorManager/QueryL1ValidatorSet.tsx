@@ -11,7 +11,7 @@ import { GlobalParamNetwork, L1ValidatorDetailsFull } from "@avalabs/avacloud-sd
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 
 export default function QueryL1ValidatorSet() {
-  const selectedL1 = useSelectedL1()
+  const selectedL1 = useSelectedL1()();
   const { avalancheNetworkID, setAvalancheNetworkID } = useWalletStore()
   const [validators, setValidators] = useState<L1ValidatorDetailsFull[]>([])
   const [isLoading, setIsLoading] = useState(false)

@@ -33,7 +33,7 @@ export default function RegisterWithHome() {
         { label: "C-Chain", value: "C-Chain" }
     ];
     const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     if (!selectedL1) return null;
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;

@@ -48,7 +48,7 @@ export default function ChangeWeight() {
 
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
   const viemChain = useViemChainStore()
-  const selectedL1 = useSelectedL1()
+  const selectedL1 = useSelectedL1()();
 
   // --- Form Input State ---
   const [nodeID, setNodeID] = useState("")
