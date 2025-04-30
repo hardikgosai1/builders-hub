@@ -34,6 +34,7 @@ export default function AddColateral() {
     const [allowance, setAllowance] = useState<bigint | null>(null);
     const [collateralInfo, setCollateralInfo] = useState<{ needed: bigint, remaining: bigint | null } | null>(null);
     const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+    const [isCollateralized, setIsCollateralized] = useState<boolean | null>(null);
     const selectedL1 = useSelectedL1();
     const [isAutoFilled, setIsAutoFilled] = useState(false); // Track if autofill happened
 
@@ -80,6 +81,7 @@ export default function AddColateral() {
             setTokenSymbol(null);
             setAllowance(null);
             setCollateralInfo(null);
+            setIsCollateralized(null);
             return;
         }
 
@@ -88,8 +90,13 @@ export default function AddColateral() {
         setIsAutoFilled(false); // Reset autofill flag on new fetch
         try {
             const publicClient = createPublicClient({
-                chain: requiredChain,
                 transport: http(requiredChain.rpcUrls.default.http[0])
+            });
+
+            if (!remoteChain) throw new Error("Remote chain not found");
+
+            const remotePublicClient = createPublicClient({
+                transport: http(remoteChain.rpcUrls.default.http[0])
             });
 
             // 1. Get Token Address from Home Contract
@@ -123,6 +130,40 @@ export default function AddColateral() {
             setTokenSymbol(fetchedSymbol as string);
             setAllowance(fetchedAllowance as bigint);
 
+            // Check if the remote contract is collateralized
+            try {
+                // First try with getIsCollateralized which is in NativeTokenRemote
+                const collateralized = await remotePublicClient.readContract({
+                    address: remoteContractAddress as Address,
+                    abi: [{
+                        type: 'function',
+                        name: 'getIsCollateralized',
+                        inputs: [],
+                        outputs: [{ type: 'bool', name: '' }],
+                        stateMutability: 'view'
+                    }],
+                    functionName: 'getIsCollateralized'
+                }).catch(async (err) => {
+                    // If that fails, try with isCollateralized which might be in other contract types
+                    return await remotePublicClient.readContract({
+                        address: remoteContractAddress as Address,
+                        abi: [{
+                            type: 'function',
+                            name: 'isCollateralized',
+                            inputs: [],
+                            outputs: [{ type: 'bool', name: '' }],
+                            stateMutability: 'view'
+                        }],
+                        functionName: 'isCollateralized'
+                    }).catch(() => null); // Return null if both fail
+                });
+
+                setIsCollateralized(collateralized as boolean);
+            } catch (error) {
+                console.error("Failed to check collateralization status:", error);
+                setIsCollateralized(null);
+            }
+
             // 3. Get Collateral Info
             const settings = await publicClient.readContract({
                 address: homeContractAddress as Address,
@@ -148,10 +189,11 @@ export default function AddColateral() {
             setTokenSymbol(null);
             setAllowance(null);
             setCollateralInfo(null);
+            setIsCollateralized(null);
         } finally {
             setIsCheckingStatus(false);
         }
-    }, [homeContractAddress, requiredChain, walletEVMAddress, remoteContractAddress, remoteBlockchainIDHex]);
+    }, [homeContractAddress, requiredChain, remoteChain, walletEVMAddress, remoteContractAddress, remoteBlockchainIDHex]);
 
     // Autofill amount when collateral info is loaded
     useEffect(() => {
@@ -253,7 +295,7 @@ export default function AddColateral() {
             setLastAddCollateralTxId(hash);
 
             await publicClient.waitForTransactionReceipt({ hash });
-            await fetchStatus(); // Refresh collateral status
+            await fetchStatus(); // Refresh collateral status and collateralization
 
         } catch (error: any) {
             console.error("Add Collateral failed:", error);
@@ -323,6 +365,16 @@ export default function AddColateral() {
                         {collateralInfo !== null && (
                             <div>Collateral Needed for Remote: <code className="font-mono">{formatUnits(collateralInfo.needed, tokenDecimals)} {tokenSymbol}</code></div>
                         )}
+                        {isCollateralized !== null && (
+                            <div className="mt-2 font-medium">
+                                Collateralization Status: {' '}
+                                {isCollateralized ? (
+                                    <span className="text-green-600 dark:text-green-400">✅ Fully Collateralized</span>
+                                ) : (
+                                    <span className="text-red-600 dark:text-red-400">⚠️ Not Collateralized</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -353,7 +405,7 @@ export default function AddColateral() {
                 <div className="flex gap-2 pt-2 border-t mt-4 flex-wrap">
                     <Button
                         onClick={handleApprove}
-                        loading={isProcessing && !lastApprovalTxId} // Show loading only for this action
+                        loading={isProcessing && !lastApprovalTxId}
                         disabled={isProcessing || !isValidAmount || !tokenAddress || hasSufficientAllowance || isCheckingStatus}
                         variant={hasSufficientAllowance ? "secondary" : "primary"}
                     >
@@ -363,8 +415,17 @@ export default function AddColateral() {
                         onClick={handleAddCollateral}
                         loading={isProcessing && !lastAddCollateralTxId}
                         disabled={isProcessing || !isValidAmount || !tokenAddress || !hasSufficientAllowance || isCheckingStatus || collateralInfo === null}
+                        variant={isCollateralized ? "secondary" : "primary"}
                     >
-                        2. Add Collateral
+                        {isCollateralized ? "Add More Collateral" : "2. Add Collateral"}
+                    </Button>
+                    <Button
+                        onClick={fetchStatus}
+                        disabled={isCheckingStatus || !remoteContractAddress}
+                        variant="outline"
+                        loading={isCheckingStatus}
+                    >
+                        Refresh Status
                     </Button>
                 </div>
 
