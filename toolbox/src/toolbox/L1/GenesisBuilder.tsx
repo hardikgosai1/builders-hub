@@ -783,9 +783,10 @@ export default function GenesisBuilder() {
                                     </div>
                                 </PrecompileCard>
                             </div>
+                        </div>
 
-                            {/* Validation and actions */}
-                            <div className="mt-8">
+                        {/* Validation and actions */}
+                        <div className="mt-8">
                                 {Object.keys(validationErrors).length > 0 ? (
                                     <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 p-4 rounded-md flex items-start mb-4">
                                         <AlertCircle className="text-red-500 mr-3 h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -817,7 +818,6 @@ export default function GenesisBuilder() {
                                     </div>
                                 )}
                             </div>
-                        </div>
                     </>
                 )}
 
