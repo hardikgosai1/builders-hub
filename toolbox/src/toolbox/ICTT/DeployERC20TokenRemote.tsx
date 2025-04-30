@@ -135,7 +135,7 @@ export default function DeployERC20TokenRemote() {
         };
 
         fetchTokenDecimals();
-    }, [deployOnReversed, erc20TokenHomeAddress["C-Chain"], erc20TokenHomeAddress["L1"], viemChain]);
+    }, [deployOnReversed, erc20TokenHomeAddress["C-Chain"], erc20TokenHomeAddress["L1"], viemChain?.id]);
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
 

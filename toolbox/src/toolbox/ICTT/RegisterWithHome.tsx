@@ -91,7 +91,7 @@ export default function RegisterWithHome() {
         } finally {
             setIsCheckingRegistration(false);
         }
-    }, [deployOn, erc20TokenRemoteAddress["C-Chain"], erc20TokenRemoteAddress["L1"], selectedL1.id, viemChain]);
+    }, [deployOn, erc20TokenRemoteAddress["C-Chain"], erc20TokenRemoteAddress["L1"], selectedL1.id, viemChain?.id]);
 
     useEffect(() => {
         fetchSettings();
