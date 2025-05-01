@@ -312,6 +312,13 @@ const componentGroups: Record<string, ComponentType[]> = {
             component: lazy(() => import('./ICTT/AddColateral')),
             fileNames: ["toolbox/src/toolbox/ICTT/AddColateral.tsx"],
             walletRequired: "with-l1"
+        },
+        {
+            id: "testSend",
+            label: "Test Sending ERC20 Tokens",
+            component: lazy(() => import('./ICTT/TestSend')),
+            fileNames: ["toolbox/src/toolbox/ICTT/TestSend.tsx"],
+            walletRequired: "with-l1"
         }
     ],
     'Conversion Utils': [
