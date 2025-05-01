@@ -83,6 +83,7 @@ const toolboxInitialState = {
     exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
     erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
     erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    nativeTokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
 
     //unverifyed state - remove after testing
     // nodeRpcUrl: "",
@@ -103,7 +104,7 @@ export const getToolboxStore = (chainId: string) => create(
             setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
             setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
             setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
-
+            setNativeTokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ nativeTokenRemoteAddress: { ...state.nativeTokenRemoteAddress, [deployOn]: address } })),
 
             //unverified methods - remove after testing
             // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),

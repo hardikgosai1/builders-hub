@@ -286,10 +286,31 @@ const componentGroups: Record<string, ComponentType[]> = {
             walletRequired: "with-l1"
         },
         {
+            id: "deployNativeTokenRemote",
+            label: "Deploy Native Token Remote Contract",
+            component: lazy(() => import('./ICTT/DeployNativeTokenRemote')),
+            fileNames: ["toolbox/src/toolbox/ICTT/DeployNativeTokenRemote.tsx"],
+            walletRequired: "with-l1"
+        },
+        {
             id: "registerWithHome",
             label: "Register Token Remote with Home",
             component: lazy(() => import('./ICTT/RegisterWithHome')),
             fileNames: ["toolbox/src/toolbox/ICTT/RegisterWithHome.tsx"],
+            walletRequired: "with-l1"
+        },
+        {
+            id: "tempNativeMinter",
+            label: "Enable Native Minting",
+            component: lazy(() => import('./ICTT/TempNativeMinter')),
+            fileNames: ["toolbox/src/toolbox/ICTT/TempNativeMinter.tsx"],
+            walletRequired: "with-l1"
+        },
+        {
+            id: "addColateral",
+            label: "Add Colateral",
+            component: lazy(() => import('./ICTT/AddColateral')),
+            fileNames: ["toolbox/src/toolbox/ICTT/AddColateral.tsx"],
             walletRequired: "with-l1"
         }
     ],
