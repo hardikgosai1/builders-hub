@@ -56,7 +56,7 @@ export const useCreateChainStore = () => {
     return getCreateChainStore(Boolean(isTestnet))
 }
 
-type L1ListItem = {
+export type L1ListItem = {
     id: string;
     name: string;
     rpcUrl: string;

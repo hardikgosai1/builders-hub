@@ -2,17 +2,18 @@
 
 import { formatEther, parseEther, createPublicClient, http } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { useSelectedL1, useViemChainStore } from '../toolboxStore';
+import { L1ListItem, useL1ListStore, useSelectedL1, useViemChainStore } from '../toolboxStore';
 import { useWalletStore } from '../../lib/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { CodeHighlighter } from '../../components/CodeHighlighter';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
 import { avalancheFuji } from 'viem/chains';
 
 const MINIMUM_BALANCE = parseEther('100')
 const MINIMUM_BALANCE_CCHAIN = parseEther('1')
+const FUJI_ID = "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp";
 
 export default function ICMRelayer() {
     const { coreWalletClient } = useWalletStore();
@@ -25,6 +26,34 @@ export default function ICMRelayer() {
     const [isSendingCChain, setIsSendingCChain] = useState(false);
     const { showBoundary } = useErrorBoundary();
     const viemChain = useViemChainStore();
+    const { l1List } = useL1ListStore()();
+
+    const getInitialSelectedIds = (currentL1Id?: string): Set<string> => {
+        const initialSet = new Set<string>();
+        initialSet.add(FUJI_ID);
+        if (currentL1Id) {
+            initialSet.add(currentL1Id);
+        }
+        return initialSet;
+    };
+
+    const [selectedSourceChainIds, setSelectedSourceChainIds] = useState<Set<string>>(() => getInitialSelectedIds(selectedL1?.id));
+    const [selectedDestinationChainIds, setSelectedDestinationChainIds] = useState<Set<string>>(() => getInitialSelectedIds(selectedL1?.id));
+
+    const availableChains: L1ListItem[] = useMemo(() => {
+        //FIXME: add mainnet support
+        const cChain: L1ListItem = {
+            id: "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp",
+            name: "Avalanche Fuji",
+            rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
+            evmChainId: 43113,
+            coinName: "AVAX",
+            isTestnet: true,
+            subnetId: "11111111111111111111111111111111LpoYY",
+            validatorManagerAddress: "0x0000000000000000000000000000000000000000"
+        }
+        return [...l1List, cChain].filter(chain => chain.id && chain.name); // Ensure chains have id and name
+    }, [l1List]);
 
     // Use sessionStorage for private key to persist across refreshes
     const [privateKey] = useState(() => {
@@ -94,6 +123,30 @@ export default function ICMRelayer() {
         checkBalanceCChain();
     }, []);
 
+    // Effect to handle subsequent changes to selectedL1 after initial load
+    useEffect(() => {
+        if (selectedL1?.id) {
+            // Add the newly selected L1 if it's not already present.
+            // This won't prevent deselection of Fuji or previous L1s.
+            setSelectedSourceChainIds(prev => {
+                if (!prev.has(selectedL1.id!)) {
+                    const newSet = new Set(prev);
+                    newSet.add(selectedL1.id!);
+                    return newSet;
+                }
+                return prev; // No change needed if already present
+            });
+            setSelectedDestinationChainIds(prev => {
+                if (!prev.has(selectedL1.id!)) {
+                    const newSet = new Set(prev);
+                    newSet.add(selectedL1.id!);
+                    return newSet;
+                }
+                return prev; // No change needed if already present
+            });
+        }
+        // Only react to changes in the selected L1 ID itself
+    }, [selectedL1?.id]);
 
     const handleFundL1 = async () => {
         if (!viemChain) {
@@ -138,125 +191,174 @@ export default function ICMRelayer() {
         }
     };
 
+    const handleSourceChainToggle = (chainId: string) => {
+        setSelectedSourceChainIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(chainId)) {
+                newSet.delete(chainId);
+            } else {
+                newSet.add(chainId);
+            }
+            return newSet;
+        });
+    };
+
+    const handleDestinationChainToggle = (chainId: string) => {
+        setSelectedDestinationChainIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(chainId)) {
+                newSet.delete(chainId);
+            } else {
+                newSet.add(chainId);
+            }
+            return newSet;
+        });
+    };
+
     const hasEnoughBalanceL1 = balanceL1 >= MINIMUM_BALANCE;
     const hasEnoughBalanceCChain = balanceCChain >= MINIMUM_BALANCE_CCHAIN;
     const hasEnoughBalance = hasEnoughBalanceL1 && hasEnoughBalanceCChain;
 
     return (
         <div className="space-y-4">
+
+
             <div className="text-lg font-bold">Relayer Configuration</div>
-            <Input
-                label="Destination Subnet ID"
-                value={selectedL1?.subnetId}
-                disabled
-            />
-            <Input
-                label="Destination Chain ID"
-                value={selectedL1?.evmChainId}
-                disabled
-            />
-            <Input
-                label="Destination RPC"
-                value={selectedL1?.rpcUrl}
-                disabled
-            />
-            <div className="space-y-2">
-                <Input
-                    label="Relayer EVM Address"
-                    value={relayerAddress}
-                    disabled
-                />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* L1 Balance Section */}
-                    <div className="space-y-3 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
-                        <div>
-                            <p className="font-semibold">Subnet (L1) Balance:</p>
-                            {isCheckingBalanceL1 ? (
-                                <p>Checking balance...</p>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <p>{formatEther(balanceL1)} coins {hasEnoughBalanceL1 ? '✅' : '❌'}</p>
-                                    <span
-                                        onClick={checkBalanceL1}
-                                        className="text-blue-500 hover:underline cursor-pointer"
-                                    >
-                                        Recheck
-                                    </span>
-                                </div>
-                            )}
-                            <div className="pb-2 text-xs">
-                                Should be at least {formatEther(MINIMUM_BALANCE)} native coins
-                            </div>
-                            {!hasEnoughBalanceL1 && (
-                                <>
-                                    <Button
-                                        variant="primary"
-                                        onClick={handleFundL1}
-                                        loading={isSendingL1}
-                                        disabled={isSendingL1 || !viemChain}
-                                    >
-                                        Fund Relayer on L1
-                                    </Button>
-                                </>
-                            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Source Chains Section */}
+                <div className="space-y-2 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
+                    <h3 className="font-semibold text-lg mb-2">Select Source Chains</h3>
+                    {availableChains.map((chain) => (
+                        <div key={chain.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800/30">
+                            <input
+                                type="checkbox"
+                                id={`source-${chain.id}`}
+                                checked={selectedSourceChainIds.has(chain.id)}
+                                onChange={() => handleSourceChainToggle(chain.id)}
+                                className="form-checkbox h-5 w-5 text-blue-600 rounded"
+                            />
+                            <label htmlFor={`source-${chain.id}`} className="cursor-pointer flex-grow space-y-1">
+                                <div className="font-medium">{chain.name} ({chain.isTestnet ? 'Testnet' : 'Mainnet'}) - {chain.coinName}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">ID: {chain.id}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">EVM Chain ID: {chain.evmChainId}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">RPC: {chain.rpcUrl}</div>
+                            </label>
                         </div>
+                    ))}
+                </div>
+
+                {/* Destination Chains Section */}
+                <div className="space-y-2 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
+                    <h3 className="font-semibold text-lg mb-2">Select Destination Chains</h3>
+                    {availableChains.map((chain) => (
+                        <div key={chain.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800/30">
+                            <input
+                                type="checkbox"
+                                id={`dest-${chain.id}`}
+                                checked={selectedDestinationChainIds.has(chain.id)}
+                                onChange={() => handleDestinationChainToggle(chain.id)}
+                                className="form-checkbox h-5 w-5 text-blue-600 rounded"
+                            />
+                            <label htmlFor={`dest-${chain.id}`} className="cursor-pointer flex-grow space-y-1">
+                                <div className="font-medium">{chain.name} ({chain.isTestnet ? 'Testnet' : 'Mainnet'}) - {chain.coinName}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">ID: {chain.id}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">EVM Chain ID: {chain.evmChainId}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">RPC: {chain.rpcUrl}</div>
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* L1 Balance Section */}
+                <div className="space-y-3 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
+                    <div>
+                        <p className="font-semibold">Subnet (L1) Balance:</p>
+                        {isCheckingBalanceL1 ? (
+                            <p>Checking balance...</p>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <p>{formatEther(balanceL1)} coins {hasEnoughBalanceL1 ? '✅' : '❌'}</p>
+                                <span
+                                    onClick={checkBalanceL1}
+                                    className="text-blue-500 hover:underline cursor-pointer"
+                                >
+                                    Recheck
+                                </span>
+                            </div>
+                        )}
+                        <div className="pb-2 text-xs">
+                            Should be at least {formatEther(MINIMUM_BALANCE)} native coins
+                        </div>
+                        {!hasEnoughBalanceL1 && (
+                            <>
+                                <Button
+                                    variant="primary"
+                                    onClick={handleFundL1}
+                                    loading={isSendingL1}
+                                    disabled={isSendingL1 || !viemChain}
+                                >
+                                    Fund Relayer on L1
+                                </Button>
+                            </>
+                        )}
                     </div>
+                </div>
 
-                    {/* C-Chain Balance Section */}
-                    <div className="space-y-3 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
-                        <div>
-                            <p className="font-semibold">C-Chain (Fuji) Balance:</p>
-                            {isCheckingBalanceCChain ? (
-                                <p>Checking balance...</p>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <p>{formatEther(balanceCChain)} AVAX {hasEnoughBalanceCChain ? '✅' : '❌'}</p>
-                                    <span
-                                        onClick={checkBalanceCChain}
-                                        className="text-blue-500 hover:underline cursor-pointer"
-                                    >
-                                        Recheck
-                                    </span>
-                                </div>
-                            )}
-                            <div className="pb-2 text-xs">
-                                Should be at least {formatEther(MINIMUM_BALANCE_CCHAIN)} AVAX
+                {/* C-Chain Balance Section */}
+                <div className="space-y-3 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
+                    <div>
+                        <p className="font-semibold">C-Chain (Fuji) Balance:</p>
+                        {isCheckingBalanceCChain ? (
+                            <p>Checking balance...</p>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <p>{formatEther(balanceCChain)} AVAX {hasEnoughBalanceCChain ? '✅' : '❌'}</p>
+                                <span
+                                    onClick={checkBalanceCChain}
+                                    className="text-blue-500 hover:underline cursor-pointer"
+                                >
+                                    Recheck
+                                </span>
                             </div>
-                            {!hasEnoughBalanceCChain && (
-                                <>
-                                    <Button
-                                        variant="primary"
-                                        onClick={handleFundCChain}
-                                        loading={isSendingCChain}
-                                        disabled={isSendingCChain}
-                                    >
-                                        Fund Relayer on C-Chain
-                                    </Button>
-                                </>
-                            )}
+                        )}
+                        <div className="pb-2 text-xs">
+                            Should be at least {formatEther(MINIMUM_BALANCE_CCHAIN)} AVAX
                         </div>
+                        {!hasEnoughBalanceCChain && (
+                            <>
+                                <Button
+                                    variant="primary"
+                                    onClick={handleFundCChain}
+                                    loading={isSendingCChain}
+                                    disabled={isSendingCChain}
+                                >
+                                    Fund Relayer on C-Chain
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
-            {hasEnoughBalance && (
-                <>
-                    <div className="text-sm">
-                        ⚠️ The private key is stored in your browser session storage and will persist until you close the browser.
-                        Please save the address above as you will need to fund it later.
-                    </div>
-                    <div className="text-lg font-bold">Write the relayer config file</div>
-                    <CodeHighlighter
-                        code={genConfigCommand(selectedL1!.subnetId, selectedL1!.id, selectedL1!.rpcUrl, privateKey)}
-                        lang="sh"
-                    />
-                    <div className="text-lg font-bold">Run the relayer</div>
-                    <CodeHighlighter
-                        code={relayerDockerCommand()}
-                        lang="sh"
-                    />
-                </>
-            )}
+            <>
+                <div className="text-sm">
+                    ⚠️ The private key is stored in your browser session storage and will persist until you close the browser.
+                    Please save the address above as you will need to fund it later.
+                </div>
+                <div className="text-lg font-bold">Write the relayer config file</div>
+                <CodeHighlighter
+                    code={genConfigCommand(selectedL1!.subnetId, selectedL1!.id, selectedL1!.rpcUrl, privateKey)}
+                    lang="sh"
+                />
+                <div className="text-lg font-bold">Run the relayer</div>
+                <CodeHighlighter
+                    code={relayerDockerCommand()}
+                    lang="sh"
+                />
+            </>
+
             {!hasEnoughBalance && (
                 <>
                     <div className="text-lg font-bold">
