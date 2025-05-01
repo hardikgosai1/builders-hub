@@ -25,7 +25,7 @@ export default function Initialize() {
     const [maximumChurnPercentage, setMaximumChurnPercentage] = useState("20");
     const [adminAddress, setAdminAddress] = useState("");
     const viemChain = useViemChainStore();
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
 
     useEffect(() => {
         if (walletEVMAddress && !adminAddress) {

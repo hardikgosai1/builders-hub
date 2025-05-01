@@ -27,7 +27,7 @@ export default function ConvertToL1() {
         setConvertToL1TxId,
         validatorWeights,
         setValidatorWeights,
-    } = useCreateChainStore();
+    } = useCreateChainStore()();
 
     const [isConverting, setIsConverting] = useState(false);
     const [validatorBalances, setValidatorBalances] = useState(Array(100).fill(BigInt(1000000000)) as bigint[]);

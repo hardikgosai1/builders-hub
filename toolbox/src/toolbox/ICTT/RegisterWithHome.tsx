@@ -37,7 +37,7 @@ export default function RegisterWithHome() {
         { label: "C-Chain", value: "C-Chain" }
     ];
     const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     if (!selectedL1) return null;
 
     const requiredChain = deployOn === "L1" ? viemChain : avalancheFuji;
@@ -95,7 +95,7 @@ export default function RegisterWithHome() {
         } finally {
             setIsCheckingRegistration(false);
         }
-    }, [deployOn, homeAddress["C-Chain"], homeAddress["L1"], selectedL1.id, viemChain]);
+    }, [deployOn, erc20TokenRemoteAddress["C-Chain"], erc20TokenRemoteAddress["L1"], homeAddress["C-Chain"], homeAddress["L1"], selectedL1.id, viemChain?.id]);
 
     useEffect(() => {
         fetchSettings();
