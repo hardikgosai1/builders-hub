@@ -46,7 +46,7 @@ export default function TestSend() {
     const [sourceTokenAllowance, setSourceTokenAllowance] = useState<bigint | null>(null);
 
     const [isFetchingSourceInfo, setIsFetchingSourceInfo] = useState(false);
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
 
     if (!selectedL1) return null;
 
@@ -64,7 +64,7 @@ export default function TestSend() {
 
     const destinationBlockchainIDHex = useMemo(() => {
         if (!destinationChain || !selectedL1) return null;
-        const chainIDBase58 = homeChainSelection === "L1" ? FUJI_C_BLOCKCHAIN_ID : selectedL1.id;
+        const chainIDBase58 = homeChainSelection === "L1" ? FUJI_C_BLOCKCHAIN_ID : selectedL1?.id;
         try {
             return utils.bufferToHex(utils.base58check.decode(chainIDBase58));
         } catch (e) {

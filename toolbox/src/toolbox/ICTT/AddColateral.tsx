@@ -35,7 +35,7 @@ export default function AddColateral() {
     const [collateralInfo, setCollateralInfo] = useState<{ needed: bigint, remaining: bigint | null } | null>(null);
     const [isCheckingStatus, setIsCheckingStatus] = useState(false);
     const [isCollateralized, setIsCollateralized] = useState<boolean | null>(null);
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     const [isAutoFilled, setIsAutoFilled] = useState(false); // Track if autofill happened
 
     if (!selectedL1) return null;

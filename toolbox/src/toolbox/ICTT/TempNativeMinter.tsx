@@ -30,7 +30,7 @@ export default function TempNativeMinter() {
     const [localError, setLocalError] = useState("");
     const [currentRole, setCurrentRole] = useState<number | null>(null);
     const [isCheckingRole, setIsCheckingRole] = useState(false);
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     if (!selectedL1) return null;
 
     const addressSuggestions: Suggestion[] = nativeTokenRemoteAddress?.L1

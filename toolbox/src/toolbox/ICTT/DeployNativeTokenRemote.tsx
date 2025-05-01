@@ -51,13 +51,13 @@ export default function DeployNativeTokenRemote() {
         { label: "C-Chain", value: "C-Chain" }
     ];
 
-    const selectedL1 = useSelectedL1();
+    const selectedL1 = useSelectedL1()();
     if (!selectedL1) return null;
 
     const tokenHomeBlockchainIDHex = useMemo(() => {
-        let chainIDBase58 = deployOn === "L1" ? FUJI_C_BLOCKCHAIN_ID : selectedL1.id;
+        let chainIDBase58 = deployOn === "L1" ? FUJI_C_BLOCKCHAIN_ID : selectedL1?.id;
         return utils.bufferToHex(utils.base58check.decode(chainIDBase58));
-    }, [deployOn, selectedL1.id]);
+    }, [deployOn, selectedL1?.id]);
 
     //Updates token decimals
     useEffect(() => {
