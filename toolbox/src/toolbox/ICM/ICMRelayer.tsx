@@ -10,6 +10,8 @@ import { CodeHighlighter } from '../../components/CodeHighlighter';
 import { useState, useEffect, useMemo } from 'react';
 import { useErrorBoundary } from "react-error-boundary";
 import { avalancheFuji } from 'viem/chains';
+import { AlertTriangle } from 'lucide-react';
+import WssEndpointInput from '../../components/WssEndpointInput';
 
 const MINIMUM_BALANCE = parseEther('100')
 const MINIMUM_BALANCE_CCHAIN = parseEther('1')
@@ -27,6 +29,7 @@ export default function ICMRelayer() {
     const { showBoundary } = useErrorBoundary();
     const viemChain = useViemChainStore();
     const { l1List } = useL1ListStore()();
+    const [wsEndpoints, setWsEndpoints] = useState<Map<string, string>>(new Map());
 
     const getInitialSelectedIds = (currentL1Id?: string): Set<string> => {
         const initialSet = new Set<string>();
@@ -54,6 +57,29 @@ export default function ICMRelayer() {
         }
         return [...l1List, cChain].filter(chain => chain.id && chain.name); // Ensure chains have id and name
     }, [l1List]);
+
+    // Derive WebSocket URL from HTTP/HTTPS RPC URL
+    const deriveWsUrl = (httpUrl: string): string => {
+        if (!httpUrl) return '';
+        try {
+            const url = new URL(httpUrl);
+            url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+            // Common replacements - adjust if needed for specific node providers
+            if (url.pathname.endsWith('/rpc')) {
+                url.pathname = url.pathname.replace(/\/rpc$/, '/ws');
+            } else if (url.pathname.includes('/ext/bc/C')) { // Specific Avalanche C-Chain path
+                url.pathname = url.pathname.replace(/\/ext\/bc\/C$/, '/ext/bc/C/ws');
+            }
+            else if (!url.pathname.endsWith('/ws')) {
+                // Append /ws if not present and likely not a special path
+                url.pathname = url.pathname.replace(/\/$/, '') + '/ws';
+            }
+            return url.toString();
+        } catch (e) {
+            console.error("Error deriving WebSocket URL:", e);
+            return ''; // Return empty string on error
+        }
+    };
 
     // Use sessionStorage for private key to persist across refreshes
     const [privateKey] = useState(() => {
@@ -192,12 +218,28 @@ export default function ICMRelayer() {
     };
 
     const handleSourceChainToggle = (chainId: string) => {
+        const chain = availableChains.find(c => c.id === chainId); // Find chain details
+        if (!chain) return; // Should not happen
+
         setSelectedSourceChainIds(prev => {
             const newSet = new Set(prev);
             if (newSet.has(chainId)) {
                 newSet.delete(chainId);
+                // Remove from wsEndpoints when deselecting
+                setWsEndpoints(currentEndpoints => {
+                    const newEndpoints = new Map(currentEndpoints);
+                    newEndpoints.delete(chainId);
+                    return newEndpoints;
+                });
             } else {
                 newSet.add(chainId);
+                // Add derived URL to wsEndpoints when selecting
+                setWsEndpoints(currentEndpoints => {
+                    const newEndpoints = new Map(currentEndpoints);
+                    // Derive and set the WS endpoint
+                    newEndpoints.set(chainId, deriveWsUrl(chain.rpcUrl));
+                    return newEndpoints;
+                });
             }
             return newSet;
         });
@@ -215,6 +257,10 @@ export default function ICMRelayer() {
         });
     };
 
+    const handleWsEndpointChange = (chainId: string, value: string) => {
+        setWsEndpoints(prev => new Map(prev).set(chainId, value));
+    };
+
     const hasEnoughBalanceL1 = balanceL1 >= MINIMUM_BALANCE;
     const hasEnoughBalanceCChain = balanceCChain >= MINIMUM_BALANCE_CCHAIN;
     const hasEnoughBalance = hasEnoughBalanceL1 && hasEnoughBalanceCChain;
@@ -230,20 +276,33 @@ export default function ICMRelayer() {
                 <div className="space-y-2 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/20">
                     <h3 className="font-semibold text-lg mb-2">Select Source Chains</h3>
                     {availableChains.map((chain) => (
-                        <div key={chain.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800/30">
-                            <input
-                                type="checkbox"
-                                id={`source-${chain.id}`}
-                                checked={selectedSourceChainIds.has(chain.id)}
-                                onChange={() => handleSourceChainToggle(chain.id)}
-                                className="form-checkbox h-5 w-5 text-blue-600 rounded"
-                            />
-                            <label htmlFor={`source-${chain.id}`} className="cursor-pointer flex-grow space-y-1">
-                                <div className="font-medium">{chain.name} ({chain.isTestnet ? 'Testnet' : 'Mainnet'}) - {chain.coinName}</div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">ID: {chain.id}</div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">EVM Chain ID: {chain.evmChainId}</div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">RPC: {chain.rpcUrl}</div>
-                            </label>
+                        <div key={chain.id} className="p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800/30">
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id={`source-${chain.id}`}
+                                    checked={selectedSourceChainIds.has(chain.id)}
+                                    onChange={() => handleSourceChainToggle(chain.id)}
+                                    className="form-checkbox h-5 w-5 text-blue-600 rounded"
+                                />
+                                <label htmlFor={`source-${chain.id}`} className="cursor-pointer flex-grow space-y-1">
+                                    <div className="font-medium">{chain.name} ({chain.isTestnet ? 'Testnet' : 'Mainnet'}) - {chain.coinName}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">ID: {chain.id}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">EVM Chain ID: {chain.evmChainId}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">RPC: {chain.rpcUrl}</div>
+                                </label>
+                            </div>
+                            {selectedSourceChainIds.has(chain.id) && (
+                                <div className="mt-2 pl-7"> {/* Indent slightly */}
+                                    <WssEndpointInput
+                                        label="WebSocket Endpoint (ws:// or wss://)"
+                                        value={wsEndpoints.get(chain.id) || ''}
+                                        onChange={value => handleWsEndpointChange(chain.id, value)}
+                                        placeholder="wss://..."
+                                        chainId={chain.id}
+                                    />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -349,7 +408,13 @@ export default function ICMRelayer() {
                 </div>
                 <div className="text-lg font-bold">Write the relayer config file</div>
                 <CodeHighlighter
-                    code={genConfigCommand(selectedL1!.subnetId, selectedL1!.id, selectedL1!.rpcUrl, privateKey)}
+                    code={genConfigCommand(
+                        availableChains,
+                        selectedSourceChainIds,
+                        selectedDestinationChainIds,
+                        wsEndpoints,
+                        privateKey
+                    )}
                     lang="sh"
                 />
                 <div className="text-lg font-bold">Run the relayer</div>
@@ -370,9 +435,16 @@ export default function ICMRelayer() {
     );
 }
 
-const genConfigCommand = (destinationSubnetID: string, destinationBlockchainID: string, destinationRPC: string, privateKeyhex: string) => {
-    const FUJI_C_SUBNET_ID = "11111111111111111111111111111111LpoYY";
-    const FUJI_C_BLOCKCHAIN_ID = "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp";
+const genConfigCommand = (
+    allChains: L1ListItem[],
+    sourceChainIds: Set<string>,
+    destinationChainIds: Set<string>,
+    wsEndpoints: Map<string, string>,
+    privateKeyhex: string
+) => {
+
+    const selectedSourceChains = allChains.filter(chain => sourceChainIds.has(chain.id));
+    const selectedDestinationChains = allChains.filter(chain => destinationChainIds.has(chain.id));
 
     const config = {
         "info-api": {
@@ -382,64 +454,38 @@ const genConfigCommand = (destinationSubnetID: string, destinationBlockchainID: 
             "base-url": "https://api.avax-test.network"
         },
         "source-blockchains": [
-            {
-                "subnet-id": FUJI_C_SUBNET_ID,
-                "blockchain-id": FUJI_C_BLOCKCHAIN_ID,
-                "vm": "evm",
+            ...selectedSourceChains.map(chain => ({
+                "subnet-id": chain.subnetId,
+                "blockchain-id": chain.id,
+                "vm": "evm", // Assuming EVM for now
                 "rpc-endpoint": {
-                    "base-url": "https://api.avax-test.network/ext/bc/C/rpc"
+                    "base-url": chain.rpcUrl,
                 },
                 "ws-endpoint": {
-                    "base-url": "wss://api.avax-test.network/ext/bc/C/ws"
+                    // Use the value from state, fallback to empty string if somehow missing
+                    "base-url": wsEndpoints.get(chain.id) || '',
                 },
                 "message-contracts": {
+                    // TODO: Make this configurable if needed
                     "0x253b2784c75e510dD0fF1da844684a1aC0aa5fcf": {
                         "message-format": "teleporter",
                         "settings": {
-                            "reward-address": "0x0000000000000000000000000000000000000000"
+                            "reward-address": "0x0000000000000000000000000000000000000000" // TODO: Make configurable?
                         }
                     }
                 }
-            },
-            {
-                "subnet-id": destinationSubnetID,
-                "blockchain-id": destinationBlockchainID,
-                "vm": "evm",
-                "rpc-endpoint": {
-                    "base-url": destinationRPC,
-                },
-                "ws-endpoint": {
-                    "base-url": destinationRPC.replace("http", "ws").replace("/rpc", "/ws"),
-                },
-                "message-contracts": {
-                    "0x253b2784c75e510dD0fF1da844684a1aC0aa5fcf": {
-                        "message-format": "teleporter",
-                        "settings": {
-                            "reward-address": "0x0000000000000000000000000000000000000000"
-                        }
-                    }
-                }
-            },
+            })),
         ],
         "destination-blockchains": [
-            {
-                "subnet-id": destinationSubnetID,
-                "blockchain-id": destinationBlockchainID,
-                "vm": "evm",
+            ...selectedDestinationChains.map(chain => ({
+                "subnet-id": chain.subnetId,
+                "blockchain-id": chain.id,
+                "vm": "evm", // Assuming EVM
                 "rpc-endpoint": {
-                    "base-url": destinationRPC
+                    "base-url": chain.rpcUrl
                 },
                 "account-private-key": privateKeyhex
-            },
-            {
-                "subnet-id": FUJI_C_SUBNET_ID,
-                "blockchain-id": FUJI_C_BLOCKCHAIN_ID,
-                "vm": "evm",
-                "rpc-endpoint": {
-                    "base-url": "https://api.avax-test.network/ext/bc/C/rpc"
-                },
-                "account-private-key": privateKeyhex
-            }
+            })),
         ]
     }
     const configStr = JSON.stringify(config, null, 4);
