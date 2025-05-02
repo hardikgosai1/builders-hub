@@ -2,7 +2,7 @@
 
 import { useWalletStore } from "../../lib/walletStore"
 import { useState } from "react"
-import { Calendar, Clock, Users, Coins, Globe, Info, Copy, Check } from "lucide-react"
+import { Calendar, Clock, Users, Coins, Info, Copy, Check } from "lucide-react"
 import { Container } from "../components/Container"
 import { Button } from "../../components/Button"
 import { networkIDs } from "@avalabs/avalanchejs"
