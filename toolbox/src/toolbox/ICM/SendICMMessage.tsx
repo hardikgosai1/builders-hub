@@ -13,6 +13,7 @@ import { Input } from "../../components/Input";
 import { avalancheFuji } from "viem/chains";
 import { SENDER_C_CHAIN_ADDRESS } from "./DeployICMDemo";
 import { RadioGroup } from "../../components/RadioGroup";
+import { Container } from "../components/Container";
 
 type MessageDirection = "CtoL1" | "L1toC";
 
@@ -134,8 +135,10 @@ export default function SendICMMessage() {
     }
 
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Send ICM Message</h2>
+        <Container
+            title="Send ICM Message"
+            description="Send a test message using the demo contract."
+        >
 
             <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900/50">
                 <RadioGroup
@@ -239,6 +242,6 @@ export default function SendICMMessage() {
                     value={lastReceivedMessage?.toString() ?? ""}
                 />
             </div>
-        </div>
+            </Container>
     );
 }
