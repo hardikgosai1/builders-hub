@@ -109,13 +109,6 @@ const componentGroups: Record<string, ComponentGroupType> = {
         },
         components: [
             {
-                id: "deployValidatorMessages",
-                label: "Deploy Validator Messages Library",
-                component: lazy(() => import('./ValidatorManager/DeployValidatorMessages')),
-                fileNames: ["toolbox/src/toolbox/ValidatorManager/DeployValidatorMessages.tsx"],
-                walletRequired: "with-l1"
-            },
-            {
                 id: "deployValidatorManager",
                 label: "Deploy Validator Manager Contract",
                 component: lazy(() => import('./ValidatorManager/DeployValidatorManager')),
