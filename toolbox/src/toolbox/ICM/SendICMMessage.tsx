@@ -6,13 +6,11 @@ import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
-import { createPublicClient, http, Chain } from 'viem';
+import { createPublicClient, http } from 'viem';
 import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
-import { RadioGroup } from "../../components/RadioGroup";
 import { Container } from "../components/Container";
-import InputChainId from "../components/InputChainId";
 import SelectChainID from "../components/SelectChainID";
 
 export default function SendICMMessage() {
