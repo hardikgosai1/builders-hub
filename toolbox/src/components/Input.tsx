@@ -6,7 +6,7 @@ import { useState, type InputHTMLAttributes } from "react"
 import { cn } from "../lib/utils"
 
 export interface RawInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  error?: string | null
+  error?: string | null | React.ReactNode
 }
 
 export function RawInput({ className, error, ...props }: RawInputProps) {
@@ -45,7 +45,7 @@ export interface InputProps extends Omit<RawInputProps, "onChange"> {
   onChange?: (newValue: string) => void
   helperText?: string | React.ReactNode
   button?: React.ReactNode
-  error?: string | null
+  error?: string | null | React.ReactNode
   suggestions?: Suggestion[]
 }
 

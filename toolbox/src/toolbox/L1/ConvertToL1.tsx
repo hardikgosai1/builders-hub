@@ -10,7 +10,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { Container } from "../components/Container";
 import { ResultField } from "../components/ResultField";
 import { ValidatorListInput } from "../../components/ValidatorListInput";
-import SelectChainId from "../components/SelectChainId";
+import InputChainId from "../components/InputChainId";
 import SelectSubnetId from "../components/SelectSubnetId";
 import { Callout } from "fumadocs-ui/components/callout";
 
@@ -68,7 +68,7 @@ export default function ConvertToL1() {
                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Validator Manager</h2>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">With the conversion of the Subnet to an L1 the validator set of the L1 will be managed by a validator manager contract. This contract can implement Proof-of-Authority, Proof-of-Stake or any custom logic to determine the validator set. The contract can be deployed on a blockchain of the L1, the C-Chain or any other blockchain in the Avalanche network.</p>
                 </div>
-                <SelectChainId
+                <InputChainId
                     value={chainID}
                     onChange={setChainID}
                     error={null}
@@ -85,8 +85,8 @@ export default function ConvertToL1() {
                 <Callout type="info">
                     In the Genesis Builder an <a href="https://docs.openzeppelin.com/contracts/4.x/api/proxy" target="_blank">OpenZeppelin TransparentUpgradeableProxy</a> contract is pre-deployed at the address <code>0xfacade...</code>. This proxy can be pointed to a reference implementation or customized version of the <a href="https://github.com/ava-labs/icm-contracts/tree/main/contracts/validator-manager" target="_blank">validator manager contract</a>. Tools for the deployment of the reference implementations of validator manager contract are available in the <a href="http://build.avax.network/tools/l1-toolbox#deployValidatorManager" target="_blank">L1 Toolbox</a> for after the conversion.
                 </Callout>
-                
-                <ValidatorListInput 
+
+                <ValidatorListInput
                     validators={validators}
                     onChange={setValidators}
                     defaultAddress={pChainAddress}

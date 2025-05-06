@@ -263,3 +263,16 @@ export function useSelectedL1() {
     );
 }
 
+
+export function useL1ByChainId(chainId: string) {
+    const l1ListStore = useL1ListStore();
+
+    return useMemo(() =>
+        () => {
+            const l1List = l1ListStore.getState().l1List;
+            return l1List.find(l1 => l1.id === chainId) || undefined;
+        },
+        [chainId, l1ListStore]
+    );
+}
+

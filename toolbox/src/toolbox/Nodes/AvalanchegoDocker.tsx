@@ -7,7 +7,7 @@ import versions from "../../versions.json";
 import { Container } from "../components/Container";
 import { Input } from "../../components/Input";
 import { getBlockchainInfo } from "../../coreViem/utils/glacier";
-import InputChainId from "../components/SelectChainId";
+import InputChainId from "../components/InputChainId";
 import { Checkbox } from "../../components/Checkbox";
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
