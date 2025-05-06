@@ -4,7 +4,7 @@ import { useWalletStore } from "../../../lib/walletStore";
 import { ChainTile } from "./ChainTile"
 import { AddChainModal } from "./AddChainModal";
 import { useErrorBoundary } from "react-error-boundary";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 export const ConnectWalletToolbox = ({ children, required, chainRequired }: { children: React.ReactNode, required: boolean, chainRequired: boolean }) => {
     const viemChain = useViemChainStore();
@@ -29,6 +29,13 @@ const ChainSelector = () => {
     const { coreWalletClient } = useWalletStore();
     const { showBoundary } = useErrorBoundary();
 
+    const handleSwitchChain = useCallback((chainId: number) => {
+        coreWalletClient.switchChain({
+            id: `0x${chainId.toString(16)}`,
+        }).then(() => {
+            window.location.reload();
+        }).catch(showBoundary);
+    }, [coreWalletClient, showBoundary]);
 
     return (
         <>
@@ -43,7 +50,7 @@ const ChainSelector = () => {
                                 key={chain.id}
                                 chain={chain}
                                 isActive={walletChainId === chain.evmChainId}
-                                onClick={() => coreWalletClient.switchChain({ id: `0x${chain.evmChainId.toString(16)}`, }).catch(showBoundary)}
+                                onClick={() => handleSwitchChain(chain.evmChainId)}
                                 onDelete={() => removeL1(chain.id)}
                             />
                         ))}
