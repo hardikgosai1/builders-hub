@@ -25,6 +25,8 @@ export default function SendICMMessage() {
     const [isSending, setIsSending] = useState(false);
     const [lastTxId, setLastTxId] = useState<string>();
     const viemChain = useViemChainStore();
+    const [isQuerying, setIsQuerying] = useState(false);
+    const [lastReceivedMessage, setLastReceivedMessage] = useState<number>();
 
     const targetToolboxStore = getToolboxStore(destinationChainId)()
     const targetL1 = useL1ByChainId(destinationChainId)();
@@ -103,6 +105,33 @@ export default function SendICMMessage() {
         }
     }
 
+    async function queryLastMessage() {
+        if (!targetL1?.rpcUrl || !targetToolboxStore.icmReceiverAddress) {
+            showBoundary(new Error('Missing required information to query message'));
+            return;
+        }
+
+        setIsQuerying(true);
+        try {
+            const destinationClient = createPublicClient({
+                transport: http(targetL1.rpcUrl),
+            });
+
+            const lastMessage = await destinationClient.readContract({
+                address: targetToolboxStore.icmReceiverAddress as `0x${string}`,
+                abi: ICMDemoABI.abi,
+                functionName: 'lastMessage',
+            });
+
+            setLastReceivedMessage(Number(lastMessage));
+        } catch (error) {
+            console.error("ICM Query Error:", error);
+            showBoundary(error);
+        } finally {
+            setIsQuerying(false);
+        }
+    }
+
     const isButtonDisabled = isSending ||
         !!sourceContractError ||
         !!targetContractError ||
@@ -110,6 +139,10 @@ export default function SendICMMessage() {
         !message ||
         !coreWalletClient ||
         !destinationBlockchainIDHex;
+
+    const isQueryButtonDisabled = isQuerying ||
+        !targetToolboxStore.icmReceiverAddress ||
+        !targetL1?.rpcUrl;
 
     return (
         <Container title="Send ICM Message">
@@ -154,6 +187,24 @@ export default function SendICMMessage() {
                         label="Transaction ID (on Source Chain)"
                         value={lastTxId ?? ""}
                     />
+                </div>
+
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                    <Button
+                        variant="secondary"
+                        onClick={queryLastMessage}
+                        loading={isQuerying}
+                        disabled={isQueryButtonDisabled}
+                    >
+                        Query Last Message on {targetL1?.name || 'Destination Chain'}
+                    </Button>
+
+                    <div className="mt-2">
+                        <Success
+                            label="Last Received Message on Destination Chain"
+                            value={lastReceivedMessage !== undefined ? lastReceivedMessage.toString() : ""}
+                        />
+                    </div>
                 </div>
             </div>
         </Container>
