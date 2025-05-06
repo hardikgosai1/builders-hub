@@ -34,8 +34,8 @@ export default function DeployERC20TokenHome() {
 
     // Initialize token address with exampleErc20Address when it becomes available
     useEffect(() => {
-        if (exampleErc20Address?.L1 && !tokenAddress) {
-            setTokenAddress(exampleErc20Address.L1);
+        if (exampleErc20Address && !tokenAddress) {
+            setTokenAddress(exampleErc20Address);
         }
     }, [exampleErc20Address, tokenAddress]);
 
@@ -108,7 +108,7 @@ export default function DeployERC20TokenHome() {
                 throw new Error('No contract address in receipt');
             }
 
-            setErc20TokenHomeAddress(receipt.contractAddress, "L1");
+            setErc20TokenHomeAddress(receipt.contractAddress);
         } catch (error) {
             showBoundary(error);
         } finally {
@@ -177,16 +177,16 @@ export default function DeployERC20TokenHome() {
 
                     <Success
                         label="ERC20 Token Home Address"
-                        value={erc20TokenHomeAddress?.L1 || ""}
+                        value={erc20TokenHomeAddress || ""}
                     />
 
                     <Button
-                        variant={erc20TokenHomeAddress?.L1 ? "secondary" : "primary"}
+                        variant={erc20TokenHomeAddress ? "secondary" : "primary"}
                         onClick={handleDeploy}
                         loading={isDeploying}
                         disabled={!teleporterRegistryAddress || !tokenAddress || tokenDecimals === "0"}
                     >
-                        {erc20TokenHomeAddress?.L1 ? "Re-Deploy ERC20 Token Home" : "Deploy ERC20 Token Home"}
+                        {erc20TokenHomeAddress ? "Re-Deploy ERC20 Token Home" : "Deploy ERC20 Token Home"}
                     </Button>
                 </div>
             </div>

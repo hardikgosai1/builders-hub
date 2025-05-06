@@ -40,7 +40,7 @@ export default function DeployExampleERC20() {
                 throw new Error('No contract address in receipt');
             }
 
-            setExampleErc20Address(receipt.contractAddress, "L1");
+            setExampleErc20Address(receipt.contractAddress);
         } catch (error) {
             showBoundary(error);
         } finally {
@@ -57,17 +57,17 @@ export default function DeployExampleERC20() {
                 </div>
 
                 <Button
-                    variant={exampleErc20Address?.L1 ? "secondary" : "primary"}
+                    variant={exampleErc20Address ? "secondary" : "primary"}
                     onClick={handleDeploy}
                     loading={isDeploying}
                     disabled={isDeploying}
                 >
-                    {exampleErc20Address?.L1 ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
+                    {exampleErc20Address ? "Re-Deploy ERC20 Token" : "Deploy ERC20 Token"}
                 </Button>
 
                 <Success
                     label="ERC20 Token Address"
-                    value={exampleErc20Address?.L1 || ""}
+                    value={exampleErc20Address || ""}
                 />
             </div>
         </Container>

@@ -3,8 +3,6 @@ import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 import { useWalletStore } from '../lib/walletStore';
 
-export type DeployOn = "L1" | "C-Chain";
-
 const localStorageComp = () => typeof window !== 'undefined' ? localStorage : { getItem: () => null, setItem: () => { }, removeItem: () => { } }
 
 export const EVM_VM_ID = "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy"
@@ -145,10 +143,10 @@ const toolboxInitialState = {
     stakingManagerAddress: "",
     teleporterRegistryAddress: "",
     icmReceiverAddress: "",
-    exampleErc20Address: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    erc20TokenHomeAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    erc20TokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
-    nativeTokenRemoteAddress: { "L1": "", "C-Chain": "" } as { L1: string, "C-Chain": string },
+    exampleErc20Address: "",
+    erc20TokenHomeAddress: "",
+    erc20TokenRemoteAddress: "",
+    nativeTokenRemoteAddress: "",
 
     //unverifyed state - remove after testing
     // nodeRpcUrl: "",
@@ -166,16 +164,10 @@ export const getToolboxStore = (chainId: string) => create(
             setStakingManagerAddress: (stakingManagerAddress: string) => set({ stakingManagerAddress }),
             setTeleporterRegistryAddress: (address: string) => set({ teleporterRegistryAddress: address }),
             setIcmReceiverAddress: (address: string) => set({ icmReceiverAddress: address }),
-            setExampleErc20Address: (address: string, deployOn: DeployOn) => set((state) => ({ exampleErc20Address: { ...state.exampleErc20Address, [deployOn]: address } })),
-            setErc20TokenHomeAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenHomeAddress: { ...state.erc20TokenHomeAddress, [deployOn]: address } })),
-            setErc20TokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ erc20TokenRemoteAddress: { ...state.erc20TokenRemoteAddress, [deployOn]: address } })),
-            setNativeTokenRemoteAddress: (address: string, deployOn: DeployOn) => set((state) => ({ nativeTokenRemoteAddress: { ...state.nativeTokenRemoteAddress, [deployOn]: address } })),
-
-            //unverified methods - remove after testing
-            // setNodeRpcUrl: (nodeRpcUrl: string) => set({ nodeRpcUrl }),
-            // setEvmChainCoinName: (evmChainCoinName: string) => set({ evmChainCoinName }),
-            // setEvmChainIsTestnet: (evmChainIsTestnet: boolean) => set({ evmChainIsTestnet }),
-
+            setExampleErc20Address: (address: string) => set({ exampleErc20Address: address }),
+            setErc20TokenHomeAddress: (address: string) => set({ erc20TokenHomeAddress: address }),
+            setErc20TokenRemoteAddress: (address: string) => set({ erc20TokenRemoteAddress: address }),
+            setNativeTokenRemoteAddress: (address: string) => set({ nativeTokenRemoteAddress: address }),
 
             reset: () => {
                 if (typeof window !== 'undefined') {
