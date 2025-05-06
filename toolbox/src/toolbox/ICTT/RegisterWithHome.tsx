@@ -1,6 +1,6 @@
 "use client";
 
-import { useSelectedL1, useToolboxStore, useViemChainStore, getToolboxStore, useL1ByChainId } from "../toolboxStore";
+import { useSelectedL1, useToolboxStore, useViemChainStore, useL1ByChainId } from "../toolboxStore";
 import { useWalletStore } from "../../lib/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
@@ -31,7 +31,6 @@ export default function RegisterWithHome() {
     const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
-    const sourceToolboxStore = getToolboxStore(sourceChainId)();
 
     let sourceChainError: string | undefined = undefined;
     if (!sourceChainId) {

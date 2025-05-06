@@ -12,7 +12,6 @@ import ExampleERC20ABI from "../../../contracts/icm-contracts/compiled/ExampleER
 import { createPublicClient, http, formatUnits, parseUnits, Address, zeroAddress } from "viem";
 import { Input, Suggestion } from "../../components/Input";
 import { utils } from "@avalabs/avalanchejs";
-import { Note } from "../../components/Note";
 import SelectChainID from "../components/SelectChainID";
 
 const DEFAULT_GAS_LIMIT = 250000n;
@@ -58,7 +57,7 @@ export default function TokenBridge() {
     const destL1 = useL1ByChainId(destinationChainId)();
     const destToolboxStore = getToolboxStore(destinationChainId)();
 
-    const { erc20TokenHomeAddress, erc20TokenRemoteAddress, nativeTokenRemoteAddress } = useToolboxStore();
+    const { erc20TokenHomeAddress } = useToolboxStore();
 
     // Destination chain validation
     let destChainError: string | undefined = undefined;
@@ -90,7 +89,7 @@ export default function TokenBridge() {
             });
         }
         return suggestions;
-    }, [useToolboxStore, selectedL1?.name]);
+    }, [erc20TokenHomeAddress, selectedL1?.name]);
 
     // Suggestions for destination contract address
     const destinationContractSuggestions: Suggestion[] = useMemo(() => {
