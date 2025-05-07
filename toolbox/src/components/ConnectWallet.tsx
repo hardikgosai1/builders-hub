@@ -13,7 +13,6 @@ import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RemountOnWalletChange } from "./RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
 import InterchainTransfer from "./InterchainTransfer"
-import { Button } from "./Button"
 
 const faucets = {
     43113: "https://test.core.app/tools/testnet-faucet/?subnet=c&token=c",

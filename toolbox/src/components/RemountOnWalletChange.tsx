@@ -32,14 +32,6 @@ export function RemountOnWalletChange({ children }: { children: React.ReactNode 
     }
   }, [isTestnet, walletChainId, walletEVMAddress])
 
-  // Fade-in effect
-  const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    setVisible(false)
-    const t = setTimeout(() => setVisible(true), 10) // allow DOM to update
-    return () => clearTimeout(t)
-  }, [key])
-
   return (
     <div
       key={key}
