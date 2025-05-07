@@ -6,7 +6,7 @@ import { useWalletStore } from '../../../lib/walletStore';
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from '../../../components/Input';
 import { Select } from '../Select';
-import { getBlockchainInfo, getSubnetInfo } from '../../../coreViem/utils/glacier';
+import { getBlockchainInfo, getSubnetInfo, getChainDetails } from '../../../coreViem/utils/glacier';
 import * as Dialog from "@radix-ui/react-dialog";
 import { fetchChainId } from '../../../lib/chainId';
 interface AddChainModalProps {
@@ -21,6 +21,7 @@ interface AddChainModalProps {
         isTestnet: boolean;
         subnetId: string;
         validatorManagerAddress: string;
+        logoUrl: string;
     }) => void;
     allowLookup?: boolean;
     fixedRPCUrl?: string;
@@ -43,6 +44,7 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
     const [validatorManagerAddress, setValidatorManagerAddress] = useState("");
     const [localError, setLocalError] = useState("");
     const { coreWalletClient } = useWalletStore();
+    const [logoUrl, setLogoUrl] = useState("");
 
     // Fetch chain data when RPC URL changes
     useEffect(() => {
@@ -51,6 +53,7 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
             setChainId("");
             setChainName("");
             setLocalError("");
+            setLogoUrl(""); // reset logo
 
             if (!rpcUrl) return;
             if (!rpcUrl.startsWith("https://") && !rpcUrl.includes("localhost") && !rpcUrl.includes("127.0.0.1")) {
@@ -69,6 +72,14 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 setIsTestnet(blockchainInfo.isTestnet);
                 const subnetInfo = await getSubnetInfo(blockchainInfo.subnetId);
                 setValidatorManagerAddress(subnetInfo.l1ValidatorManagerDetails?.contractAddress || "");
+
+                // Fetch logo URL
+                try {
+                    const chainDetails = await getChainDetails(String(ethereumChainId));
+                    setLogoUrl(chainDetails.chainLogoUri || "");
+                } catch (e) {
+                    setLogoUrl(""); // fallback if not found
+                }
             } catch (error) {
                 //Fatal error, toolbox has a hard dependency on glacier
                 setLocalError((error as Error)?.message || String(error));
@@ -115,6 +126,7 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 isTestnet: isTestnet,
                 subnetId: subnetId,
                 validatorManagerAddress: validatorManagerAddress,
+                logoUrl: logoUrl,
             });
             onClose();
         } catch (error) {
@@ -133,6 +145,12 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                     <Dialog.Title className="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100">
                         Add an existing Avalanche L1
                     </Dialog.Title>
+
+                    {logoUrl && (
+                        <div className="flex justify-center mb-4">
+                            <img src={logoUrl} alt="Chain Logo" className="h-12 w-12 rounded-full" />
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         {allowLookup && (
@@ -192,6 +210,12 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                             value={validatorManagerAddress}
                             disabled={true}
                             placeholder="0x1234567890123456789012345678901234567890"
+                        />
+
+                        <Input
+                            label="Logo URL"
+                            value={logoUrl}
+                            disabled={true}
                         />
 
                         <Select

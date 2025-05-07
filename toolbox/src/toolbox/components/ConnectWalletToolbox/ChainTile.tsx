@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, X } from 'lucide-react';
+import { ExternalLink, X, Link } from 'lucide-react';
 
 // Use the correct interface from the L1ListStore
 interface ChainInfo {
@@ -10,7 +10,7 @@ interface ChainInfo {
     coinName: string;
     isTestnet: boolean;
     subnetId: string;
-    imageUri?: string;
+    logoUrl?: string;
 }
 
 interface ChainTileProps {
@@ -34,12 +34,12 @@ export const ChainTile: React.FC<ChainTileProps> = ({
         <div
             onClick={onClick}
             className={`
-        ${isAddTile ? 'h-16 flex items-center justify-center' : 'h-16 flex flex-col items-center justify-center'}
+        ${isAddTile ? 'h-20 flex items-center justify-center' : 'h-20 flex items-center p-3 gap-3'} 
         w-full rounded-lg border cursor-pointer transition-all relative
         transform hover:scale-[1.02] hover:shadow-sm active:scale-[0.98]
         ${isAddTile
                     ? "hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-500"
-                    : chain?.isTestnet // Keep conditional hover based on testnet, but don't show the badge
+                    : chain?.isTestnet
                         ? "hover:border-orange-300 dark:hover:border-orange-600"
                         : "hover:border-green-300 dark:hover:border-green-600"
                 }
@@ -56,6 +56,31 @@ export const ChainTile: React.FC<ChainTileProps> = ({
                 </div>
             ) : (
                 <>
+                    {/* Logo or Placeholder */}
+                    <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden flex items-center justify-center">
+                        {chain?.logoUrl ? (
+                            <img src={chain.logoUrl} alt={`${chain.name} logo`} className="w-full h-full object-cover" />
+                        ) : (
+                            <Link className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
+                        )}
+                    </div>
+
+                    {/* Chain Info Container */}
+                    <div className="flex flex-col items-start justify-center flex-grow min-w-0">
+                        {/* Chain Name */}
+                        <div className="font-medium text-sm text-zinc-800 dark:text-zinc-100 truncate w-full">
+                            {chain?.name}
+                        </div>
+
+                        {/* Chain ID Badge */}
+                        <div className={`text-[10px] font-medium px-2 py-0.5 rounded-full mt-1 ${chain?.isTestnet
+                            ? "bg-orange-100/50 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300"
+                            : "bg-green-100/50 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                            }`}>
+                            ID: {chain?.evmChainId}
+                        </div>
+                    </div>
+
                     {/* Delete Button */}
                     {onDelete && chain && (
                         <button
@@ -67,19 +92,6 @@ export const ChainTile: React.FC<ChainTileProps> = ({
                             <X size={12} strokeWidth={2.5} />
                         </button>
                     )}
-
-                    {/* Chain Name */}
-                    <div className="font-medium text-sm text-zinc-800 dark:text-zinc-100 truncate max-w-[90%] px-1 text-center mb-1 mt-1">
-                        {chain?.name}
-                    </div>
-
-                    {/* Chain ID Badge */}
-                    <div className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${chain?.isTestnet
-                        ? "bg-orange-100/50 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300"
-                        : "bg-green-100/50 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                        }`}>
-                        ID: {chain?.evmChainId}
-                    </div>
 
                     {/* External Link Indicator (subtle) */}
                     <div className="absolute bottom-1 right-1 opacity-30">

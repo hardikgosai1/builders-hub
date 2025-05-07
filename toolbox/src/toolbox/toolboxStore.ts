@@ -63,6 +63,7 @@ type L1ListItem = {
     isTestnet: boolean;
     subnetId: string;
     validatorManagerAddress: string;
+    logoUrl: string;
 };
 
 const l1ListInitialStateFuji = {
@@ -76,6 +77,7 @@ const l1ListInitialStateFuji = {
             isTestnet: true,
             subnetId: "11111111111111111111111111111111LpoYY",
             validatorManagerAddress: "",
+            logoUrl: "https://images.ctfassets.net/gcj8jwzm6086/5VHupNKwnDYJvqMENeV7iJ/3e4b8ff10b69bfa31e70080a4b142cd0/avalanche-avax-logo.svg",
         },
         {
             id: "98qnjenm7MBd8G2cPZoRvZrgJC33JGSAAKghsQ6eojbLCeRNp",
@@ -86,6 +88,7 @@ const l1ListInitialStateFuji = {
             isTestnet: true,
             subnetId: "i9gFpZQHPLcGfZaQLiwFAStddQD7iTKBpFfurPFJsXm1CkTZK",
             validatorManagerAddress: "0x0646263a231b4fde6f62d4de63e18df7e6ad94d6",
+            logoUrl: "https://images.ctfassets.net/gcj8jwzm6086/7kyTY75fdtnO6mh7f0osix/4c92c93dd688082bfbb43d5d910cbfeb/Echo_Subnet_Logo.png",
         },
         {
             id: "2D8RG4UpSXbPbvPCAWppNJyqTG2i2CAXSkTgmTBBvs7GKNZjsY",
@@ -96,6 +99,7 @@ const l1ListInitialStateFuji = {
             isTestnet: true,
             subnetId: "7WtoAMPhrmh5KosDUsFL9yTcvw7YSxiKHPpdfs4JsgW47oZT5",
             validatorManagerAddress: "",
+            logoUrl: "https://images.ctfassets.net/gcj8jwzm6086/60XrKdf99PqQKrHiuYdwTE/908622f5204311dbb11be9c6008ead44/Dispatch_Subnet_Logo.png",
         }
     ] as L1ListItem[],
 }
@@ -111,6 +115,7 @@ const l1ListInitialStateMainnet = {
             isTestnet: false,
             subnetId: "11111111111111111111111111111111LpoYY",
             validatorManagerAddress: "",
+            logoUrl: "https://images.ctfassets.net/gcj8jwzm6086/5VHupNKwnDYJvqMENeV7iJ/3e4b8ff10b69bfa31e70080a4b142cd0/avalanche-avax-logo.svg",
         }
     ] as L1ListItem[],
 }
