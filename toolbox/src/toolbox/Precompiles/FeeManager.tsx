@@ -208,9 +208,19 @@ const InputWithValidation = ({
   );
 };
 
+interface ActiveRulesResponse {
+  precompiles?: {
+    feeManagerConfig?: {
+      timestamp: number;
+    };
+  };
+}
+
 export default function FeeManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
+  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   // Fee config state
   const [gasLimit, setGasLimit] = useState<string>("20000000");
@@ -297,6 +307,31 @@ export default function FeeManager() {
     maxBlockGasCost,
     blockGasCostStep,
   ]);
+
+  useEffect(() => {
+    async function checkPrecompileStatus() {
+      try {
+        setIsChecking(true);
+        const response = await publicClient.request({
+          method: 'eth_getActiveRulesAt',
+          params: [],
+        }) as ActiveRulesResponse;
+
+        // Check if the fee manager precompile exists in the response
+        const isActive = response?.precompiles?.feeManagerConfig?.timestamp !== undefined;
+        setIsPrecompileActive(isActive);
+      } catch (error) {
+        console.error('Failed to check precompile status:', error);
+        setIsPrecompileActive(false);
+      } finally {
+        setIsChecking(false);
+      }
+    }
+
+    if (publicClient) {
+      checkPrecompileStatus();
+    }
+  }, [publicClient]);
 
   const handleSetFeeConfig = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");
@@ -395,6 +430,14 @@ export default function FeeManager() {
     isValidFeeConfig &&
     !isSettingConfig
   );
+
+  if (isChecking) {
+    return <div>Checking precompile availability...</div>;
+  }
+
+  if (!isPrecompileActive) {
+    return <div>The Fee Manager precompile is not available on this chain.</div>;
+  }
 
   return (
     <div className="space-y-6">

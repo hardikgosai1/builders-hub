@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
@@ -42,9 +42,19 @@ const StatusBadge = ({ status, loadingText, isLoading }: StatusBadgeProps) => {
   );
 };
 
+interface ActiveRulesResponse {
+  precompiles?: {
+    rewardManagerConfig?: {
+      timestamp: number;
+    };
+  };
+}
+
 export default function RewardManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
+  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   // Fee config state
   const [isAllowingFeeRecipients, setIsAllowingFeeRecipients] = useState(false);
@@ -57,6 +67,39 @@ export default function RewardManager() {
   const [rewardAddress, setRewardAddress] = useState<string>("");
   const [isFeeRecipientsAllowed, setIsFeeRecipientsAllowed] = useState<boolean | null>(null);
   const [currentRewardAddress, setCurrentRewardAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function checkPrecompileStatus() {
+      try {
+        setIsChecking(true);
+        const response = await publicClient.request({
+          method: 'eth_getActiveRulesAt',
+          params: [],
+        }) as ActiveRulesResponse;
+
+        // Check if the reward manager precompile exists in the response
+        const isActive = response?.precompiles?.rewardManagerConfig?.timestamp !== undefined;
+        setIsPrecompileActive(isActive);
+      } catch (error) {
+        console.error('Failed to check precompile status:', error);
+        setIsPrecompileActive(false);
+      } finally {
+        setIsChecking(false);
+      }
+    }
+
+    if (publicClient) {
+      checkPrecompileStatus();
+    }
+  }, [publicClient]);
+
+  if (isChecking) {
+    return <div>Checking precompile availability...</div>;
+  }
+
+  if (!isPrecompileActive) {
+    return <div>The Reward Manager precompile is not available on this chain.</div>;
+  }
 
   const handleAllowFeeRecipients = async () => {
     if (!walletEVMAddress || !coreWalletClient) {

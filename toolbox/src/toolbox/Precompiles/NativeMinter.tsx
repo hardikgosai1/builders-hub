@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
@@ -15,6 +15,14 @@ import { AllowlistComponent } from "../components/AllowListComponents";
 const DEFAULT_NATIVE_MINTER_ADDRESS =
   "0x0200000000000000000000000000000000000001";
 
+interface ActiveRulesResponse {
+  precompiles?: {
+    contractNativeMinterConfig?: {
+      timestamp: number;
+    };
+  };
+}
+
 export default function NativeMinter() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
@@ -22,6 +30,41 @@ export default function NativeMinter() {
   const [recipient, setRecipient] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkPrecompileStatus() {
+      try {
+        setIsChecking(true);
+        const response = await publicClient.request({
+          method: 'eth_getActiveRulesAt',
+          params: [],
+        }) as ActiveRulesResponse;
+
+        // Check if the native minter precompile exists in the response
+        const isActive = response?.precompiles?.contractNativeMinterConfig?.timestamp !== undefined;
+        setIsPrecompileActive(isActive);
+      } catch (error) {
+        console.error('Failed to check precompile status:', error);
+        setIsPrecompileActive(false);
+      } finally {
+        setIsChecking(false);
+      }
+    }
+
+    if (publicClient) {
+      checkPrecompileStatus();
+    }
+  }, [publicClient]);
+
+  if (isChecking) {
+    return <div>Checking precompile availability...</div>;
+  }
+
+  if (!isPrecompileActive) {
+    return <div>The Native Minter precompile is not available on this chain.</div>;
+  }
 
   const handleMint = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");

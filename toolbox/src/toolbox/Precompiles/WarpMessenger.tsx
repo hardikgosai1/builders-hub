@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
@@ -19,8 +19,16 @@ const DEFAULT_WARP_MESSENGER_ADDRESS =
 
 type MessageDirection = "CtoL1" | "L1toC";
 
+interface ActiveRulesResponse {
+  precompiles?: {
+    warpMessengerConfig?: {
+      timestamp: number;
+    };
+  };
+}
+
 export default function WarpMessenger() {
-  const { coreWalletClient, walletEVMAddress } = useWalletStore();
+  const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
   const [messagePayload, setMessagePayload] = useState<string>("");
   const [blockIndex, setBlockIndex] = useState<string>("");
@@ -35,6 +43,33 @@ export default function WarpMessenger() {
   const [isGettingBlockchainID, setIsGettingBlockchainID] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [messageDirection, setMessageDirection] = useState<MessageDirection>("CtoL1");
+  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkPrecompileStatus() {
+      try {
+        setIsChecking(true);
+        const response = await publicClient.request({
+          method: 'eth_getActiveRulesAt',
+          params: [],
+        }) as ActiveRulesResponse;
+
+        // Check if the warp messenger precompile exists in the response
+        const isActive = response?.precompiles?.warpMessengerConfig?.timestamp !== undefined;
+        setIsPrecompileActive(isActive);
+      } catch (error) {
+        console.error('Failed to check precompile status:', error);
+        setIsPrecompileActive(false);
+      } finally {
+        setIsChecking(false);
+      }
+    }
+
+    if (publicClient) {
+      checkPrecompileStatus();
+    }
+  }, [publicClient]);
 
   const directionOptions = [
     { value: "CtoL1", label: "C-Chain to Subnet (L1)" },
@@ -48,6 +83,14 @@ export default function WarpMessenger() {
   const selectedPublicClient = createPublicClient({
     transport: http(requiredChain?.rpcUrls.default.http[0]),
   });
+
+  if (isChecking) {
+    return <div>Checking precompile availability...</div>;
+  }
+
+  if (!isPrecompileActive) {
+    return <div>The Warp Messenger precompile is not available on this chain.</div>;
+  }
 
   const handleSendWarpMessage = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");
