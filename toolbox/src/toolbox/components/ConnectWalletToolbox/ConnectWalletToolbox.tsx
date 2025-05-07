@@ -32,8 +32,6 @@ const ChainSelector = () => {
     const handleSwitchChain = useCallback((chainId: number) => {
         coreWalletClient.switchChain({
             id: `0x${chainId.toString(16)}`,
-        }).then(() => {
-            window.location.reload();
         }).catch(showBoundary);
     }, [coreWalletClient, showBoundary]);
 

@@ -10,7 +10,7 @@ import { networkIDs } from "@avalabs/avalanchejs"
 import { useWalletStore } from "../lib/walletStore"
 import { WalletRequiredPrompt } from "./WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
-import { RefreshOnMainnetTestnetChange } from "./RefreshOnMainnetTestnetChange"
+import { RemountOnWalletChange } from "./RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
 import InterchainTransfer from "./InterchainTransfer"
 
@@ -343,9 +343,9 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
             )}
 
             {/* Children content */}
-            <RefreshOnMainnetTestnetChange>
+            <RemountOnWalletChange>
                 <div className="transition-all duration-300">{children}</div>
-            </RefreshOnMainnetTestnetChange>
+            </RemountOnWalletChange>
         </div>
     )
 }
