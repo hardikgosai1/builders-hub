@@ -1,5 +1,5 @@
 "use client";
-import { Search } from "lucide-react";
+import { Search, Building2 } from "lucide-react";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Separator } from "../ui/separator";
+import { useSession } from 'next-auth/react';
 import {
   Pagination,
   PaginationContent,
@@ -68,6 +69,9 @@ export default function Hackathons({
   totalPastHackathons,
   totalUpcomingHackathons,
 }: Props) {
+  const { data: session } = useSession() ?? {};
+  const isHackathonCreator = session?.user?.custom_attributes.includes("hackathonCreator");
+  
   const router = useRouter();
   const pageSize = 4;
 
@@ -163,6 +167,10 @@ export default function Hackathons({
   };
   const topMostHackathon = upcomingHackathons.find((x) => x.top_most);
 
+  const addNewHackathon = () => {
+    router.push('/hackathons/edit');
+  };
+
   return (
     <section className="px-8 py-6">
       {topMostHackathon && (
@@ -190,7 +198,15 @@ export default function Hackathons({
           </div>
         </div>
       )}
-
+      {isHackathonCreator && <><button
+        className={`flex items-center gap-2 font-medium text-3xl text-zinc-900 dark:text-zinc-50 ${topMostHackathon ? "mt-12" : ""} px-4 py-2 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-red-500 hover:text-white transition-colors duration-200 cursor-pointer`}
+        onClick={addNewHackathon}
+      >
+        <Building2 className="h-6 w-6" />
+        My Hackathons
+      </button>
+      <Separator className="my-4 bg-zinc-300 dark:bg-zinc-800" />
+      </>}
       <h2
         className={`font-medium text-3xl text-zinc-900 dark:text-zinc-50 ${
           topMostHackathon ? "mt-12" : ""
