@@ -9,9 +9,11 @@ const DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS =
   "0x0200000000000000000000000000000000000000";
 
 interface ActiveRulesResponse {
-  precompiles?: {
-    contractDeployerAllowListConfig?: {
-      timestamp: number;
+  result?: {
+    precompiles?: {
+      contractDeployerAllowListConfig?: {
+        timestamp: number;
+      };
     };
   };
 }
@@ -31,7 +33,7 @@ export default function DeployerAllowlist() {
         }) as ActiveRulesResponse;
 
         // Check if the deployer allowlist precompile exists in the response
-        const isActive = response?.precompiles?.contractDeployerAllowListConfig?.timestamp !== undefined;
+        const isActive = response?.result?.precompiles?.contractDeployerAllowListConfig?.timestamp !== undefined;
         setIsPrecompileActive(isActive);
       } catch (error) {
         console.error('Failed to check precompile status:', error);

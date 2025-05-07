@@ -9,9 +9,11 @@ const DEFAULT_TRANSACTION_ALLOWLIST_ADDRESS =
   "0x0200000000000000000000000000000000000002";
 
 interface ActiveRulesResponse {
-  precompiles?: {
-    txAllowListConfig?: {
-      timestamp: number;
+  result?: {
+    precompiles?: {
+      txAllowListConfig?: {
+        timestamp: number;
+      };
     };
   };
 }
@@ -31,7 +33,7 @@ export default function TransactionAllowlist() {
         }) as ActiveRulesResponse;
 
         // Check if the transaction allowlist precompile exists in the response
-        const isActive = response?.precompiles?.txAllowListConfig?.timestamp !== undefined;
+        const isActive = response?.result?.precompiles?.txAllowListConfig?.timestamp !== undefined;
         setIsPrecompileActive(isActive);
       } catch (error) {
         console.error('Failed to check precompile status:', error);

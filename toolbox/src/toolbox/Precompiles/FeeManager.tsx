@@ -209,9 +209,11 @@ const InputWithValidation = ({
 };
 
 interface ActiveRulesResponse {
-  precompiles?: {
-    feeManagerConfig?: {
-      timestamp: number;
+  result?: {
+    precompiles?: {
+      feeManagerConfig?: {
+        timestamp: number;
+      };
     };
   };
 }
@@ -318,7 +320,7 @@ export default function FeeManager() {
         }) as ActiveRulesResponse;
 
         // Check if the fee manager precompile exists in the response
-        const isActive = response?.precompiles?.feeManagerConfig?.timestamp !== undefined;
+        const isActive = response?.result?.precompiles?.feeManagerConfig?.timestamp !== undefined;
         setIsPrecompileActive(isActive);
       } catch (error) {
         console.error('Failed to check precompile status:', error);

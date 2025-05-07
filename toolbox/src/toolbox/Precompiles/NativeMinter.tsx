@@ -16,9 +16,11 @@ const DEFAULT_NATIVE_MINTER_ADDRESS =
   "0x0200000000000000000000000000000000000001";
 
 interface ActiveRulesResponse {
-  precompiles?: {
-    contractNativeMinterConfig?: {
-      timestamp: number;
+  result?: {
+    precompiles?: {
+      contractNativeMinterConfig?: {
+        timestamp: number;
+      };
     };
   };
 }
@@ -43,7 +45,7 @@ export default function NativeMinter() {
         }) as ActiveRulesResponse;
 
         // Check if the native minter precompile exists in the response
-        const isActive = response?.precompiles?.contractNativeMinterConfig?.timestamp !== undefined;
+        const isActive = response?.result?.precompiles?.contractNativeMinterConfig?.timestamp !== undefined;
         setIsPrecompileActive(isActive);
       } catch (error) {
         console.error('Failed to check precompile status:', error);

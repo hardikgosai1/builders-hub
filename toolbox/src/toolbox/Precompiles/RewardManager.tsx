@@ -43,9 +43,11 @@ const StatusBadge = ({ status, loadingText, isLoading }: StatusBadgeProps) => {
 };
 
 interface ActiveRulesResponse {
-  precompiles?: {
-    rewardManagerConfig?: {
-      timestamp: number;
+  result?: {
+    precompiles?: {
+      rewardManagerConfig?: {
+        timestamp: number;
+      };
     };
   };
 }
@@ -78,7 +80,7 @@ export default function RewardManager() {
         }) as ActiveRulesResponse;
 
         // Check if the reward manager precompile exists in the response
-        const isActive = response?.precompiles?.rewardManagerConfig?.timestamp !== undefined;
+        const isActive = response?.result?.precompiles?.rewardManagerConfig?.timestamp !== undefined;
         setIsPrecompileActive(isActive);
       } catch (error) {
         console.error('Failed to check precompile status:', error);
