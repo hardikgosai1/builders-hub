@@ -8,7 +8,7 @@ import { useState, useEffect, ReactElement, lazy, Suspense } from "react";
 import { GithubLink } from "./components/GithubLink";
 import { ErrorFallback } from "../components/ErrorFallback";
 import { ConnectWalletToolbox } from "./components/ConnectWalletToolbox/ConnectWalletToolbox";
-
+import "../main.css";
 
 type ComponentType = {
   id: string;

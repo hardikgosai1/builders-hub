@@ -13,6 +13,14 @@ import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RemountOnWalletChange } from "./RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
 import InterchainTransfer from "./InterchainTransfer"
+import { Button } from "./Button"
+
+const faucets = {
+    43113: "https://test.core.app/tools/testnet-faucet/?subnet=c&token=c",
+    173750: "https://test.core.app/tools/testnet-faucet/?subnet=echo&token=echo",
+    779672: "https://test.core.app/tools/testnet-faucet/?subnet=dispatch&token=dispatch"
+}
+const LOW_BALANCE_THRESHOLD = 0.5
 
 export const ConnectWallet = ({ children, required, extraElements }: { children: React.ReactNode; required: boolean; extraElements?: React.ReactNode }) => {
     const setWalletChainId = useWalletStore(state => state.setWalletChainId);
@@ -38,6 +46,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const [isClient, setIsClient] = useState<boolean>(false)
     const pChainBalance = useWalletStore(state => state.pChainBalance);
     const l1Balance = useWalletStore(state => state.l1Balance);
+    const faucetUrl = faucets[walletChainId as keyof typeof faucets];
     const { showBoundary } = useErrorBoundary()
 
     // Set isClient to true once component mounts (client-side only)
@@ -284,6 +293,18 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                                 >
                                     <RefreshCw className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
                                 </button>
+                                {faucetUrl && (
+                                    <button
+                                        onClick={() => window.open(faucetUrl, "_blank")}
+                                        className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${l1Balance < LOW_BALANCE_THRESHOLD
+                                            ? "shimmer"
+                                            : ""
+                                            }`}
+                                        title="Open faucet"
+                                    >
+                                        Free tokens
+                                    </button>
+                                )}
                             </div>
                             {/* EVM Address inside the card */}
                             <div className="flex items-center justify-between">
