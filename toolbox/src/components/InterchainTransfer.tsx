@@ -1,6 +1,6 @@
 import { ArrowRight, Loader2, X } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWalletStore } from '../lib/walletStore';
 import { Button } from './Button';
 import { Input } from './Input';
@@ -12,34 +12,41 @@ import { useErrorBoundary } from "react-error-boundary"
 import { pvm, Utxo, TransferOutput, evm } from '@avalabs/avalanchejs';
 import { getRPCEndpoint } from '../coreViem/utils/rpc';
 
-interface InterchainTransferProps {
-    onBalanceChanged?: () => void;
-}
 
-export default function InterchainTransfer({ onBalanceChanged = () => { } }: InterchainTransferProps) {
+export default function InterchainTransfer() {
     const [open, setOpen] = useState(false);
     const [direction, setDirection] = useState<'c-to-p' | 'p-to-c'>('c-to-p');
     const [amount, setAmount] = useState<string>("");
-    const [availableBalance, setAvailableBalance] = useState<number>(0);
-    const [pChainAvailableBalance, setPChainAvailableBalance] = useState<number>(0);
     const [exportLoading, setExportLoading] = useState<boolean>(false);
     const [importLoading, setImportLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [importError, setImportError] = useState<string | null>(null);
     const [cToP_UTXOs, setC_To_P_UTXOs] = useState<Utxo<TransferOutput>[]>([]);
     const [pToC_UTXOs, setP_To_C_UTXOs] = useState<Utxo<TransferOutput>[]>([]);
+    const isFetchingRef = useRef(false);
 
     const { showBoundary } = useErrorBoundary();
-    const { pChainAddress, walletEVMAddress, coreWalletClient, publicClient, isTestnet, coreEthAddress } = useWalletStore();
+    const { pChainAddress, walletEVMAddress, coreWalletClient, isTestnet, coreEthAddress, l1Balance, updateL1Balance, pChainBalance, updatePChainBalance } = useWalletStore();
 
     const sourceChain = direction === 'c-to-p' ? 'c-chain' : 'p-chain';
     const destinationChain = direction === 'c-to-p' ? 'p-chain' : 'c-chain';
-    const currentBalance = direction === 'c-to-p' ? availableBalance : pChainAvailableBalance;
+    const currentBalance = direction === 'c-to-p' ? l1Balance : pChainBalance;
     const importableUTXOs = direction === 'c-to-p' ? cToP_UTXOs : pToC_UTXOs;
 
+    const onBalanceChanged = useCallback(() => {
+        updateL1Balance()?.catch(showBoundary)
+        updatePChainBalance()?.catch(showBoundary)
+    }, [updateL1Balance, updatePChainBalance, showBoundary]);
+
     // Fetch UTXOs from both chains
-    const fetchUTXOs = async () => {
-        if (!pChainAddress || !walletEVMAddress) return;
+    const fetchUTXOs = useCallback(async () => {
+        if (!pChainAddress || !walletEVMAddress || isFetchingRef.current) return false;
+
+        isFetchingRef.current = true;
+
+        // Store previous counts for comparison
+        const prevCToPCount = cToP_UTXOs.length;
+        const prevPToCCount = pToC_UTXOs.length;
 
         try {
             const platformEndpoint = getRPCEndpoint(Boolean(isTestnet));
@@ -50,7 +57,6 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
                 sourceChain: 'C'
             });
             setC_To_P_UTXOs(cChainUTXOs.utxos as Utxo<TransferOutput>[]);
-            console.log('pvmApi UTXOs', cChainUTXOs.utxos);
 
             const evmApi = new evm.EVMApi(platformEndpoint);
 
@@ -60,52 +66,20 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
                 sourceChain: 'C'
             });
             setP_To_C_UTXOs(pChainUTXOs.utxos as Utxo<TransferOutput>[]);
-            console.log('evmApi UTXOs', pChainUTXOs.utxos);
+
+            // Check if the number of UTXOs has changed
+            const newCToPCount = cChainUTXOs.utxos.length;
+            const newPToCCount = pChainUTXOs.utxos.length;
+
+            // Return true if UTXOs count changed
+            return prevCToPCount !== newCToPCount || prevPToCCount !== newPToCCount;
         } catch (e) {
             console.error("Error fetching UTXOs:", e);
+            return false;
+        } finally {
+            isFetchingRef.current = false;
         }
-    };
-
-    // Fetch balances
-    const fetchBalances = async () => {
-        setError(null);
-        if (publicClient && walletEVMAddress) {
-            try {
-                const balance = await publicClient.getBalance({
-                    address: walletEVMAddress as `0x${string}`,
-                });
-                setAvailableBalance(Number(balance) / 1e18);
-            } catch (e) {
-                console.error("Error fetching C-Chain balance:", e);
-            }
-        }
-
-        if (coreWalletClient && pChainAddress) {
-            try {
-                const balance = await coreWalletClient.getPChainBalance();
-                setPChainAvailableBalance(Number(balance) / 1e9);
-            } catch (e) {
-                console.error("Error fetching P-Chain balance:", e);
-            }
-        }
-    };
-
-    // Initial data load and polling setup
-    useEffect(() => {
-        if (open) {
-            // Fetch UTXOs first as they might be quicker or more critical for initial UI state
-            fetchUTXOs();
-            fetchBalances();
-
-            // Set up polling for UTXOs and balances
-            const interval = setInterval(() => {
-                fetchUTXOs();
-                fetchBalances();
-            }, 3000);
-
-            return () => clearInterval(interval);
-        }
-    }, [open, publicClient, walletEVMAddress, pChainAddress, coreWalletClient]);
+    }, [pChainAddress, walletEVMAddress, coreEthAddress, isTestnet, cToP_UTXOs.length, pToC_UTXOs.length]);
 
     // Reset state when dialog closes
     useEffect(() => {
@@ -144,6 +118,22 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
         return true;
     };
 
+    const pollForUTXOChanges = useCallback(async () => {
+        try {
+            for (let i = 0; i < 10; i++) {
+                await new Promise(resolve => setTimeout(resolve, (i + 1) * 1000));
+                const utxosChanged = await fetchUTXOs();
+
+                // Break the loop if UTXOs changed
+                if (utxosChanged) {
+                    break;
+                }
+            }
+        } catch (e) {
+            showBoundary(`Error fetching UTXOs: ${e}`);
+        }
+    }, [fetchUTXOs]);
+
     const handleExport = async () => {
         if (!validateAmount()) return;
 
@@ -162,12 +152,9 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
                 await pvmExport(coreWalletClient, { amount, pChainAddress });
             }
 
-            // After export, update UTXOs and balances
-            await fetchUTXOs();
-            await fetchBalances();
-
-            // Notify parent component of balance change
+            await pollForUTXOChanges();
             onBalanceChanged();
+
         } catch (e: any) {
             showBoundary(e);
             setError(`Export failed: ${e.message || 'Unknown error'}`);
@@ -175,6 +162,13 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
             setExportLoading(false);
         }
     };
+
+    //fetch UTXOs when dialog opens
+    useEffect(() => {
+        if (open) {
+            fetchUTXOs();
+        }
+    }, [open, fetchUTXOs]);
 
     const handleImport = async () => {
         if (typeof window === 'undefined' || !walletEVMAddress || !pChainAddress || !coreWalletClient) {
@@ -192,12 +186,9 @@ export default function InterchainTransfer({ onBalanceChanged = () => { } }: Int
                 await evmImportTx(coreWalletClient, { walletEVMAddress });
             }
 
-            // After import, update UTXOs and balances
-            await fetchUTXOs();
-            await fetchBalances();
-
-            // Notify parent component of balance change
+            await pollForUTXOChanges();
             onBalanceChanged();
+
         } catch (e: any) {
             showBoundary(e);
             setImportError(`Import failed: ${e.message || 'Unknown error'}`);

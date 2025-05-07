@@ -37,6 +37,7 @@
     "boring-name-generator": "^1.0.3",
     "buffer": "^6.0.3",
     "clsx": "^2.1.1",
+    "debounce": "^2.2.0",
     "ethers": "^6.13.5",
     "fumadocs-ui": "^15.2.12",
     "lucide-react": "^0.475.0",

@@ -86,3 +86,56 @@ export async function getSubnetInfoForNetwork(network: Network, subnetId: string
     const data: SubnetInfo = await response.json();
     return data;
 }
+
+// Interfaces for P-Chain Balance
+interface AssetBalance {
+    assetId: string;
+    name: string;
+    symbol: string;
+    denomination: number;
+    type: string;
+    amount: string;
+    utxoCount: number;
+    status?: string; // Optional, e.g., for atomicMemoryUnlocked
+    sharedWithChainId?: string; // Optional, e.g., for atomicMemoryUnlocked
+}
+
+interface Balances {
+    unlockedStaked: AssetBalance[];
+    unlockedUnstaked: AssetBalance[];
+    lockedStaked: AssetBalance[];
+    lockedPlatform: AssetBalance[];
+    lockedStakeable: AssetBalance[];
+    pendingStaked: AssetBalance[];
+    atomicMemoryLocked: AssetBalance[];
+    atomicMemoryUnlocked: AssetBalance[];
+}
+
+interface PChainChainInfo {
+    chainName: string;
+    network: string; // e.g., "fuji", "mainnet"
+}
+
+export interface PChainBalanceResponse {
+    balances: Balances;
+    chainInfo: PChainChainInfo;
+}
+
+export async function getPChainBalance(network: Network, address: string): Promise<PChainBalanceResponse> {
+    const networkPath = network === "testnet" ? "fuji" : network;
+    const url = `${endpoint}/v1/networks/${networkPath}/blockchains/p-chain/balances?addresses=${address}`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch P-Chain balance for ${address} on ${networkPath} (${network}): ${response.status} ${response.statusText}`);
+    }
+
+    const data: PChainBalanceResponse = await response.json();
+    return data;
+}
