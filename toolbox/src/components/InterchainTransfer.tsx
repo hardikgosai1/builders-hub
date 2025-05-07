@@ -13,7 +13,7 @@ import { pvm, Utxo, TransferOutput, evm } from '@avalabs/avalanchejs';
 import { getRPCEndpoint } from '../coreViem/utils/rpc';
 
 
-export default function InterchainTransfer() {
+export default function InterchainTransfer({ glow = false }: { glow?: boolean }) {
     const [open, setOpen] = useState(false);
     const [direction, setDirection] = useState<'c-to-p' | 'p-to-c'>('c-to-p');
     const [amount, setAmount] = useState<string>("");
@@ -213,7 +213,7 @@ export default function InterchainTransfer() {
                 <Dialog.Trigger asChild>
                     <button
                         onClick={() => openDialog('c-to-p')}
-                        className="p-1.5 rounded-full bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                        className={`p-1.5 rounded-full bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm ${glow ? "shimmer" : ""}`}
                         aria-label="Transfer C-Chain to P-Chain"
                     >
                         <ArrowRight className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />

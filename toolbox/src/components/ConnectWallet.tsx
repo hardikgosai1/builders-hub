@@ -323,7 +323,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
 
                         {/* Arrows between cards */}
                         {(walletChainId === avalanche.id || walletChainId === avalancheFuji.id) && (
-                            <InterchainTransfer />
+                            <InterchainTransfer glow={pChainBalance < LOW_BALANCE_THRESHOLD && l1Balance > LOW_BALANCE_THRESHOLD} />
                         )}
 
                         {/* P-Chain */}
