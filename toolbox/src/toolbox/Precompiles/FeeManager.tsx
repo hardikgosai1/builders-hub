@@ -222,7 +222,8 @@ export default function FeeManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
   const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isChecking, setIsChecking] = useState(false);
+  const [hasChecked, setHasChecked] = useState(false);
 
   // Fee config state
   const [gasLimit, setGasLimit] = useState<string>("20000000");
@@ -311,29 +312,47 @@ export default function FeeManager() {
   ]);
 
   useEffect(() => {
+    if (hasChecked || isChecking || !viemChain?.rpcUrls?.default?.http?.[0]) {
+      return;
+    }
+
     async function checkPrecompileStatus() {
       try {
         setIsChecking(true);
-        const response = await publicClient.request({
-          method: 'eth_getActiveRulesAt',
-          params: [],
-        }) as ActiveRulesResponse;
+        if (!viemChain) {
+          throw new Error('Chain not available');
+        }
+        const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        // Check if the fee manager precompile exists in the response
-        const isActive = response?.result?.precompiles?.feeManagerConfig?.timestamp !== undefined;
-        setIsPrecompileActive(isActive);
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "eth_getActiveRulesAt",
+            params: [],
+            id: 1
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json() as ActiveRulesResponse;
+        setIsPrecompileActive(data?.result?.precompiles?.feeManagerConfig?.timestamp !== undefined);
       } catch (error) {
-        console.error('Failed to check precompile status:', error);
         setIsPrecompileActive(false);
       } finally {
         setIsChecking(false);
+        setHasChecked(true);
       }
     }
 
-    if (publicClient) {
-      checkPrecompileStatus();
-    }
-  }, [publicClient]);
+    checkPrecompileStatus();
+  }, [viemChain, hasChecked, isChecking]);
 
   const handleSetFeeConfig = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");

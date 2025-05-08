@@ -20,8 +20,6 @@ const DEFAULT_WARP_MESSENGER_ADDRESS =
 type MessageDirection = "CtoL1" | "L1toC";
 
 interface ActiveRulesResponse {
-  jsonrpc?: string;
-  id?: number;
   result?: {
     precompiles?: {
       warpConfig?: {
@@ -32,7 +30,7 @@ interface ActiveRulesResponse {
 }
 
 export default function WarpMessenger() {
-  const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
+  const { coreWalletClient } = useWalletStore();
   const viemChain = useViemChainStore();
   const [messagePayload, setMessagePayload] = useState<string>("");
   const [blockIndex, setBlockIndex] = useState<string>("");
@@ -52,28 +50,18 @@ export default function WarpMessenger() {
   const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    // Skip if we've already checked or if we're currently checking
-    if (hasChecked || isChecking) {
-      return;
-    }
-
-    // Skip if we don't have the chain data yet
-    if (!viemChain?.rpcUrls?.default?.http?.[0]) {
+    if (hasChecked || isChecking || !viemChain?.rpcUrls?.default?.http?.[0]) {
       return;
     }
 
     async function checkPrecompileStatus() {
       try {
         setIsChecking(true);
-
-        // Get RPC URL from viem chain config
-        if (!viemChain?.rpcUrls?.default?.http?.[0]) {
-          throw new Error('No RPC URL available');
+        if (!viemChain) {
+          throw new Error('Chain not available');
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
-        console.log('Current RPC URL:', rpcUrl);
 
-        // Make the exact same request as the curl command
         const response = await fetch(rpcUrl, {
           method: 'POST',
           headers: {
@@ -91,20 +79,9 @@ export default function WarpMessenger() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log('RPC Response:', data);
-
-        // Check if the warp precompile exists in the response
-        const isActive = data?.result?.precompiles?.warpConfig?.timestamp !== undefined;
-        console.log('Warp precompile active:', isActive);
-        setIsPrecompileActive(isActive);
-      } catch (error: any) {
-        console.error('Failed to check precompile status:', error);
-        console.error('Error details:', {
-          name: error?.name,
-          message: error?.message,
-          stack: error?.stack
-        });
+        const data = await response.json() as ActiveRulesResponse;
+        setIsPrecompileActive(data?.result?.precompiles?.warpConfig?.timestamp !== undefined);
+      } catch (error) {
         setIsPrecompileActive(false);
       } finally {
         setIsChecking(false);
@@ -113,7 +90,7 @@ export default function WarpMessenger() {
     }
 
     checkPrecompileStatus();
-  }, [viemChain, hasChecked, isChecking]); // Only re-run if chain data changes and we haven't checked yet
+  }, [viemChain, hasChecked, isChecking]);
 
   const directionOptions = [
     { value: "CtoL1", label: "C-Chain to Subnet (L1)" },
@@ -222,7 +199,6 @@ export default function WarpMessenger() {
 
   const canSendMessage = Boolean(
     messagePayload &&
-    walletEVMAddress &&
     coreWalletClient &&
     !isSendingMessage
   );
