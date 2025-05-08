@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TransferableOutput, addTxSignatures, pvm, utils, Context } from "@avalabs/avalanchejs";
+import { getAuthSession } from '@/lib/auth/authSession';
 
 const SERVER_PRIVATE_KEY = process.env.SERVER_PRIVATE_KEY;
 const FAUCET_P_CHAIN_ADDRESS = process.env.FAUCET_P_CHAIN_ADDRESS;
@@ -64,6 +65,14 @@ async function transferPToP(
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const session = await getAuthSession();   
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     if (!SERVER_PRIVATE_KEY || !FAUCET_P_CHAIN_ADDRESS) {
       return NextResponse.json(
         { success: false, message: 'Server not properly configured' },
