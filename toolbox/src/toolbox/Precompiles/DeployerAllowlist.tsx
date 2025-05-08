@@ -3,20 +3,11 @@
 import { useState, useEffect } from "react";
 import { AllowlistComponent } from "../components/AllowListComponents";
 import { useViemChainStore } from "../toolboxStore";
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Deployer AllowList address
 const DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS =
   "0x0200000000000000000000000000000000000000";
-
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      contractDeployerAllowListConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
 
 export default function DeployerAllowlist() {
   const viemChain = useViemChainStore();
@@ -37,24 +28,7 @@ export default function DeployerAllowlist() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.contractDeployerAllowListConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);
@@ -77,14 +51,12 @@ export default function DeployerAllowlist() {
 
   return (
     <div className="space-y-6">
-      {isPrecompileActive && (
-        <div className="w-full">
-          <AllowlistComponent
-            precompileAddress={DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS}
-            precompileType="Deployer"
-          />
-        </div>
-      )}
+      <div className="w-full">
+        <AllowlistComponent
+          precompileAddress={DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS}
+          precompileType="Deployer"
+        />
+      </div>
     </div>
   );
 }

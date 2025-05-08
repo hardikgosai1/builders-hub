@@ -12,22 +12,13 @@ import warpMessengerAbi from "../../../contracts/precompiles/WarpMessenger.json"
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from 'viem/chains';
 import { createPublicClient, http } from 'viem';
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Warp Messenger address
 const DEFAULT_WARP_MESSENGER_ADDRESS =
   "0x0200000000000000000000000000000000000005";
 
 type MessageDirection = "CtoL1" | "L1toC";
-
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      warpConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
 
 export default function WarpMessenger() {
   const { coreWalletClient } = useWalletStore();
@@ -62,24 +53,7 @@ export default function WarpMessenger() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.warpConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);

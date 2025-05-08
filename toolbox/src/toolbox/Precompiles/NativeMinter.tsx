@@ -10,20 +10,11 @@ import { ResultField } from "../components/ResultField";
 import { EVMAddressInput } from "../components/EVMAddressInput";
 import nativeMinterAbi from "../../../contracts/precompiles/NativeMinter.json";
 import { AllowlistComponent } from "../components/AllowListComponents";
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Native Minter address
 const DEFAULT_NATIVE_MINTER_ADDRESS =
   "0x0200000000000000000000000000000000000001";
-
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      contractNativeMinterConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
 
 export default function NativeMinter() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
@@ -49,24 +40,7 @@ export default function NativeMinter() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.contractNativeMinterConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);

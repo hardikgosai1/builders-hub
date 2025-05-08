@@ -3,20 +3,11 @@
 import { useState, useEffect } from "react";
 import { AllowlistComponent } from "../components/AllowListComponents";
 import { useViemChainStore } from "../toolboxStore";
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Transaction AllowList address
 const DEFAULT_TRANSACTION_ALLOWLIST_ADDRESS =
   "0x0200000000000000000000000000000000000002";
-
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      txAllowListConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
 
 export default function TransactionAllowlist() {
   const viemChain = useViemChainStore();
@@ -37,24 +28,7 @@ export default function TransactionAllowlist() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.txAllowListConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);

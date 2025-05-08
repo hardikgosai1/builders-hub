@@ -10,6 +10,7 @@ import { AllowlistComponent } from "../components/AllowListComponents";
 import rewardManagerAbi from "../../../contracts/precompiles/RewardManager.json";
 import { CheckCircle, Edit, Users, Wallet } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Reward Manager address
 const DEFAULT_REWARD_MANAGER_ADDRESS =
@@ -41,16 +42,6 @@ const StatusBadge = ({ status, loadingText, isLoading }: StatusBadgeProps) => {
     </span>
   );
 };
-
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      rewardManagerConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
 
 export default function RewardManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
@@ -84,24 +75,7 @@ export default function RewardManager() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.rewardManagerConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);

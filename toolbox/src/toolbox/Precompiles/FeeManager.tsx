@@ -9,6 +9,7 @@ import { Container } from "../components/Container";
 import { ResultField } from "../components/ResultField";
 import feeManagerAbi from "../../../contracts/precompiles/FeeManager.json";
 import { AllowlistComponent } from "../components/AllowListComponents";
+import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Fee Manager address
 const DEFAULT_FEE_MANAGER_ADDRESS =
@@ -208,16 +209,6 @@ const InputWithValidation = ({
   );
 };
 
-interface ActiveRulesResponse {
-  result?: {
-    precompiles?: {
-      feeManagerConfig?: {
-        timestamp: number;
-      };
-    };
-  };
-}
-
 export default function FeeManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
@@ -324,24 +315,7 @@ export default function FeeManager() {
         }
         const rpcUrl = viemChain.rpcUrls.default.http[0];
 
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "eth_getActiveRulesAt",
-            params: [],
-            id: 1
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as ActiveRulesResponse;
+        const data = await getActiveRulesAt(rpcUrl);
         setIsPrecompileActive(data?.result?.precompiles?.feeManagerConfig?.timestamp !== undefined);
       } catch (error) {
         setIsPrecompileActive(false);
