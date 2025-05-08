@@ -48,7 +48,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
     const faucetUrl = faucets[walletChainId as keyof typeof faucets];
     const { showBoundary } = useErrorBoundary();
     const [isRequestingPTokens, setIsRequestingPTokens] = useState(false);
-    const [pTokenRequestError, setPTokenRequestError] = useState(null);
+    const [pTokenRequestError, setPTokenRequestError] = useState<string | null>(null);
 
     // Set isClient to true once component mounts (client-side only)
     useEffect(() => {
