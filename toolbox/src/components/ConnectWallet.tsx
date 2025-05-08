@@ -373,7 +373,7 @@ export const ConnectWallet = ({ children, required, extraElements }: { children:
                                                     }
                                                 } catch (error) {
                                                     console.error("P-Chain token request error:", error);
-                                                    setPTokenRequestError(error.message || "Unknown error occurred");
+                                                    setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
                                                 } finally {
                                                     setIsRequestingPTokens(false);
                                                 }
