@@ -13,14 +13,10 @@ export default function DeployerAllowlist() {
       configKey="contractDeployerAllowListConfig"
       precompileName="Deployer Allowlist"
     >
-      <div className="space-y-6">
-        <div className="w-full">
-          <AllowlistComponent
-            precompileAddress={DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS}
-            precompileType="Deployer"
-          />
-        </div>
-      </div>
+      <AllowlistComponent
+        precompileAddress={DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS}
+        precompileType="Deployer"
+      />
     </CheckPrecompile>
   );
 }

@@ -13,14 +13,10 @@ export default function TransactionAllowlist() {
       configKey="txAllowListConfig"
       precompileName="Transaction Allowlist"
     >
-      <div className="space-y-6">
-        <div className="w-full">
-          <AllowlistComponent
-            precompileAddress={DEFAULT_TRANSACTION_ALLOWLIST_ADDRESS}
-            precompileType="Transaction"
-          />
-        </div>
-      </div>
+      <AllowlistComponent
+        precompileAddress={DEFAULT_TRANSACTION_ALLOWLIST_ADDRESS}
+        precompileType="Transaction"
+      />
     </CheckPrecompile>
   );
 }
