@@ -14,6 +14,9 @@ interface CheckPrecompileProps {
     children: React.ReactNode;
     configKey: PrecompileConfigKey;
     precompileName: string;
+    errorMessage?: string;
+    docsLink?: string;
+    docsLinkText?: string;
 }
 
 interface PrecompileState {
@@ -22,7 +25,14 @@ interface PrecompileState {
     error: string | null;
 }
 
-export const CheckPrecompile = ({ children, configKey, precompileName }: CheckPrecompileProps) => {
+export const CheckPrecompile = ({
+    children,
+    configKey,
+    precompileName,
+    errorMessage,
+    docsLink,
+    docsLinkText = "Learn how to activate this precompile"
+}: CheckPrecompileProps) => {
     const { coreWalletClient } = useWalletStore();
     const [state, setState] = useState<PrecompileState>({
         isActive: false,
@@ -80,8 +90,18 @@ export const CheckPrecompile = ({ children, configKey, precompileName }: CheckPr
         return (
             <div className="p-4 border border-yellow-200 rounded-md bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800">
                 <p className="text-yellow-700 dark:text-yellow-300">
-                    {precompileName} is not available on this chain.
+                    {errorMessage || `${precompileName} is not available on this chain.`}
                 </p>
+                {docsLink && (
+                    <a
+                        href={docsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                        {docsLinkText} →
+                    </a>
+                )}
             </div>
         );
     }
