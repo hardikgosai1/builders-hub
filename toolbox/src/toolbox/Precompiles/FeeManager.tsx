@@ -9,6 +9,7 @@ import { Container } from "../components/Container";
 import { ResultField } from "../components/ResultField";
 import feeManagerAbi from "../../../contracts/precompiles/FeeManager.json";
 import { AllowlistComponent } from "../components/AllowListComponents";
+import { CheckPrecompile } from "../components/CheckPrecompile";
 import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
 
 // Default Fee Manager address
@@ -435,141 +436,146 @@ export default function FeeManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <Container
-        title="Fee Configuration"
-        description="Configure the dynamic fee parameters for the chain."
-      >
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <InputWithValidation
-              label="Gas Limit"
-              value={gasLimit}
-              onChange={setGasLimit}
-              type="number"
-              warning={validationWarnings.gasLimit}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Target Block Rate"
-              value={targetBlockRate}
-              onChange={setTargetBlockRate}
-              type="number"
-              warning={validationWarnings.targetBlockRate}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Minimum Base Fee (gwei)"
-              value={minBaseFee}
-              onChange={setMinBaseFee}
-              type="number"
-              warning={validationWarnings.minBaseFee}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Target Gas"
-              value={targetGas}
-              onChange={setTargetGas}
-              type="number"
-              warning={validationWarnings.targetGas}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Base Fee Change Denominator"
-              value={baseFeeChangeDenominator}
-              onChange={setBaseFeeChangeDenominator}
-              type="number"
-              warning={validationWarnings.baseFeeChangeDenominator}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Minimum Block Gas Cost"
-              value={minBlockGasCost}
-              onChange={setMinBlockGasCost}
-              type="number"
-              warning={validationWarnings.minBlockGasCost}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Maximum Block Gas Cost"
-              value={maxBlockGasCost}
-              onChange={setMaxBlockGasCost}
-              type="number"
-              warning={validationWarnings.maxBlockGasCost}
-              disabled={isSettingConfig}
-            />
-            <InputWithValidation
-              label="Block Gas Cost Step"
-              value={blockGasCostStep}
-              onChange={setBlockGasCostStep}
-              type="number"
-              warning={validationWarnings.blockGasCostStep}
-              disabled={isSettingConfig}
-            />
+    <CheckPrecompile
+      configKey="feeManagerConfig"
+      precompileName="Fee Manager"
+    >
+      <div className="space-y-6">
+        <Container
+          title="Fee Configuration"
+          description="Configure the dynamic fee parameters for the chain."
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <InputWithValidation
+                label="Gas Limit"
+                value={gasLimit}
+                onChange={setGasLimit}
+                type="number"
+                warning={validationWarnings.gasLimit}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Target Block Rate"
+                value={targetBlockRate}
+                onChange={setTargetBlockRate}
+                type="number"
+                warning={validationWarnings.targetBlockRate}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Minimum Base Fee (gwei)"
+                value={minBaseFee}
+                onChange={setMinBaseFee}
+                type="number"
+                warning={validationWarnings.minBaseFee}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Target Gas"
+                value={targetGas}
+                onChange={setTargetGas}
+                type="number"
+                warning={validationWarnings.targetGas}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Base Fee Change Denominator"
+                value={baseFeeChangeDenominator}
+                onChange={setBaseFeeChangeDenominator}
+                type="number"
+                warning={validationWarnings.baseFeeChangeDenominator}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Minimum Block Gas Cost"
+                value={minBlockGasCost}
+                onChange={setMinBlockGasCost}
+                type="number"
+                warning={validationWarnings.minBlockGasCost}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Maximum Block Gas Cost"
+                value={maxBlockGasCost}
+                onChange={setMaxBlockGasCost}
+                type="number"
+                warning={validationWarnings.maxBlockGasCost}
+                disabled={isSettingConfig}
+              />
+              <InputWithValidation
+                label="Block Gas Cost Step"
+                value={blockGasCostStep}
+                onChange={setBlockGasCostStep}
+                type="number"
+                warning={validationWarnings.blockGasCostStep}
+                disabled={isSettingConfig}
+              />
+            </div>
+
+            <Button
+              onClick={handleSetFeeConfig}
+              loading={isSettingConfig}
+              variant="primary"
+              disabled={!canSetFeeConfig}
+            >
+              Set Fee Configuration
+            </Button>
+
+            {txHash && (
+              <ResultField
+                label="Transaction Successful"
+                value={txHash}
+                showCheck={true}
+              />
+            )}
           </div>
+        </Container>
 
-          <Button
-            onClick={handleSetFeeConfig}
-            loading={isSettingConfig}
-            variant="primary"
-            disabled={!canSetFeeConfig}
-          >
-            Set Fee Configuration
-          </Button>
+        <Container
+          title="Current Fee Configuration"
+          description="View the current fee configuration and last change timestamp."
+        >
+          <div className="space-y-4">
+            <Button
+              onClick={handleGetFeeConfig}
+              loading={isReadingConfig}
+              variant="primary"
+              disabled={isReadingConfig}
+            >
+              Get Current Config
+            </Button>
+            <Button
+              onClick={handleGetLastChangedAt}
+              variant="secondary"
+              disabled={isReadingConfig || isSettingConfig}
+            >
+              Get Last Changed At
+            </Button>
 
-          {txHash && (
-            <ResultField
-              label="Transaction Successful"
-              value={txHash}
-              showCheck={true}
-            />
-          )}
+            {currentConfig && (
+              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                <pre className="text-sm">
+                  {JSON.stringify(currentConfig, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {lastChangedAt !== null && (
+              <div className="mt-4">
+                <p className="text-sm">Last changed at block: {lastChangedAt}</p>
+              </div>
+            )}
+          </div>
+        </Container>
+
+        <div className="w-full">
+          <AllowlistComponent
+            precompileAddress={DEFAULT_FEE_MANAGER_ADDRESS}
+            precompileType="Fee Manager"
+          />
         </div>
-      </Container>
-
-      <Container
-        title="Current Fee Configuration"
-        description="View the current fee configuration and last change timestamp."
-      >
-        <div className="space-y-4">
-          <Button
-            onClick={handleGetFeeConfig}
-            loading={isReadingConfig}
-            variant="primary"
-            disabled={isReadingConfig}
-          >
-            Get Current Config
-          </Button>
-          <Button
-            onClick={handleGetLastChangedAt}
-            variant="secondary"
-            disabled={isReadingConfig || isSettingConfig}
-          >
-            Get Last Changed At
-          </Button>
-
-          {currentConfig && (
-            <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
-              <pre className="text-sm">
-                {JSON.stringify(currentConfig, null, 2)}
-              </pre>
-            </div>
-          )}
-
-          {lastChangedAt !== null && (
-            <div className="mt-4">
-              <p className="text-sm">Last changed at block: {lastChangedAt}</p>
-            </div>
-          )}
-        </div>
-      </Container>
-
-      <div className="w-full">
-        <AllowlistComponent
-          precompileAddress={DEFAULT_FEE_MANAGER_ADDRESS}
-          precompileType="Fee Manager"
-        />
       </div>
-    </div>
+    </CheckPrecompile>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
@@ -10,7 +10,7 @@ import { ResultField } from "../components/ResultField";
 import { EVMAddressInput } from "../components/EVMAddressInput";
 import nativeMinterAbi from "../../../contracts/precompiles/NativeMinter.json";
 import { AllowlistComponent } from "../components/AllowListComponents";
-import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
+import { CheckPrecompile } from "../components/CheckPrecompile";
 
 // Default Native Minter address
 const DEFAULT_NATIVE_MINTER_ADDRESS =
@@ -23,43 +23,6 @@ export default function NativeMinter() {
   const [recipient, setRecipient] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState(false);
-  const [hasChecked, setHasChecked] = useState(false);
-
-  useEffect(() => {
-    if (hasChecked || isChecking || !viemChain?.rpcUrls?.default?.http?.[0]) {
-      return;
-    }
-
-    async function checkPrecompileStatus() {
-      try {
-        setIsChecking(true);
-        if (!viemChain) {
-          throw new Error('Chain not available');
-        }
-        const rpcUrl = viemChain.rpcUrls.default.http[0];
-
-        const data = await getActiveRulesAt(rpcUrl);
-        setIsPrecompileActive(data?.result?.precompiles?.contractNativeMinterConfig?.timestamp !== undefined);
-      } catch (error) {
-        setIsPrecompileActive(false);
-      } finally {
-        setIsChecking(false);
-        setHasChecked(true);
-      }
-    }
-
-    checkPrecompileStatus();
-  }, [viemChain, hasChecked, isChecking]);
-
-  if (isChecking) {
-    return <div>Checking precompile availability...</div>;
-  }
-
-  if (!isPrecompileActive) {
-    return <div>The Native Minter precompile is not available on this chain.</div>;
-  }
 
   const handleMint = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");
@@ -98,57 +61,62 @@ export default function NativeMinter() {
   const canMint = Boolean(recipient && isValidAmount && walletEVMAddress && coreWalletClient && !isMinting);
 
   return (
-    <div className="space-y-6">
-      <Container
-        title="Mint Native Tokens"
-        description="This will mint native tokens to the specified address."
-      >
-        <div className="space-y-4">
+    <CheckPrecompile
+      configKey="contractNativeMinterConfig"
+      precompileName="Native Minter"
+    >
+      <div className="space-y-6">
+        <Container
+          title="Mint Native Tokens"
+          description="This will mint native tokens to the specified address."
+        >
           <div className="space-y-4">
-            <EVMAddressInput
-              label="Recipient Address"
-              value={recipient}
-              onChange={setRecipient}
-              disabled={isMinting}
-            />
-            <Input
-              label="Amount"
-              value={amount}
-              onChange={(value) => setAmount(value)}
-              type="number"
-              min="0"
-              step="0.000000000000000001"
-              disabled={isMinting}
-            />
+            <div className="space-y-4">
+              <EVMAddressInput
+                label="Recipient Address"
+                value={recipient}
+                onChange={setRecipient}
+                disabled={isMinting}
+              />
+              <Input
+                label="Amount"
+                value={amount}
+                onChange={(value) => setAmount(value)}
+                type="number"
+                min="0"
+                step="0.000000000000000001"
+                disabled={isMinting}
+              />
+            </div>
+
+            {txHash && (
+              <ResultField
+                label="Transaction Successful"
+                value={txHash}
+                showCheck={true}
+              />
+            )}
+
+            <Button
+              variant="primary"
+              onClick={handleMint}
+              loading={isMinting}
+              disabled={!canMint}
+            >
+              {!walletEVMAddress
+                ? "Connect Wallet to Mint"
+                : "Mint Native Tokens"}
+            </Button>
           </div>
+        </Container>
 
-          {txHash && (
-            <ResultField
-              label="Transaction Successful"
-              value={txHash}
-              showCheck={true}
-            />
-          )}
-
-          <Button
-            variant="primary"
-            onClick={handleMint}
-            loading={isMinting}
-            disabled={!canMint}
-          >
-            {!walletEVMAddress
-              ? "Connect Wallet to Mint"
-              : "Mint Native Tokens"}
-          </Button>
+        <div className="w-full">
+          <AllowlistComponent
+            precompileAddress={DEFAULT_NATIVE_MINTER_ADDRESS}
+            precompileType="Minter"
+          />
         </div>
-      </Container>
-
-      <div className="w-full">
-        <AllowlistComponent
-          precompileAddress={DEFAULT_NATIVE_MINTER_ADDRESS}
-          precompileType="Minter"
-        />
       </div>
-    </div>
+    </CheckPrecompile>
   );
 }

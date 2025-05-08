@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useWalletStore } from "../../lib/walletStore";
 import { useViemChainStore } from "../toolboxStore";
 import { Button } from "../../components/Button";
@@ -12,7 +12,7 @@ import warpMessengerAbi from "../../../contracts/precompiles/WarpMessenger.json"
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from 'viem/chains';
 import { createPublicClient, http } from 'viem';
-import { getActiveRulesAt } from "../../coreViem/methods/getActiveRulesAt";
+import { CheckPrecompile } from "../components/CheckPrecompile";
 
 // Default Warp Messenger address
 const DEFAULT_WARP_MESSENGER_ADDRESS =
@@ -36,35 +36,6 @@ export default function WarpMessenger() {
   const [isGettingBlockchainID, setIsGettingBlockchainID] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [messageDirection, setMessageDirection] = useState<MessageDirection>("CtoL1");
-  const [isPrecompileActive, setIsPrecompileActive] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState(false);
-  const [hasChecked, setHasChecked] = useState(false);
-
-  useEffect(() => {
-    if (hasChecked || isChecking || !viemChain?.rpcUrls?.default?.http?.[0]) {
-      return;
-    }
-
-    async function checkPrecompileStatus() {
-      try {
-        setIsChecking(true);
-        if (!viemChain) {
-          throw new Error('Chain not available');
-        }
-        const rpcUrl = viemChain.rpcUrls.default.http[0];
-
-        const data = await getActiveRulesAt(rpcUrl);
-        setIsPrecompileActive(data?.result?.precompiles?.warpConfig?.timestamp !== undefined);
-      } catch (error) {
-        setIsPrecompileActive(false);
-      } finally {
-        setIsChecking(false);
-        setHasChecked(true);
-      }
-    }
-
-    checkPrecompileStatus();
-  }, [viemChain, hasChecked, isChecking]);
 
   const directionOptions = [
     { value: "CtoL1", label: "C-Chain to Subnet (L1)" },
@@ -78,14 +49,6 @@ export default function WarpMessenger() {
   const selectedPublicClient = createPublicClient({
     transport: http(requiredChain?.rpcUrls.default.http[0]),
   });
-
-  if (isChecking) {
-    return <div>Checking precompile availability...</div>;
-  }
-
-  if (!isPrecompileActive) {
-    return <div>The Warp Messenger precompile is not available on this chain.</div>;
-  }
 
   const handleSendWarpMessage = async () => {
     if (!coreWalletClient) throw new Error("Wallet client not found");
@@ -200,160 +163,165 @@ export default function WarpMessenger() {
   const destinationChainText = messageDirection === "CtoL1" ? "Subnet (L1)" : "C-Chain";
 
   return (
-    <div className="space-y-6">
-      <Container
-        title="Warp Messenger"
-        description="Send and verify cross-chain messages using the Warp protocol."
-      >
-        <div className="space-y-4">
-          <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900/50">
-            <RadioGroup
-              items={directionOptions}
-              value={messageDirection}
-              onChange={(value) => setMessageDirection(value as MessageDirection)}
-              idPrefix="message-direction-"
-            />
-          </div>
-
+    <CheckPrecompile
+      configKey="warpConfig"
+      precompileName="Warp Messenger"
+    >
+      <div className="space-y-6">
+        <Container
+          title="Warp Messenger"
+          description="Send and verify cross-chain messages using the Warp protocol."
+        >
           <div className="space-y-4">
-            <div className="flex space-x-4">
-              <Button
-                variant="primary"
-                onClick={handleGetBlockchainID}
-                disabled={isAnyOperationInProgress}
-                loading={isGettingBlockchainID}
-              >
-                Get Blockchain ID
-              </Button>
+            <div className="p-4 border rounded-md bg-gray-50 dark:bg-gray-900/50">
+              <RadioGroup
+                items={directionOptions}
+                value={messageDirection}
+                onChange={(value) => setMessageDirection(value as MessageDirection)}
+                idPrefix="message-direction-"
+              />
             </div>
 
-            {blockchainID && (
-              <Success label="Blockchain ID" value={blockchainID} />
-            )}
-
-            <div className="space-y-2">
-              <Input
-                label="Message Payload (hex)"
-                value={messagePayload}
-                onChange={setMessagePayload}
-                disabled={isAnyOperationInProgress}
-              />
-              <Button
-                variant="primary"
-                onClick={handleSendWarpMessage}
-                loading={isSendingMessage}
-                disabled={!canSendMessage}
-              >
-                Send Warp Message from {sourceChainText} to {destinationChainText}
-              </Button>
-            </div>
-
-            {messageID && <Success label="Message ID" value={messageID} />}
-
-            <div className="space-y-2">
-              <Input
-                label="Block Index"
-                value={blockIndex}
-                onChange={setBlockIndex}
-                type="number"
-                min="0"
-                disabled={isAnyOperationInProgress}
-              />
-              <Button
-                variant="secondary"
-                onClick={handleGetVerifiedWarpBlockHash}
-                loading={isGettingBlockHash}
-                disabled={!canGetBlockHash}
-              >
-                Get Verified Warp Block Hash
-              </Button>
-            </div>
-
-            {warpBlockHash && (
-              <div className="space-y-2">
-                <Success
-                  label="Source Chain ID"
-                  value={warpBlockHash[0].sourceChainID}
-                />
-                <Success
-                  label="Block Hash"
-                  value={warpBlockHash[0].blockHash}
-                />
-                <Success
-                  label="Valid"
-                  value={warpBlockHash[1] ? "Yes" : "No"}
-                />
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Input
-                label="Message Index"
-                value={messageIndex}
-                onChange={setMessageIndex}
-                type="number"
-                min="0"
-                disabled={isAnyOperationInProgress}
-              />
-              <Button
-                variant="secondary"
-                onClick={handleGetVerifiedWarpMessage}
-                loading={isGettingMessage}
-                disabled={!canGetMessage}
-              >
-                Get Verified Warp Message
-              </Button>
-            </div>
-
-            {warpMessage && (
-              <div className="space-y-2">
-                <Success
-                  label="Source Chain ID"
-                  value={warpMessage[0].sourceChainID}
-                />
-                <Success
-                  label="Origin Sender Address"
-                  value={warpMessage[0].originSenderAddress}
-                />
-                <Success
-                  label="Payload"
-                  value={warpMessage[0].payload}
-                />
-                <Success
-                  label="Valid"
-                  value={warpMessage[1] ? "Yes" : "No"}
-                />
-              </div>
-            )}
-          </div>
-
-          {txHash && (
-            <div className="space-y-2">
-              <Success
-                label="Transaction Successful"
-                value={txHash}
-              />
-              {txHash && (
-                <a
-                  href={`https://subnets-test.avax.network/${messageDirection === "CtoL1" ? "c-chain" : viemChain?.name?.toLowerCase()}/tx/${txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-500 hover:underline"
+            <div className="space-y-4">
+              <div className="flex space-x-4">
+                <Button
+                  variant="primary"
+                  onClick={handleGetBlockchainID}
+                  disabled={isAnyOperationInProgress}
+                  loading={isGettingBlockchainID}
                 >
-                  View on Explorer
-                </a>
+                  Get Blockchain ID
+                </Button>
+              </div>
+
+              {blockchainID && (
+                <Success label="Blockchain ID" value={blockchainID} />
+              )}
+
+              <div className="space-y-2">
+                <Input
+                  label="Message Payload (hex)"
+                  value={messagePayload}
+                  onChange={setMessagePayload}
+                  disabled={isAnyOperationInProgress}
+                />
+                <Button
+                  variant="primary"
+                  onClick={handleSendWarpMessage}
+                  loading={isSendingMessage}
+                  disabled={!canSendMessage}
+                >
+                  Send Warp Message from {sourceChainText} to {destinationChainText}
+                </Button>
+              </div>
+
+              {messageID && <Success label="Message ID" value={messageID} />}
+
+              <div className="space-y-2">
+                <Input
+                  label="Block Index"
+                  value={blockIndex}
+                  onChange={setBlockIndex}
+                  type="number"
+                  min="0"
+                  disabled={isAnyOperationInProgress}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleGetVerifiedWarpBlockHash}
+                  loading={isGettingBlockHash}
+                  disabled={!canGetBlockHash}
+                >
+                  Get Verified Warp Block Hash
+                </Button>
+              </div>
+
+              {warpBlockHash && (
+                <div className="space-y-2">
+                  <Success
+                    label="Source Chain ID"
+                    value={warpBlockHash[0].sourceChainID}
+                  />
+                  <Success
+                    label="Block Hash"
+                    value={warpBlockHash[0].blockHash}
+                  />
+                  <Success
+                    label="Valid"
+                    value={warpBlockHash[1] ? "Yes" : "No"}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Input
+                  label="Message Index"
+                  value={messageIndex}
+                  onChange={setMessageIndex}
+                  type="number"
+                  min="0"
+                  disabled={isAnyOperationInProgress}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleGetVerifiedWarpMessage}
+                  loading={isGettingMessage}
+                  disabled={!canGetMessage}
+                >
+                  Get Verified Warp Message
+                </Button>
+              </div>
+
+              {warpMessage && (
+                <div className="space-y-2">
+                  <Success
+                    label="Source Chain ID"
+                    value={warpMessage[0].sourceChainID}
+                  />
+                  <Success
+                    label="Origin Sender Address"
+                    value={warpMessage[0].originSenderAddress}
+                  />
+                  <Success
+                    label="Payload"
+                    value={warpMessage[0].payload}
+                  />
+                  <Success
+                    label="Valid"
+                    value={warpMessage[1] ? "Yes" : "No"}
+                  />
+                </div>
               )}
             </div>
-          )}
-        </div>
-      </Container>
 
-      <div className="w-full">
-        <AllowlistComponent
-          precompileAddress={DEFAULT_WARP_MESSENGER_ADDRESS}
-          precompileType="Warp Messenger"
-        />
+            {txHash && (
+              <div className="space-y-2">
+                <Success
+                  label="Transaction Successful"
+                  value={txHash}
+                />
+                {txHash && (
+                  <a
+                    href={`https://subnets-test.avax.network/${messageDirection === "CtoL1" ? "c-chain" : viemChain?.name?.toLowerCase()}/tx/${txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-500 hover:underline"
+                  >
+                    View on Explorer
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </Container>
+
+        <div className="w-full">
+          <AllowlistComponent
+            precompileAddress={DEFAULT_WARP_MESSENGER_ADDRESS}
+            precompileType="Warp Messenger"
+          />
+        </div>
       </div>
-    </div>
+    </CheckPrecompile>
   );
 }
