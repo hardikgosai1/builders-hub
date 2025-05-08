@@ -46,6 +46,8 @@ const StatusBadge = ({ status, loadingText, isLoading }: StatusBadgeProps) => {
 export default function RewardManager() {
   const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
+
+  // Fee config state
   const [isAllowingFeeRecipients, setIsAllowingFeeRecipients] = useState(false);
   const [isDisablingRewards, setIsDisablingRewards] = useState(false);
   const [isSettingRewardAddress, setIsSettingRewardAddress] = useState(false);

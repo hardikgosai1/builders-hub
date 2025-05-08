@@ -21,7 +21,7 @@ const DEFAULT_WARP_MESSENGER_ADDRESS =
 type MessageDirection = "CtoL1" | "L1toC";
 
 export default function WarpMessenger() {
-  const { coreWalletClient } = useWalletStore();
+  const { coreWalletClient, walletEVMAddress } = useWalletStore();
   const viemChain = useViemChainStore();
   const [messagePayload, setMessagePayload] = useState<string>("");
   const [blockIndex, setBlockIndex] = useState<string>("");
@@ -136,6 +136,7 @@ export default function WarpMessenger() {
 
   const canSendMessage = Boolean(
     messagePayload &&
+    walletEVMAddress &&
     coreWalletClient &&
     !isSendingMessage
   );
