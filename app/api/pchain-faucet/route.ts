@@ -11,10 +11,6 @@ if (!SERVER_PRIVATE_KEY || !FAUCET_P_CHAIN_ADDRESS) {
   console.error('necessary environment variables are not set');
 }
 
-interface TransferRequestBody {
-  destinationAddress: string;
-}
-
 interface TransferResponse {
   success: boolean;
   txID?: string;
@@ -54,7 +50,7 @@ async function transferPToP(
     },
     context,
   );
-  
+
   await addTxSignatures({
     unsignedTx: tx,
     privateKeys: [utils.hexToBuffer(sourcePrivateKey)],
@@ -63,7 +59,7 @@ async function transferPToP(
   return pvmApi.issueSignedTx(tx.getSignedTx());
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getAuthSession();   
     if (!session?.user) {
@@ -80,8 +76,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const body: TransferRequestBody = await request.json();
-    const { destinationAddress } = body;
+    const searchParams = request.nextUrl.searchParams;
+    const destinationAddress = searchParams.get('address');
   
     if (!destinationAddress) {
       return NextResponse.json(
@@ -89,7 +85,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 400 }
       );
     }
-    
+
     const tx = await transferPToP(
       SERVER_PRIVATE_KEY,
       FAUCET_P_CHAIN_ADDRESS,
