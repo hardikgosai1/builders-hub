@@ -61,7 +61,6 @@ export default function TokenBridge() {
     }> | null>(null);
     const [localError, setLocalError] = useState("");
     const [isFetchingSourceInfo, setIsFetchingSourceInfo] = useState(false);
-    const [isFetchingDestInfo, setIsFetchingDstInfo] = useState(false);
 
     // Token info
     const [tokenAddress, setTokenAddress] = useState<Address | null>(null);
@@ -465,7 +464,7 @@ export default function TokenBridge() {
         return logs[0];
     }
 
-    const isMessageReceived = async (messageId: string) => {
+    const isMessageReceived = async () => {
         const receiveTransaction = await getReceiveTransaction();
         if (receiveTransaction) {
             fetchTokenInfoFromBridgeContract(destinationContractAddress as Address, "destination");
@@ -478,7 +477,7 @@ export default function TokenBridge() {
         if (messageID === undefined) {
             return;
         }
-        isMessageReceived(messageID).then(r => {
+        isMessageReceived().then(r => {
             if (r === true) {
                 setLastSendTxDetails(prev => ({
                     ...prev,
