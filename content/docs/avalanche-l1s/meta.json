@@ -22,6 +22,7 @@
     "evm-l1-customization",
     "default-precompiles",
     "custom-precompiles",
+    "precompile-upgrades",
     "---Upgrade an Avalanche L1---",
     "...upgrade"
   ]
