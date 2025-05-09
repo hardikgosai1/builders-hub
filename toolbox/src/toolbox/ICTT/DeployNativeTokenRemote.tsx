@@ -36,7 +36,6 @@ export default function DeployNativeTokenRemote() {
     const [tokenName, setTokenName] = useState("");
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenDecimals, setTokenDecimals] = useState("0");
-    const [tokenFetched, setTokenFetched] = useState(false);
     const [minTeleporterVersion, setMinTeleporterVersion] = useState("1");
     const [initialReserveImbalance, setInitialReserveImbalance] = useState("0");
     const [burnedFeesReportingRewardPercentage, setBurnedFeesReportingRewardPercentage] = useState("0");
@@ -101,7 +100,6 @@ export default function DeployNativeTokenRemote() {
                 setTokenDecimals(String(decimals));
                 setTokenName(name as string);
                 setTokenSymbol(symbol as string);
-                setTokenFetched(true);
             } catch (error: any) {
                 console.error(error);
                 setLocalError("Fetching token details failed: " + error.message);

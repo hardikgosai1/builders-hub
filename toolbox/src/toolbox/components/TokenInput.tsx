@@ -43,7 +43,6 @@ export function TokenInput({
   button,
 }: TokenInputProps) {
   const [validationError, setValidationError] = useState<string | undefined>();
-  const [tokenInfo, setTokenInfo] = useState<any | undefined>();
 
   const validateAddress = (address: string) => {
     if (!address) {

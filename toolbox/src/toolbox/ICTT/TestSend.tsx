@@ -59,10 +59,9 @@ export default function TokenBridge() {
             confirmedAt: number;
         }>
     }> | null>(null);
-    const [isMultiHop, setIsMultiHop] = useState(false);
     const [localError, setLocalError] = useState("");
     const [isFetchingSourceInfo, setIsFetchingSourceInfo] = useState(false);
-    const [isFetchingDestInfo, setIsFetchingDestInfo] = useState(false);
+    const [isFetchingDestInfo, setIsFetchingDstInfo] = useState(false);
 
     // Token info
     const [tokenAddress, setTokenAddress] = useState<Address | null>(null);
@@ -70,9 +69,6 @@ export default function TokenBridge() {
     const [tokenSymbol, setTokenSymbol] = useState<string | null>(null);
     const [tokenBalance, setTokenBalance] = useState<bigint | null>(null);
     const [tokenAllowance, setTokenAllowance] = useState<bigint | null>(null);
-
-    // Destination token info
-    const [destTokenBalance, setDestTokenBalance] = useState<bigint | null>(null);
 
     // Get chain info - source is current chain, destination is selected
     const destL1 = useL1ByChainId(destinationChainId)();
@@ -311,47 +307,9 @@ export default function TokenBridge() {
         }
     }, [viemChain, walletEVMAddress, sourceContractAddress]);
 
-    // Fetch destination token balance
-    const fetchDestinationBalance = useCallback(async () => {
-        if (!destL1?.rpcUrl || !walletEVMAddress || !destinationContractAddress || !recipientAddress) {
-            setDestTokenBalance(null);
-            return;
-        }
-
-        setIsFetchingDestInfo(true);
-        try {
-            const publicClient = createPublicClient({
-                transport: http(destL1.rpcUrl)
-            });
-
-            // Try to get balance directly from the remote contract (it's ERC20-compatible)
-            const destBalance = await publicClient.readContract({
-                address: destinationContractAddress as Address,
-                abi: ExampleERC20ABI.abi,
-                functionName: 'balanceOf',
-                args: [recipientAddress as Address]
-            }).catch(() => null) as bigint | null;
-
-            if (destBalance !== null) {
-                setDestTokenBalance(destBalance);
-            } else {
-                setDestTokenBalance(null);
-            }
-        } catch (error) {
-            console.error("Error fetching destination balance:", error);
-            setDestTokenBalance(null);
-        } finally {
-            setIsFetchingDestInfo(false);
-        }
-    }, [destL1?.rpcUrl, walletEVMAddress, destinationContractAddress, recipientAddress]);
-
     useEffect(() => {
         fetchSourceInfo();
     }, [fetchSourceInfo]);
-
-    useEffect(() => {
-        fetchDestinationBalance();
-    }, [fetchDestinationBalance, lastSendTxId]);
 
     // Set initial recipient address to connected wallet
     const [useMyAddress, setUseMyAddress] = useState(true);
@@ -483,11 +441,6 @@ export default function TokenBridge() {
             }));
             await fetchSourceInfo(); // todo: duplicate remove this
             await fetchTokenInfoFromBridgeContract(sourceContractAddress as Address, "source");
-
-            // Wait a moment before checking destination balance to allow for cross-chain message
-            setTimeout(() => {
-                fetchDestinationBalance();
-            }, 3000);
         } catch (error: any) {
             console.error("Send failed:", error);
             setLocalError(`Send failed: ${error.shortMessage || error.message}`);
@@ -497,7 +450,7 @@ export default function TokenBridge() {
         }
     };
 
-    const getReceiveTransaction = async (messageID: string) => {
+    const getReceiveTransaction = async () => {
         const publicClient = createPublicClient({
             transport: http(destL1?.rpcUrl)
         });
@@ -513,7 +466,7 @@ export default function TokenBridge() {
     }
 
     const isMessageReceived = async (messageId: string) => {
-        const receiveTransaction = await getReceiveTransaction(messageId);
+        const receiveTransaction = await getReceiveTransaction();
         if (receiveTransaction) {
             fetchTokenInfoFromBridgeContract(destinationContractAddress as Address, "destination");
             return true;
@@ -561,7 +514,6 @@ export default function TokenBridge() {
     const isReadyToSend = isValidAmount && hasSufficientAllowance && hasSufficientBalance &&
         destinationContractAddress && recipientAddress && destinationBlockchainIDHex && requiredGasLimit;
 
-    const [isRecipientEditing, setIsRecipientEditing] = useState(false);
     const [isGasLimitEditing, setIsGasLimitEditing] = useState(false);
 
     return (
