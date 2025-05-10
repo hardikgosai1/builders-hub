@@ -66,7 +66,6 @@ export default function ChangeWeight() {
   const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || selectedL1?.subnetId || "")
   const [validatorManagerAddress, setValidatorManagerAddress] = useState("")
   const [validatorManagerError, setValidatorManagerError] = useState<string | null>(null)
-  const [blockchainId, setBlockchainId] = useState("")
   const [signingSubnetId, setSigningSubnetId] = useState("")
 
   // --- Intermediate Data State ---
@@ -105,7 +104,6 @@ export default function ChangeWeight() {
     const fetchVMCDetails = async () => {
       if (!subnetId || subnetId === "11111111111111111111111111111111LpoYY") {
         setValidatorManagerAddress("")
-        setBlockchainId("")
         setValidatorManagerError("Please select a valid subnet ID")
         return
       }
@@ -117,7 +115,6 @@ export default function ChangeWeight() {
         // Restore cached values
         const cachedValues = subnetCache.current[cacheKey];
         setValidatorManagerAddress(cachedValues.validatorManagerAddress);
-        setBlockchainId(cachedValues.blockchainId);
         setSigningSubnetId(cachedValues.signingSubnetId);
         setValidatorManagerError(null); // Clear any previous errors
         return;
@@ -133,20 +130,18 @@ export default function ChangeWeight() {
         // Check if subnet is an L1
         if (!subnetInfo.isL1 || !subnetInfo.l1ValidatorManagerDetails) {
           setValidatorManagerAddress("")
-          setBlockchainId("")
           setValidatorManagerError("Selected subnet is not an L1 or doesn't have a Validator Manager Contract")
           return
         }
         
         // Get VMC details
         const vmcAddress = subnetInfo.l1ValidatorManagerDetails.contractAddress
-        const vmcBlockchainId = subnetInfo.l1ValidatorManagerDetails.blockchainId
         
         // Fetch chain details to get EVM chain ID - use the same network
         try {
           const blockchainInfoForVMC: { evmChainId: number } = await getBlockchainInfoForNetwork(
             network, 
-            vmcBlockchainId
+            subnetInfo.l1ValidatorManagerDetails.blockchainId
           )
           const expectedChainIdForVMC = blockchainInfoForVMC.evmChainId
           
@@ -172,12 +167,11 @@ export default function ChangeWeight() {
           // If we get here, both checks passed
           setValidatorManagerError(null)
           setValidatorManagerAddress(vmcAddress)
-          setBlockchainId(vmcBlockchainId)
           
           // Fetch the signing subnet ID - the useEffect dependency on subnetId 
           // ensures this only runs when subnet changes
           try {
-            const blockchainInfo = await getBlockchainInfoForNetwork(network, vmcBlockchainId)
+            const blockchainInfo = await getBlockchainInfoForNetwork(network, subnetInfo.l1ValidatorManagerDetails.blockchainId)
             setSigningSubnetId(blockchainInfo.subnetId)
           } catch (subnetIdError) {
             console.error("Error getting subnet ID from blockchain ID:", subnetIdError)
@@ -188,7 +182,7 @@ export default function ChangeWeight() {
           // Mark this subnet ID as fetched to avoid redundant API calls
           subnetCache.current[cacheKey] = {
             validatorManagerAddress: vmcAddress,
-            blockchainId: vmcBlockchainId,
+            blockchainId: subnetInfo.l1ValidatorManagerDetails.blockchainId,
             signingSubnetId: signingSubnetId,
           };
           
@@ -201,7 +195,6 @@ export default function ChangeWeight() {
       } catch (error) {
         console.error("Error fetching Validator Manager details:", error)
         setValidatorManagerAddress("")
-        setBlockchainId("")
         setValidatorManagerError("Failed to fetch Validator Manager information for this subnet")
       }
     }

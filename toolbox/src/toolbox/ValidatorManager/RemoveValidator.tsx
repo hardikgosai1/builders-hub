@@ -63,7 +63,6 @@ export default function RemoveValidator() {
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
   const [pChainSignature, setPChainSignature] = useState("")
-  const [blockchainId, setBlockchainId] = useState("")
   const [signingSubnetId, setSigningSubnetId] = useState("")
 
   const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
@@ -89,7 +88,6 @@ export default function RemoveValidator() {
     const fetchVMCDetails = async () => {
       if (!subnetId || subnetId === "11111111111111111111111111111111LpoYY") {
         setValidatorManagerAddress("")
-        setBlockchainId("")
         setValidatorManagerError("Please select a valid subnet ID")
         return
       }
@@ -101,7 +99,6 @@ export default function RemoveValidator() {
         // Restore cached values
         const cachedValues = subnetCache.current[cacheKey];
         setValidatorManagerAddress(cachedValues.validatorManagerAddress);
-        setBlockchainId(cachedValues.blockchainId);
         setSigningSubnetId(cachedValues.signingSubnetId);
         setValidatorManagerError(null); // Clear any previous errors
         return;
@@ -117,7 +114,6 @@ export default function RemoveValidator() {
         // Check if subnet is an L1
         if (!subnetInfo.isL1 || !subnetInfo.l1ValidatorManagerDetails) {
           setValidatorManagerAddress("")
-          setBlockchainId("")
           setValidatorManagerError("Selected subnet is not an L1 or doesn't have a Validator Manager Contract")
           return
         }
@@ -156,7 +152,6 @@ export default function RemoveValidator() {
           // If we get here, both checks passed
           setValidatorManagerError(null)
           setValidatorManagerAddress(vmcAddress)
-          setBlockchainId(vmcBlockchainId)
           
           // Fetch the signing subnet ID - the useEffect dependency on subnetId 
           // ensures this only runs when subnet changes
@@ -185,7 +180,6 @@ export default function RemoveValidator() {
       } catch (error) {
         console.error("Error fetching Validator Manager details:", error)
         setValidatorManagerAddress("")
-        setBlockchainId("")
         setValidatorManagerError("Failed to fetch Validator Manager information for this subnet")
       }
     }
