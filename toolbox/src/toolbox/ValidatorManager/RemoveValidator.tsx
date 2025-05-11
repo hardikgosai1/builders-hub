@@ -59,7 +59,8 @@ export default function RemoveValidator() {
       validatorManagerAddress, 
       signingSubnetId, 
       error: validatorManagerError, 
-      isLoading: isLoadingVMCDetails 
+      isLoading: isLoadingVMCDetails,
+      blockchainId,
   } = useValidatorManagerDetails({ subnetId });
 
   const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
@@ -373,9 +374,22 @@ export default function RemoveValidator() {
             <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Loading L1 details...</p>
           )}
           {validatorManagerAddress && !isLoadingVMCDetails && (
-            <div className="mt-2">
-              <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Validator Manager Address</div>
-              <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{validatorManagerAddress}</div>
+            <div className="mt-2 space-y-1">
+              <div>
+                <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Validator Manager Address</div>
+                <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{validatorManagerAddress}</div>
+              </div>
+              {blockchainId && (
+                <div>
+                  <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Blockchain ID</div>
+                  <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{blockchainId}</div>
+                </div>
+              )}
+              {blockchainId && subnetId && blockchainId !== subnetId && (
+                <div className="p-2 mt-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md text-blue-700 dark:text-blue-300 text-xs">
+                  <span>Note: The blockchain ID identifies the blockchain where this L1's validator manager contract is deployed.</span>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -34,13 +34,11 @@ export async function getTotalStake(
  * 
  * @param totalStake - The current total L1 weight
  * @param validatorWeight - The weight of the validator to check
- * @param maxPercentage - The maximum allowed percentage (default: 20)
  * @returns An object with the percentage and whether it exceeds the maximum
  */
 export function validateStakePercentage(
   totalStake: bigint, 
-  validatorWeight: bigint,
-  maxPercentage: number = 20
+  validatorWeight: bigint
 ): { percentage: number; exceedsMaximum: boolean } {
   if (totalStake === 0n) {
     // If there's no total stake, this would be the first validator
@@ -49,10 +47,10 @@ export function validateStakePercentage(
   
   // Calculate the percentage that this validator would represent
   // Formula: (validatorWeight / (totalStake + validatorWeight)) * 100
-  const percentage = Number(validatorWeight * 100n) / Number(totalStake + validatorWeight);
+  const percentage = Number(validatorWeight) / Number(totalStake + validatorWeight) * 100;
   
   return {
     percentage,
-    exceedsMaximum: percentage >= maxPercentage
+    exceedsMaximum: percentage >= 20
   };
 } 
