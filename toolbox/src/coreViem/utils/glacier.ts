@@ -2,8 +2,6 @@
 
 const endpoint = "https://glacier-api.avax.network"
 
-// Add a cache for blockchain info to avoid repeated API calls
-const blockchainInfoCache: Record<string, BlockchainInfo> = {};
 
 interface BlockchainInfo {
     createBlockTimestamp: number;
@@ -25,12 +23,6 @@ export async function getBlockchainInfo(blockchainId: string): Promise<Blockchai
 }
 
 export async function getBlockchainInfoForNetwork(network: Network, blockchainId: string): Promise<BlockchainInfo> {
-    // Check cache first
-    const cacheKey = `${network}-${blockchainId}`;
-    if (blockchainInfoCache[cacheKey]) {
-        console.log(`Using cached blockchain info for ${blockchainId} on ${network}`);
-        return blockchainInfoCache[cacheKey];
-    }
 
     const url = `${endpoint}/v1/networks/${network}/blockchains/${blockchainId}`;
     const response = await fetch(url, {
@@ -46,14 +38,9 @@ export async function getBlockchainInfoForNetwork(network: Network, blockchainId
 
     const data: BlockchainInfo = await response.json();
     
-    // Cache the result
-    blockchainInfoCache[cacheKey] = data;
-    
     return data;
 }
 
-// Add a cache for subnet info
-const subnetInfoCache: Record<string, SubnetInfo> = {};
 
 interface SubnetOwnershipInfo {
     addresses: string[];
@@ -90,12 +77,6 @@ export async function getSubnetInfo(subnetId: string): Promise<SubnetInfo> {
 }
 
 export async function getSubnetInfoForNetwork(network: Network, subnetId: string): Promise<SubnetInfo> {
-    // Check cache first
-    const cacheKey = `${network}-${subnetId}`;
-    if (subnetInfoCache[cacheKey]) {
-        console.log(`Using cached subnet info for ${subnetId} on ${network}`);
-        return subnetInfoCache[cacheKey];
-    }
 
     const url = `${endpoint}/v1/networks/${network}/subnets/${subnetId}`;
     const response = await fetch(url, {
@@ -110,9 +91,6 @@ export async function getSubnetInfoForNetwork(network: Network, subnetId: string
     }
 
     const data: SubnetInfo = await response.json();
-    
-    // Cache the result
-    subnetInfoCache[cacheKey] = data;
     
     return data;
 }
