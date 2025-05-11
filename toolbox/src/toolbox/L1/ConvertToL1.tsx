@@ -94,7 +94,7 @@ export default function ConvertToL1() {
 
                 <div>
                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Validator Manager</h2>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">With the conversion of the Subnet to an L1 the validator set of the L1 will be managed by a validator manager contract. This contract can implement Proof-of-Authority, Proof-of-Stake or any custom logic to determine the validator set. The contract can be deployed on a blockchain of the L1, the C-Chain or any other blockchain in the Avalanche network.</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">With the conversion of the Subnet to an L1, the validator set of the L1 will be managed by a validator manager contract. This contract can implement Proof-of-Authority, Proof-of-Stake or any custom logic to determine the validator set. The contract can be deployed on a blockchain of the L1, the C-Chain or any other blockchain in the Avalanche network.</p>
                 </div>
                 <InputChainId
                     value={chainID}
@@ -109,7 +109,7 @@ export default function ConvertToL1() {
                     disabled={isConverting}
                 />
                 <Callout type="info">
-                    In the Genesis Builder an <a href="https://docs.openzeppelin.com/contracts/4.x/api/proxy" target="_blank">OpenZeppelin TransparentUpgradeableProxy</a> contract is pre-deployed at the address <code>0xfacade...</code>. This proxy can be pointed to a reference implementation or customized version of the <a href="https://github.com/ava-labs/icm-contracts/tree/main/contracts/validator-manager" target="_blank">validator manager contract</a>. Tools for the deployment of the reference implementations of validator manager contract are available in the <a href="http://build.avax.network/tools/l1-toolbox#deployValidatorManager" target="_blank">L1 Toolbox</a> for after the conversion.
+                    In the Genesis Builder, an <a href="https://docs.openzeppelin.com/contracts/4.x/api/proxy" target="_blank">OpenZeppelin TransparentUpgradeableProxy</a> contract is pre-deployed at the address <code>0xfacade...</code>. This proxy can be pointed to a reference implementation or customized version of the <a href="https://github.com/ava-labs/icm-contracts/tree/main/contracts/validator-manager" target="_blank">validator manager contract</a>. Tools for the deployment of the reference implementations of validator manager contracts are available in the <a href="http://build.avax.network/tools/l1-toolbox#deployValidatorManager" target="_blank">L1 Toolbox</a> for after the conversion.
                 </Callout>
 
                 <ValidatorListInput
@@ -117,7 +117,7 @@ export default function ConvertToL1() {
                     onChange={setValidators}
                     defaultAddress={pChainAddress}
                     label="Initial Validators"
-                    description="Specify the intial validator set for the L1 below. You need to add a least one validator. If converting a pre-existing Subnet with validators, you must establish a completely new validator set for the L1 conversion. The existing Subnet validators cannot be transferred. For each new validator you need to specify NodeID, the consensus weight, the initial balance and an address or a multi-sig that can deactivate the validator and that receives its remaining balance. The sum of the initial balances of the validators need to be paid when issuing this transaction."
+                    description="Specify the initial validator set for the L1 below. You need to add at least one validator. If converting a pre-existing Subnet with validators, you must establish a completely new validator set for the L1 conversion. The existing Subnet validators cannot be transferred. For each new validator, you need to specify NodeID, the consensus weight, the initial balance and an address or a multi-sig that can deactivate the validator and that receives its remaining balance. The sum of the initial balances of the validators needs to be paid when issuing this transaction."
                     userPChainBalanceNavax={rawPChainBalanceNavax}
                 />
 
