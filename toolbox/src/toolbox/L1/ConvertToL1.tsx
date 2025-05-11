@@ -36,19 +36,13 @@ export default function ConvertToL1() {
 
     useEffect(() => {
         const isMounted = { current: true };
-        const cache: { balance?: { timestamp: number; rawValue: bigint } } = {};
 
         const fetchBalance = async () => {
             if (!pChainAddress || !coreWalletClient) return;
             try {
-                const now = Date.now();
-                if (!cache.balance || (now - cache.balance.timestamp > 10000)) {
-                    const balanceValue = await getPChainBalance(coreWalletClient);
-                    if (isMounted.current) {
-                        setRawPChainBalanceNavax(balanceValue);
-                    }
-                } else if (cache.balance) {
-                    setRawPChainBalanceNavax(cache.balance.rawValue);
+                const balanceValue = await getPChainBalance(coreWalletClient);
+                if (isMounted.current) {
+                    setRawPChainBalanceNavax(balanceValue);
                 }
             } catch (error) {
                 console.error("Error fetching P-Chain balance in ConvertToL1:", error);
