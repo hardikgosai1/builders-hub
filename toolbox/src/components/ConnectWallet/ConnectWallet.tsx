@@ -425,6 +425,9 @@ export const ConnectWallet = ({
                                                             if (response.status === 401) {
                                                                 throw new Error("Please login first");
                                                             }
+                                                            if (response.status === 429) {
+                                                                throw new Error(data.message || "Rate limit exceeded. Please try again later.");
+                                                            }
                                                             throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
                                                         }
 
