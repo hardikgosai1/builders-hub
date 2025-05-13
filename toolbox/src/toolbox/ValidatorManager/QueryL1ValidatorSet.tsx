@@ -10,6 +10,7 @@ import { GlobalParamNetwork, L1ValidatorDetailsFull } from "@avalabs/avacloud-sd
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import SelectSubnetId from "../components/SelectSubnetId"
 import { Tooltip } from "../../components/Tooltip"
+import { formatAvaxBalance } from "../../coreViem/utils/format"
 
 export default function QueryL1ValidatorSet() {
   const { avalancheNetworkID } = useWalletStore()
@@ -69,18 +70,6 @@ export default function QueryL1ValidatorSet() {
 
     // Format as just the number with commas, no conversion
     return stake.toLocaleString()
-  }
-
-  function formatAvaxBalance(balance: number): string {
-    if (isNaN(balance)) return String(balance)
-
-    // Format with commas and convert to AVAX (1 AVAX = 10^9 nAVAX)
-    return (
-      (balance / 1_000_000_000).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }) + " AVAX"
-    )
   }
 
   const handleViewDetails = (validator: L1ValidatorDetailsFull) => {

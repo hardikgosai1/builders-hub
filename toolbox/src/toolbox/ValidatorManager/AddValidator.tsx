@@ -25,6 +25,7 @@ import SelectSubnetId from "../components/SelectSubnetId"
 import { 
     getBlockchainInfoForNetwork 
 } from "../../coreViem/utils/glacier"
+import { formatAvaxBalance } from "../../coreViem/utils/format"
 import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
 import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
@@ -45,17 +46,6 @@ const addValidationStepsConfig: StepsConfig<AddValidationStepKey> = {
     waitForPChain: "Aggregate Signatures for P-Chain Warp Message",
     finalizeRegistration: "Finalize Validator Registration",
 };
-
-// Helper function to format AVAX amounts
-function formatAvaxBalance(balance: number | bigint): string {
-    const balanceNum = typeof balance === 'bigint' ? Number(balance) : balance;
-    return (
-        (balanceNum / 1_000_000_000).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }) + " AVAX"
-    );
-}
 
 export default function AddValidator() {
     const { showBoundary } = useErrorBoundary()
