@@ -3,6 +3,8 @@ import { persist, createJSONStorage, combine } from 'zustand/middleware'
 import { useMemo } from 'react';
 import { useWalletStore } from '../lib/walletStore';
 
+export const STORE_VERSION = "v1"
+
 const localStorageComp = () => typeof window !== 'undefined' ? localStorage : { getItem: () => null, setItem: () => { }, removeItem: () => { } }
 
 export const EVM_VM_ID = "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy"
@@ -39,11 +41,11 @@ const getCreateChainStore = (isTestnet: boolean) => create(
             setNodePopJsons: (nodePopJsons: string[]) => set({ nodePopJsons }),
 
             reset: () => {
-                window?.localStorage.removeItem(`create-chain-store-${isTestnet ? 'testnet' : 'mainnet'}`);
+                window?.localStorage.removeItem(`${STORE_VERSION}-create-chain-store-${isTestnet ? 'testnet' : 'mainnet'}`);
             },
         })),
         {
-            name: `create-chain-store-${isTestnet ? 'testnet' : 'mainnet'}`,
+            name: `${STORE_VERSION}-create-chain-store-${isTestnet ? 'testnet' : 'mainnet'}`,
             storage: createJSONStorage(localStorageComp),
         },
     ),
@@ -119,17 +121,18 @@ const l1ListInitialStateMainnet = {
         }
     ] as L1ListItem[],
 }
+
 const getL1ListStore = (isTestnet: boolean) => create(
     persist(
         combine(isTestnet ? l1ListInitialStateFuji : l1ListInitialStateMainnet, (set) => ({
             addL1: (l1: L1ListItem) => set((state) => ({ l1List: [...state.l1List, l1] })),
             removeL1: (l1Id: string) => set((state) => ({ l1List: state.l1List.filter((l) => l.id !== l1Id) })),
             reset: () => {
-                window?.localStorage.removeItem(`l1-list-store-${isTestnet ? 'testnet' : 'mainnet'}`);
+                window?.localStorage.removeItem(`${STORE_VERSION}-l1-list-store-${isTestnet ? 'testnet' : 'mainnet'}`);
             },
         })),
         {
-            name: `l1-list-store-${isTestnet ? 'testnet' : 'mainnet'}`,
+            name: `${STORE_VERSION}-l1-list-store-${isTestnet ? 'testnet' : 'mainnet'}`,
             storage: createJSONStorage(localStorageComp),
         },
     ),
@@ -141,7 +144,6 @@ export const useL1ListStore = () => {
 }
 
 const toolboxInitialState = {
-    //verified state
     validatorMessagesLibAddress: "",
     validatorManagerAddress: "",
     rewardCalculatorAddress: "",
@@ -152,17 +154,11 @@ const toolboxInitialState = {
     erc20TokenHomeAddress: "",
     erc20TokenRemoteAddress: "",
     nativeTokenRemoteAddress: "",
-
-    //unverifyed state - remove after testing
-    // nodeRpcUrl: "",
-    // evmChainCoinName: "COIN",
-    // evmChainIsTestnet: true,
 }
 
 export const getToolboxStore = (chainId: string) => create(
     persist(
         combine(toolboxInitialState, (set) => ({
-            //verified methods
             setValidatorMessagesLibAddress: (validatorMessagesLibAddress: string) => set({ validatorMessagesLibAddress }),
             setValidatorManagerAddress: (validatorManagerAddress: string) => set({ validatorManagerAddress }),
             setRewardCalculatorAddress: (rewardCalculatorAddress: string) => set({ rewardCalculatorAddress }),
@@ -176,12 +172,12 @@ export const getToolboxStore = (chainId: string) => create(
 
             reset: () => {
                 if (typeof window !== 'undefined') {
-                    window.localStorage.removeItem(`toolbox-storage-${chainId}`);
+                    window.localStorage.removeItem(`${STORE_VERSION}-toolbox-storage-${chainId}`);
                 }
             },
         })),
         {
-            name: `toolbox-storage-${chainId}`,
+            name: `${STORE_VERSION}-toolbox-storage-${chainId}`,
             storage: createJSONStorage(localStorageComp),
         },
     ),
@@ -272,4 +268,3 @@ export function useL1ByChainId(chainId: string) {
         [chainId, l1ListStore]
     );
 }
-
