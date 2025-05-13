@@ -66,7 +66,7 @@ type L1ListItem = {
     subnetId: string;
     validatorManagerAddress: string;
     logoUrl: string;
-    wellKnownTeleporterRegistryAddress: string;
+    wellKnownTeleporterRegistryAddress?: string;
 };
 
 const l1ListInitialStateFuji = {
