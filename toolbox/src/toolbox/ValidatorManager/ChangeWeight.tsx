@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useErrorBoundary } from "react-error-boundary"
 
-import { useSelectedL1, useViemChainStore, useCreateChainStore } from "../toolboxStore"
+import { useViemChainStore, useCreateChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 
 import { Container } from "../components/Container"
@@ -77,7 +77,6 @@ export default function ChangeWeight() {
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
   const [pChainSignature, setPChainSignature] = useState("")
-  const [currentValidatorWeight, setCurrentValidatorWeight] = useState<bigint | null>(null)
   const [eventData, setEventData] = useState<{
     validationID: `0x${string}`;
     nonce: bigint;
@@ -117,7 +116,6 @@ export default function ChangeWeight() {
           )
           setIsContractOwner(ownershipValidated)
         } catch (error) {
-          console.error("Error validating contract ownership:", error)
           setIsContractOwner(false)
         }
       }
@@ -197,7 +195,6 @@ export default function ChangeWeight() {
         }
       }
     } catch (error: any) {
-      console.error("Error in preflight validation checks:", error);
       setError(`Validation pre-check failed: ${error.message || String(error)}`);
       return; // Stop processing if pre-flight check itself fails
     }
@@ -232,7 +229,6 @@ export default function ChangeWeight() {
               validatorManagerAddress as `0x${string}`, 
               validationIDResult as string
             );
-            setCurrentValidatorWeight(currentWeight);
             console.log("Current validator weight:", currentWeight);
           }
             
@@ -301,7 +297,6 @@ export default function ChangeWeight() {
                 localEventData = eventDataObj;
                 console.log("Saved event data:", eventDataObj)
               } catch (parseError) {
-                console.error("Error parsing event data:", parseError)
                 // Clear local and state
                 setEventData(null)
                 localEventData = null;
@@ -488,7 +483,6 @@ export default function ChangeWeight() {
               throw new Error(`Transaction failed with status: ${receipt.status}`)
             }
           } catch (receiptError: any) {
-            console.error("Failed to get transaction receipt:", receiptError)
             throw new Error(`Failed waiting for transaction receipt: ${receiptError.message}`)
           }
 
@@ -504,7 +498,6 @@ export default function ChangeWeight() {
 
     } catch (err: any) {
       setError(`Failed to change validator weight: ${err.message}`)
-      console.error(err)
       showBoundary(err)
     }
   }
@@ -618,10 +611,7 @@ export default function ChangeWeight() {
                     resetSteps();
                     setNodeID("");
                     setWeight("");
-                    setCurrentValidatorWeight(null);
                     setValidationIDHex("");
-                    // Optionally reset subnetId if it shouldn't persist
-                    // setSubnetId(createChainStoreSubnetId || selectedL1?.subnetId || ""); 
                   }}
                   className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 rounded transition-colors"
                 >

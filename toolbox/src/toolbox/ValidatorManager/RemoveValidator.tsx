@@ -98,7 +98,6 @@ export default function RemoveValidator() {
           )
           setIsContractOwner(ownershipValidated)
         } catch (error) {
-          console.error("Error validating contract ownership:", error)
           setIsContractOwner(false)
         }
       }
@@ -329,7 +328,6 @@ export default function RemoveValidator() {
               throw new Error(`Transaction failed with status: ${receipt.status}`);
             }
           } catch (receiptError: any) {
-            console.error("Failed to get transaction receipt:", receiptError);
             throw new Error(`Failed waiting for transaction receipt: ${receiptError.message}`);
           }
 
@@ -344,7 +342,6 @@ export default function RemoveValidator() {
 
     } catch (err: any) {
       setError(`Failed to remove validator: ${err.message}`)
-      console.error(err)
       showBoundary(err)
     }
   }
