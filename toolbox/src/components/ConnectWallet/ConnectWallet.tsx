@@ -5,14 +5,15 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useErrorBoundary } from "react-error-boundary"
 import { Copy, RefreshCw } from "lucide-react"
-import { createCoreWalletClient } from "../coreViem"
+import { createCoreWalletClient } from "../../coreViem"
 import { networkIDs } from "@avalabs/avalanchejs"
-import { useWalletStore } from "../lib/walletStore"
-import { WalletRequiredPrompt } from "./WalletRequiredPrompt"
+import { useWalletStore } from "../../lib/walletStore"
+import { WalletRequiredPrompt } from "../WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
-import { RemountOnWalletChange } from "./RemountOnWalletChange"
+import { RemountOnWalletChange } from "../RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
-import InterchainTransfer from "./InterchainTransfer"
+import InterchainTransfer from "../InterchainTransfer"
+import { ExplorerButton } from "./ExplorerButton"
 
 const faucets = {
     43113: "https://test.core.app/tools/testnet-faucet/?subnet=c&token=c",
@@ -66,11 +67,14 @@ export const ConnectWallet = ({
     const { showBoundary } = useErrorBoundary();
     const [isRequestingPTokens, setIsRequestingPTokens] = useState(false);
     const [pTokenRequestError, setPTokenRequestError] = useState<string | null>(null);
+    const [rpcUrl, setRpcUrl] = useState<string>("");
+
 
     // Set isClient to true once component mounts (client-side only)
     useEffect(() => {
         setIsClient(true)
     }, [])
+
 
     useEffect(() => {
         if (!walletEVMAddress || !walletChainId || !pChainAddress) return;
@@ -148,10 +152,12 @@ export const ConnectWallet = ({
 
         coreWalletClient
             .getEthereumChain()
-            .then(({ isTestnet, chainName }: { isTestnet: boolean, chainName: string }) => {
+            .then((data: { isTestnet: boolean, chainName: string, rpcUrls: string[] }) => {
+                const { isTestnet, chainName, rpcUrls } = data;
                 setAvalancheNetworkID(isTestnet ? networkIDs.FujiID : networkIDs.MainnetID)
                 setIsTestnet(isTestnet)
                 setEvmChainName(chainName)
+                setRpcUrl(rpcUrls[0]!)
             })
             .catch(showBoundary)
     }
@@ -285,6 +291,7 @@ export const ConnectWallet = ({
     }
 
     const glowConditionL1Balance = forceCChain ? cChainBalance : l1Balance;
+    const displayedEvmChainId = forceCChain ? (isTestnet ? avalancheFuji.id : avalanche.id) : walletChainId;
 
     return (
         <div className="space-y-4 transition-all duration-300">
@@ -354,6 +361,10 @@ export const ConnectWallet = ({
                                         Free tokens
                                     </button>
                                 )}
+                                <ExplorerButton
+                                    rpcUrl={rpcUrl}
+                                    evmChainId={displayedEvmChainId}
+                                />
                             </div>
                             {/* EVM Address inside the card */}
                             <div className="flex items-center justify-between">
@@ -395,58 +406,57 @@ export const ConnectWallet = ({
                                         <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isPChainBalanceLoading ? 'animate-spin' : ''}`} />
                                     </button>
                                     {pChainAddress && (
-                                    <button
-                                        onClick={async () => {
-                                            if (!isRequestingPTokens) {
-                                                setIsRequestingPTokens(true);
-                                                setPTokenRequestError(null);
-                                                try {
-                                                    const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
-                                                    const rawText = await response.text();
-                                                    let data;
+                                        <button
+                                            onClick={async () => {
+                                                if (!isRequestingPTokens) {
+                                                    setIsRequestingPTokens(true);
+                                                    setPTokenRequestError(null);
                                                     try {
-                                                        data = JSON.parse(rawText);
-                                                    } catch (parseError) {
-                                                        throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
-                                                    }
-
-                                                    if (!response.ok) {
-                                                        if (response.status === 401) {
-                                                            throw new Error("Please login first");
+                                                        const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
+                                                        const rawText = await response.text();
+                                                        let data;
+                                                        try {
+                                                            data = JSON.parse(rawText);
+                                                        } catch (parseError) {
+                                                            throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
                                                         }
-                                                        throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
-                                                    }
-                                                    
-                                                    if (data.success) {
-                                                        console.log('Token request successful, txID:', data.txID);
-                                                        setTimeout(() => updatePChainBalance(), 3000);
-                                                    } else {
-                                                        throw new Error(data.message || "Failed to get tokens");
-                                                    }
-                                                } catch (error) {
-                                                    console.error("P-Chain token request error:", error);
-                                                    setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
-                                                } finally {
-                                                    setIsRequestingPTokens(false);
-                                                }
-                                            }
-                                        }}
-                                        disabled={isRequestingPTokens}
-                                        className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${
-                                            pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
-                                        } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
-                                        title="Get free P-Chain AVAX"
-                                    >
-                                        {isRequestingPTokens ? "Requesting..." : "Get tokens"}
-                                    </button>
-                                )}
-                            </div>
-                                
-                            {pTokenRequestError && (
-                                <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
-                            )}
 
-                            <div className="flex items-center justify-between">
+                                                        if (!response.ok) {
+                                                            if (response.status === 401) {
+                                                                throw new Error("Please login first");
+                                                            }
+                                                            throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
+                                                        }
+
+                                                        if (data.success) {
+                                                            console.log('Token request successful, txID:', data.txID);
+                                                            setTimeout(() => updatePChainBalance(), 3000);
+                                                        } else {
+                                                            throw new Error(data.message || "Failed to get tokens");
+                                                        }
+                                                    } catch (error) {
+                                                        console.error("P-Chain token request error:", error);
+                                                        setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
+                                                    } finally {
+                                                        setIsRequestingPTokens(false);
+                                                    }
+                                                }
+                                            }}
+                                            disabled={isRequestingPTokens}
+                                            className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
+                                                } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            title="Get free P-Chain AVAX"
+                                        >
+                                            {isRequestingPTokens ? "Requesting..." : "Get tokens"}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {pTokenRequestError && (
+                                    <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
+                                )}
+
+                                <div className="flex items-center justify-between">
                                     <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
                                         {pChainAddress ? pChainAddress : "Loading..."}
                                     </div>

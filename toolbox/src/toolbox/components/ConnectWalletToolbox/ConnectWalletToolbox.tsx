@@ -1,4 +1,4 @@
-import { ConnectWallet } from "../../../components/ConnectWallet";
+import { ConnectWallet } from "../../../components/ConnectWallet/ConnectWallet";
 import { useL1ListStore, useViemChainStore } from "../../toolboxStore";
 import { useWalletStore } from "../../../lib/walletStore";
 import { ChainTile } from "./ChainTile"

@@ -6,7 +6,7 @@ import ToolHeader from "../components/ToolHeader";
 import { stepGroups, stepList } from "./stepList";
 import { useL1LauncherStore } from "./L1LauncherStore";
 import { Button } from "../components/Button";
-import { ConnectWallet } from "../components/ConnectWallet";
+import { ConnectWallet } from "../components/ConnectWallet/ConnectWallet";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../components/ErrorFallback";
 

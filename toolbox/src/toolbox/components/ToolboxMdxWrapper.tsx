@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorBoundary } from "react-error-boundary";
-import { ConnectWallet } from "../../components/ConnectWallet";
+import { ConnectWallet } from "../../components/ConnectWallet/ConnectWallet";
 import { ErrorFallback } from "../../components/ErrorFallback";
 
 export default function ToolboxMdxWrapper({ children }: { children: React.ReactNode }) {
