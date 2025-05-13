@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useErrorBoundary } from "react-error-boundary"
 
 import { useSelectedL1, useViemChainStore, useCreateChainStore } from "../toolboxStore"
@@ -27,6 +27,7 @@ import { useStepProgress, StepsConfig } from "../hooks/useStepProgress"
 import { setL1ValidatorWeight } from "../../coreViem/methods/setL1ValidatorWeight"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
 import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
+import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
 
 // Define step keys and configuration
 type ChangeWeightStepKey =
@@ -66,6 +67,9 @@ export default function ChangeWeight() {
       contractTotalWeight,
       blockchainId
   } = useValidatorManagerDetails({ subnetId });
+  
+  // Add isContractOwner state
+  const [isContractOwner, setIsContractOwner] = useState<boolean | null>(null)
 
   // --- Intermediate Data State ---
   const [validationIDHex, setValidationIDHex] = useState("")
@@ -98,6 +102,28 @@ export default function ChangeWeight() {
 
   const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
 
+  // Check if the user is the contract owner when validatorManagerAddress changes
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (validatorManagerAddress && publicClient && coreWalletClient) {
+        try {
+          const [account] = await coreWalletClient.requestAddresses()
+          const ownershipValidated = await validateContractOwner(
+            publicClient,
+            validatorManagerAddress as `0x${string}`,
+            account
+          )
+          setIsContractOwner(ownershipValidated)
+        } catch (error) {
+          console.error("Error validating contract ownership:", error)
+          setIsContractOwner(false)
+        }
+      }
+    }
+
+    checkOwnership()
+  }, [validatorManagerAddress, publicClient, coreWalletClient])
+
   const handleChangeWeight = async (startFromStep?: ChangeWeightStepKey) => {
     // Initial Form Validation
     if (!nodeID.trim()) {
@@ -115,6 +141,12 @@ export default function ChangeWeight() {
     }
     if (!validatorManagerAddress) {
       setError("Validator Manager Address is required. Please select a valid L1 subnet.")
+      return
+    }
+    
+    // Check if user is contract owner
+    if (isContractOwner === false) {
+      setError("You are not the owner of this contract. Only the contract owner can change validator weights.")
       return
     }
 
@@ -448,6 +480,15 @@ export default function ChangeWeight() {
           </div>
         )}
 
+        {isContractOwner === false && !error && !isProcessing && (
+          <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
+              <span>You are not the owner of this contract. Only the contract owner can change validator weights.</span>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Input
             id="nodeID"
@@ -525,8 +566,8 @@ export default function ChangeWeight() {
         {!isProcessing && (
           <Button
             onClick={() => handleChangeWeight()}
-            disabled={isProcessing || !nodeID || !weight || !validatorManagerAddress || !!validatorManagerError || isLoadingVMCDetails}
-            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "")}
+            disabled={isProcessing || !nodeID || !weight || !validatorManagerAddress || !!validatorManagerError || isLoadingVMCDetails || isContractOwner === false}
+            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "") || (isContractOwner === false ? "Not the contract owner" : "")}
           >
             {"Change Weight"}
           </Button>

@@ -27,6 +27,7 @@ import {
 } from "../../coreViem/utils/glacier"
 import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
+import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
 
 // Define step keys and configuration for AddValidator
 type AddValidationStepKey =
@@ -68,8 +69,10 @@ export default function AddValidator() {
     const [subnetId, setSubnetId] = useState(selectedL1?.subnetId || "")
     const [validationErrors, setValidationErrors] = useState<{
         insufficientBalance?: boolean,
-        weightTooHigh?: boolean
+        weightTooHigh?: boolean,
+        notContractOwner?: boolean
     }>({})
+    const [isContractOwner, setIsContractOwner] = useState<boolean | null>(null)
 
     const { 
         validatorManagerAddress, 
@@ -219,15 +222,52 @@ export default function AddValidator() {
         }
     }, [contractTotalWeight, totalStake, validators, l1WeightError]);
 
-    // Update the validation function to use the contractTotalWeight
+    // Check if the user is the contract owner when validatorManagerAddress changes
+    useEffect(() => {
+        const checkOwnership = async () => {
+            if (validatorManagerAddress && publicClient && coreWalletClient) {
+                try {
+                    const [account] = await coreWalletClient.requestAddresses()
+                    const ownershipValidated = await validateContractOwner(
+                        publicClient,
+                        validatorManagerAddress as `0x${string}`,
+                        account
+                    )
+                    setIsContractOwner(ownershipValidated)
+                    
+                    if (!ownershipValidated) {
+                        setValidationErrors(prev => ({ ...prev, notContractOwner: true }))
+                    } else {
+                        setValidationErrors(prev => ({ ...prev, notContractOwner: false }))
+                    }
+                } catch (error) {
+                    console.error("Error validating contract ownership:", error)
+                    setIsContractOwner(false)
+                }
+            }
+        }
+
+        checkOwnership()
+    }, [validatorManagerAddress, publicClient, coreWalletClient])
+
+    // Update the validation function to check contract ownership
     const validateInputs = (): boolean => {
         const errors: {
             insufficientBalance?: boolean,
-            weightTooHigh?: boolean
+            weightTooHigh?: boolean,
+            notContractOwner?: boolean
         } = {}
         
         if (validators.length === 0) {
             hookSetError("Please add a validator to continue")
+            return false
+        }
+        
+        // Check if user is contract owner
+        if (isContractOwner === false) {
+            errors.notContractOwner = true
+            hookSetError("You are not the owner of this contract. Only the contract owner can add validators.")
+            setValidationErrors(errors)
             return false
         }
         
@@ -656,6 +696,15 @@ export default function AddValidator() {
                     </div>
                 )}
 
+                {isContractOwner === false && !hookError && (
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-red-700 dark:text-red-300 text-sm">
+                        <div className="flex items-center">
+                            <AlertCircle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
+                            <span>You are not the owner of this contract. Only the contract owner can add validators.</span>
+                        </div>
+                    </div>
+                )}
+
                 <div className="space-y-3">
                     <div className="space-y-1">
                         <SelectSubnetId
@@ -715,8 +764,8 @@ export default function AddValidator() {
                     {!isProcessing && (
                         <Button
                             onClick={() => addValidator()}
-                            disabled={!validatorManagerAddress || !subnetId || validators.length === 0 || !!validatorManagerError || isLoadingVMCDetails}
-                            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "")}
+                            disabled={!validatorManagerAddress || !subnetId || validators.length === 0 || !!validatorManagerError || isLoadingVMCDetails || isContractOwner === false}
+                            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "") || (isContractOwner === false ? "Not the contract owner" : "")}
                             className="mt-4"
                         >
                             Add Validator

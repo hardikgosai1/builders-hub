@@ -5,7 +5,7 @@ import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import { bytesToHex, hexToBytes } from "viem"
 import { networkIDs } from "@avalabs/avalanchejs"
 import { useErrorBoundary } from "react-error-boundary"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { Button } from "../../components/Button"
 import { Container } from "../components/Container"
@@ -23,6 +23,7 @@ import { useStepProgress, StepsConfig } from "../hooks/useStepProgress"
 import { setL1ValidatorWeight } from "../../coreViem/methods/setL1ValidatorWeight"
 import SelectSubnetId from "../components/SelectSubnetId"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
+import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
 
 // Define step keys and configuration
 type RemovalStepKey =
@@ -54,6 +55,7 @@ export default function RemoveValidator() {
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
   const [pChainSignature, setPChainSignature] = useState("")
+  const [isContractOwner, setIsContractOwner] = useState<boolean | null>(null)
 
   const { 
       validatorManagerAddress, 
@@ -81,6 +83,28 @@ export default function RemoveValidator() {
     setError,
   } = useStepProgress<RemovalStepKey>(removalStepsConfig);
 
+  // Check if the user is the contract owner when validatorManagerAddress changes
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (validatorManagerAddress && publicClient && coreWalletClient) {
+        try {
+          const [account] = await coreWalletClient.requestAddresses()
+          const ownershipValidated = await validateContractOwner(
+            publicClient,
+            validatorManagerAddress as `0x${string}`,
+            account
+          )
+          setIsContractOwner(ownershipValidated)
+        } catch (error) {
+          console.error("Error validating contract ownership:", error)
+          setIsContractOwner(false)
+        }
+      }
+    }
+
+    checkOwnership()
+  }, [validatorManagerAddress, publicClient, coreWalletClient])
+
   const handleRemove = async (startFromStep?: RemovalStepKey) => {
     if (!nodeID) {
       setError("Node ID is required")
@@ -89,6 +113,12 @@ export default function RemoveValidator() {
 
     if (!validatorManagerAddress) {
       setError("Validator Manager Address is required. Please select a valid L1 subnet.")
+      return
+    }
+    
+    // Check if user is contract owner
+    if (isContractOwner === false) {
+      setError("You are not the owner of this contract. Only the contract owner can remove validators.")
       return
     }
 
@@ -341,6 +371,15 @@ export default function RemoveValidator() {
           </div>
         )}
 
+        {isContractOwner === false && !error && !isProcessing && (
+          <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
+              <span>You are not the owner of this contract. Only the contract owner can remove validators.</span>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Input
             id="nodeID"
@@ -397,8 +436,8 @@ export default function RemoveValidator() {
         {!isProcessing && (
           <Button
             onClick={() => handleRemove()}
-            disabled={!nodeID || !validatorManagerAddress || isProcessing || !!validatorManagerError || isLoadingVMCDetails}
-            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "")}
+            disabled={!nodeID || !validatorManagerAddress || isProcessing || !!validatorManagerError || isLoadingVMCDetails || isContractOwner === false}
+            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "") || (isContractOwner === false ? "Not the contract owner" : "")}
           >
             {"Remove Validator"}
           </Button>
