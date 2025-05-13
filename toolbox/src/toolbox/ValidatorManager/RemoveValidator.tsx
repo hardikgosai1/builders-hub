@@ -15,7 +15,7 @@ import { cn } from "../../lib/utils"
 import { packL1ValidatorRegistration } from "../../coreViem/utils/convertWarp"
 import { packWarpIntoAccessList } from "./packWarp"
 import { StepIndicator } from "../components/StepIndicator"
-import { useSelectedL1, useViemChainStore } from "../toolboxStore"
+import { useViemChainStore, useCreateChainStore} from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import validatorManagerAbi from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 import { getValidationIdHex } from "../../coreViem/hooks/getValidationID"
@@ -24,6 +24,7 @@ import { setL1ValidatorWeight } from "../../coreViem/methods/setL1ValidatorWeigh
 import SelectSubnetId from "../components/SelectSubnetId"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
 import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
+import { ValidatorManagerDetails } from "../../components/ValidatorManagerDetails"
 
 // Define step keys and configuration
 type RemovalStepKey =
@@ -46,11 +47,12 @@ const removalStepsConfig: StepsConfig<RemovalStepKey> = {
 export default function RemoveValidator() {
   const { showBoundary } = useErrorBoundary()
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
-  const selectedL1 = useSelectedL1()();
   const viemChain = useViemChainStore()
 
+  const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId);
+  const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || "")
+
   const [nodeID, setNodeID] = useState("")
-  const [subnetId, setSubnetId] = useState(selectedL1?.subnetId || "")
   const [validationIDHex, setValidationIDHex] = useState("")
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
@@ -408,29 +410,14 @@ export default function RemoveValidator() {
             value={subnetId}
             onChange={setSubnetId}
             error={validatorManagerError}
+            hidePrimaryNetwork={true}
           />
-          {isLoadingVMCDetails && (
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Loading L1 details...</p>
-          )}
-          {validatorManagerAddress && !isLoadingVMCDetails && (
-            <div className="mt-2 space-y-1">
-              <div>
-                <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Validator Manager Address</div>
-                <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{validatorManagerAddress}</div>
-              </div>
-              {blockchainId && (
-                <div>
-                  <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Blockchain ID</div>
-                  <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{blockchainId}</div>
-                </div>
-              )}
-              {blockchainId && subnetId && blockchainId !== subnetId && (
-                <div className="p-2 mt-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md text-blue-700 dark:text-blue-300 text-xs">
-                  <span>Note: The blockchain ID identifies the blockchain where this L1's validator manager contract is deployed.</span>
-                </div>
-              )}
-            </div>
-          )}
+          <ValidatorManagerDetails
+            validatorManagerAddress={validatorManagerAddress}
+            blockchainId={blockchainId}
+            subnetId={subnetId}
+            isLoading={isLoadingVMCDetails}
+          />
         </div>
 
         {!isProcessing && (

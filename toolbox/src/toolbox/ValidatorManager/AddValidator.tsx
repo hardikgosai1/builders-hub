@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react"
-import { useSelectedL1, useViemChainStore } from "../toolboxStore"
+import { useCreateChainStore, useSelectedL1, useViemChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 import { useErrorBoundary } from "react-error-boundary"
 import { fromBytes, bytesToHex, hexToBytes, Chain } from "viem"
@@ -28,6 +28,7 @@ import {
 import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
 import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
+import { ValidatorManagerDetails } from "../../components/ValidatorManagerDetails"
 
 // Define step keys and configuration for AddValidator
 type AddValidationStepKey =
@@ -66,7 +67,8 @@ export default function AddValidator() {
     const [balance, setBalance] = useState("0")
     const [rawPChainBalanceNavax, setRawPChainBalanceNavax] = useState<bigint | null>(null);
     const [totalStake, setTotalStake] = useState(BigInt(0))
-    const [subnetId, setSubnetId] = useState(selectedL1?.subnetId || "")
+    const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId);
+    const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || "")
     const [validationErrors, setValidationErrors] = useState<{
         insufficientBalance?: boolean,
         weightTooHigh?: boolean,
@@ -115,51 +117,30 @@ export default function AddValidator() {
     useEffect(() => {
         // Use a ref to track if the component is mounted
         const isMounted = { current: true };
-        // Simple cache to store recent API results
-        const cache: {
-            balance?: { timestamp: number; value: string; rawValue: bigint };
-            stake?: { timestamp: number; value: bigint };
-        } = {};
         
         const fetchBalanceAndStake = async () => {
             if (!pChainAddress) return;
             
             try {
-                // Check if we have cached data and it's recent (less than 10 seconds old)
-                const now = Date.now();
-                let shouldFetchBalance = !cache.balance || (now - cache.balance.timestamp > 10000);
-                let shouldFetchStake = !cache.stake || (now - cache.stake.timestamp > 10000);
-                
                 // Fetch P-Chain balance using the utility function
-                if (shouldFetchBalance) {
-                    try {
-                        const balanceValue = await getPChainBalance(coreWalletClient);
-                        
-                        if (isMounted.current) {
-                            const formattedBalance = formatAvaxBalance(balanceValue);
-                            setBalance(formattedBalance);
-                            setRawPChainBalanceNavax(balanceValue);
-                            // Cache the result
-                            cache.balance = { timestamp: now, value: formattedBalance, rawValue: balanceValue };
-                        }
-                    } catch (balanceError) {
-                        console.error("Error fetching balance:", balanceError);
-                        // If we get a rate limit error, use cached data if available
-                        if (cache.balance) {
-                            setBalance(cache.balance.value);
-                            setRawPChainBalanceNavax(cache.balance.rawValue);
-                        }
-                    }
+                try {
+                    const balanceValue = await getPChainBalance(coreWalletClient);
                     
-                    // Add a small delay between requests to avoid rate limiting
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else if (cache.balance) {
-                    setBalance(cache.balance.value);
-                    setRawPChainBalanceNavax(cache.balance.rawValue);
+                    if (isMounted.current) {
+                        const formattedBalance = formatAvaxBalance(balanceValue);
+                        setBalance(formattedBalance);
+                        setRawPChainBalanceNavax(balanceValue);
+                    }
+                } catch (balanceError) {
+                    // Handle balance fetch error
+                    console.error("Error fetching balance:", balanceError);
                 }
                 
-                // Fetch total stake only if needed and if subnet ID is available
-                if (shouldFetchStake && subnetId && subnetId !== "11111111111111111111111111111111LpoYY") {
+                // Add a small delay between requests to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Fetch total stake only if subnet ID is available
+                if (subnetId && subnetId !== "11111111111111111111111111111111LpoYY") {
                     try {
                         // Use a longer timeout for stake-related requests
                         const controller = new AbortController();
@@ -181,21 +162,13 @@ export default function AddValidator() {
                             ) || BigInt(0);
                             
                             setTotalStake(total);
-                            // Cache the result
-                            cache.stake = { timestamp: now, value: total };
                         }
                     } catch (stakeError) {
                         console.error("Error fetching stake:", stakeError);
-                        // If we get a rate limit error, use cached data if available
-                        if (cache.stake) {
-                            setTotalStake(cache.stake.value);
-                        }
                     }
-                } else if (cache.stake) {
-                    setTotalStake(cache.stake.value);
                 }
             } catch (error) {
-                console.error("Error in fetchBalanceAndStake:", error);
+                throw new Error("Error fetching balance or stake: " + error)
             }
         };
         
@@ -212,13 +185,17 @@ export default function AddValidator() {
     useEffect(() => {
         if (contractTotalWeight > 0n && validators.length > 0) {
             const validatorWeightBigInt = BigInt(validators[0].validatorWeight.toString());
-            const { percentage } = validateStakePercentage(contractTotalWeight, validatorWeightBigInt);
-            console.log(`Calculated stake percentage: ${percentage.toFixed(2)}% using contract total weight: ${contractTotalWeight}`);
+            // For a new validator, currentWeight is 0n. validateStakePercentage will calculate
+            // newValidatorWeight / totalL1StakeBeforeChange.
+            const { percentageChange } = validateStakePercentage(contractTotalWeight, validatorWeightBigInt, 0n);
+            console.log(`New validator's weight as percentage of current L1 stake: ${percentageChange.toFixed(2)}% (Contract total: ${contractTotalWeight}, New validator weight: ${validatorWeightBigInt})`);
         } else if (totalStake > 0n && validators.length > 0 && contractTotalWeight === 0n && !l1WeightError) {
             // Fallback to P-Chain totalStake for percentage calculation if contract weight is 0 and no specific L1 error
             const validatorWeightBigInt = BigInt(validators[0].validatorWeight.toString());
+            // This fallback calculates newValidatorWeight / (PChainTotalStake + newValidatorWeight)
+            // This is a different calculation than the primary one above.
             const weightPercentage = (Number(validatorWeightBigInt * 100n) / Number(totalStake + validatorWeightBigInt));
-            console.log(`Calculated stake percentage: ${weightPercentage.toFixed(2)}% using P-Chain total stake as fallback.`);
+            console.log(`Calculated stake percentage using P-Chain total stake (fallback): ${weightPercentage.toFixed(2)}%`);
         }
     }, [contractTotalWeight, totalStake, validators, l1WeightError]);
 
@@ -241,7 +218,6 @@ export default function AddValidator() {
                         setValidationErrors(prev => ({ ...prev, notContractOwner: false }))
                     }
                 } catch (error) {
-                    console.error("Error validating contract ownership:", error)
                     setIsContractOwner(false)
                 }
             }
@@ -292,14 +268,17 @@ export default function AddValidator() {
             // Ensure validator weight is treated as BigInt
             const validatorWeightBigInt = BigInt(validator.validatorWeight.toString())
             
-            const { percentage, exceedsMaximum } = validateStakePercentage(
+            // For a new validator, its currentWeight is 0n.
+            // percentageChange will be: newValidatorWeight / contractTotalWeight (current L1 total)
+            const { percentageChange, exceedsMaximum } = validateStakePercentage(
                 contractTotalWeight,
-                validatorWeightBigInt
+                validatorWeightBigInt,
+                0n // currentWeightOfValidatorToChange is 0 for a new validator
             )
             
             if (exceedsMaximum) {
                 errors.weightTooHigh = true
-                hookSetError(`Validator weight must be less than 20% of total L1 weight (currently ${percentage.toFixed(2)}%).`)
+                hookSetError(`The new validator's proposed weight (${validator.validatorWeight}) represents ${percentageChange.toFixed(2)}% of the current total L1 stake (${contractTotalWeight}). This must be less than 20%.`)
                 setValidationErrors(errors)
                 return false
             }
@@ -379,7 +358,6 @@ export default function AddValidator() {
                         throw new Error(`Please connect to chain ID ${expectedChainIdForValidator} to use this L1's Validator Manager`)
                     }
                 } catch (chainError) {
-                    console.error("Chain verification error:", chainError)
                     throw new Error("Failed to verify connected chain. Please ensure your wallet is connected to the correct network.")
                 }
             }
@@ -433,9 +411,7 @@ export default function AddValidator() {
                         localValidationIdHex = receipt.logs[1].topics[1] ?? "";
                         console.log("Setting warp message:", localUnsignedWarpMsg.substring(0, 20) + "...")
                         console.log("Setting validationID:", localValidationIdHex)
-                    } catch (txError) {
-                        console.error("Transaction failed:", txError)
-                        
+                    } catch (txError) {                        
                         // Attempt to get existing validation ID
                         try {
                             const validationIDResult = await getValidationIdHex(
@@ -490,7 +466,6 @@ export default function AddValidator() {
                     
                     updateStepStatus("initializeRegistration", "success")
                 } catch (error: any) {
-                    console.error("Error during validation initialization:", error)
                     updateStepStatus("initializeRegistration", "error", error.message)
                     return
                 }
@@ -711,29 +686,14 @@ export default function AddValidator() {
                             value={subnetId}
                             onChange={setSubnetId}
                             error={validatorManagerError}
+                            hidePrimaryNetwork={true}
                         />
-                        {isLoadingVMCDetails && (
-                             <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Loading L1 details...</p>
-                        )}
-                        {validatorManagerAddress && !isLoadingVMCDetails && (
-                            <div className="mt-2 space-y-1">
-                                <div>
-                                    <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Validator Manager Address</div>
-                                    <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{validatorManagerAddress}</div>
-                                </div>
-                                {blockchainId && (
-                                    <div>
-                                        <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Blockchain ID</div>
-                                        <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{blockchainId}</div>
-                                    </div>
-                                )}
-                                {blockchainId && subnetId && blockchainId !== subnetId && (
-                                    <div className="p-2 mt-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md text-blue-700 dark:text-blue-300 text-xs">
-                                        <span>Note: The blockchain ID identifies the blockchain where this L1's validator manager contract is deployed.</span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        <ValidatorManagerDetails
+                            validatorManagerAddress={validatorManagerAddress}
+                            blockchainId={blockchainId}
+                            subnetId={subnetId}
+                            isLoading={isLoadingVMCDetails}
+                        />
                     </div>
 
                     <div className="mt-4">

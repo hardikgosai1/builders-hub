@@ -12,6 +12,7 @@ import { Button } from "../../components/Button"
 import { StepIndicator } from "../components/StepIndicator"
 import { AlertCircle, CheckCircle } from "lucide-react"
 import SelectSubnetId from "../components/SelectSubnetId"
+import { ValidatorManagerDetails } from "../../components/ValidatorManagerDetails"
 
 import { cn } from "../../lib/utils"
 import { bytesToHex, hexToBytes } from "viem"
@@ -28,6 +29,7 @@ import { setL1ValidatorWeight } from "../../coreViem/methods/setL1ValidatorWeigh
 import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
 import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
 import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
+import { getValidatorWeight } from "../../coreViem/hooks/getValidatorWeight"
 
 // Define step keys and configuration
 type ChangeWeightStepKey =
@@ -52,13 +54,12 @@ export default function ChangeWeight() {
 
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
   const viemChain = useViemChainStore()
-  const selectedL1 = useSelectedL1()()
   const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId)
 
   // --- Form Input State ---
   const [nodeID, setNodeID] = useState("")
   const [weight, setWeight] = useState("")
-  const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || selectedL1?.subnetId || "")
+  const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || "")
   const { 
       validatorManagerAddress, 
       signingSubnetId, 
@@ -76,6 +77,7 @@ export default function ChangeWeight() {
   const [unsignedWarpMessage, setUnsignedWarpMessage] = useState("")
   const [signedWarpMessage, setSignedWarpMessage] = useState("")
   const [pChainSignature, setPChainSignature] = useState("")
+  const [currentValidatorWeight, setCurrentValidatorWeight] = useState<bigint | null>(null)
   const [eventData, setEventData] = useState<{
     validationID: `0x${string}`;
     nonce: bigint;
@@ -150,18 +152,54 @@ export default function ChangeWeight() {
       return
     }
 
-    if (contractTotalWeight > 0n) {
-      const weightBigInt = BigInt(weight)
-      const validationDetails = validateStakePercentage(
-        contractTotalWeight,
-        weightBigInt
-      );
+    // Get the validation ID and current weight before validating the percentage
+    let validatorValidationID: string | null = null;
+    let validatorCurrentWeight: bigint | null = null;
+    
+    try {
+      // Only do this preflight check if we're starting fresh
+      if (!startFromStep) {
+        validatorValidationID = await getValidationIdHex(publicClient, validatorManagerAddress as `0x${string}`, nodeID) as string;
+        
+        if (validatorValidationID) {
+          validatorCurrentWeight = await getValidatorWeight(
+            publicClient, 
+            validatorManagerAddress as `0x${string}`, 
+            validatorValidationID
+          );
+          
+          // Log these values to understand what's happening
+          console.log("Pre-flight Check: contractTotalWeight", contractTotalWeight);
+          console.log("Pre-flight Check: validatorCurrentWeight", validatorCurrentWeight);
+          console.log("Pre-flight Check: new weight (BigInt)", BigInt(weight));
 
-      if (validationDetails.exceedsMaximum) {
-        const errorMessage = `Proposed weight (${weight}) would be ${validationDetails.percentage.toFixed(2)}% of total L1 stake. It must be less than 20%.`;
-        setError(errorMessage);
-        return;
+          if (contractTotalWeight > 0n) {
+            const weightBigInt = BigInt(weight)
+            const validationDetails = validateStakePercentage(
+              contractTotalWeight,
+              weightBigInt,
+              validatorCurrentWeight || 0n
+            );
+    
+            // Log validationDetails
+            console.log("Pre-flight Check: validationDetails", validationDetails);
+
+            if (validationDetails.exceedsMaximum) {
+              const weightAdjustment = weightBigInt > (validatorCurrentWeight || 0n) 
+                ? weightBigInt - (validatorCurrentWeight || 0n) 
+                : (validatorCurrentWeight || 0n) - weightBigInt;
+              const currentWeightDisplay = validatorCurrentWeight?.toString() || "0";
+              const errorMessage = `The proposed weight change from ${currentWeightDisplay} to ${weight} (an adjustment of ${weightAdjustment}) represents ${validationDetails.percentageChange.toFixed(2)}% of the current total L1 stake (${contractTotalWeight}). This adjustment percentage must be less than 20%.`;
+              setError(errorMessage);
+              return;
+            }
+          }
+        }
       }
+    } catch (error: any) {
+      console.error("Error in preflight validation checks:", error);
+      setError(`Validation pre-check failed: ${error.message || String(error)}`);
+      return; // Stop processing if pre-flight check itself fails
     }
 
     // Start processing if it's a fresh run
@@ -170,7 +208,7 @@ export default function ChangeWeight() {
     }
 
     // Local variables for synchronous data passing
-    let localValidationID = startFromStep ? validationIDHex : "";
+    let localValidationID = startFromStep ? validationIDHex : validatorValidationID || "";
     let localUnsignedWarpMessage = startFromStep ? unsignedWarpMessage : "";
     let localSignedMessage = startFromStep ? signedWarpMessage : "";
     let localPChainSignature = startFromStep ? pChainSignature : "";
@@ -186,6 +224,18 @@ export default function ChangeWeight() {
           setValidationIDHex(validationIDResult as string)
           localValidationID = validationIDResult as string;
           console.log("ValidationID:", validationIDResult)
+          
+          // Get current validator weight if validation ID exists
+          if (validationIDResult) {
+            const currentWeight = await getValidatorWeight(
+              publicClient, 
+              validatorManagerAddress as `0x${string}`, 
+              validationIDResult as string
+            );
+            setCurrentValidatorWeight(currentWeight);
+            console.log("Current validator weight:", currentWeight);
+          }
+            
           updateStepStatus("getValidationID", "success")
         } catch (error: any) {
           updateStepStatus("getValidationID", "error", error.message)
@@ -538,29 +588,14 @@ export default function ChangeWeight() {
             value={subnetId}
             onChange={setSubnetId}
             error={validatorManagerError}
+            hidePrimaryNetwork={true}
           />
-          {isLoadingVMCDetails && (
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Loading L1 details...</p>
-          )}
-          {validatorManagerAddress && !isLoadingVMCDetails && (
-            <div className="mt-2 space-y-1">
-              <div>
-                <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Validator Manager Address</div>
-                <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{validatorManagerAddress}</div>
-              </div>
-              {blockchainId && (
-                <div>
-                  <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Blockchain ID</div>
-                  <div className="font-mono text-xs text-zinc-800 dark:text-zinc-200 truncate">{blockchainId}</div>
-                </div>
-              )}
-              {blockchainId && subnetId && blockchainId !== subnetId && (
-                <div className="p-2 mt-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md text-blue-700 dark:text-blue-300 text-xs">
-                  <span>Note: The blockchain ID identifies the blockchain where this L1's validator manager contract is deployed.</span>
-                </div>
-              )}
-            </div>
-          )}
+          <ValidatorManagerDetails
+            validatorManagerAddress={validatorManagerAddress}
+            blockchainId={blockchainId}
+            subnetId={subnetId}
+            isLoading={isLoadingVMCDetails}
+          />
         </div>
 
         {!isProcessing && (
@@ -579,7 +614,15 @@ export default function ChangeWeight() {
               <h3 className="font-medium text-sm text-zinc-800 dark:text-zinc-200">Change Weight Progress</h3>
               {isProcessComplete && (
                 <button
-                  onClick={resetSteps}
+                  onClick={() => {
+                    resetSteps();
+                    setNodeID("");
+                    setWeight("");
+                    setCurrentValidatorWeight(null);
+                    setValidationIDHex("");
+                    // Optionally reset subnetId if it shouldn't persist
+                    // setSubnetId(createChainStoreSubnetId || selectedL1?.subnetId || ""); 
+                  }}
                   className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 rounded transition-colors"
                 >
                   Start New Change
