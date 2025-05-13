@@ -21,11 +21,9 @@ async function defaultIdentifier(req: NextRequest): Promise<string> {
   try {
     const session = await import('@/lib/auth/authSession').then(mod => mod.getAuthSession());
     const userId = session?.user?.id || 'anonymous';
-    console.log("logging id now"); //check
     return userId;
   } catch (authError) {
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    console.log("using  now");
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
     return ip;
   }
 }
