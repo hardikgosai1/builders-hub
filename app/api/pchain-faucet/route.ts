@@ -86,12 +86,12 @@ async function handleFaucetRequest(request: NextRequest): Promise<NextResponse> 
       );
     }
     
-    /*if (destinationAddress === FAUCET_P_CHAIN_ADDRESS) {
+    if (destinationAddress === FAUCET_P_CHAIN_ADDRESS) {
       return NextResponse.json(
         { success: false, message: 'Cannot send tokens to the faucet address' },
         { status: 400 }
       );
-    }*/
+    }
     
     const tx = await transferPToP(
       SERVER_PRIVATE_KEY,
