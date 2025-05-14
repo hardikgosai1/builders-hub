@@ -17,15 +17,14 @@ import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20
 import SelectChainID from "../components/SelectChainID";
 import { CheckPrecompile } from "../components/CheckPrecompile";
 import { Container } from "../components/Container";
-
+import TeleporterRegistryAddressInput from "../components/TeleporterRegistryAddressInput";
 export default function DeployNativeTokenRemote() {
     const { showBoundary } = useErrorBoundary();
     const {
-        teleporterRegistryAddress,
-        setTeleporterRegistryAddress,
         nativeTokenRemoteAddress,
         setNativeTokenRemoteAddress,
     } = useToolboxStore();
+    const [teleporterRegistryAddress, setTeleporterRegistryAddress] = useState("");
     const { coreWalletClient, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
     const selectedL1 = useSelectedL1()();
@@ -195,8 +194,7 @@ export default function DeployNativeTokenRemote() {
                     </p>
                 </div>
 
-                <EVMAddressInput
-                    label="Teleporter Registry Address"
+                <TeleporterRegistryAddressInput
                     value={teleporterRegistryAddress}
                     onChange={setTeleporterRegistryAddress}
                     disabled={isDeploying}

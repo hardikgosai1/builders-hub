@@ -304,15 +304,14 @@ export default function AvalanchegoDocker() {
                             </Step>
                             {nodeRunningMode === "server" && (<Step>
                                 <h3 className="text-xl font-bold mb-4">Port Configuration</h3>
-                                <p>Make sure the following port{isRPC && 's'} are open:
-                                    <ul>
-                                        {isRPC && <>
-                                            <li><strong>443</strong> (for the Reverse Proxy)</li>
-                                            <li><strong>9650</strong> (for the RPC endpoint)</li>
-                                        </>}
-                                        <li><strong>9651</strong> (for the node-to-node communication)</li>
-                                    </ul>
-                                </p>
+                                <p>Make sure the following port{isRPC && 's'} are open:</p>
+                                <ul>
+                                    {isRPC && <>
+                                        <li><strong>443</strong> (for the Reverse Proxy)</li>
+                                        <li><strong>9650</strong> (for the RPC endpoint)</li>
+                                    </>}
+                                    <li><strong>9651</strong> (for the node-to-node communication)</li>
+                                </ul>
                             </Step>)}
                             <Step>
                                 <h3 className="text-xl font-bold">Start AvalancheGo Node</h3>

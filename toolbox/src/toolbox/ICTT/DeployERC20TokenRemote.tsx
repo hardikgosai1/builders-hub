@@ -16,13 +16,11 @@ import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20To
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json";
 import SelectChainID from "../components/SelectChainID";
 import { Container } from "../components/Container";
-
+import TeleporterRegistryAddressInput from "../components/TeleporterRegistryAddressInput";
 
 export default function DeployERC20TokenRemote() {
     const { showBoundary } = useErrorBoundary();
     const {
-        teleporterRegistryAddress,
-        setTeleporterRegistryAddress,
         erc20TokenRemoteAddress,
         setErc20TokenRemoteAddress,
     } = useToolboxStore();
@@ -38,6 +36,7 @@ export default function DeployERC20TokenRemote() {
     const [tokenDecimals, setTokenDecimals] = useState("0");
     const [minTeleporterVersion, setMinTeleporterVersion] = useState("1");
     const [tokenHomeAddress, setTokenHomeAddress] = useState("");
+    const [teleporterRegistryAddress, setTeleporterRegistryAddress] = useState("");
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
     const sourceToolboxStore = getToolboxStore(sourceChainId)();
@@ -185,97 +184,96 @@ export default function DeployERC20TokenRemote() {
                 </p>
             </div>
 
-                <EVMAddressInput
-                    label="Teleporter Registry Address"
-                    value={teleporterRegistryAddress}
-                    onChange={setTeleporterRegistryAddress}
-                    disabled={isDeploying}
-                />
+            <TeleporterRegistryAddressInput
+                value={teleporterRegistryAddress}
+                onChange={setTeleporterRegistryAddress}
+                disabled={isDeploying}
+            />
 
-                {!teleporterRegistryAddress && <Note variant="warning">
-                    <p>
-                        Please <a href="#teleporterRegistry" className="text-blue-500">deploy the Teleporter Registry contract first</a>.
-                    </p>
-                </Note>}
+            {!teleporterRegistryAddress && <Note variant="warning">
+                <p>
+                    Please <a href="#teleporterRegistry" className="text-blue-500">deploy the Teleporter Registry contract first</a>.
+                </p>
+            </Note>}
 
-                <SelectChainID
-                    label="Source Chain (where token home is deployed)"
-                    value={sourceChainId}
-                    onChange={(value) => setSourceChainId(value)}
-                    error={sourceChainError}
-                />
+            <SelectChainID
+                label="Source Chain (where token home is deployed)"
+                value={sourceChainId}
+                onChange={(value) => setSourceChainId(value)}
+                error={sourceChainError}
+            />
 
-                {sourceChainId && <EVMAddressInput
-                    label={`Token Home Address on ${sourceL1?.name}`}
-                    value={tokenHomeAddress}
-                    onChange={setTokenHomeAddress}
-                    disabled={true}
-                    helperText={!sourceToolboxStore.erc20TokenHomeAddress ? `Please deploy the Token Home contract on ${sourceL1?.name} first` : undefined}
-                />}
+            {sourceChainId && <EVMAddressInput
+                label={`Token Home Address on ${sourceL1?.name}`}
+                value={tokenHomeAddress}
+                onChange={setTokenHomeAddress}
+                disabled={true}
+                helperText={!sourceToolboxStore.erc20TokenHomeAddress ? `Please deploy the Token Home contract on ${sourceL1?.name} first` : undefined}
+            />}
 
-                {tokenHomeBlockchainIDHex && <Input
-                    label="Token Home Blockchain ID (hex)"
-                    value={tokenHomeBlockchainIDHex}
+            {tokenHomeBlockchainIDHex && <Input
+                label="Token Home Blockchain ID (hex)"
+                value={tokenHomeBlockchainIDHex}
+                disabled
+            />}
+
+            {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input
+                    label="Token Name"
+                    value={tokenName}
                     disabled
-                />}
-
-                {localError && <div className="text-red-500 mt-2 p-2 border border-red-300 rounded">{localError}</div>}
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input
-                        label="Token Name"
-                        value={tokenName}
-                        disabled
-                    />
-
-                    <Input
-                        label="Token Symbol"
-                        value={tokenSymbol}
-                        disabled
-                    />
-
-                    <Input
-                        label="Token Decimals"
-                        value={tokenDecimals}
-                        disabled
-                    />
-                </div>
-
-                <EVMAddressInput
-                    label="Teleporter Manager Address"
-                    value={teleporterManager}
-                    onChange={setTeleporterManager}
-                    disabled={isDeploying}
                 />
 
                 <Input
-                    label="Min Teleporter Version"
-                    value={minTeleporterVersion}
-                    onChange={setMinTeleporterVersion}
-                    type="number"
-                    required
+                    label="Token Symbol"
+                    value={tokenSymbol}
+                    disabled
                 />
 
-                <Success
-                    label={`ERC20 Token Remote Address (on ${selectedL1?.name})`}
-                    value={erc20TokenRemoteAddress || ""}
+                <Input
+                    label="Token Decimals"
+                    value={tokenDecimals}
+                    disabled
                 />
+            </div>
 
-                <Button
-                    variant={erc20TokenRemoteAddress ? "secondary" : "primary"}
-                    onClick={handleDeploy}
-                    loading={isDeploying}
-                    disabled={isDeploying ||
-                        !sourceToolboxStore.erc20TokenHomeAddress ||
-                        !tokenHomeBlockchainIDHex ||
-                        tokenDecimals === "0" ||
-                        !tokenName ||
-                        !tokenSymbol ||
-                        !teleporterRegistryAddress ||
-                        !!sourceChainError}
-                >
-                    {erc20TokenRemoteAddress ? "Re-Deploy ERC20 Token Remote" : "Deploy ERC20 Token Remote"}
-                </Button>
+            <EVMAddressInput
+                label="Teleporter Manager Address"
+                value={teleporterManager}
+                onChange={setTeleporterManager}
+                disabled={isDeploying}
+            />
+
+            <Input
+                label="Min Teleporter Version"
+                value={minTeleporterVersion}
+                onChange={setMinTeleporterVersion}
+                type="number"
+                required
+            />
+
+            <Success
+                label={`ERC20 Token Remote Address (on ${selectedL1?.name})`}
+                value={erc20TokenRemoteAddress || ""}
+            />
+
+            <Button
+                variant={erc20TokenRemoteAddress ? "secondary" : "primary"}
+                onClick={handleDeploy}
+                loading={isDeploying}
+                disabled={isDeploying ||
+                    !sourceToolboxStore.erc20TokenHomeAddress ||
+                    !tokenHomeBlockchainIDHex ||
+                    tokenDecimals === "0" ||
+                    !tokenName ||
+                    !tokenSymbol ||
+                    !teleporterRegistryAddress ||
+                    !!sourceChainError}
+            >
+                {erc20TokenRemoteAddress ? "Re-Deploy ERC20 Token Remote" : "Deploy ERC20 Token Remote"}
+            </Button>
         </Container>
     );
 } 

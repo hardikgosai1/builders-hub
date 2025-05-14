@@ -22,6 +22,7 @@ interface AddChainModalProps {
         subnetId: string;
         validatorManagerAddress: string;
         logoUrl: string;
+        wellKnownTeleporterRegistryAddress?: string;
     }) => void;
     allowLookup?: boolean;
     fixedRPCUrl?: string;

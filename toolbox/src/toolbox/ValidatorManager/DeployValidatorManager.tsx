@@ -107,28 +107,26 @@ export default function DeployValidatorContracts() {
             title="Deploy Validator Contracts"
             description="Deploy the ValidatorMessages library and ValidatorManager contract to the EVM network."
         >
-            <div className="space-y-8">
+            <div className="space-y-4">
                 <Steps>
                     <Step>
-                        <div className="p-6 border rounded-lg">
-                            <h3 className="text-xl font-bold mb-6">Deploy Validator Messages Library</h3>
-                            <div className="mb-6">
+                        <div className="p-4 border rounded-lg">
+                            <h3 className="text-lg font-bold mb-2">Deploy Validator Messages Library</h3>
+                            <div className="mb-3 text-sm">
                                 This will deploy the <code>ValidatorMessages</code> contract to the EVM network <code>{viemChain?.id}</code>. <code>ValidatorMessages</code> is a library required by the <code>ValidatorManager</code> family of contracts.
                             </div>
-                            <div className="mb-8">
-                                <Button
-                                    variant="primary"
-                                    onClick={deployValidatorMessages}
-                                    loading={isDeployingMessages}
-                                    disabled={isDeployingMessages || !!validatorMessagesLibAddress}
-                                    className="mt-4"
-                                >
-                                    Deploy Library
-                                </Button>
-                            </div>
+                            <Button
+                                variant="primary"
+                                onClick={deployValidatorMessages}
+                                loading={isDeployingMessages}
+                                disabled={isDeployingMessages || !!validatorMessagesLibAddress}
+                                className="mt-1"
+                            >
+                                Deploy Library
+                            </Button>
                             
                             {validatorMessagesLibAddress && (
-                                <div className="mt-10 pt-6 border-t">
+                                <div className="mt-3 pt-3 border-t">
                                     <ResultField
                                         label="ValidatorMessages Library Address"
                                         value={validatorMessagesLibAddress}
@@ -140,28 +138,24 @@ export default function DeployValidatorContracts() {
                     </Step>
 
                     <Step>
-                        <div className="p-6 border rounded-lg mt-8">
-                            <h3 className="text-xl font-bold mb-6">Deploy Validator Manager Contract</h3>
-                            <div className="mb-6">
+                        <div className="p-4 border rounded-lg mt-4">
+                            <h3 className="text-lg font-bold mb-2">Deploy Validator Manager Contract</h3>
+                            <div className="mb-2 text-sm">
                                 This will deploy the <code>ValidatorManager</code> contract to the EVM network <code>{viemChain?.id}</code>.
-                            </div>
-                            <div className="mb-6">
                                 The contract requires the <code>ValidatorMessages</code> library at address: <code>{validatorMessagesLibAddress || "Not deployed"}</code>
                             </div>
-                            <div className="mb-8">
-                                <Button
-                                    variant="primary"
-                                    onClick={deployValidatorManager}
-                                    loading={isDeployingManager}
-                                    disabled={isDeployingManager || !validatorMessagesLibAddress || !!validatorManagerAddress}
-                                    className="mt-4"
-                                >
-                                    Deploy Manager Contract
-                                </Button>
-                            </div>
+                            <Button
+                                variant="primary"
+                                onClick={deployValidatorManager}
+                                loading={isDeployingManager}
+                                disabled={isDeployingManager || !validatorMessagesLibAddress || !!validatorManagerAddress}
+                                className="mt-1"
+                            >
+                                Deploy Manager Contract
+                            </Button>
                             
                             {validatorManagerAddress && (
-                                <div className="mt-10 pt-6 border-t">
+                                <div className="mt-3 pt-3 border-t">
                                     <ResultField
                                         label="ValidatorManager Address"
                                         value={validatorManagerAddress}

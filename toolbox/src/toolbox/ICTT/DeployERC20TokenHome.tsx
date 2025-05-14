@@ -13,17 +13,14 @@ import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20
 import { createPublicClient, http } from "viem";
 import { Note } from "../../components/Note";
 import { Container } from "../components/Container";
-
+import TeleporterRegistryAddressInput from "../components/TeleporterRegistryAddressInput";
 
 export default function DeployERC20TokenHome() {
     const { showBoundary } = useErrorBoundary();
     const {
-        teleporterRegistryAddress,
         exampleErc20Address,
         setErc20TokenHomeAddress,
-        erc20TokenHomeAddress,
-        setTeleporterRegistryAddress
-    } = useToolboxStore();
+        erc20TokenHomeAddress } = useToolboxStore();
     const { coreWalletClient, walletEVMAddress, walletChainId } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
@@ -33,6 +30,8 @@ export default function DeployERC20TokenHome() {
     const [tokenDecimals, setTokenDecimals] = useState("0");
     const [localError, setLocalError] = useState("");
     const [deployError, setDeployError] = useState("");
+    const [teleporterRegistryAddress, setTeleporterRegistryAddress] = useState("");//local, not in store
+
 
     const [initTokenAddressRan, setInitTokenAddressRan] = useState(false);
     useEffect(() => {
@@ -121,6 +120,8 @@ export default function DeployERC20TokenHome() {
         }
     }
 
+
+
     return (
         <Container
             title="Deploy ERC20 Token Home Contract"
@@ -137,12 +138,10 @@ export default function DeployERC20TokenHome() {
             {localError && <div className="text-red-500">{localError}</div>}
             {deployError && <div className="text-red-500 mt-2">{deployError}</div>}
 
-            <EVMAddressInput
-                label="Teleporter Registry Address"
+            <TeleporterRegistryAddressInput
                 value={teleporterRegistryAddress}
                 onChange={setTeleporterRegistryAddress}
                 disabled={isDeploying}
-
             />
 
             {!teleporterRegistryAddress && <Note variant="warning" className="px-2 py-1">

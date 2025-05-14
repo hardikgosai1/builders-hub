@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useErrorBoundary } from "react-error-boundary"
 
-import { useSelectedL1, useViemChainStore, useCreateChainStore } from "../toolboxStore"
+import { useViemChainStore, useCreateChainStore } from "../toolboxStore"
 import { useWalletStore } from "../../lib/walletStore"
 
 import { Container } from "../components/Container"
@@ -12,7 +12,7 @@ import { Button } from "../../components/Button"
 import { StepIndicator } from "../components/StepIndicator"
 import { AlertCircle, CheckCircle } from "lucide-react"
 import SelectSubnetId from "../components/SelectSubnetId"
-import { EVMAddressInput } from "../components/EVMAddressInput"
+import { ValidatorManagerDetails } from "../../components/ValidatorManagerDetails"
 
 import { cn } from "../../lib/utils"
 import { bytesToHex, hexToBytes } from "viem"
@@ -26,6 +26,10 @@ import { packWarpIntoAccessList } from "./packWarp"
 import { getValidationIdHex } from "../../coreViem/hooks/getValidationID"
 import { useStepProgress, StepsConfig } from "../hooks/useStepProgress"
 import { setL1ValidatorWeight } from "../../coreViem/methods/setL1ValidatorWeight"
+import { useValidatorManagerDetails } from "../hooks/useValidatorManagerDetails"
+import { validateStakePercentage } from "../../coreViem/hooks/getTotalStake"
+import { validateContractOwner } from "../../coreViem/hooks/validateContractOwner"
+import { getValidatorWeight } from "../../coreViem/hooks/getValidatorWeight"
 
 // Define step keys and configuration
 type ChangeWeightStepKey =
@@ -50,14 +54,23 @@ export default function ChangeWeight() {
 
   const { coreWalletClient, pChainAddress, avalancheNetworkID, publicClient } = useWalletStore()
   const viemChain = useViemChainStore()
-  const selectedL1 = useSelectedL1()()
   const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId)
 
   // --- Form Input State ---
   const [nodeID, setNodeID] = useState("")
   const [weight, setWeight] = useState("")
-  const [manualProxyAddress, setManualProxyAddress] = useState(selectedL1?.validatorManagerAddress || "")
-  const [currentSubnetId, setCurrentSubnetId] = useState(createChainStoreSubnetId || selectedL1?.subnetId || "")
+  const [subnetId, setSubnetId] = useState(createChainStoreSubnetId || "")
+  const { 
+      validatorManagerAddress, 
+      signingSubnetId, 
+      error: validatorManagerError, 
+      isLoading: isLoadingVMCDetails,
+      contractTotalWeight,
+      blockchainId
+  } = useValidatorManagerDetails({ subnetId });
+  
+  // Add isContractOwner state
+  const [isContractOwner, setIsContractOwner] = useState<boolean | null>(null)
 
   // --- Intermediate Data State ---
   const [validationIDHex, setValidationIDHex] = useState("")
@@ -90,6 +103,27 @@ export default function ChangeWeight() {
 
   const networkName = avalancheNetworkID === networkIDs.MainnetID ? "mainnet" : "fuji"
 
+  // Check if the user is the contract owner when validatorManagerAddress changes
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (validatorManagerAddress && publicClient && coreWalletClient) {
+        try {
+          const [account] = await coreWalletClient.requestAddresses()
+          const ownershipValidated = await validateContractOwner(
+            publicClient,
+            validatorManagerAddress as `0x${string}`,
+            account
+          )
+          setIsContractOwner(ownershipValidated)
+        } catch (error) {
+          setIsContractOwner(false)
+        }
+      }
+    }
+
+    checkOwnership()
+  }, [validatorManagerAddress, publicClient, coreWalletClient])
+
   const handleChangeWeight = async (startFromStep?: ChangeWeightStepKey) => {
     // Initial Form Validation
     if (!nodeID.trim()) {
@@ -105,6 +139,65 @@ export default function ChangeWeight() {
       setError("Weight must be a positive number")
       return
     }
+    if (!validatorManagerAddress) {
+      setError("Validator Manager Address is required. Please select a valid L1 subnet.")
+      return
+    }
+    
+    // Check if user is contract owner
+    if (isContractOwner === false) {
+      setError("You are not the owner of this contract. Only the contract owner can change validator weights.")
+      return
+    }
+
+    // Get the validation ID and current weight before validating the percentage
+    let validatorValidationID: string | null = null;
+    let validatorCurrentWeight: bigint | null = null;
+    
+    try {
+      // Only do this preflight check if we're starting fresh
+      if (!startFromStep) {
+        validatorValidationID = await getValidationIdHex(publicClient, validatorManagerAddress as `0x${string}`, nodeID) as string;
+        
+        if (validatorValidationID) {
+          validatorCurrentWeight = await getValidatorWeight(
+            publicClient, 
+            validatorManagerAddress as `0x${string}`, 
+            validatorValidationID
+          );
+          
+          // Log these values to understand what's happening
+          console.log("Pre-flight Check: contractTotalWeight", contractTotalWeight);
+          console.log("Pre-flight Check: validatorCurrentWeight", validatorCurrentWeight);
+          console.log("Pre-flight Check: new weight (BigInt)", BigInt(weight));
+
+          if (contractTotalWeight > 0n) {
+            const weightBigInt = BigInt(weight)
+            const validationDetails = validateStakePercentage(
+              contractTotalWeight,
+              weightBigInt,
+              validatorCurrentWeight || 0n
+            );
+    
+            // Log validationDetails
+            console.log("Pre-flight Check: validationDetails", validationDetails);
+
+            if (validationDetails.exceedsMaximum) {
+              const weightAdjustment = weightBigInt > (validatorCurrentWeight || 0n) 
+                ? weightBigInt - (validatorCurrentWeight || 0n) 
+                : (validatorCurrentWeight || 0n) - weightBigInt;
+              const currentWeightDisplay = validatorCurrentWeight?.toString() || "0";
+              const errorMessage = `The proposed weight change from ${currentWeightDisplay} to ${weight} (an adjustment of ${weightAdjustment}) represents ${validationDetails.percentageChange.toFixed(2)}% of the current total L1 stake (${contractTotalWeight}). This adjustment percentage must be less than 20%.`;
+              setError(errorMessage);
+              return;
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      setError(`Validation pre-check failed: ${error.message || String(error)}`);
+      return; // Stop processing if pre-flight check itself fails
+    }
 
     // Start processing if it's a fresh run
     if (!startFromStep) {
@@ -112,7 +205,7 @@ export default function ChangeWeight() {
     }
 
     // Local variables for synchronous data passing
-    let localValidationID = startFromStep ? validationIDHex : "";
+    let localValidationID = startFromStep ? validationIDHex : validatorValidationID || "";
     let localUnsignedWarpMessage = startFromStep ? unsignedWarpMessage : "";
     let localSignedMessage = startFromStep ? signedWarpMessage : "";
     let localPChainSignature = startFromStep ? pChainSignature : "";
@@ -123,11 +216,22 @@ export default function ChangeWeight() {
       if (!startFromStep || startFromStep === "getValidationID") {
         updateStepStatus("getValidationID", "loading")
         try {
-          const validationIDResult = await getValidationIdHex(publicClient, manualProxyAddress as `0x${string}`, nodeID)
+          const validationIDResult = await getValidationIdHex(publicClient, validatorManagerAddress as `0x${string}`, nodeID)
           // Update local and state
           setValidationIDHex(validationIDResult as string)
           localValidationID = validationIDResult as string;
           console.log("ValidationID:", validationIDResult)
+          
+          // Get current validator weight if validation ID exists
+          if (validationIDResult) {
+            const currentWeight = await getValidatorWeight(
+              publicClient, 
+              validatorManagerAddress as `0x${string}`, 
+              validationIDResult as string
+            );
+            console.log("Current validator weight:", currentWeight);
+          }
+            
           updateStepStatus("getValidationID", "success")
         } catch (error: any) {
           updateStepStatus("getValidationID", "error", error.message)
@@ -148,7 +252,7 @@ export default function ChangeWeight() {
           const weightBigInt = BigInt(weight)
 
           const changeWeightTx = await coreWalletClient.writeContract({
-            address: manualProxyAddress as `0x${string}`,
+            address: validatorManagerAddress as `0x${string}`,
             abi: validatorManagerAbi.abi,
             functionName: "initiateValidatorWeightUpdate",
             args: [validationIDToUse, weightBigInt], // Use potentially updated local ID
@@ -193,7 +297,6 @@ export default function ChangeWeight() {
                 localEventData = eventDataObj;
                 console.log("Saved event data:", eventDataObj)
               } catch (parseError) {
-                console.error("Error parsing event data:", parseError)
                 // Clear local and state
                 setEventData(null)
                 localEventData = null;
@@ -229,15 +332,11 @@ export default function ChangeWeight() {
             throw new Error("Warp message is empty. Retry step 2.")
           }
 
-          if (!selectedL1?.subnetId) {
-            throw new Error("No subnet ID available. Please select a valid L1 or specify a subnet ID.")
-          }
-
           const { signedMessage: signedMessageResult } = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
               message: warpMessageToSign,
-              signingSubnetId: selectedL1.subnetId,
+              signingSubnetId: signingSubnetId || subnetId,
               quorumPercentage: 67,
             },
           })
@@ -293,13 +392,13 @@ export default function ChangeWeight() {
 
           if (!viemChain) throw new Error("Viem chain configuration is missing.")
           if (!validationIDForJustification) throw new Error("Validation ID is missing.")
-          if (!currentSubnetId) throw new Error("Subnet ID is missing.")
+          if (!subnetId) throw new Error("Subnet ID is missing.")
           if (!eventDataForPacking) throw new Error("Event data missing. Retry step 2.")
 
           const justification = await GetRegistrationJustification(
             nodeID,
             validationIDForJustification,
-            currentSubnetId,
+            subnetId,
             publicClient
           )
 
@@ -323,16 +422,12 @@ export default function ChangeWeight() {
           console.log("Change Weight Message Hex:", bytesToHex(changeWeightMessage))
           console.log("Justification:", justification)
 
-          if (!selectedL1?.subnetId) {
-            throw new Error("No subnet ID available. Please select a valid L1 or specify a subnet ID.")
-          }
-
           const signature = await new AvaCloudSDK().data.signatureAggregator.aggregateSignatures({
             network: networkName,
             signatureAggregatorRequest: {
               message: bytesToHex(changeWeightMessage),
               justification: bytesToHex(justification),
-              signingSubnetId: selectedL1.subnetId,
+              signingSubnetId: signingSubnetId || subnetId,
               quorumPercentage: 67,
             },
           })
@@ -363,14 +458,14 @@ export default function ChangeWeight() {
           const signedPChainWarpMsgBytes = hexToBytes(`0x${finalPChainSig}`) // Use potentially updated local sig
           const accessList = packWarpIntoAccessList(signedPChainWarpMsgBytes)
 
-          if (!manualProxyAddress) throw new Error("Proxy address is not set.")
+          if (!validatorManagerAddress) throw new Error("Validator Manager address is not set.")
           if (!coreWalletClient) throw new Error("Core wallet client is not initialized.")
           if (!publicClient) throw new Error("Public client is not initialized.")
           if (!viemChain) throw new Error("Viem chain is not configured.")
 
 
           const hash = await coreWalletClient.writeContract({
-            address: manualProxyAddress as `0x${string}`,
+            address: validatorManagerAddress as `0x${string}`,
             abi: validatorManagerAbi.abi,
             functionName: "completeValidatorWeightUpdate",
             args: [0],
@@ -388,7 +483,6 @@ export default function ChangeWeight() {
               throw new Error(`Transaction failed with status: ${receipt.status}`)
             }
           } catch (receiptError: any) {
-            console.error("Failed to get transaction receipt:", receiptError)
             throw new Error(`Failed waiting for transaction receipt: ${receiptError.message}`)
           }
 
@@ -404,7 +498,6 @@ export default function ChangeWeight() {
 
     } catch (err: any) {
       setError(`Failed to change validator weight: ${err.message}`)
-      console.error(err)
       showBoundary(err)
     }
   }
@@ -426,6 +519,15 @@ export default function ChangeWeight() {
             <div className="flex items-center">
               <AlertCircle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
               <span>{error}</span>
+            </div>
+          </div>
+        )}
+
+        {isContractOwner === false && !error && !isProcessing && (
+          <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
+              <span>You are not the owner of this contract. Only the contract owner can change validator weights.</span>
             </div>
           </div>
         )}
@@ -475,32 +577,25 @@ export default function ChangeWeight() {
         </div>
 
         <div className="space-y-2">
-          <EVMAddressInput
-            label="Proxy Address"
-            value={manualProxyAddress}
-            onChange={setManualProxyAddress}
-            disabled={isProcessing}
-          />
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Override the current proxy address ({manualProxyAddress?.substring(0, 10)}... or leave empty to use default)
-          </p>
-        </div>
-
-        <div className="space-y-2">
           <SelectSubnetId
-            value={currentSubnetId}
-            onChange={setCurrentSubnetId}
-            error={null}
+            value={subnetId}
+            onChange={setSubnetId}
+            error={validatorManagerError}
+            hidePrimaryNetwork={true}
           />
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Select a subnet ID (defaults to subnet from Create Subnet tool if available)
-          </p>
+          <ValidatorManagerDetails
+            validatorManagerAddress={validatorManagerAddress}
+            blockchainId={blockchainId}
+            subnetId={subnetId}
+            isLoading={isLoadingVMCDetails}
+          />
         </div>
 
         {!isProcessing && (
           <Button
             onClick={() => handleChangeWeight()}
-            disabled={isProcessing || !nodeID || !weight}
+            disabled={isProcessing || !nodeID || !weight || !validatorManagerAddress || !!validatorManagerError || isLoadingVMCDetails || isContractOwner === false}
+            error={validatorManagerError || (!validatorManagerAddress ? "Select a valid L1 subnet" : "") || (isContractOwner === false ? "Not the contract owner" : "")}
           >
             {"Change Weight"}
           </Button>
@@ -512,7 +607,12 @@ export default function ChangeWeight() {
               <h3 className="font-medium text-sm text-zinc-800 dark:text-zinc-200">Change Weight Progress</h3>
               {isProcessComplete && (
                 <button
-                  onClick={resetSteps}
+                  onClick={() => {
+                    resetSteps();
+                    setNodeID("");
+                    setWeight("");
+                    setValidationIDHex("");
+                  }}
                   className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 rounded transition-colors"
                 >
                   Start New Change
