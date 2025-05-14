@@ -28,17 +28,40 @@ Subnet-EVM comes with a set of default precompiles that extend the EVM's functio
 - **Reward Manager**: Handles the distribution of staking rewards to validators.
 - **Warp Messenger**: Enables cross-chain communication between Avalanche L1s.
 
-These precompiles enhance the capabilities of your smart contracts and enable more complex decentralized applications.
+### Precompile Addresses and Configuration
 
-## Custom Precompiles
+If a precompile is enabled within the `genesis.json` using the respective `ConfigKey`, you can interact with the precompile using Foundry or other tools such as Remix.
 
-One of the powerful features of Subnet-EVM is the ability to create custom precompiles. By writing Go code and integrating it as a precompile, you can extend the EVM's functionality to suit specific use cases. Custom precompiles allow you to:
+Below are the addresses and `ConfigKey` values of default precompiles available in Subnet-EVM. The address and `ConfigKey` [are defined in the `module.go` of each precompile contract](https://github.com/ava-labs/subnet-evm/tree/master/precompile/contracts).
 
-- Achieve higher performance for computationally intensive tasks.
-- Access lower-level system functions not available in Solidity.
-- Implement custom cryptographic functions or algorithms.
-- Interact with external systems or data sources.
+| Precompile             | ConfigKey                         | Address                                      |
+| ---------------------- | --------------------------------- | -------------------------------------------- |
+| Deployer AllowList     | `contractDeployerAllowListConfig` | `0x0200000000000000000000000000000000000000` |
+| Native Minter          | `contractNativeMinterConfig`      | `0x0200000000000000000000000000000000000001` |
+| Transaction AllowList  | `txAllowListConfig`               | `0x0200000000000000000000000000000000000002` |
+| Fee Manager            | `feeManagerConfig`                | `0x0200000000000000000000000000000000000003` |
+| Reward Manager         | `rewardManagerConfig`             | `0x0200000000000000000000000000000000000004` |
+| Warp Messenger         | `warpConfig`                      | `0x0200000000000000000000000000000000000005` |
 
-Creating custom precompiles opens up a wide range of possibilities for developers to optimize and expand their decentralized applications on Avalanche L1s.
+#### Example Interaction
 
-In the following sections, we'll explore both the default precompiles that come with Subnet-EVM and how to create your own custom precompiles to enhance your L1's functionality. You'll learn how to leverage these powerful features to build highly customized and efficient decentralized applications.
+For example, if `contractDeployerAllowListConfig` is enabled in the `genesis.json`:
+
+```json title="genesis.json"
+ "contractDeployerAllowListConfig": {
+      "adminAddresses": [ // Addresses that can manage (add/remove) enabled addresses. They are also enabled themselves for contract deployment.
+        "0x4f9e12d407b18ad1e96e4f139ef1c144f4058a4e",
+        "0x4b9e5977a46307dd93674762f9ddbe94fb054def"
+      ],
+      "blockTimestamp": 0,
+      "enabledAddresses": [
+        "0x09c6fa19dd5d41ec6d0f4ca6f923ec3d941cc569" // Addresses that can only deploy contracts
+      ]
+    },
+```
+
+We can then add an `Enabled` address to the Deployer AllowList by interacting with the `IAllowList` interface at `0x0200000000000000000000000000000000000000`:
+
+```bash
+cast send 0x0200000000000000000000000000000000000000 setEnabled(address addr) <ADDRESS_TO_ENABLE> --rpc-url $MY_L1_RPC --private-key $ADMIN_PRIVATE_KEY
+```

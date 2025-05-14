@@ -20,8 +20,11 @@
     "validator-manager/custom-validator-manager",
     "---Subnet-EVM Configuration---",
     "evm-l1-customization",
-    "default-precompiles",
-    "custom-precompiles",
+    "default-precompiles/allowlist",
+    "default-precompiles/permissions",
+    "default-precompiles/tokenomics",
+    "default-precompiles/transaction-fees",
+    "default-precompiles/warpmessenger",
     "precompile-upgrades",
     "---Upgrade an Avalanche L1---",
     "...upgrade"
