@@ -2,6 +2,7 @@
 
 const endpoint = "https://glacier-api.avax.network"
 
+
 interface BlockchainInfo {
     createBlockTimestamp: number;
     createBlockNumber: string;
@@ -22,6 +23,7 @@ export async function getBlockchainInfo(blockchainId: string): Promise<Blockchai
 }
 
 export async function getBlockchainInfoForNetwork(network: Network, blockchainId: string): Promise<BlockchainInfo> {
+
     const url = `${endpoint}/v1/networks/${network}/blockchains/${blockchainId}`;
     const response = await fetch(url, {
         method: 'GET',
@@ -35,8 +37,10 @@ export async function getBlockchainInfoForNetwork(network: Network, blockchainId
     }
 
     const data: BlockchainInfo = await response.json();
+    
     return data;
 }
+
 
 interface SubnetOwnershipInfo {
     addresses: string[];
@@ -73,6 +77,7 @@ export async function getSubnetInfo(subnetId: string): Promise<SubnetInfo> {
 }
 
 export async function getSubnetInfoForNetwork(network: Network, subnetId: string): Promise<SubnetInfo> {
+
     const url = `${endpoint}/v1/networks/${network}/subnets/${subnetId}`;
     const response = await fetch(url, {
         method: 'GET',
@@ -86,6 +91,7 @@ export async function getSubnetInfoForNetwork(network: Network, subnetId: string
     }
 
     const data: SubnetInfo = await response.json();
+    
     return data;
 }
 

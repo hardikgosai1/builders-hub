@@ -1,8 +1,9 @@
 // src/toolbox/ICTT/TestSend.ts
 "use client";
 
-import { useSelectedL1, useToolboxStore, useViemChainStore, getToolboxStore, useL1ByChainId } from "../toolboxStore";
-import { useWalletStore } from "../../lib/walletStore";
+import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
+import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
+import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
@@ -13,11 +14,11 @@ import ITeleporterMessenger from "../../../contracts/example-contracts/compiled/
 import { createPublicClient, http, formatUnits, parseUnits, Address, zeroAddress, decodeEventLog, AbiEvent } from "viem";
 import { AmountInput } from "../../components/AmountInput";
 import { Suggestion } from "../../components/TokenInput";
-import { EVMAddressInput } from "../components/EVMAddressInput";
-import { Token, TokenInput } from "../components/TokenInput";
+import { EVMAddressInput } from "../../components/EVMAddressInput";
+import { Token, TokenInput } from "../../components/TokenInputToolbox";
 import { utils } from "@avalabs/avalanchejs";
-import SelectChainID from "../components/SelectChainID";
-import { Container } from "../components/Container";
+import SelectChainID from "../../components/SelectChainID";
+import { Container } from "../../components/Container";
 import { Toggle } from "../../components/Toggle";
 import { Ellipsis } from "lucide-react";
 
@@ -142,7 +143,7 @@ export default function TokenBridge() {
         if (!destL1) return;
 
         fetchSuggestions();
-    }, [destToolboxStore?.erc20TokenRemoteAddress, destToolboxStore?.nativeTokenRemoteAddress, destL1]);
+    }, [destToolboxStore?.erc20TokenRemoteAddress, destToolboxStore?.nativeTokenRemoteAddress, destL1?.id]);
 
     // Fetch token info from bridge contract on current chain
     const fetchTokenInfoFromBridgeContract = useCallback(async (address: Address, direction: "source" | "destination", updateState: boolean = true, _destL1?: any) => {
@@ -232,10 +233,10 @@ export default function TokenBridge() {
             console.error("Error fetching token info:", error);
             return;
         }
-    }, [viemChain, walletEVMAddress, sourceContractAddress]);
+    }, [viemChain?.id, walletEVMAddress, sourceContractAddress]);
 
     // Fetch token info from source contract on current chain 
-     // todo: duplicate remove this
+    // todo: duplicate remove this
     const fetchSourceInfo = useCallback(async () => {
         if (!viemChain || !walletEVMAddress || !sourceContractAddress) {
             setTokenAddress(null);
@@ -304,7 +305,7 @@ export default function TokenBridge() {
         } finally {
             setIsFetchingSourceInfo(false);
         }
-    }, [viemChain, walletEVMAddress, sourceContractAddress]);
+    }, [viemChain?.id, walletEVMAddress, sourceContractAddress]);
 
     useEffect(() => {
         fetchSourceInfo();
@@ -658,13 +659,13 @@ export default function TokenBridge() {
                 </Button>
             </div>
 
-            { lastApprovalTxId && (
+            {lastApprovalTxId && (
                 <Success label="Approval Transaction ID" value={lastApprovalTxId} />
             )}
             {/* {lastSendTxId && (
                 <Success label="Send Transaction ID" value={lastSendTxId} />
             )} */}
-            { lastSendTxId && lastSendTxDetails && (
+            {lastSendTxId && lastSendTxDetails && (
                 <div className="w-full border rounded-md bg-gray-50 dark:bg-gray-800">
                     <div className="flex w-full items-center justify-evenly p-6">
                         <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
@@ -683,7 +684,7 @@ export default function TokenBridge() {
                             />
                         )}
                         <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
-                            <span className="text-gray-500 text-sm">{ selectedL1!.name }</span>
+                            <span className="text-gray-500 text-sm">{selectedL1!.name}</span>
                             <span className="font-mono text-base">
                                 {lastSendTxDetails.source?.confirmedAt
                                     ? new Date(lastSendTxDetails.source.confirmedAt).toLocaleTimeString()
@@ -698,7 +699,7 @@ export default function TokenBridge() {
                             />
                         )}
                         <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
-                            <span className="text-gray-500 text-sm">{ destL1!.name }</span>
+                            <span className="text-gray-500 text-sm">{destL1!.name}</span>
                             <span className="font-mono text-base">
                                 {lastSendTxDetails.destination?.confirmedAt
                                     ? new Date(lastSendTxDetails.destination.confirmedAt).toLocaleTimeString()

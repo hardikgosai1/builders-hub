@@ -1,19 +1,21 @@
 "use client";
 
-import { useSelectedL1, useViemChainStore, useCreateChainStore } from "../toolboxStore";
-import { useWalletStore } from "../../lib/walletStore";
+import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { ResultField } from "../components/ResultField";
+import { ResultField } from "../../components/ResultField";
 import { AbiEvent } from 'viem';
 import ValidatorManagerABI from "../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
-import SelectSubnetId from "../components/SelectSubnetId";
-import { Container } from "../components/Container";
+import SelectSubnetId from "../../components/SelectSubnetId";
+import { Container } from "../../components/Container";
 import { getSubnetInfo } from "../../coreViem/utils/glacier";
-import { EVMAddressInput } from "../components/EVMAddressInput";
+import { EVMAddressInput } from "../../components/EVMAddressInput";
+import { useViemChainStore } from "../../stores/toolboxStore";
+import { useSelectedL1 } from "../../stores/l1ListStore";
+import { useCreateChainStore } from "../../stores/createChainStore";
 
 export default function Initialize() {
     const { showBoundary } = useErrorBoundary();

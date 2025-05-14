@@ -1,7 +1,8 @@
 "use client";
 
-import { useSelectedL1, useToolboxStore, useViemChainStore, useL1ByChainId } from "../toolboxStore";
-import { useWalletStore } from "../../lib/walletStore";
+import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
+import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
+import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
@@ -10,11 +11,11 @@ import ERC20TokenRemoteABI from "../../../contracts/icm-contracts/compiled/ERC20
 import ERC20TokenHomeABI from "../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
 import { Abi, createPublicClient, http, PublicClient, zeroAddress } from "viem";
 import { Suggestion } from "../../components/Input";
-import { EVMAddressInput } from "../components/EVMAddressInput";
+import { EVMAddressInput } from "../../components/EVMAddressInput";
 import { utils } from "@avalabs/avalanchejs";
 import { ListContractEvents } from "../../components/ListContractEvents";
-import SelectChainID from "../components/SelectChainID";
-import { Container } from "../components/Container";
+import SelectChainID from "../../components/SelectChainID";
+import { Container } from "../../components/Container";
 
 export default function RegisterWithHome() {
     const { showBoundary } = useErrorBoundary();
@@ -190,7 +191,6 @@ export default function RegisterWithHome() {
                 value={remoteAddress}
                 onChange={setRemoteAddress}
                 disabled={isRegistering}
-
                 suggestions={remoteAddressSuggestions}
                 helperText={!remoteAddress ? "Please enter a remote contract address" : undefined}
             />
@@ -201,7 +201,7 @@ export default function RegisterWithHome() {
                 variant="primary"
                 onClick={handleRegister}
                 loading={isRegistering}
-                disabled={isRegistering || !remoteAddress || !sourceChainId || !!sourceChainError}
+                disabled={isRegistering || !remoteAddress || !sourceChainId || !!sourceChainError || isRegistered || isCheckingRegistration}
             >
                 Register Remote with Home
             </Button>
