@@ -3,6 +3,13 @@
   "description": "Build Your L1 Blockchain",
   "icon": "Logs",
   "root": true,
+  "redirects": {
+    "/docs/avalanche-l1s/default-precompiles/permissions": "/docs/avalanche-l1s/permissions",
+    "/docs/avalanche-l1s/default-precompiles/allowlist": "/docs/avalanche-l1s/allowlist",
+    "/docs/avalanche-l1s/default-precompiles/tokenomics": "/docs/avalanche-l1s/tokenomics",
+    "/docs/avalanche-l1s/default-precompiles/transaction-fees": "/docs/avalanche-l1s/transaction-fees",
+    "/docs/avalanche-l1s/default-precompiles/warpmessenger": "/docs/avalanche-l1s/warpmessenger"
+  },
   "pages": [
     "---Avalanche L1s---",
     "index",
@@ -20,11 +27,11 @@
     "validator-manager/custom-validator-manager",
     "---Subnet-EVM Configuration---",
     "evm-l1-customization",
-    "default-precompiles/allowlist",
-    "default-precompiles/permissions",
-    "default-precompiles/tokenomics",
-    "default-precompiles/transaction-fees",
-    "default-precompiles/warpmessenger",
+    "allowlist",
+    "permissions",
+    "tokenomics",
+    "transaction-fees",
+    "warpmessenger",
     "precompile-upgrades",
     "---Upgrade an Avalanche L1---",
     "...upgrade"
