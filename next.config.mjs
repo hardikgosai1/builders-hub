@@ -40,33 +40,38 @@ const config = {
       },
       // Redirects from old VM paths
       {
+        source: '/docs/virtual-machines/default-precompiles/index',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/evm-l1-customization',
+        permanent: true,
+      },
+      {
         source: '/docs/virtual-machines/default-precompiles/deployerallowlist',
-        destination: '/docs/avalanche-l1s/permissions',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/permissions',
         permanent: true,
       },
       {
         source: '/docs/virtual-machines/default-precompiles/txallowlist',
-        destination: '/docs/avalanche-l1s/permissions',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/permissions',
         permanent: true,
       },
       {
         source: '/docs/virtual-machines/default-precompiles/contractnativeminter',
-        destination: '/docs/avalanche-l1s/tokenomics',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/tokenomics',
         permanent: true,
       },
       {
         source: '/docs/virtual-machines/default-precompiles/feemanager',
-        destination: '/docs/avalanche-l1s/transaction-fees',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/transaction-fees',
         permanent: true,
       },
       {
         source: '/docs/virtual-machines/default-precompiles/rewardmanager',
-        destination: '/docs/avalanche-l1s/transaction-fees',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/transaction-fees',
         permanent: true,
       },
       {
         source: '/docs/virtual-machines/default-precompiles/warpmessenger',
-        destination: '/docs/avalanche-l1s/warpmessenger',
+        destination: '/docs/avalanche-l1s/subnetEVM-configuration/warpmessenger',
         permanent: true,
       }
     ];
