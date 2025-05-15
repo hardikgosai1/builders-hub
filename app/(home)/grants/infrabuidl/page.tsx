@@ -1,445 +1,3772 @@
 "use client"
-
-import Image from "next/image"
-import { useState } from "react"
+import Image from 'next/image'
+import { useState, useEffect } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
 
-export default function Page() {
-  const [formData, setFormData] = useState({
-    // Personal/Team Information
-    projectName: "",
-    teamName: "",
-    contactName: "",
-    contactEmail: "",
-    contactTelegram: "",
-    contactDiscord: "",
-    
-    // Project Details
-    projectWebsite: "",
-    githubRepo: "",
-    projectCategory: "",
-    projectDescription: "",
-    
-    // Technical Details
-    technicalArchitecture: "",
-    avaxIntegration: "",
-    
-    // Business & Impact
-    problemStatement: "",
-    targetAudience: "",
-    impactOnEcosystem: "",
-    
-    // Funding & Timeline
-    fundingAmount: "",
-    timelineEstimate: "",
-    milestones: "",
-    teamExperience: "",
-    previousProjects: "",
-    
-    // Agreements
-    privacyPolicy: false,
-    marketingEmails: false,
-  })
+// Create schema for form validation
+const formSchema = z.object({
+  // Project Overview
+  project: z.string().min(1, "Project name is required"),
+  grant_program: z.string().min(1, "Grant program selection is required"),
+  project_type: z.string().min(1, "Project type is required"),
+  project_type_other: z.string().optional(),
+  project_abstract_objective: z.string().min(10, "Please provide a more detailed project abstract"),
+  technical_roadmap: z.string().min(10, "Please provide a more detailed technical roadmap"),
+  repositories_achievements: z.string().min(10, "Please provide evidence of prior accomplishments"),
+  risks_challenges: z.string().min(10, "Please provide key risks and challenges"),
+  project_company_website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  project_company_x_handle: z.string().optional(),
+  project_company_github: z.string().min(1, "GitHub repository is required"),
+  company_type: z.string().min(1, "Company type is required"),
+  project_company_hq: z.string().min(1, "Project/Company HQ is required"),
+  project_company_continent: z.string().min(1, "Project/Company continent is required"),
+  project_company_logo: z.any().optional(),
+  project_company_banner: z.any().optional(),
+  media_kit: z.string().min(1, "Media Kit URL is required"),
+  
+  // Financial Overview
+  previous_funding: z.array(z.string()).min(1, "At least one funding option must be selected"),
+  funding_entity: z.string().optional(),
+  funding_amount: z.string().optional(),
+  funding_round: z.string().optional(),
+  previous_avalanche_funding_grants: z.array(z.string()).min(1, "At least one option must be selected"),
+  requested_funding_range: z.string().min(1, "Funding range is required"),
+  
+  // Grant Budget Structure & Milestones
+  upfront_payment_requested: z.number().min(0, "Upfront payment must be a positive number"),
+  milestone_name_1: z.string().min(1, "Milestone name is required"),
+  milestone_1_description: z.string().min(10, "Please provide a more detailed milestone description"),
+  milestone_1_deliverables_kpi: z.string().min(10, "Please provide more detailed deliverables and KPIs"),
+  milestone_1_completion_date: z.date({
+    required_error: "Completion date is required",
+  }),
+  milestone_1_amount_requested: z.number().min(1, "Amount must be greater than 0"),
+  
+  milestone_name_2: z.string().min(1, "Milestone name is required"),
+  milestone_2_description: z.string().min(10, "Please provide a more detailed milestone description"),
+  milestone_2_deliverables_kpi: z.string().min(10, "Please provide more detailed deliverables and KPIs"),
+  milestone_2_completion_date: z.date({
+    required_error: "Completion date is required",
+  }),
+  milestone_2_amount_requested: z.number().min(1, "Amount must be greater than 0"),
+  
+  milestone_name_3: z.string().optional(),
+  milestone_3_description: z.string().optional(),
+  milestone_3_deliverables_kpi: z.string().optional(),
+  milestone_3_completion_date: z.date().optional(),
+  milestone_3_amount_requested: z.number().optional(),
+  
+  milestone_name_4: z.string().optional(),
+  milestone_4_description: z.string().optional(),
+  milestone_4_deliverables_kpi: z.string().optional(),
+  milestone_4_completion_date: z.date().optional(),
+  milestone_4_amount_requested: z.number().optional(),
+  
+  vc_fundraising_support_check: z.string().min(1, "Please select an option"),
+  aethir_ai_gaming_fund_check: z.string().min(1, "Please select an option"),
+  
+  // Contribution to the Avalanche Ecosystem
+  current_development_stage: z.string().min(1, "Development stage is required"),
+  project_work_duration: z.string().min(1, "Work duration is required"),
+  project_live_status: z.string().min(1, "Project live status is required"),
+  multichain_check: z.string().min(1, "Please select an option"),
+  multichain_chains: z.string().optional(),
+  first_build_avalanche: z.string().min(1, "Please select an option"),
+  previous_avalanche_project_info: z.string().optional(),
+  avalanche_contribution: z.string().min(10, "Please provide more details about your contribution"),
+  avalanche_benefit_check: z.string().min(1, "Please select an option"),
+  avalanche_l1_project_benefited_1: z.string().optional(),
+  avalanche_l1_project_benefited_1_website: z.string().optional(),
+  avalanche_l1_project_benefited_2: z.string().optional(),
+  avalanche_l1_project_benefited_2_website: z.string().optional(),
+  similar_project_check: z.string().min(1, "Please select an option"),
+  similar_project_name_1: z.string().optional(),
+  similar_project_website_1: z.string().optional(),
+  similar_project_name_2: z.string().optional(),
+  similar_project_website_2: z.string().optional(),
+  direct_competitor_check: z.string().min(1, "Please select an option"),
+  direct_competitor_1: z.string().optional(),
+  direct_competitor_1_website: z.string().optional(),
+  direct_competitor_2: z.string().optional(),
+  direct_competitor_2_website: z.string().optional(),
+  token_launch_avalanche_check: z.string().min(1, "Please select an option"),
+  token_launch_other: z.string().optional(),
+  open_source_check: z.string().min(1, "Please select an option"),
+  
+  // Applicant Information
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email address"),
+  applicant_job_role: z.string().min(1, "Job role is required"),
+  applicant_job_role_other: z.string().optional(),
+  applicant_bio: z.string().min(10, "Please provide a more detailed bio"),
+  applicant_country: z.string().optional(),
+  x_account: z.string().min(1, "X account is required"),
+  telegram: z.string().min(1, "Telegram is required"),
+  linkedin: z.string().optional(),
+  github: z.string().optional(),
+  other_resources: z.string().optional(),
+  
+  // Team Details
+  team_size: z.string().min(1, "Team size is required"),
+  
+  // Team members (conditionally required based on team size)
+  team_member_1_first_name: z.string().optional(),
+  team_member_1_last_name: z.string().optional(),
+  team_member_1_email: z.string().optional(),
+  job_role_team_member_1: z.string().optional(),
+  team_member_1_bio: z.string().optional(),
+  team_member_1_x_account: z.string().optional(),
+  team_member_1_telegram: z.string().optional(),
+  team_member_1_linkedin: z.string().optional(),
+  team_member_1_github: z.string().optional(),
+  team_member_1_country: z.string().optional(),
+  other_resource_s__team_member_1: z.string().optional(),
+  
+  team_member_2_first_name: z.string().optional(),
+  team_member_2_last_name: z.string().optional(),
+  team_member_2_email: z.string().optional(),
+  job_role_team_member_2: z.string().optional(),
+  team_member_2_bio: z.string().optional(),
+  team_member_2_x_account: z.string().optional(),
+  team_member_2_telegram: z.string().optional(),
+  team_member_2_linkedin: z.string().optional(),
+  team_member_2_github: z.string().optional(),
+  team_member_2_country: z.string().optional(),
+  other_resource_s__team_member_2: z.string().optional(),
+  
+  // Other
+  avalanche_grant_source: z.string().min(1, "Please select an option"),
+  avalanche_grant_source_other: z.string().optional(),
+  program_referral_check: z.string().min(1, "Please select an option"),
+  program_referrer: z.string().optional(),
+  
+  // Legal Compliance
+  gdpr: z.boolean().refine(val => val === true, {
+    message: "You must agree to the privacy policy to submit the form",
+  }),
+  marketing_consent: z.boolean().optional(),
+});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+// These are job roles that will be available in dropdowns
+const jobRoles = [
+  "Founder / Co-Founder",
+  "Chief Executive Officer (CEO)",
+  "Chief Technology Officer (CTO)",
+  "Lead Developer / Senior Developer",
+  "Smart Contract Developer",
+  "Product Manager",
+  "Community Manager",
+  "Marketing Lead / Growth Lead",
+  "Blockchain Engineer",
+  "UX/UI Designer",
+  "Other"
+];
 
-  const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({ ...prev, [name]: checked }))
-  }
+// These are continents that will be available in dropdown
+const continents = [
+  "Africa",
+  "Asia",
+  "Australia",
+  "Europe",
+  "North America",
+  "South America"
+];
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+// Sample list of countries for the dropdown
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
+  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", 
+  "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+  // Add more countries as needed
+  "United States", "United Kingdom", "Canada", "Germany", "France", "Japan", "China", "India", "Russia", "Brazil"
+];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+export default function InfrabuildlGrantsForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState<'success' | 'error' | null>(null);
+  const [showTeamMembers, setShowTeamMembers] = useState(false);
+  const [showProjectTypeOther, setShowProjectTypeOther] = useState(false);
+  const [showJobRoleOther, setShowJobRoleOther] = useState(false);
+  const [showFundingDetails, setShowFundingDetails] = useState(false);
+  const [showMultichainDetails, setShowMultichainDetails] = useState(false);
+  const [showPreviousProjectDetails, setShowPreviousProjectDetails] = useState(false);
+  const [showBenefitDetails, setShowBenefitDetails] = useState(false);
+  const [showSimilarProjects, setShowSimilarProjects] = useState(false);
+  const [showCompetitors, setShowCompetitors] = useState(false);
+  const [showTokenLaunchDetails, setShowTokenLaunchDetails] = useState(false);
+  const [showReferrer, setShowReferrer] = useState(false);
+  const [selectedGrantProgram, setSelectedGrantProgram] = useState("");
+
+  // Initialize the form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      // Project Overview defaults
+      project: "",
+      grant_program: "",
+      project_type: "",
+      project_type_other: "",
+      project_abstract_objective: "",
+      technical_roadmap: "",
+      repositories_achievements: "",
+      risks_challenges: "",
+      project_company_website: "",
+      project_company_x_handle: "",
+      project_company_github: "",
+      company_type: "",
+      project_company_hq: "",
+      project_company_continent: "",
+      media_kit: "",
+      
+      // Financial Overview defaults
+      previous_funding: [],
+      funding_entity: "",
+      funding_amount: "",
+      funding_round: "",
+      previous_avalanche_funding_grants: [],
+      requested_funding_range: "",
+      
+      // Grant Budget Structure & Milestones defaults
+      upfront_payment_requested: 0,
+      milestone_name_1: "",
+      milestone_1_description: "",
+      milestone_1_deliverables_kpi: "",
+      milestone_1_amount_requested: 0,
+      
+      milestone_name_2: "",
+      milestone_2_description: "",
+      milestone_2_deliverables_kpi: "",
+      milestone_2_amount_requested: 0,
+      
+      milestone_name_3: "",
+      milestone_3_description: "",
+      milestone_3_deliverables_kpi: "",
+      milestone_3_amount_requested: 0,
+      
+      milestone_name_4: "",
+      milestone_4_description: "",
+      milestone_4_deliverables_kpi: "",
+      milestone_4_amount_requested: 0,
+      
+      vc_fundraising_support_check: "",
+      aethir_ai_gaming_fund_check: "",
+      
+      // Contribution to the Avalanche Ecosystem defaults
+      current_development_stage: "",
+      project_work_duration: "",
+      project_live_status: "",
+      multichain_check: "",
+      multichain_chains: "",
+      first_build_avalanche: "",
+      previous_avalanche_project_info: "",
+      avalanche_contribution: "",
+      avalanche_benefit_check: "",
+      avalanche_l1_project_benefited_1: "",
+      avalanche_l1_project_benefited_1_website: "",
+      avalanche_l1_project_benefited_2: "",
+      avalanche_l1_project_benefited_2_website: "",
+      similar_project_check: "",
+      similar_project_name_1: "",
+      similar_project_website_1: "",
+      similar_project_name_2: "",
+      similar_project_website_2: "",
+      direct_competitor_check: "",
+      direct_competitor_1: "",
+      direct_competitor_1_website: "",
+      direct_competitor_2: "",
+      direct_competitor_2_website: "",
+      token_launch_avalanche_check: "",
+      token_launch_other: "",
+      open_source_check: "",
+      
+      // Applicant Information defaults
+      firstname: "",
+      lastname: "",
+      email: "",
+      applicant_job_role: "",
+      applicant_job_role_other: "",
+      applicant_bio: "",
+      applicant_country: "",
+      x_account: "",
+      telegram: "",
+      linkedin: "",
+      github: "",
+      other_resources: "",
+      
+      // Team Details defaults
+      team_size: "",
+      
+      // Team Member 1 defaults
+      team_member_1_first_name: "",
+      team_member_1_last_name: "",
+      team_member_1_email: "",
+      job_role_team_member_1: "",
+      team_member_1_bio: "",
+      team_member_1_x_account: "",
+      team_member_1_telegram: "",
+      team_member_1_linkedin: "",
+      team_member_1_github: "",
+      team_member_1_country: "",
+      other_resource_s__team_member_1: "",
+      
+      // Team Member 2 defaults
+      team_member_2_first_name: "",
+      team_member_2_last_name: "",
+      team_member_2_email: "",
+      job_role_team_member_2: "",
+      team_member_2_bio: "",
+      team_member_2_x_account: "",
+      team_member_2_telegram: "",
+      team_member_2_linkedin: "",
+      team_member_2_github: "",
+      team_member_2_country: "",
+      other_resource_s__team_member_2: "",
+      
+      // Other defaults
+      avalanche_grant_source: "",
+      avalanche_grant_source_other: "",
+      program_referral_check: "",
+      program_referrer: "",
+      
+      // Legal Compliance defaults
+      gdpr: false,
+      marketing_consent: false,
+    }
+  });
+
+  // Watch for changes in specific form values to show/hide conditional fields
+  const watchTeamSize = form.watch("team_size");
+  const watchProjectType = form.watch("project_type");
+  const watchApplicantJobRole = form.watch("applicant_job_role");
+  const watchPreviousFunding = form.watch("previous_funding");
+  const watchMultichainCheck = form.watch("multichain_check");
+  const watchFirstBuildAvalanche = form.watch("first_build_avalanche");
+  const watchAvalancheBenefitCheck = form.watch("avalanche_benefit_check");
+  const watchSimilarProjectCheck = form.watch("similar_project_check");
+  const watchDirectCompetitorCheck = form.watch("direct_competitor_check");
+  const watchTokenLaunchCheck = form.watch("token_launch_avalanche_check");
+  const watchGrantSource = form.watch("avalanche_grant_source");
+  const watchReferralCheck = form.watch("program_referral_check");
+  const watchGrantProgram = form.watch("grant_program");
+
+  // Effect to update state based on form field changes
+  useEffect(() => {
+    setShowTeamMembers(watchTeamSize !== "1" && watchTeamSize !== "");
+    setShowProjectTypeOther(watchProjectType === "Other");
+    setShowJobRoleOther(watchApplicantJobRole === "Other");
+    
+    const fundingTypes = ["Grant", "Angel Investment", "Pre-Seed", "Seed", "Series A"];
+    setShowFundingDetails(watchPreviousFunding.some(type => fundingTypes.includes(type)));
+    
+    setShowMultichainDetails(watchMultichainCheck === "Yes");
+    setShowPreviousProjectDetails(watchFirstBuildAvalanche === "No");
+    setShowBenefitDetails(watchAvalancheBenefitCheck === "Yes");
+    setShowSimilarProjects(watchSimilarProjectCheck === "Yes");
+    setShowCompetitors(watchDirectCompetitorCheck === "Yes");
+    setShowTokenLaunchDetails(watchTokenLaunchCheck === "No");
+    setShowReferrer(watchReferralCheck === "Yes");
+    
+    setSelectedGrantProgram(watchGrantProgram);
+  }, [
+    watchTeamSize,
+    watchProjectType,
+    watchApplicantJobRole,
+    watchPreviousFunding,
+    watchMultichainCheck,
+    watchFirstBuildAvalanche,
+    watchAvalancheBenefitCheck,
+    watchSimilarProjectCheck,
+    watchDirectCompetitorCheck,
+    watchTokenLaunchCheck,
+    watchGrantSource,
+    watchReferralCheck,
+    watchGrantProgram
+  ]);
+
+  // Function to handle form submission
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    
+    try {
+      // Convert form values to HubSpot data format
+      const hubspotFormData: Record<string, string | number | boolean | string[]> = {};
+      
+      // Map each field to its HubSpot property name
+      Object.entries(values).forEach(([key, value]) => {
+        // Skip empty optional fields
+        if ((value === "" || value === null || value === undefined) && 
+            key !== "firstname" && 
+            key !== "email" && 
+            !key.includes("required")) {
+          return;
+        }
+        
+        // Handle arrays (checkboxes)
+        if (Array.isArray(value)) {
+          hubspotFormData[key] = value.join(";");
+        }
+        // Handle dates
+        else if (value instanceof Date) {
+          hubspotFormData[key] = format(value, "yyyy-MM-dd");
+        }
+        // Handle booleans
+        else if (typeof value === 'boolean') {
+          if (key === 'gdpr' || key === 'marketing_consent') {
+            hubspotFormData[key] = value;
+          } else {
+            hubspotFormData[key] = value ? "Yes" : "No";
+          }
+        } 
+        // Handle everything else
+        else {
+          hubspotFormData[key] = value;
+        }
+      });
+      
+      console.log("HubSpot form data prepared for submission:", hubspotFormData);
+
+      // Submit to HubSpot API
+      const response = await fetch('/api/hubspot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(hubspotFormData)
+      });
+
+      console.log("API Response status:", response.status);
+      const result = await response.json();
+      console.log("API Response data:", result);
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to submit to HubSpot');
+      }
+
+      setSubmissionStatus('success');
+      alert("Your grant application has been successfully submitted!");
+      form.reset();
+    } catch (error) {
+      setSubmissionStatus('error');
+      alert(`Error submitting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-12 flex flex-col items-center">
-      <div className="w-full max-w-3xl">
-        <div className="w-full relative mb-8">
+    <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <section className="text-center space-y-6 pt-12 pb-16">
+        <div className="flex justify-center mb-6">
           <Image
-            src="/infrabuidl.png"
-            alt="Avalanche infraBUILD() Program"
-            width={800}
-            height={200}
-            className="w-full h-auto rounded-lg"
-            priority
+            src="/logo-black.png"
+            alt="Avalanche Logo"
+            width={200}
+            height={50}
+            className="dark:hidden"
+          />
+          <Image
+            src="/logo-white.png"
+            alt="Avalanche Logo"
+            width={200}
+            height={50}
+            className="hidden dark:block"
           />
         </div>
-        <h1 className="text-5xl font-semibold mb-4">Avalanche<br/>infraBUIDL()<br/>Program</h1>
-        <h2 className="text-2xl mb-6 text-red-500">Application Form</h2>
-        
-        <div className="mb-12 space-y-4">
-          <p>
-            The Avalanche infraBUILD() Program is designed to fortify the Avalanche ecosystem by supporting
-            infrastructure projects that enhance user and developer experience.
-          </p>
-          
-          <p className="text-gray-400">
-            infraBUILD() will fund projects demonstrating innovation or strategic importance
-            to the broader Avalanche ecosystem. The program will support onramps,
-            validator marketplaces, VMs, wallets, oracles, interoperability tools,
-            cryptography, bridges, explorers, RPCs, data storage, indexers, token
-            engineering, and more!
-          </p>
-          
-          <p className="text-gray-400">
-            To be considered for support from the program, please fill out the form with all
-            relevant details, and the Avalanche Foundation will reach out to discuss your
-            project.
-          </p>
-          
-          <p className="text-gray-400">
-            For further information on the infraBUILD() Program, including eligibility criteria
-            and application requirements, visit the <a href="#" className="text-red-500 underline">Forum</a>.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Project & Team Information Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Project & Team Information</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="projectName">Project Name</Label>
-              <Input
-                id="projectName"
-                name="projectName"
-                placeholder="Your project name"
-                value={formData.projectName}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="teamName">Team/Organization Name</Label>
-              <Input
-                id="teamName"
-                name="teamName"
-                placeholder="Your team or organization name"
-                value={formData.teamName}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="contactName">Contact Name</Label>
-                <Input
-                  id="contactName"
-                  name="contactName"
-                  placeholder="Full name"
-                  value={formData.contactName}
-                  onChange={handleChange}
-                  className="h-14 bg-gray-900 border-gray-700"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email</Label>
-                <Input
-                  id="contactEmail"
-                  name="contactEmail"
-                  type="email"
-                  placeholder="Email address"
-                  value={formData.contactEmail}
-                  onChange={handleChange}
-                  className="h-14 bg-gray-900 border-gray-700"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="contactTelegram">Telegram Handle (optional)</Label>
-                <Input
-                  id="contactTelegram"
-                  name="contactTelegram"
-                  placeholder="@username"
-                  value={formData.contactTelegram}
-                  onChange={handleChange}
-                  className="h-14 bg-gray-900 border-gray-700"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactDiscord">Discord Handle (optional)</Label>
-                <Input
-                  id="contactDiscord"
-                  name="contactDiscord"
-                  placeholder="username#0000"
-                  value={formData.contactDiscord}
-                  onChange={handleChange}
-                  className="h-14 bg-gray-900 border-gray-700"
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* Project Details Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Project Details</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="projectWebsite">Project Website (if available)</Label>
-              <Input
-                id="projectWebsite"
-                name="projectWebsite"
-                placeholder="https://"
-                value={formData.projectWebsite}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="githubRepo">GitHub Repository (if available)</Label>
-              <Input
-                id="githubRepo"
-                name="githubRepo"
-                placeholder="https://github.com/..."
-                value={formData.githubRepo}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="projectCategory">Project Category</Label>
-              <Select 
-                onValueChange={(value) => handleSelectChange("projectCategory", value)}
-                value={formData.projectCategory}
-              >
-                <SelectTrigger className="h-14 bg-gray-900 border-gray-700">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-700">
-                  <SelectItem value="onramp">Onramp</SelectItem>
-                  <SelectItem value="validator">Validator Marketplace</SelectItem>
-                  <SelectItem value="vm">Virtual Machine (VM)</SelectItem>
-                  <SelectItem value="wallet">Wallet</SelectItem>
-                  <SelectItem value="oracle">Oracle</SelectItem>
-                  <SelectItem value="interop">Interoperability Tool</SelectItem>
-                  <SelectItem value="bridge">Bridge</SelectItem>
-                  <SelectItem value="explorer">Explorer</SelectItem>
-                  <SelectItem value="rpc">RPC Service</SelectItem>
-                  <SelectItem value="storage">Data Storage</SelectItem>
-                  <SelectItem value="indexer">Indexer</SelectItem>
-                  <SelectItem value="token">Token Engineering</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="projectDescription">Project Description</Label>
-              <Textarea
-                id="projectDescription"
-                name="projectDescription"
-                placeholder="Provide a comprehensive description of your project"
-                value={formData.projectDescription}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-          </div>
-          
-          {/* Technical Details Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Technical Details</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="technicalArchitecture">Technical Architecture</Label>
-              <Textarea
-                id="technicalArchitecture"
-                name="technicalArchitecture"
-                placeholder="Describe the technical architecture of your project"
-                value={formData.technicalArchitecture}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="avaxIntegration">Avalanche Integration</Label>
-              <Textarea
-                id="avaxIntegration"
-                name="avaxIntegration"
-                placeholder="Explain how your project integrates with the Avalanche ecosystem"
-                value={formData.avaxIntegration}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-          </div>
-          
-          {/* Business & Impact Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Business & Ecosystem Impact</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="problemStatement">Problem Statement</Label>
-              <Textarea
-                id="problemStatement"
-                name="problemStatement"
-                placeholder="What problem does your project solve?"
-                value={formData.problemStatement}
-                onChange={handleChange}
-                className="min-h-[100px] bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience">Target Audience</Label>
-              <Textarea
-                id="targetAudience"
-                name="targetAudience"
-                placeholder="Who are the target users of your project?"
-                value={formData.targetAudience}
-                onChange={handleChange}
-                className="min-h-[100px] bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="impactOnEcosystem">Impact on Avalanche Ecosystem</Label>
-              <Textarea
-                id="impactOnEcosystem"
-                name="impactOnEcosystem"
-                placeholder="How will your project benefit the Avalanche ecosystem?"
-                value={formData.impactOnEcosystem}
-                onChange={handleChange}
-                className="min-h-[100px] bg-gray-900 border-gray-700"
-              />
-            </div>
-          </div>
-          
-          {/* Funding & Timeline Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Funding & Timeline</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="fundingAmount">Requested Funding Amount (in USD)</Label>
-              <Input
-                id="fundingAmount"
-                name="fundingAmount"
-                placeholder="$"
-                value={formData.fundingAmount}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="timelineEstimate">Estimated Timeline</Label>
-              <Input
-                id="timelineEstimate"
-                name="timelineEstimate"
-                placeholder="e.g., 3 months, 6 months"
-                value={formData.timelineEstimate}
-                onChange={handleChange}
-                className="h-14 bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="milestones">Project Milestones</Label>
-              <Textarea
-                id="milestones"
-                name="milestones"
-                placeholder="List key milestones and deliverables with estimated completion dates"
-                value={formData.milestones}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-          </div>
-          
-          {/* Team Experience Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Team Experience</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="teamExperience">Team Experience</Label>
-              <Textarea
-                id="teamExperience"
-                name="teamExperience"
-                placeholder="Describe your team's relevant experience and expertise"
-                value={formData.teamExperience}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="previousProjects">Previous Projects</Label>
-              <Textarea
-                id="previousProjects"
-                name="previousProjects"
-                placeholder="List any previous projects or contributions to the blockchain space"
-                value={formData.previousProjects}
-                onChange={handleChange}
-                className="min-h-[150px] bg-gray-900 border-gray-700"
-              />
-            </div>
-          </div>
-          
-          {/* Agreements Section */}
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="privacyPolicy" 
-                checked={formData.privacyPolicy}
-                onCheckedChange={(checked) => 
-                  handleCheckboxChange("privacyPolicy", checked as boolean)
-                }
-                className="mt-1"
-              />
-              <div className="space-y-1 leading-none">
-                <Label htmlFor="privacyPolicy" className="font-normal">
-                  I have read the <a href="#" className="text-red-500 underline">privacy policy</a>.*
-                </Label>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="marketingEmails" 
-                checked={formData.marketingEmails}
-                onCheckedChange={(checked) => 
-                  handleCheckboxChange("marketingEmails", checked as boolean)
-                }
-                className="mt-1"
-              />
-              <div className="space-y-1 leading-none">
-                <Label htmlFor="marketingEmails" className="font-normal">
-                  I agree to receive marketing emails from the Avalanche Foundation.
-                </Label>
-              </div>
-            </div>
-            
-            <p className="text-sm text-gray-400 mt-4">
-              The Avalanche Foundation needs the contact information you provide to us to contact you about our products and services.
-              You may unsubscribe from these communications at any time. For information on how to unsubscribe, as well as our privacy
-              practices and commitment to protecting your privacy, please review our Privacy Policy.
-            </p>
-          </div>
-          
-          <Button type="submit" className="w-full h-14 mt-8 bg-red-500 hover:bg-red-600 text-white">
-            Apply Now
+        <h1 className="text-4xl md:text-7xl font-bold tracking-tighter">
+          infraBUIDL
+          <span className="block pb-1 text-[#EB4C50]">
+            Grants Program
+          </span>
+        </h1>
+      </section>
+      
+      {submissionStatus === 'success' ? (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+          <h2 className="text-2xl font-semibold text-green-800 mb-4">Application Submitted Successfully!</h2>
+          <p className="text-green-700 mb-6">Thank you for applying to the infraBUIDL grant program. We will review your application and get back to you soon.</p>
+          <Button 
+            onClick={() => {
+              setSubmissionStatus(null)
+              form.reset()
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            Submit Another Application
           </Button>
-        </form>
-      </div>
+        </div>
+      ) : (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Project Overview */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Project Overview</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Project/Company Name */}
+                <FormField
+                  control={form.control}
+                  name="project"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company Name <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Enter your project or company name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Grant Program */}
+                <FormField
+                  control={form.control}
+                  name="grant_program"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Grant Program <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please select the grant program you are applying for.
+                      </FormDescription>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="infraBUIDL()" id="infraBUIDL()" />
+                            <label htmlFor="infraBUIDL()">infraBUIDL()</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="infraBUIDL(AI)" id="infraBUIDL(AI)" />
+                            <label htmlFor="infraBUIDL(AI)">infraBUIDL(AI)</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project Type - Conditional based on selected grant program */}
+                {selectedGrantProgram && (
+                  <FormField
+                    control={form.control}
+                    name="project_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Project Type <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              setShowProjectTypeOther(value === "Other");
+                            }}
+                            defaultValue={field.value}
+                            className="flex flex-col space-y-1"
+                          >
+                            {selectedGrantProgram === "infraBUIDL()" ? (
+                              // Options for infraBUIDL()
+                              <>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Validator Marketplaces" id="validator-marketplaces" />
+                                  <label htmlFor="validator-marketplaces">Validator Marketplaces</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Virtual Machines" id="virtual-machines" />
+                                  <label htmlFor="virtual-machines">Virtual Machines</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Wallets" id="wallets" />
+                                  <label htmlFor="wallets">Wallets</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Oracles" id="oracles" />
+                                  <label htmlFor="oracles">Oracles</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Interoperability Tools" id="interoperability-tools" />
+                                  <label htmlFor="interoperability-tools">Interoperability Tools</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Cryptography" id="cryptography" />
+                                  <label htmlFor="cryptography">Cryptography</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Bridges" id="bridges" />
+                                  <label htmlFor="bridges">Bridges</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Explorers" id="explorers" />
+                                  <label htmlFor="explorers">Explorers</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="RPCs" id="rpcs" />
+                                  <label htmlFor="rpcs">RPCs</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Data Storage" id="data-storage" />
+                                  <label htmlFor="data-storage">Data Storage</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Indexers" id="indexers" />
+                                  <label htmlFor="indexers">Indexers</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Token Engineering" id="token-engineering" />
+                                  <label htmlFor="token-engineering">Token Engineering</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="On & Offramps" id="on-offramps" />
+                                  <label htmlFor="on-offramps">On & Offramps</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Other" id="other" />
+<label htmlFor="other">Other</label>
+                                </div>
+                              </>
+                            ) : (
+                              // Options for infraBUIDL(AI)
+                              <>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Autonomous Chat Agents" id="autonomous-chat-agents" />
+                                  <label htmlFor="autonomous-chat-agents">Autonomous Chat Agents</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Meme Agents" id="meme-agents" />
+                                  <label htmlFor="meme-agents">Meme Agents</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Social and Influencer Agents" id="social-influencer-agents" />
+                                  <label htmlFor="social-influencer-agents">Social and Influencer Agents</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Agents Infra" id="agents-infra" />
+                                  <label htmlFor="agents-infra">Agents Infra</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Agent Token Tooling" id="agent-token-tooling" />
+                                  <label htmlFor="agent-token-tooling">Agent Token Tooling</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="DeFi Agents" id="defi-agents" />
+                                  <label htmlFor="defi-agents">DeFi Agents</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Trading Agents" id="trading-agents" />
+                                  <label htmlFor="trading-agents">Trading Agents</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="Other" id="other" />
+                                  <label htmlFor="other">Other</label>
+                                </div>
+                              </>
+                            )}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Project Type Other */}
+                {showProjectTypeOther && (
+                  <FormField
+                    control={form.control}
+                    name="project_type_other"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          If you chose "Other," please share your project's type below <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="E.g., RWA"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Project Abstract and Objective */}
+                <FormField
+                  control={form.control}
+                  name="project_abstract_objective"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project Abstract and Objective <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please tell us more about the project and clearly state its primary objectives and key use cases. Explain how the solution enhances Avalanche's capabilities and why it's well-suited for emerging market conditions.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Describe your project, its objectives, and key use cases..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Technical Roadmap */}
+                <FormField
+                  control={form.control}
+                  name="technical_roadmap"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Technical Roadmap <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please include a technical roadmap to outline the various development stages involved in the project. This roadmap should provide a clear timeline, specifying the expected start and end dates for each stage, as well as the key activities that will be undertaken during each phase.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Outline your technical roadmap with timelines and key activities..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Repositories and Achievements */}
+                <FormField
+                  control={form.control}
+                  name="repositories_achievements"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Repositories and Achievements <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Provide evidence of prior accomplishments in blockchain infrastructure and tooling, blockchain software, AI tooling or related fields.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="List your repositories and achievements in blockchain or AI fields..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Risks and Challenges */}
+                <FormField
+                  control={form.control}
+                  name="risks_challenges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Risks and Challenges <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please provide key risks (technical, regulatory, market, etc.), potential roadblocks and contingency plans.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Describe the risks, challenges, and contingency plans for your project..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company Website */}
+                <FormField
+                  control={form.control}
+                  name="project_company_website"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company Website
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://yourwebsite.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company X Handle */}
+                <FormField
+                  control={form.control}
+                  name="project_company_x_handle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company X Handle
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="@yourhandle"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company GitHub */}
+                <FormField
+                  control={form.control}
+                  name="project_company_github"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company GitHub <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://github.com/your-project"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Company Type */}
+                <FormField
+                  control={form.control}
+                  name="company_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Company Type <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No Registered Entity" id="no-registered-entity" />
+                            <label htmlFor="no-registered-entity">No Registered Entity</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Solo Developer" id="solo-developer" />
+                            <label htmlFor="solo-developer">Solo Developer</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Independent Development Team" id="independent-development-team" />
+                            <label htmlFor="independent-development-team">Independent Development Team</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="DAO" id="dao" />
+                            <label htmlFor="dao">DAO</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Private Company" id="private-company" />
+                            <label htmlFor="private-company">Private Company</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Public Company" id="public-company" />
+                            <label htmlFor="public-company">Public Company</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Not for Profit" id="not-for-profit" />
+                            <label htmlFor="not-for-profit">Not for Profit</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Other" id="company-type-other" />
+                            <label htmlFor="company-type-other">Other</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company HQ */}
+                <FormField
+                  control={form.control}
+                  name="project_company_hq"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company HQ <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country} className="dark:text-gray-200">
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company Continent */}
+                <FormField
+                  control={form.control}
+                  name="project_company_continent"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company Continent <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select continent" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                          {continents.map((continent) => (
+                            <SelectItem key={continent} value={continent} className="dark:text-gray-200">
+                              {continent}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company Logo */}
+                <FormField
+                  control={form.control}
+                  name="project_company_logo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company Logo
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          onChange={(e) => {
+                            const file = e.target.files ? e.target.files[0] : null;
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project/Company Banner */}
+                <FormField
+                  control={form.control}
+                  name="project_company_banner"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project/Company Banner
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          onChange={(e) => {
+                            const file = e.target.files ? e.target.files[0] : null;
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Media Kit */}
+                <FormField
+                  control={form.control}
+                  name="media_kit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Media Kit <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please share a Google Drive folder link for your brand guidelines, logos, and video/static assets that can be used in social content. Ensure the folder is accessible to anyone with the link.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://drive.google.com/drive/folders/your-folder-id"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            {/* Financial Overview */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Financial Overview</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Previous Funding */}
+                <FormField
+                  control={form.control}
+                  name="previous_funding"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Previous Funding <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        If you choose 'Grant,' 'Angel Investment,' 'Pre-Seed,' 'Seed,' or 'Series A,' you will be prompted to list the entity, amount, and funding round.
+                      </FormDescription>
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="no-funding"
+                            checked={field.value.includes("No Funding")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "No Funding"]
+                                : field.value.filter((v) => v !== "No Funding");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="no-funding" className="text-sm font-medium leading-none">
+                            No Funding
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="self-funding"
+                            checked={field.value.includes("Self-Funding")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Self-Funding"]
+                                : field.value.filter((v) => v !== "Self-Funding");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="self-funding" className="text-sm font-medium leading-none">
+                            Self-Funding
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="family-friends"
+                            checked={field.value.includes("Family & Friends")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Family & Friends"]
+                                : field.value.filter((v) => v !== "Family & Friends");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="family-friends" className="text-sm font-medium leading-none">
+                            Family & Friends
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="grant"
+                            checked={field.value.includes("Grant")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Grant"]
+                                : field.value.filter((v) => v !== "Grant");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="grant" className="text-sm font-medium leading-none">
+                            Grant
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="angel-investment"
+                            checked={field.value.includes("Angel Investment")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Angel Investment"]
+                                : field.value.filter((v) => v !== "Angel Investment");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="angel-investment" className="text-sm font-medium leading-none">
+                            Angel Investment
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="pre-seed"
+                            checked={field.value.includes("Pre-Seed")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Pre-Seed"]
+                                : field.value.filter((v) => v !== "Pre-Seed");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="pre-seed" className="text-sm font-medium leading-none">
+                            Pre-Seed
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="seed"
+                            checked={field.value.includes("Seed")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Seed"]
+                                : field.value.filter((v) => v !== "Seed");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="seed" className="text-sm font-medium leading-none">
+                            Seed
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="series-a"
+                            checked={field.value.includes("Series A")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Series A"]
+                                : field.value.filter((v) => v !== "Series A");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="series-a" className="text-sm font-medium leading-none">
+                            Series A
+                          </label>
+                        </div>
+                      </div>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Funding Details (conditional) */}
+                {showFundingDetails && (
+                  <div className="space-y-6 border-l-2 border-gray-200 pl-4 dark:border-gray-700">
+                    <FormField
+                      control={form.control}
+                      name="funding_entity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Funding Entity <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter the name of the funding entity"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="funding_amount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Funding Amount <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter the funding amount (e.g., $100,000)"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="funding_round"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Funding Round <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter the funding round details"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+                
+                {/* Previous Avalanche Funding/Grants */}
+                <FormField
+                  control={form.control}
+                  name="previous_avalanche_funding_grants"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Previous Avalanche Funding/Grants <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="codebase"
+                            checked={field.value.includes("Codebase")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "Codebase"]
+                                : field.value.filter((v) => v !== "Codebase");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="codebase" className="text-sm font-medium leading-none">
+                            Codebase
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="infrabuildl"
+                            checked={field.value.includes("infraBUIDL()")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "infraBUIDL()"]
+                                : field.value.filter((v) => v !== "infraBUIDL()");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="infrabuildl" className="text-sm font-medium leading-none">
+                            infraBUIDL()
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="infrabuildl-ai"
+                            checked={field.value.includes("infraBUIDL(AI)")}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, "infraBUIDL(AI)"]
+                                : field.value.filter((v) => v !== "infraBUIDL(AI)");
+                              field.onChange(newValue);
+                            }}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                          <label htmlFor="infrabuildl-ai" className="text-sm font-medium leading-none">
+                            infraBUIDL(AI)
+                          </label>
+                        </div>
+                      </div>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Requested Funding Range */}
+                <FormField
+                  control={form.control}
+                  name="requested_funding_range"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Requested Funding Range <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="$1 - $24,999" id="1-24999" />
+                            <label htmlFor="1-24999">$1 - $24,999</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="$25,000 - $49,999" id="25000-49999" />
+                            <label htmlFor="25000-49999">$25,000 - $49,999</label>
+                          </div>
+<div className="flex items-center space-x-2">
+                            <RadioGroupItem value="$50,000 - $99,999" id="50000-99999" />
+                            <label htmlFor="50000-99999">$50,000 - $99,999</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="$100,000 - $199,999" id="100000-199999" />
+                            <label htmlFor="100000-199999">$100,000 - $199,999</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="$200,000+" id="200000-plus" />
+                            <label htmlFor="200000-plus">$200,000+</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            {/* Grant Budget Structure & Milestones */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Grant Budget Structure & Milestones</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Each project must present a structured grant budget and define four (4) key milestones, each with 
+                  clear deliverables, measurable success criteria, and an allocated budget. This ensures transparency, 
+                  accountability, and effective resource allocation. A typical grant structure includes an upfront payment 
+                  of up to 20%, provided at the start of the project to cover initial development costs, while the 
+                  remaining grant amount is tied to the successful completion of quantifiable milestones with well-
+                  defined KPIs and deliverables. Success metrics may include user adoption, performance 
+                  improvements, developer engagement, or technical development milestones, depending on the 
+                  project's stage. By aligning payments with measurable outcomes, this structure ensures efficient fund 
+                  distribution, project accountability, and long-term success.
+                </p>
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Milestone Format</h3>
+                  <ul className="list-disc pl-6 mt-2 space-y-2">
+                    <li>
+                      <span className="font-medium">Milestone Name:</span> A short, clear title describing the milestone's focus (e.g. Smart Contract Development & Initial Audit).
+                    </li>
+                    <li>
+                      <span className="font-medium">Description:</span> A summary of the key activities and goals for the milestone (e.g. Develop, test, and audit).
+                    </li>
+                    <li>
+                      <span className="font-medium">Deliverables & Success Metrics/KPIs:</span> Tangible outputs that demonstrate milestone completion and measurable indicators that define a successful milestone.
+                    </li>
+                    <li>
+                      <span className="font-medium">Estimated Completion Date:</span> The expected completion date for the milestone.
+                    </li>
+                    <li>
+                      <span className="font-medium">Amount Requested:</span> The grant amount that is needed to for this milestone.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Upfront Payment */}
+                <FormField
+                  control={form.control}
+                  name="upfront_payment_requested"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Upfront Payment <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        How much of the total funding are you requesting to receive in advance, apart from the milestone allocations?
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Enter amount (e.g., 5000)"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Milestone 1 */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Milestone 1:</h3>
+                  
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="milestone_name_1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Name <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter milestone name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_1_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Description <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe the milestone's key activities and goals"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_1_deliverables_kpi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Deliverables & Success Metrics/KPIs <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe tangible outputs and measurable success indicators"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_1_completion_date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="dark:text-gray-200">
+                            Estimated Completion Date <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_1_amount_requested"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Amount Requested <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter amount (e.g., 10000)"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                {/* Milestone 2 */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Milestone 2:</h3>
+                  
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="milestone_name_2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Name <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter milestone name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_2_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Description <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe the milestone's key activities and goals"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_2_deliverables_kpi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Deliverables & Success Metrics/KPIs <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe tangible outputs and measurable success indicators"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_2_completion_date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="dark:text-gray-200">
+                            Estimated Completion Date <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_2_amount_requested"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Amount Requested <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter amount (e.g., 15000)"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                {/* Milestone 3 (Optional) */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Milestone 3 (Optional):</h3>
+                  
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="milestone_name_3"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter milestone name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_3_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Description
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe the milestone's key activities and goals"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_3_deliverables_kpi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Deliverables & Success Metrics/KPIs
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe tangible outputs and measurable success indicators"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_3_completion_date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="dark:text-gray-200">
+                            Estimated Completion Date
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_3_amount_requested"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Amount Requested
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter amount (e.g., 15000)"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                {/* Milestone 4 (Optional) */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Milestone 4 (Optional):</h3>
+                  
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="milestone_name_4"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter milestone name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_4_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Milestone Description
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe the milestone's key activities and goals"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_4_deliverables_kpi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Deliverables & Success Metrics/KPIs
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe tangible outputs and measurable success indicators"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_4_completion_date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="dark:text-gray-200">
+                            Estimated Completion Date
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="milestone_4_amount_requested"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Amount Requested
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Enter amount (e.g., 15000)"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                {/* Additional Support Options */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="vc_fundraising_support_check"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Support with venture capital fundraising? <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormDescription>
+                          Please indicate if you require assistance with venture capital fundraising
+                        </FormDescription>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                            <SelectItem value="Yes" className="dark:text-gray-200">Yes</SelectItem>
+                            <SelectItem value="No" className="dark:text-gray-200">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="aethir_ai_gaming_fund_check"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Support through Aethir's Ecosystem Fund for AI and gaming innovators? <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormDescription>
+                          Would you like to be considered for computational resource support through Aethir's Ecosystem Fund for AI and gaming innovators? More information: <a href="https://www.avax.network/blog/avalanche-foundation-partners-with-aethir-to-fast-track-infrabuidl-ai-grantees-into-100m-ecosystem-fund" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">https://www.avax.network/blog/avalanche-foundation-partners-with-aethir-to-fast-track-infrabuidl-ai-grantees-into-100m-ecosystem-fund</a>
+                        </FormDescription>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                            <SelectItem value="Yes" className="dark:text-gray-200">Yes</SelectItem>
+                            <SelectItem value="No" className="dark:text-gray-200">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Contribution to the Avalanche Ecosystem */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Contribution to the Avalanche Ecosystem</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Current Development Stage */}
+                <FormField
+                  control={form.control}
+                  name="current_development_stage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Current Development Stage <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please share where you are in the development process.
+                      </FormDescription>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Early-Stage (idea, Proof of Concept, prototype development)" id="early-stage" />
+                            <label htmlFor="early-stage">Early-Stage (idea, Proof of Concept, prototype development)</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Mid-Stage (product on testnet, closed beta)" id="mid-stage" />
+                            <label htmlFor="mid-stage">Mid-Stage (product on testnet, closed beta)</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+<RadioGroupItem value="Late-Stage (product live with onchain metrics)" id="late-stage" />
+                            <label htmlFor="late-stage">Late-Stage (product live with onchain metrics)</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Duration working on the project */}
+                <FormField
+                  control={form.control}
+                  name="project_work_duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Duration working on the project <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="0-3 months" id="0-3-months" />
+                            <label htmlFor="0-3-months">0-3 months</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="4-6 months" id="4-6-months" />
+                            <label htmlFor="4-6-months">4-6 months</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="7-12 months" id="7-12-months" />
+                            <label htmlFor="7-12-months">7-12 months</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="1-2 years" id="1-2-years" />
+                            <label htmlFor="1-2-years">1-2 years</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="2+ years" id="2-plus-years" />
+                            <label htmlFor="2-plus-years">2+ years</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Project live status */}
+                <FormField
+                  control={form.control}
+                  name="project_live_status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Project live status <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Not Live" id="not-live" />
+                            <label htmlFor="not-live">Not Live</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Live on Testnet" id="live-testnet" />
+                            <label htmlFor="live-testnet">Live on Testnet</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Live on Mainnet" id="live-mainnet" />
+                            <label htmlFor="live-mainnet">Live on Mainnet</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Is your project multichain? */}
+                <FormField
+                  control={form.control}
+                  name="multichain_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Is your project multichain? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowMultichainDetails(value === "Yes");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="multichain-yes" />
+                            <label htmlFor="multichain-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="multichain-no" />
+                            <label htmlFor="multichain-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Share which chain(s) */}
+                {showMultichainDetails && (
+                  <FormField
+                    control={form.control}
+                    name="multichain_chains"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Share which chain(s): <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="List the chains your project supports or plans to support"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Will this be your first time building in the Avalanche Ecosystem? */}
+                <FormField
+                  control={form.control}
+                  name="first_build_avalanche"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Will this be your first time building in the Avalanche Ecosystem? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowPreviousProjectDetails(value === "No");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="first-build-yes" />
+                            <label htmlFor="first-build-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="first-build-no" />
+                            <label htmlFor="first-build-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Share your previous project name(s) and details */}
+                {showPreviousProjectDetails && (
+                  <FormField
+                    control={form.control}
+                    name="previous_avalanche_project_info"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Share your previous project name(s) and details: <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Describe your previous Avalanche projects and experience"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Contribution to the Avalanche Ecosystem */}
+                <FormField
+                  control={form.control}
+                  name="avalanche_contribution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Contribution to the Avalanche Ecosystem <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Please explain how your project contributes to Avalanche and your expected outcomes. Be specific about the outcomes you expect to see on the Avalanche Network as a result of you potentially receiving this grant.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="E.g., 10,000 new unique wallets on Avalanche in the first 6 months of launch."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Would any existing Avalanche projects/L1s benefit from your proposal being implemented? */}
+                <FormField
+                  control={form.control}
+                  name="avalanche_benefit_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Would any existing Avalanche projects/L1s benefit from your proposal being implemented? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowBenefitDetails(value === "Yes");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="avalanche-benefit-yes" />
+                            <label htmlFor="avalanche-benefit-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="avalanche-benefit-no" />
+                            <label htmlFor="avalanche-benefit-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Benefiting projects */}
+                {showBenefitDetails && (
+                  <>
+                    <div className="space-y-6 border-l-2 border-gray-200 pl-4 dark:border-gray-700">
+                      <FormField
+                        control={form.control}
+                        name="avalanche_l1_project_benefited_1"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="dark:text-gray-200">
+                              First Project/L1: Name and how they would benefit <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                placeholder="Project name and benefit"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className="dark:text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="avalanche_l1_project_benefited_1_website"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="dark:text-gray-200">
+                              First Project/L1: Website <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                placeholder="https://project-website.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className="dark:text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="avalanche_l1_project_benefited_2"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="dark:text-gray-200">
+                              Second Project/L1: Name and how they would benefit
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                placeholder="Project name and benefit"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className="dark:text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="avalanche_l1_project_benefited_2_website"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="dark:text-gray-200">
+                              Second Project/L1: Website
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                placeholder="https://project-website.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className="dark:text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
+                
+                {/* Are there any Web2 or Web3 projects that are similar to yours? */}
+                <FormField
+                  control={form.control}
+                  name="similar_project_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Are there any Web2 or Web3 projects that are similar to yours? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowSimilarProjects(value === "Yes");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="similar-project-yes" />
+                            <label htmlFor="similar-project-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="similar-project-no" />
+                            <label htmlFor="similar-project-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Similar projects */}
+                {showSimilarProjects && (
+                  <div className="space-y-6 border-l-2 border-gray-200 pl-4 dark:border-gray-700">
+                    <FormField
+                      control={form.control}
+                      name="similar_project_name_1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Project 1: Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Project name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="similar_project_website_1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Project 1: Website
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="https://project-website.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="similar_project_name_2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Project 2: Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Project name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="similar_project_website_2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Project 2: Website
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="https://project-website.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+                
+                {/* Does your project have any direct competitors? */}
+                <FormField
+                  control={form.control}
+                  name="direct_competitor_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Does your project have any direct competitors? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowCompetitors(value === "Yes");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="direct-competitor-yes" />
+                            <label htmlFor="direct-competitor-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="direct-competitor-no" />
+                            <label htmlFor="direct-competitor-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Competitors */}
+                {showCompetitors && (
+                  <div className="space-y-6 border-l-2 border-gray-200 pl-4 dark:border-gray-700">
+                    <FormField
+                      control={form.control}
+                      name="direct_competitor_1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Direct Competitor 1 <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe your competitor and how your project differs"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="direct_competitor_1_website"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Direct Competitor 1 Website <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="https://competitor-website.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="direct_competitor_2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Direct Competitor 2
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="Describe your competitor and how your project differs"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="direct_competitor_2_website"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="dark:text-gray-200">
+                            Direct Competitor 2 Website
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              placeholder="https://competitor-website.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="dark:text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+                
+                {/* Do you plan on launching your project's token on Avalanche? */}
+                <FormField
+                  control={form.control}
+                  name="token_launch_avalanche_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Do you plan on launching your project's token on Avalanche? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowTokenLaunchDetails(value === "No");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="token-launch-yes" />
+                            <label htmlFor="token-launch-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="token-launch-no" />
+                            <label htmlFor="token-launch-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Token launch details */}
+                {showTokenLaunchDetails && (
+                  <FormField
+                    control={form.control}
+                    name="token_launch_other"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          What chain(s) will you launch your token on and why?
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Explain which chains you plan to launch your token on and your reasoning"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Is your project open source? */}
+                <FormField
+                  control={form.control}
+                  name="open_source_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Is your project open source? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                          <SelectItem value="Yes" className="dark:text-gray-200">Yes</SelectItem>
+                          <SelectItem value="No" className="dark:text-gray-200">No</SelectItem>
+                          <SelectItem value="Partially" className="dark:text-gray-200">Partially</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            {/* Applicant Information */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Applicant Information</h2>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="firstname"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Applicant First Name <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Enter your first name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="lastname"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Applicant Last Name <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Enter your last name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Applicant Email <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Enter your email address"
+                          type="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="applicant_job_role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Applicant Job Title <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setShowJobRoleOther(value === "Other");
+                        }} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select your job role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                          {jobRoles.map((role) => (
+<SelectItem key={role} value={role} className="dark:text-gray-200">
+                              {role}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Job Role Other */}
+                {showJobRoleOther && (
+                  <FormField
+                    control={form.control}
+                    name="applicant_job_role_other"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Please specify your job title <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Specify your job title"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                <FormField
+                  control={form.control}
+                  name="applicant_bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Applicant Bio <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Provide a brief bio, including your background and experience"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="applicant_country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Country of Residence
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select your country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country} className="dark:text-gray-200">
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="x_account"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        X Account <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Share the link to your X account.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://twitter.com/yourusername"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="telegram"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Telegram <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Share the link to your Telegram account.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://t.me/yourusername"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="linkedin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        LinkedIn
+                      </FormLabel>
+                      <FormDescription>
+                        Share the link to your LinkedIn account.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://linkedin.com/in/yourusername"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="github"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        GitHub
+                      </FormLabel>
+                      <FormDescription>
+                        Share the link to your GitHub account.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="https://github.com/yourusername"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="other_resources"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Other Resource(s)
+                      </FormLabel>
+                      <FormDescription>
+                        Share any additional links that support your application. This could include portfolios, websites, media coverage, case studies, or anything else that helps illustrate your work or impact.
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Additional resources or links"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            {/* Team Details */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Team Details</h2>
+              </div>
+              
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="team_size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Team size <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowTeamMembers(value !== "1" && value !== "");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="1" id="team-size-1" />
+                            <label htmlFor="team-size-1">1</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="2-5" id="team-size-2-5" />
+                            <label htmlFor="team-size-2-5">2-5</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="6-10" id="team-size-6-10" />
+                            <label htmlFor="team-size-6-10">6-10</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="10+" id="team-size-10-plus" />
+                            <label htmlFor="team-size-10-plus">10+</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Team Members (conditionally shown) */}
+                {showTeamMembers && (
+                  <div className="mt-8 space-y-8">
+                    <div>
+                      <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-gray-100">Team Members</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        If applicable, you will be prompted to add two more team members other than the main applicant.
+                        Demonstrate the team's technical prowess and track record, ensuring they can deliver on their vision.
+                      </p>
+                    </div>
+                    
+                    {/* Team Member 1 */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h3 className="text-md font-medium mb-4 text-gray-900 dark:text-gray-100">Team Member 1:</h3>
+                      
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <FormField
+                            control={form.control}
+                            name="team_member_1_first_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="dark:text-gray-200">
+                                  First Name
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    placeholder="First name"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage className="dark:text-red-400" />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="team_member_1_last_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="dark:text-gray-200">
+                                  Last Name
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    placeholder="Last name"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage className="dark:text-red-400" />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Email
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="email@example.com"
+                                  type="email"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="job_role_team_member_1"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Job Role
+                              </FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                    <SelectValue placeholder="Select job role" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                  {jobRoles.map((role) => (
+                                    <SelectItem key={role} value={role} className="dark:text-gray-200">
+                                      {role}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_bio"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Bio
+                              </FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="Brief bio and experience"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_x_account"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                X Account
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://twitter.com/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_telegram"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Telegram
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://t.me/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_linkedin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                LinkedIn
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://linkedin.com/in/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_github"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                GitHub
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://github.com/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_1_country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Country
+                              </FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                    <SelectValue placeholder="Select country" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                  {countries.map((country) => (
+                                    <SelectItem key={country} value={country} className="dark:text-gray-200">
+                                      {country}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="other_resource_s__team_member_1"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Other Resource(s)
+                              </FormLabel>
+                              <FormDescription>
+                                Share any additional links that support your application. This could include portfolios, websites, media coverage, case studies, or anything else that helps illustrate your work or impact.
+                              </FormDescription>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="Additional resources or links"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Team Member 2 */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h3 className="text-md font-medium mb-4 text-gray-900 dark:text-gray-100">Team Member 2:</h3>
+                      
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <FormField
+                            control={form.control}
+                            name="team_member_2_first_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="dark:text-gray-200">
+                                  First Name
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    placeholder="First name"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage className="dark:text-red-400" />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="team_member_2_last_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="dark:text-gray-200">
+                                  Last Name
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    placeholder="Last name"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage className="dark:text-red-400" />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Email
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="email@example.com"
+                                  type="email"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="job_role_team_member_2"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Job Role
+                              </FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                    <SelectValue placeholder="Select job role" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                  {jobRoles.map((role) => (
+                                    <SelectItem key={role} value={role} className="dark:text-gray-200">
+                                      {role}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        {/* Rest of team member 2 fields (similar to team member 1) */}
+                        {/* ... (similar fields as team member 1) */}
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_bio"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Bio
+                              </FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="Brief bio and experience"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_x_account"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                X Account
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://twitter.com/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_telegram"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Telegram
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://t.me/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_linkedin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                LinkedIn
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://linkedin.com/in/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_github"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                GitHub
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="https://github.com/username"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="team_member_2_country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Country
+                              </FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                    <SelectValue placeholder="Select country" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                  {countries.map((country) => (
+                                    <SelectItem key={country} value={country} className="dark:text-gray-200">
+                                      {country}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="other_resource_s__team_member_2"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="dark:text-gray-200">
+                                Other Resource(s)
+                              </FormLabel>
+                              <FormDescription>
+                                Share any additional links that support your application. This could include portfolios, websites, media coverage, case studies, or anything else that helps illustrate your work or impact.
+                              </FormDescription>
+                              <FormControl>
+                                <Textarea
+                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  placeholder="Additional resources or links"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="dark:text-red-400" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Other */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+              <div className="space-y-1 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Other</h2>
+              </div>
+              
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="avalanche_grant_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        How did you hear about the Grant Program? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setShowGrantSource(value === "Other");
+                        }} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+<SelectItem value="Avalanche Website" className="dark:text-gray-200">Avalanche Website</SelectItem>
+                          <SelectItem value="Avalanche Forum" className="dark:text-gray-200">Avalanche Forum</SelectItem>
+                          <SelectItem value="Twitter/X" className="dark:text-gray-200">Twitter/X</SelectItem>
+                          <SelectItem value="Telegram" className="dark:text-gray-200">Telegram</SelectItem>
+                          <SelectItem value="LinkedIn" className="dark:text-gray-200">LinkedIn</SelectItem>
+                          <SelectItem value="Livestream" className="dark:text-gray-200">Livestream</SelectItem>
+                          <SelectItem value="The Arena" className="dark:text-gray-200">The Arena</SelectItem>
+                          <SelectItem value="Email" className="dark:text-gray-200">Email</SelectItem>
+                          <SelectItem value="Word of Mouth" className="dark:text-gray-200">Word of Mouth</SelectItem>
+                          <SelectItem value="Event" className="dark:text-gray-200">Event</SelectItem>
+                          <SelectItem value="Other" className="dark:text-gray-200">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Source Other */}
+                {watchGrantSource === "Other" && (
+                  <FormField
+                    control={form.control}
+                    name="avalanche_grant_source_other"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Let us know how you heard about the program
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Please specify"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Did someone specific refer you to the program? */}
+                <FormField
+                  control={form.control}
+                  name="program_referral_check"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-200">
+                        Did someone specific refer you to the program? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setShowReferrer(value === "Yes");
+                          }}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Yes" id="referral-yes" />
+                            <label htmlFor="referral-yes">Yes</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="No" id="referral-no" />
+                            <label htmlFor="referral-no">No</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage className="dark:text-red-400" />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Referrer */}
+                {showReferrer && (
+                  <FormField
+                    control={form.control}
+                    name="program_referrer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-gray-200">
+                          Share the name of the person who referred you <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            placeholder="Referrer's name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                
+                {/* Legal Compliance */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    The Avalanche Foundation needs the contact information you provide to us to contact you about our products and services. You may unsubscribe from these communications at any time. For information on how to unsubscribe, as well as our privacy practices and commitment to protecting your privacy, please review our <a href="#" className="text-blue-500 hover:underline">Privacy Policy</a>.
+                  </p>
+                  
+                  <FormField
+                    control={form.control}
+                    name="gdpr"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-200 dark:border-gray-700 p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal dark:text-gray-200">
+                            By checking this box, you agree and authorize the Avalanche Foundation to utilize artificial intelligence systems to process the information in your application, any related material you provide to us and any related communications between you and the Avalanche Foundation, in order to assess the eligibility and suitability of your application and proposal. You can withdraw your consent at any time. For more details on data processing and your rights, please refer to our Privacy Policy, linked above. <span className="text-red-500">*</span>
+                          </FormLabel>
+                        </div>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="marketing_consent"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-200 dark:border-gray-700 p-4 mt-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal dark:text-gray-200">
+                            Check this box to stay up to date with all things Avalanche, including promotional emails about events, initiatives and programs. You can unsubscribe anytime.
+                          </FormLabel>
+                        </div>
+                        <FormMessage className="dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-4 flex justify-end">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-8 py-2 bg-[#EB4C50] hover:bg-[#EB4C50]/90 dark:bg-[#EB4C50] dark:hover:bg-[#EB4C50]/90"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                  </>
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
     </div>
-  )
+  );
 }
