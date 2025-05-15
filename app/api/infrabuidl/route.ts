@@ -38,20 +38,19 @@ export async function POST(request: Request) {
     });
     
     processedFormData["2-44649732/project_type_ai"] = formData.project_type || "N/A";
-    processedFormData["2-44649732/project_type_other"] = "N/A";
-    processedFormData["2-44649732/token_launch_other"] = "N/A";
-    processedFormData["2-44649732/funding_round"] = "N/A";
-    processedFormData["2-44649732/direct_competitor_1"] = "N/A";
-    processedFormData["2-44649732/applicant_job_role_other"] = "N/A";
-    processedFormData["2-44649732/avalanche_l1_project_benefited_1"] = "N/A";
-    processedFormData["2-44649732/previous_avalanche_project_info"] = "N/A";
-    processedFormData["2-44649732/funding_amount"] = "N/A";
-    processedFormData["2-44649732/direct_competitor_1_website"] = "N/A";
-    processedFormData["2-44649732/program_referrer"] = "N/A";
-    processedFormData["2-44649732/funding_entity"] = "N/A";
-    processedFormData["2-44649732/multichain_chains"] = "N/A";
-    processedFormData["2-44649732/avalanche_l1_project_benefited_1_website"] = "N/A";
-    
+    processedFormData["2-44649732/project_type_other"] = formData.project_type_other || "N/A";
+    processedFormData["2-44649732/token_launch_other"] = formData.token_launch_other || "N/A";
+    processedFormData["2-44649732/funding_round"] = formData.funding_round || "N/A";
+    processedFormData["2-44649732/direct_competitor_1"] = formData.direct_competitor_1 || "N/A";
+    processedFormData["2-44649732/applicant_job_role_other"] = formData.applicant_job_role_other || "N/A";
+    processedFormData["2-44649732/avalanche_l1_project_benefited_1"] = formData.avalanche_l1_project_benefited_1 || "N/A";
+    processedFormData["2-44649732/previous_avalanche_project_info"] = formData.previous_avalanche_project_info || "N/A";
+    processedFormData["2-44649732/funding_amount"] = formData.funding_amount || "N/A";
+    processedFormData["2-44649732/direct_competitor_1_website"] = formData.direct_competitor_1_website || "N/A";
+    processedFormData["2-44649732/program_referrer"] = formData.program_referrer || "N/A";
+    processedFormData["2-44649732/funding_entity"] = formData.funding_entity || "N/A";
+    processedFormData["2-44649732/multichain_chains"] = formData.multichain_chains || "N/A";
+    processedFormData["2-44649732/avalanche_l1_project_benefited_1_website"] = formData.avalanche_l1_project_benefited_1_website || "N/A";   
     processedFormData["2-44649732/applicant_first_name"] = formData.firstname;
     processedFormData["2-44649732/applicant_last_name"] = formData.lastname;
      
