@@ -4,11 +4,13 @@
   "icon": "Logs",
   "root": true,
   "redirects": {
-    "/docs/avalanche-l1s/default-precompiles/permissions": "/docs/avalanche-l1s/permissions",
-    "/docs/avalanche-l1s/default-precompiles/allowlist": "/docs/avalanche-l1s/allowlist",
-    "/docs/avalanche-l1s/default-precompiles/tokenomics": "/docs/avalanche-l1s/tokenomics",
-    "/docs/avalanche-l1s/default-precompiles/transaction-fees": "/docs/avalanche-l1s/transaction-fees",
-    "/docs/avalanche-l1s/default-precompiles/warpmessenger": "/docs/avalanche-l1s/warpmessenger"
+    "/docs/avalanche-l1s/precompile-upgrades": "/docs/avalanche-l1s/subnetEVM-configuration/precompile-upgrades",
+    "/docs/avalanche-l1s/permissions": "/docs/avalanche-l1s/subnetEVM-configuration/permissions",
+    "/docs/avalanche-l1s/allowlist": "/docs/avalanche-l1s/subnetEVM-configuration/allowlist",
+    "/docs/avalanche-l1s/tokenomics": "/docs/avalanche-l1s/subnetEVM-configuration/tokenomics",
+    "/docs/avalanche-l1s/transaction-fees": "/docs/avalanche-l1s/subnetEVM-configuration/transaction-fees",
+    "/docs/avalanche-l1s/warpmessenger": "/docs/avalanche-l1s/subnetEVM-configuration/warpmessenger",
+    "/docs/avalanche-l1s/evm-l1-customization": "/docs/avalanche-l1s/subnetEVM-configuration/evm-l1-customization"
   },
   "pages": [
     "---Avalanche L1s---",
@@ -26,13 +28,13 @@
     "validator-manager/upgrade",
     "validator-manager/custom-validator-manager",
     "---Subnet-EVM Configuration---",
-    "evm-l1-customization",
-    "allowlist",
-    "permissions",
-    "tokenomics",
-    "transaction-fees",
-    "warpmessenger",
-    "precompile-upgrades",
+    "subnetEVM-configuration/evm-l1-customization",
+    "subnetEVM-configuration/allowlist",
+    "subnetEVM-configuration/permissions",
+    "subnetEVM-configuration/tokenomics",
+    "subnetEVM-configuration/transaction-fees",
+    "subnetEVM-configuration/warpmessenger",
+    "subnetEVM-configuration/precompile-upgrades",
     "---Upgrade an Avalanche L1---",
     "...upgrade"
   ]
