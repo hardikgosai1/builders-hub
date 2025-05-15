@@ -17,15 +17,10 @@ const DEFAULT_OPTIONS: RateLimitOptions = {
   maxRequests: 1,
 };
 
-async function defaultIdentifier(req: NextRequest): Promise<string> {
-  try {
+async function defaultIdentifier(): Promise<string> {
     const session = await import('@/lib/auth/authSession').then(mod => mod.getAuthSession());
     const userId = session?.user?.id || 'anonymous';
     return userId;
-  } catch (authError) {
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
-    return ip;
-  }
 }
 
 function getResetTime(timestamp: number): string {
