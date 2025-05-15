@@ -45,6 +45,7 @@ export interface GetHackathonsOptions {
     date?: string | null;
     status?: HackathonStatus | null;
     search?: string;
+    created_by?: string | null;
 }
 
 export async function getHackathon(id: string) {
@@ -94,6 +95,7 @@ export async function getFilteredHackathons(options: GetHackathonsOptions) {
             }
         }
     }
+    if (options.created_by) filters.created_by = options.created_by;
     if (options.date) filters.date = options.date;
     if (options.search) {
         const searchWords = options.search.split(/\s+/)
