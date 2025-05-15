@@ -310,13 +310,13 @@ export const ConnectWallet = ({
             console.error("P-Chain token request error:", error);
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
             setPTokenRequestError(errorMessage);
-            if (errorMessage.includes("login first") || errorMessage.includes("401")) {
+            if (errorMessage.includes("login") || errorMessage.includes("401")) {
                 setAlertDialogTitle("Authentication Required");
-                setAlertDialogMessage("You need to be logged in to request tokens.");
+                setAlertDialogMessage("You need to be logged in to request free tokens from the P-Chain Faucet.");
                 setIsLoginError(true);
                 setIsAlertDialogOpen(true);
             } else {
-                setAlertDialogTitle("P-Chain Token Request Failed");
+                setAlertDialogTitle("Faucet Request Failed");
                 setAlertDialogMessage(errorMessage);
                 setIsLoginError(false);
                 setIsAlertDialogOpen(true);
