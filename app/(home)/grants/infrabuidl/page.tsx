@@ -17,7 +17,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
-// Create schema for form validation
 const formSchema = z.object({
   // Project Overview
   project: z.string().min(1, "Project name is required"),
@@ -177,7 +176,6 @@ const jobRoles = [
   "Other"
 ];
 
-// These are continents that will be available in dropdown
 const continents = [
   "Africa",
   "Asia",
@@ -187,13 +185,14 @@ const continents = [
   "South America"
 ];
 
-// Sample list of countries for the dropdown
 const countries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", 
   "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-  // Add more countries as needed
-  "United States", "United Kingdom", "Canada", "Germany", "France", "Japan", "China", "India", "Russia", "Brazil"
+  "Canada", "China", "Denmark", "Egypt", "Finland", "France", "Germany", "Greece", "India", "Indonesia",
+  "Ireland", "Israel", "Italy", "Japan", "Kenya", "Mexico", "Netherlands", "New Zealand", "Norway",
+  "Portugal", "Russia", "Saudi Arabia", "Singapore", "South Africa", "South Korea", "Spain", "Sweden",
+  "Switzerland", "Thailand", "Turkey", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Vietnam"
 ];
 
 export default function InfrabuildlGrantsForm() {
@@ -211,8 +210,8 @@ export default function InfrabuildlGrantsForm() {
   const [showTokenLaunchDetails, setShowTokenLaunchDetails] = useState(false);
   const [showReferrer, setShowReferrer] = useState(false);
   const [selectedGrantProgram, setSelectedGrantProgram] = useState("");
+  const [showGrantSource, setShowGrantSource] = useState(false);
 
-  // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -349,7 +348,6 @@ export default function InfrabuildlGrantsForm() {
     }
   });
 
-  // Watch for changes in specific form values to show/hide conditional fields
   const watchTeamSize = form.watch("team_size");
   const watchProjectType = form.watch("project_type");
   const watchApplicantJobRole = form.watch("applicant_job_role");
@@ -364,11 +362,11 @@ export default function InfrabuildlGrantsForm() {
   const watchReferralCheck = form.watch("program_referral_check");
   const watchGrantProgram = form.watch("grant_program");
 
-  // Effect to update state based on form field changes
   useEffect(() => {
     setShowTeamMembers(watchTeamSize !== "1" && watchTeamSize !== "");
     setShowProjectTypeOther(watchProjectType === "Other");
     setShowJobRoleOther(watchApplicantJobRole === "Other");
+    setShowGrantSource(watchGrantSource === "Other");
     
     const fundingTypes = ["Grant", "Angel Investment", "Pre-Seed", "Seed", "Series A"];
     setShowFundingDetails(watchPreviousFunding.some(type => fundingTypes.includes(type)));
@@ -401,66 +399,67 @@ export default function InfrabuildlGrantsForm() {
   // Function to handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    console.log('Form values:', values);
     
-    try {
-      // Convert form values to HubSpot data format
-      const hubspotFormData: Record<string, string | number | boolean | string[]> = {};
-      
-      // Map each field to its HubSpot property name
-      Object.entries(values).forEach(([key, value]) => {
-        // Skip empty optional fields
-        if ((value === "" || value === null || value === undefined) && 
-            key !== "firstname" && 
-            key !== "email" && 
-            !key.includes("required")) {
-          return;
-        }
-        
-        // Handle arrays (checkboxes)
-        if (Array.isArray(value)) {
-          hubspotFormData[key] = value.join(";");
-        }
-        // Handle dates
-        else if (value instanceof Date) {
-          hubspotFormData[key] = format(value, "yyyy-MM-dd");
-        }
-        // Handle booleans
-        else if (typeof value === 'boolean') {
-          if (key === 'gdpr' || key === 'marketing_consent') {
-            hubspotFormData[key] = value;
-          } else {
-            hubspotFormData[key] = value ? "Yes" : "No";
-          }
-        } 
-        // Handle everything else
-        else {
-          hubspotFormData[key] = value;
-        }
-      });
-      
-      console.log("HubSpot form data prepared for submission:", hubspotFormData);
-
-      // Submit to HubSpot API
-      const response = await fetch('/api/hubspot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(hubspotFormData)
-      });
-
-      console.log("API Response status:", response.status);
-      const result = await response.json();
-      console.log("API Response data:", result);
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Failed to submit to HubSpot');
+try {
+  // Convert form values to HubSpot data format
+  const hubspotFormData: Record<string, string | number | boolean | string[]> = {};
+  
+  // Map each field to its HubSpot property name
+  Object.entries(values).forEach(([key, value]) => {
+    // Skip empty optional fields
+    if ((value === "" || value === null || value === undefined) && 
+        key !== "firstname" && 
+        key !== "email" && 
+        !key.includes("required")) {
+      return;
+    }
+    
+    // Handle arrays (checkboxes)
+    if (Array.isArray(value)) {
+      hubspotFormData[key] = value.join(";");
+    }
+    // Handle dates
+    else if (value instanceof Date) {
+      hubspotFormData[key] = format(value, "yyyy-MM-dd");
+    }
+    // Handle booleans
+    else if (typeof value === 'boolean') {
+      if (key === 'gdpr' || key === 'marketing_consent') {
+        hubspotFormData[key] = value;
+      } else {
+        hubspotFormData[key] = value ? "Yes" : "No";
       }
+    } 
+    // Handle everything else
+    else {
+      hubspotFormData[key] = value;
+    }
+  });
+  
+  console.log("HubSpot form data prepared for submission:", hubspotFormData);
 
-      setSubmissionStatus('success');
-      alert("Your grant application has been successfully submitted!");
-      form.reset();
-    } catch (error) {
+  // Submit to Infrabuidl form API
+  const response = await fetch('/api/infrabuidl', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(hubspotFormData)
+  });
+
+  console.log("API Response status:", response.status);
+  const result = await response.json();
+  console.log("API Response data:", result);
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || 'Failed to submit to HubSpot');
+  }
+
+  setSubmissionStatus('success');
+  alert("Your grant application has been successfully submitted!");
+  form.reset();
+} catch (error) {
       setSubmissionStatus('error');
       alert(`Error submitting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
@@ -470,30 +469,40 @@ export default function InfrabuildlGrantsForm() {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <section className="text-center space-y-6 pt-12 pb-16">
-        <div className="flex justify-center mb-6">
+        <div className="w-full relative mb-8">
           <Image
-            src="/logo-black.png"
-            alt="Avalanche Logo"
-            width={200}
-            height={50}
-            className="dark:hidden"
-          />
-          <Image
-            src="/logo-white.png"
-            alt="Avalanche Logo"
-            width={200}
-            height={50}
-            className="hidden dark:block"
+            src="/infrabuidl.png"
+            alt="Avalanche infraBUILD() Program"
+            width={800}
+            height={200}
+            className="w-full h-auto rounded-lg"
+            priority
           />
         </div>
-        <h1 className="text-4xl md:text-7xl font-bold tracking-tighter">
-          infraBUIDL
-          <span className="block pb-1 text-[#EB4C50]">
-            Grants Program
-          </span>
-        </h1>
-      </section>
+        <h1 className="text-7xl font-bold mb-4 leading-tight font-mono">Avalanche<br/>infraBUIDL()<br/>Program</h1>
+        <h2 className="text-2xl mb-6 font-semibold text-red-500 font-mono">Application Form</h2>
+        
+        <div className="mb-12 space-y-4">
+          <p className="text-lg">
+            The Avalanche infraBUIDL() Program is designed to fortify the Avalanche ecosystem 
+            by supporting infrastructure projects that enhance user and developer experience.
+          </p>
+          
+          <p className="text-gray-400 text-sm">
+            infraBUIDL() will fund projects demonstrating innovation or strategic importance to 
+            the broader Avalanche ecosystem. The program will support onramps, validator marketplaces, 
+            VMs, wallets, oracles, interoperability tools, cryptography, bridges, explorers, RPCs, data 
+            storage, indexers, token engineering, and more!To be considered for support from the program, 
+            please fill out the form with all relevant details, and the Avalanche Foundation will 
+            reach out to discuss your project.For further information on the infraBUIDL() Program, 
+            including eligibility criteria and application requirements, visit the Forum.
+          </p>
+          
+          <p className="text-gray-400 text-sm">
+            For further information on the infraBUILD() Program, including eligibility criteria
+            and application requirements, visit the <a href="https://forum.avax.network" className="text-red-500 underline">Forum</a>.
+          </p>
+        </div>
       
       {submissionStatus === 'success' ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
@@ -513,9 +522,9 @@ export default function InfrabuildlGrantsForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Project Overview */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Project Overview</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Project Overview</h2>
               </div>
               
               <div className="space-y-6">
@@ -525,12 +534,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company Name <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Enter your project or company name"
                           {...field}
                         />
@@ -546,7 +555,7 @@ export default function InfrabuildlGrantsForm() {
                   name="grant_program"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Grant Program <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -580,7 +589,7 @@ export default function InfrabuildlGrantsForm() {
                     name="project_type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Project Type <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
@@ -649,7 +658,7 @@ export default function InfrabuildlGrantsForm() {
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <RadioGroupItem value="Other" id="other" />
-<label htmlFor="other">Other</label>
+                                  <label htmlFor="other">Other</label>
                                 </div>
                               </>
                             ) : (
@@ -704,12 +713,12 @@ export default function InfrabuildlGrantsForm() {
                     name="project_type_other"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           If you chose "Other," please share your project's type below <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="E.g., RWA"
                             {...field}
                           />
@@ -726,7 +735,7 @@ export default function InfrabuildlGrantsForm() {
                   name="project_abstract_objective"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project Abstract and Objective <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -734,7 +743,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Describe your project, its objectives, and key use cases..."
                           {...field}
                         />
@@ -750,7 +759,7 @@ export default function InfrabuildlGrantsForm() {
                   name="technical_roadmap"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Technical Roadmap <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -758,7 +767,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Outline your technical roadmap with timelines and key activities..."
                           {...field}
                         />
@@ -774,7 +783,7 @@ export default function InfrabuildlGrantsForm() {
                   name="repositories_achievements"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Repositories and Achievements <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -782,7 +791,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="List your repositories and achievements in blockchain or AI fields..."
                           {...field}
                         />
@@ -798,7 +807,7 @@ export default function InfrabuildlGrantsForm() {
                   name="risks_challenges"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Risks and Challenges <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -806,7 +815,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Describe the risks, challenges, and contingency plans for your project..."
                           {...field}
                         />
@@ -822,12 +831,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company Website
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://yourwebsite.com"
                           {...field}
                         />
@@ -843,12 +852,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_x_handle"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company X Handle
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="@yourhandle"
                           {...field}
                         />
@@ -864,12 +873,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_github"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company GitHub <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://github.com/your-project"
                           {...field}
                         />
@@ -885,7 +894,7 @@ export default function InfrabuildlGrantsForm() {
                   name="company_type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Company Type <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -939,12 +948,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_hq"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company HQ <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
                         </FormControl>
@@ -967,12 +976,12 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_continent"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company Continent <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select continent" />
                           </SelectTrigger>
                         </FormControl>
@@ -995,13 +1004,13 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_logo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company Logo
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="file"
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           onChange={(e) => {
                             const file = e.target.files ? e.target.files[0] : null;
                             field.onChange(file);
@@ -1019,13 +1028,13 @@ export default function InfrabuildlGrantsForm() {
                   name="project_company_banner"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project/Company Banner
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="file"
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           onChange={(e) => {
                             const file = e.target.files ? e.target.files[0] : null;
                             field.onChange(file);
@@ -1043,7 +1052,7 @@ export default function InfrabuildlGrantsForm() {
                   name="media_kit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Media Kit <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -1051,7 +1060,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://drive.google.com/drive/folders/your-folder-id"
                           {...field}
                         />
@@ -1064,9 +1073,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Financial Overview */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Financial Overview</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Financial Overview</h2>
               </div>
               
               <div className="space-y-6">
@@ -1076,7 +1085,7 @@ export default function InfrabuildlGrantsForm() {
                   name="previous_funding"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Previous Funding <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -1093,7 +1102,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "No Funding");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="no-funding" className="text-sm font-medium leading-none">
                             No Funding
@@ -1109,7 +1118,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Self-Funding");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="self-funding" className="text-sm font-medium leading-none">
                             Self-Funding
@@ -1125,7 +1134,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Family & Friends");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="family-friends" className="text-sm font-medium leading-none">
                             Family & Friends
@@ -1141,7 +1150,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Grant");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="grant" className="text-sm font-medium leading-none">
                             Grant
@@ -1157,7 +1166,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Angel Investment");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="angel-investment" className="text-sm font-medium leading-none">
                             Angel Investment
@@ -1173,7 +1182,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Pre-Seed");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="pre-seed" className="text-sm font-medium leading-none">
                             Pre-Seed
@@ -1189,7 +1198,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Seed");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="seed" className="text-sm font-medium leading-none">
                             Seed
@@ -1205,7 +1214,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Series A");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="series-a" className="text-sm font-medium leading-none">
                             Series A
@@ -1225,12 +1234,12 @@ export default function InfrabuildlGrantsForm() {
                       name="funding_entity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Funding Entity <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter the name of the funding entity"
                               {...field}
                             />
@@ -1245,12 +1254,12 @@ export default function InfrabuildlGrantsForm() {
                       name="funding_amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Funding Amount <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter the funding amount (e.g., $100,000)"
                               {...field}
                             />
@@ -1265,12 +1274,12 @@ export default function InfrabuildlGrantsForm() {
                       name="funding_round"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Funding Round <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter the funding round details"
                               {...field}
                             />
@@ -1288,7 +1297,7 @@ export default function InfrabuildlGrantsForm() {
                   name="previous_avalanche_funding_grants"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Previous Avalanche Funding/Grants <span className="text-red-500">*</span>
                       </FormLabel>
                       <div className="flex flex-col space-y-2">
@@ -1302,7 +1311,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "Codebase");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="codebase" className="text-sm font-medium leading-none">
                             Codebase
@@ -1318,7 +1327,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "infraBUIDL()");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="infrabuildl" className="text-sm font-medium leading-none">
                             infraBUIDL()
@@ -1334,7 +1343,7 @@ export default function InfrabuildlGrantsForm() {
                                 : field.value.filter((v) => v !== "infraBUIDL(AI)");
                               field.onChange(newValue);
                             }}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                           <label htmlFor="infrabuildl-ai" className="text-sm font-medium leading-none">
                             infraBUIDL(AI)
@@ -1352,7 +1361,7 @@ export default function InfrabuildlGrantsForm() {
                   name="requested_funding_range"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Requested Funding Range <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -1369,7 +1378,7 @@ export default function InfrabuildlGrantsForm() {
                             <RadioGroupItem value="$25,000 - $49,999" id="25000-49999" />
                             <label htmlFor="25000-49999">$25,000 - $49,999</label>
                           </div>
-<div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
                             <RadioGroupItem value="$50,000 - $99,999" id="50000-99999" />
                             <label htmlFor="50000-99999">$50,000 - $99,999</label>
                           </div>
@@ -1391,9 +1400,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Grant Budget Structure & Milestones */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Grant Budget Structure & Milestones</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Grant Budget Structure & Milestones</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Each project must present a structured grant budget and define four (4) key milestones, each with 
                   clear deliverables, measurable success criteria, and an allocated budget. This ensures transparency, 
@@ -1434,7 +1443,7 @@ export default function InfrabuildlGrantsForm() {
                   name="upfront_payment_requested"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Upfront Payment <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -1443,10 +1452,14 @@ export default function InfrabuildlGrantsForm() {
                       <FormControl>
                         <Input
                           type="number"
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Enter amount (e.g., 5000)"
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          value={field.value === 0 ? "" : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage className="dark:text-red-400" />
@@ -1464,12 +1477,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_name_1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Name <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter milestone name"
                               {...field}
                             />
@@ -1484,12 +1497,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_1_description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Description <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe the milestone's key activities and goals"
                               {...field}
                             />
@@ -1504,12 +1517,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_1_deliverables_kpi"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Deliverables & Success Metrics/KPIs <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe tangible outputs and measurable success indicators"
                               {...field}
                             />
@@ -1524,7 +1537,7 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_1_completion_date"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Estimated Completion Date <span className="text-red-500">*</span>
                           </FormLabel>
                           <Popover>
@@ -1532,7 +1545,7 @@ export default function InfrabuildlGrantsForm() {
                               <FormControl>
                                 <Button
                                   variant={"outline"}
-                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
                                 >
                                   {field.value ? (
                                     format(field.value, "PPP")
@@ -1562,16 +1575,20 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_1_amount_requested"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Amount Requested <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter amount (e.g., 10000)"
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              value={field.value === 0 ? "" : field.value}
+                              onChange={(e) => {
+                                const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                field.onChange(value);
+                              }}
                             />
                           </FormControl>
                           <FormMessage className="dark:text-red-400" />
@@ -1591,12 +1608,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_name_2"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Name <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter milestone name"
                               {...field}
                             />
@@ -1611,12 +1628,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_2_description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Description <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe the milestone's key activities and goals"
                               {...field}
                             />
@@ -1631,12 +1648,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_2_deliverables_kpi"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Deliverables & Success Metrics/KPIs <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe tangible outputs and measurable success indicators"
                               {...field}
                             />
@@ -1651,7 +1668,7 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_2_completion_date"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Estimated Completion Date <span className="text-red-500">*</span>
                           </FormLabel>
                           <Popover>
@@ -1659,7 +1676,7 @@ export default function InfrabuildlGrantsForm() {
                               <FormControl>
                                 <Button
                                   variant={"outline"}
-                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
                                 >
                                   {field.value ? (
                                     format(field.value, "PPP")
@@ -1689,16 +1706,20 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_2_amount_requested"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Amount Requested <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter amount (e.g., 15000)"
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              value={field.value === 0 ? "" : field.value}
+                              onChange={(e) => {
+                                const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                field.onChange(value);
+                              }}
                             />
                           </FormControl>
                           <FormMessage className="dark:text-red-400" />
@@ -1718,12 +1739,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_name_3"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Name
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter milestone name"
                               {...field}
                             />
@@ -1738,12 +1759,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_3_description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Description
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe the milestone's key activities and goals"
                               {...field}
                             />
@@ -1758,12 +1779,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_3_deliverables_kpi"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Deliverables & Success Metrics/KPIs
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe tangible outputs and measurable success indicators"
                               {...field}
                             />
@@ -1778,7 +1799,7 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_3_completion_date"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Estimated Completion Date
                           </FormLabel>
                           <Popover>
@@ -1786,7 +1807,7 @@ export default function InfrabuildlGrantsForm() {
                               <FormControl>
                                 <Button
                                   variant={"outline"}
-                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
                                 >
                                   {field.value ? (
                                     format(field.value, "PPP")
@@ -1816,17 +1837,18 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_3_amount_requested"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Amount Requested
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter amount (e.g., 15000)"
                               {...field}
+                              value={field.value === 0 ? "" : field.value}
                               onChange={(e) => {
-                                const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
+                                const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
                                 field.onChange(value);
                               }}
                             />
@@ -1848,12 +1870,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_name_4"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Name
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter milestone name"
                               {...field}
                             />
@@ -1868,12 +1890,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_4_description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Milestone Description
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe the milestone's key activities and goals"
                               {...field}
                             />
@@ -1888,12 +1910,12 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_4_deliverables_kpi"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Deliverables & Success Metrics/KPIs
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe tangible outputs and measurable success indicators"
                               {...field}
                             />
@@ -1908,7 +1930,7 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_4_completion_date"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Estimated Completion Date
                           </FormLabel>
                           <Popover>
@@ -1916,7 +1938,7 @@ export default function InfrabuildlGrantsForm() {
                               <FormControl>
                                 <Button
                                   variant={"outline"}
-                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
+                                  className={`w-full pl-3 text-left font-normal border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100 ${!field.value ? "text-muted-foreground" : ""}`}
                                 >
                                   {field.value ? (
                                     format(field.value, "PPP")
@@ -1946,15 +1968,16 @@ export default function InfrabuildlGrantsForm() {
                       name="milestone_4_amount_requested"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Amount Requested
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Enter amount (e.g., 15000)"
                               {...field}
+                              value={field.value === 0 ? "" : field.value}
                               onChange={(e) => {
                                 const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
                                 field.onChange(value);
@@ -1975,7 +1998,7 @@ export default function InfrabuildlGrantsForm() {
                     name="vc_fundraising_support_check"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Support with venture capital fundraising? <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormDescription>
@@ -1983,7 +2006,7 @@ export default function InfrabuildlGrantsForm() {
                         </FormDescription>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
                           </FormControl>
@@ -2002,7 +2025,7 @@ export default function InfrabuildlGrantsForm() {
                     name="aethir_ai_gaming_fund_check"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Support through Aethir's Ecosystem Fund for AI and gaming innovators? <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormDescription>
@@ -2010,7 +2033,7 @@ export default function InfrabuildlGrantsForm() {
                         </FormDescription>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                            <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
                           </FormControl>
@@ -2028,9 +2051,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Contribution to the Avalanche Ecosystem */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Contribution to the Avalanche Ecosystem</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Contribution to the Avalanche Ecosystem</h2>
               </div>
               
               <div className="space-y-6">
@@ -2040,7 +2063,7 @@ export default function InfrabuildlGrantsForm() {
                   name="current_development_stage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Current Development Stage <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -2077,7 +2100,7 @@ export default function InfrabuildlGrantsForm() {
                   name="project_work_duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Duration working on the project <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2119,7 +2142,7 @@ export default function InfrabuildlGrantsForm() {
                   name="project_live_status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Project live status <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2153,7 +2176,7 @@ export default function InfrabuildlGrantsForm() {
                   name="multichain_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Is your project multichain? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2187,12 +2210,12 @@ export default function InfrabuildlGrantsForm() {
                     name="multichain_chains"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Share which chain(s): <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Textarea
-                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="List the chains your project supports or plans to support"
                             {...field}
                           />
@@ -2209,7 +2232,7 @@ export default function InfrabuildlGrantsForm() {
                   name="first_build_avalanche"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Will this be your first time building in the Avalanche Ecosystem? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2243,12 +2266,12 @@ export default function InfrabuildlGrantsForm() {
                     name="previous_avalanche_project_info"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Share your previous project name(s) and details: <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Textarea
-                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Describe your previous Avalanche projects and experience"
                             {...field}
                           />
@@ -2265,7 +2288,7 @@ export default function InfrabuildlGrantsForm() {
                   name="avalanche_contribution"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Contribution to the Avalanche Ecosystem <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -2273,7 +2296,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="E.g., 10,000 new unique wallets on Avalanche in the first 6 months of launch."
                           {...field}
                         />
@@ -2289,7 +2312,7 @@ export default function InfrabuildlGrantsForm() {
                   name="avalanche_benefit_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Would any existing Avalanche projects/L1s benefit from your proposal being implemented? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2325,12 +2348,12 @@ export default function InfrabuildlGrantsForm() {
                         name="avalanche_l1_project_benefited_1"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-200">
+                            <FormLabel className="dark:text-gray-200 text-md">
                               First Project/L1: Name and how they would benefit <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
-                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                 placeholder="Project name and benefit"
                                 {...field}
                               />
@@ -2345,12 +2368,12 @@ export default function InfrabuildlGrantsForm() {
                         name="avalanche_l1_project_benefited_1_website"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-200">
+                            <FormLabel className="dark:text-gray-200 text-md">
                               First Project/L1: Website <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
-                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                 placeholder="https://project-website.com"
                                 {...field}
                               />
@@ -2365,12 +2388,12 @@ export default function InfrabuildlGrantsForm() {
                         name="avalanche_l1_project_benefited_2"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-200">
+                            <FormLabel className="dark:text-gray-200 text-md">
                               Second Project/L1: Name and how they would benefit
                             </FormLabel>
                             <FormControl>
                               <Input
-                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                 placeholder="Project name and benefit"
                                 {...field}
                               />
@@ -2385,12 +2408,12 @@ export default function InfrabuildlGrantsForm() {
                         name="avalanche_l1_project_benefited_2_website"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-200">
+                            <FormLabel className="dark:text-gray-200 text-md">
                               Second Project/L1: Website
                             </FormLabel>
                             <FormControl>
                               <Input
-                                className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                 placeholder="https://project-website.com"
                                 {...field}
                               />
@@ -2409,7 +2432,7 @@ export default function InfrabuildlGrantsForm() {
                   name="similar_project_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Are there any Web2 or Web3 projects that are similar to yours? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2444,12 +2467,12 @@ export default function InfrabuildlGrantsForm() {
                       name="similar_project_name_1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Project 1: Name
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Project name"
                               {...field}
                             />
@@ -2464,12 +2487,12 @@ export default function InfrabuildlGrantsForm() {
                       name="similar_project_website_1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Project 1: Website
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="https://project-website.com"
                               {...field}
                             />
@@ -2484,12 +2507,12 @@ export default function InfrabuildlGrantsForm() {
                       name="similar_project_name_2"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Project 2: Name
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Project name"
                               {...field}
                             />
@@ -2504,12 +2527,12 @@ export default function InfrabuildlGrantsForm() {
                       name="similar_project_website_2"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Project 2: Website
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="https://project-website.com"
                               {...field}
                             />
@@ -2527,7 +2550,7 @@ export default function InfrabuildlGrantsForm() {
                   name="direct_competitor_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Does your project have any direct competitors? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2562,12 +2585,12 @@ export default function InfrabuildlGrantsForm() {
                       name="direct_competitor_1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Direct Competitor 1 <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe your competitor and how your project differs"
                               {...field}
                             />
@@ -2582,12 +2605,12 @@ export default function InfrabuildlGrantsForm() {
                       name="direct_competitor_1_website"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Direct Competitor 1 Website <span className="text-red-500">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="https://competitor-website.com"
                               {...field}
                             />
@@ -2602,12 +2625,12 @@ export default function InfrabuildlGrantsForm() {
                       name="direct_competitor_2"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Direct Competitor 2
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="Describe your competitor and how your project differs"
                               {...field}
                             />
@@ -2622,12 +2645,12 @@ export default function InfrabuildlGrantsForm() {
                       name="direct_competitor_2_website"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-200">
+                          <FormLabel className="dark:text-gray-200 text-md">
                             Direct Competitor 2 Website
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                               placeholder="https://competitor-website.com"
                               {...field}
                             />
@@ -2645,7 +2668,7 @@ export default function InfrabuildlGrantsForm() {
                   name="token_launch_avalanche_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Do you plan on launching your project's token on Avalanche? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -2679,12 +2702,12 @@ export default function InfrabuildlGrantsForm() {
                     name="token_launch_other"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           What chain(s) will you launch your token on and why?
                         </FormLabel>
                         <FormControl>
                           <Textarea
-                            className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Explain which chains you plan to launch your token on and your reasoning"
                             {...field}
                           />
@@ -2701,12 +2724,12 @@ export default function InfrabuildlGrantsForm() {
                   name="open_source_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Is your project open source? <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
                         </FormControl>
@@ -2724,9 +2747,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Applicant Information */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Applicant Information</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Applicant Information</h2>
               </div>
               
               <div className="space-y-6">
@@ -2736,12 +2759,12 @@ export default function InfrabuildlGrantsForm() {
                     name="firstname"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Applicant First Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Enter your first name"
                             {...field}
                           />
@@ -2756,12 +2779,12 @@ export default function InfrabuildlGrantsForm() {
                     name="lastname"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Applicant Last Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Enter your last name"
                             {...field}
                           />
@@ -2777,12 +2800,12 @@ export default function InfrabuildlGrantsForm() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Applicant Email <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Enter your email address"
                           type="email"
                           {...field}
@@ -2798,7 +2821,7 @@ export default function InfrabuildlGrantsForm() {
                   name="applicant_job_role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Applicant Job Title <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select 
@@ -2809,7 +2832,7 @@ export default function InfrabuildlGrantsForm() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select your job role" />
                           </SelectTrigger>
                         </FormControl>
@@ -2833,12 +2856,12 @@ export default function InfrabuildlGrantsForm() {
                     name="applicant_job_role_other"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Please specify your job title <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Specify your job title"
                             {...field}
                           />
@@ -2854,12 +2877,12 @@ export default function InfrabuildlGrantsForm() {
                   name="applicant_bio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Applicant Bio <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          className="min-h-[150px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[150px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Provide a brief bio, including your background and experience"
                           {...field}
                         />
@@ -2874,12 +2897,12 @@ export default function InfrabuildlGrantsForm() {
                   name="applicant_country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Country of Residence
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select your country" />
                           </SelectTrigger>
                         </FormControl>
@@ -2901,7 +2924,7 @@ export default function InfrabuildlGrantsForm() {
                   name="x_account"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         X Account <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -2909,7 +2932,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://twitter.com/yourusername"
                           {...field}
                         />
@@ -2924,7 +2947,7 @@ export default function InfrabuildlGrantsForm() {
                   name="telegram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Telegram <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormDescription>
@@ -2932,7 +2955,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://t.me/yourusername"
                           {...field}
                         />
@@ -2947,7 +2970,7 @@ export default function InfrabuildlGrantsForm() {
                   name="linkedin"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         LinkedIn
                       </FormLabel>
                       <FormDescription>
@@ -2955,7 +2978,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://linkedin.com/in/yourusername"
                           {...field}
                         />
@@ -2970,7 +2993,7 @@ export default function InfrabuildlGrantsForm() {
                   name="github"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         GitHub
                       </FormLabel>
                       <FormDescription>
@@ -2978,7 +3001,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Input
-                          className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="https://github.com/yourusername"
                           {...field}
                         />
@@ -2993,7 +3016,7 @@ export default function InfrabuildlGrantsForm() {
                   name="other_resources"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Other Resource(s)
                       </FormLabel>
                       <FormDescription>
@@ -3001,7 +3024,7 @@ export default function InfrabuildlGrantsForm() {
                       </FormDescription>
                       <FormControl>
                         <Textarea
-                          className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                           placeholder="Additional resources or links"
                           {...field}
                         />
@@ -3014,9 +3037,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Team Details */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Team Details</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Team Details</h2>
               </div>
               
               <div className="space-y-6">
@@ -3025,7 +3048,7 @@ export default function InfrabuildlGrantsForm() {
                   name="team_size"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Team size <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -3082,12 +3105,12 @@ export default function InfrabuildlGrantsForm() {
                             name="team_member_1_first_name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="dark:text-gray-200">
+                                <FormLabel className="dark:text-gray-200 text-md">
                                   First Name
                                 </FormLabel>
                                 <FormControl>
                                   <Input
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                     placeholder="First name"
                                     {...field}
                                   />
@@ -3102,12 +3125,12 @@ export default function InfrabuildlGrantsForm() {
                             name="team_member_1_last_name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="dark:text-gray-200">
+                                <FormLabel className="dark:text-gray-200 text-md">
                                   Last Name
                                 </FormLabel>
                                 <FormControl>
                                   <Input
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                     placeholder="Last name"
                                     {...field}
                                   />
@@ -3123,12 +3146,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Email
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="email@example.com"
                                   type="email"
                                   {...field}
@@ -3144,12 +3167,12 @@ export default function InfrabuildlGrantsForm() {
                           name="job_role_team_member_1"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Job Role
                               </FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                  <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                                     <SelectValue placeholder="Select job role" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -3171,12 +3194,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_bio"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Bio
                               </FormLabel>
                               <FormControl>
                                 <Textarea
-                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="Brief bio and experience"
                                   {...field}
                                 />
@@ -3191,12 +3214,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_x_account"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 X Account
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://twitter.com/username"
                                   {...field}
                                 />
@@ -3211,12 +3234,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_telegram"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Telegram
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://t.me/username"
                                   {...field}
                                 />
@@ -3231,12 +3254,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_linkedin"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 LinkedIn
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://linkedin.com/in/username"
                                   {...field}
                                 />
@@ -3251,12 +3274,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_github"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 GitHub
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://github.com/username"
                                   {...field}
                                 />
@@ -3271,12 +3294,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_1_country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Country
                               </FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                  <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                                     <SelectValue placeholder="Select country" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -3298,7 +3321,7 @@ export default function InfrabuildlGrantsForm() {
                           name="other_resource_s__team_member_1"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Other Resource(s)
                               </FormLabel>
                               <FormDescription>
@@ -3306,7 +3329,7 @@ export default function InfrabuildlGrantsForm() {
                               </FormDescription>
                               <FormControl>
                                 <Textarea
-                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="Additional resources or links"
                                   {...field}
                                 />
@@ -3329,12 +3352,12 @@ export default function InfrabuildlGrantsForm() {
                             name="team_member_2_first_name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="dark:text-gray-200">
+                                <FormLabel className="dark:text-gray-200 text-md">
                                   First Name
                                 </FormLabel>
                                 <FormControl>
                                   <Input
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                     placeholder="First name"
                                     {...field}
                                   />
@@ -3349,12 +3372,12 @@ export default function InfrabuildlGrantsForm() {
                             name="team_member_2_last_name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="dark:text-gray-200">
+                                <FormLabel className="dark:text-gray-200 text-md">
                                   Last Name
                                 </FormLabel>
                                 <FormControl>
                                   <Input
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                     placeholder="Last name"
                                     {...field}
                                   />
@@ -3370,12 +3393,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Email
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="email@example.com"
                                   type="email"
                                   {...field}
@@ -3391,12 +3414,12 @@ export default function InfrabuildlGrantsForm() {
                           name="job_role_team_member_2"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Job Role
                               </FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                  <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                                     <SelectValue placeholder="Select job role" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -3420,12 +3443,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_bio"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Bio
                               </FormLabel>
                               <FormControl>
                                 <Textarea
-                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="Brief bio and experience"
                                   {...field}
                                 />
@@ -3440,12 +3463,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_x_account"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 X Account
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://twitter.com/username"
                                   {...field}
                                 />
@@ -3460,12 +3483,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_telegram"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Telegram
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://t.me/username"
                                   {...field}
                                 />
@@ -3480,12 +3503,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_linkedin"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 LinkedIn
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://linkedin.com/in/username"
                                   {...field}
                                 />
@@ -3500,12 +3523,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_github"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 GitHub
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="https://github.com/username"
                                   {...field}
                                 />
@@ -3520,12 +3543,12 @@ export default function InfrabuildlGrantsForm() {
                           name="team_member_2_country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Country
                               </FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                  <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                                     <SelectValue placeholder="Select country" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -3547,7 +3570,7 @@ export default function InfrabuildlGrantsForm() {
                           name="other_resource_s__team_member_2"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="dark:text-gray-200">
+                              <FormLabel className="dark:text-gray-200 text-md">
                                 Other Resource(s)
                               </FormLabel>
                               <FormDescription>
@@ -3555,7 +3578,7 @@ export default function InfrabuildlGrantsForm() {
                               </FormDescription>
                               <FormControl>
                                 <Textarea
-                                  className="min-h-[100px] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                  className="min-h-[100px] border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                                   placeholder="Additional resources or links"
                                   {...field}
                                 />
@@ -3572,9 +3595,9 @@ export default function InfrabuildlGrantsForm() {
             </div>
             
             {/* Other */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
+            <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 mb-8">
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Other</h2>
+                <h2 className="text-2xl text-gray-900 dark:text-gray-100">Other</h2>
               </div>
               
               <div className="space-y-6">
@@ -3583,7 +3606,7 @@ export default function InfrabuildlGrantsForm() {
                   name="avalanche_grant_source"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         How did you hear about the Grant Program? <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select 
@@ -3594,12 +3617,12 @@ export default function InfrabuildlGrantsForm() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                          <SelectTrigger className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100">
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-<SelectItem value="Avalanche Website" className="dark:text-gray-200">Avalanche Website</SelectItem>
+                          <SelectItem value="Avalanche Website" className="dark:text-gray-200">Avalanche Website</SelectItem>
                           <SelectItem value="Avalanche Forum" className="dark:text-gray-200">Avalanche Forum</SelectItem>
                           <SelectItem value="Twitter/X" className="dark:text-gray-200">Twitter/X</SelectItem>
                           <SelectItem value="Telegram" className="dark:text-gray-200">Telegram</SelectItem>
@@ -3624,12 +3647,12 @@ export default function InfrabuildlGrantsForm() {
                     name="avalanche_grant_source_other"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Let us know how you heard about the program
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Please specify"
                             {...field}
                           />
@@ -3646,7 +3669,7 @@ export default function InfrabuildlGrantsForm() {
                   name="program_referral_check"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-gray-200">
+                      <FormLabel className="dark:text-gray-200 text-md">
                         Did someone specific refer you to the program? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
@@ -3680,12 +3703,12 @@ export default function InfrabuildlGrantsForm() {
                     name="program_referrer"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">
+                        <FormLabel className="dark:text-gray-200 text-md">
                           Share the name of the person who referred you <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
                             placeholder="Referrer's name"
                             {...field}
                           />
@@ -3711,7 +3734,7 @@ export default function InfrabuildlGrantsForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -3733,7 +3756,7 @@ export default function InfrabuildlGrantsForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">

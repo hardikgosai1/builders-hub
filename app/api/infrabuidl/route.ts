@@ -27,38 +27,50 @@ export async function POST(request: Request) {
       );
     }
     
-    const fields: { name: string; value: string | boolean | string[] }[] = [];
-    Object.entries(formData).forEach(([name, value]: [string, any]) => {
-      if (value === undefined || value === null || value === '') {
-        return;
+    const processedFormData: Record<string, any> = {};
+    
+    Object.entries(formData).forEach(([key, value]) => {
+      if (['firstname', 'lastname', 'email', 'gdpr', 'marketing_consent'].includes(key)) {
+        processedFormData[key] = value;
+      } else {
+        processedFormData[`2-44649732/${key}`] = value;
       }
-      
-      let formattedValue: string | boolean | string[] = value;
-      
-      // Handle arrays (for checkbox groups that return arrays)
-      if (Array.isArray(value)) {
-        // For HubSpot, arrays should be converted to semicolon-separated strings
-        formattedValue = (value as string[]).join(';');
-      }
-      // Handle booleans
-      else if (typeof value === 'boolean') {
-        if (name !== 'gdpr' && name !== 'marketing_consent') {
-          formattedValue = value ? 'Yes' : 'No';
-        }
-      }
-      // Handle dates
-      else if (value instanceof Date) {
-        formattedValue = (value as Date).toISOString().split('T')[0]; // YYYY-MM-DD format
-      }
-      
-      fields.push({
-        name: name,
-        value: formattedValue
-      });
     });
     
-    const hubspotPayload: {
-      fields: { name: string; value: string | boolean | string[] }[];
+    processedFormData["2-44649732/project_type_ai"] = formData.project_type || "N/A";
+    processedFormData["2-44649732/project_type_other"] = "N/A";
+    processedFormData["2-44649732/token_launch_other"] = "N/A";
+    processedFormData["2-44649732/funding_round"] = "N/A";
+    processedFormData["2-44649732/direct_competitor_1"] = "N/A";
+    processedFormData["2-44649732/applicant_job_role_other"] = "N/A";
+    processedFormData["2-44649732/avalanche_l1_project_benefited_1"] = "N/A";
+    processedFormData["2-44649732/previous_avalanche_project_info"] = "N/A";
+    processedFormData["2-44649732/funding_amount"] = "N/A";
+    processedFormData["2-44649732/direct_competitor_1_website"] = "N/A";
+    processedFormData["2-44649732/program_referrer"] = "N/A";
+    processedFormData["2-44649732/funding_entity"] = "N/A";
+    processedFormData["2-44649732/multichain_chains"] = "N/A";
+    processedFormData["2-44649732/avalanche_l1_project_benefited_1_website"] = "N/A";
+    
+    processedFormData["2-44649732/applicant_first_name"] = formData.firstname;
+    processedFormData["2-44649732/applicant_last_name"] = formData.lastname;
+     
+    const fields = Object.entries(processedFormData).map(([name, value]) => {
+      let formattedValue: any;
+       
+      if (Array.isArray(value)) {
+        formattedValue = value.join(';');
+      } else if (value instanceof Date) {
+        formattedValue = value.toISOString().split('T')[0];
+      } else {
+        formattedValue = value;
+      }
+       
+      return { name, value: formattedValue };
+    });
+    
+    interface HubspotPayload {
+      fields: { name: string; value: any }[];
       context: { pageUri: string; pageName: string };
       legalConsentOptions?: {
         consent: {
@@ -71,7 +83,9 @@ export async function POST(request: Request) {
           }>;
         };
       };
-    } = {
+    }
+    
+    const hubspotPayload: HubspotPayload = {
       fields: fields,
       context: {
         pageUri: request.headers.get('referer') || 'https://build.avax.network',
@@ -79,7 +93,6 @@ export async function POST(request: Request) {
       }
     };
 
-    // Add legal consent options if GDPR consent was given
     if (formData.gdpr === true) {
       hubspotPayload.legalConsentOptions = {
         consent: {
@@ -96,6 +109,9 @@ export async function POST(request: Request) {
       };
     }
   
+    console.log('HubSpot payload fields count:', hubspotPayload.fields.length);
+    console.log('project_type_ai field:', processedFormData["2-44649732/project_type_ai"]);
+    
     const hubspotResponse = await fetch(
       `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_INFRABUIDL_FORM_GUID}`,
       {
@@ -124,14 +140,17 @@ export async function POST(request: Request) {
       hubspotResult = { status: 'error', message: 'Could not read HubSpot response' };
     }
     
+    console.log('HubSpot response status:', hubspotResponse.status);
     console.log('HubSpot response:', hubspotResult);
+    
     if (!hubspotResponse.ok) {
       return NextResponse.json(
         { 
           success: false, 
           status: responseStatus,
           response: hubspotResult
-        }
+        },
+        { status: responseStatus }
       );
     }
 
