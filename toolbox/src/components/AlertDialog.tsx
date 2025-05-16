@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
-
 import { cn } from "./utils"
-import { Button } from "../components/Button" // Import the Button component
 
 function AlertDialog({
   ...props
@@ -118,7 +116,6 @@ function AlertDialogDescription({
   )
 }
 
-// Define button classes directly in AlertDialog.tsx
 const buttonVariants = ({
   variant = "primary",
   className = "",

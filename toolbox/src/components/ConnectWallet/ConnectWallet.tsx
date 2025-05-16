@@ -20,7 +20,7 @@ import {
     AlertDialogAction, 
     AlertDialogContent, 
     AlertDialogDescription, 
-    AlertDialogFooter, 
+    AlertDialogFooter,
     AlertDialogHeader, 
     AlertDialogTitle 
 } from "../AlertDialog"
@@ -521,6 +521,9 @@ export const ConnectWallet = ({
                                         </button>
                                     )}
                                 </div>
+                                {pTokenRequestError && (
+                                    <div className="text-red-500 text-xs mt-2">{pTokenRequestError}</div>
+                                )}
 
                                 <div className="flex items-center justify-between">
                                     <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
