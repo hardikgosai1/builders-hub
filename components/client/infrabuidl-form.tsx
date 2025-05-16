@@ -230,7 +230,9 @@ export default function GrantApplicationForm({ programType, headerComponent }: G
     try {
       const submissionData = {
         ...values,
-        grant_program: programType
+        grant_program: programType,
+        project_company_logo: "N/A",
+        project_company_banner: "N/A",
       };
       
       const hubspotFormData: Record<string, string | number | boolean> = {};
@@ -749,54 +751,12 @@ export default function GrantApplicationForm({ programType, headerComponent }: G
                     </FormItem>
                   )}
                 />
-                
-                {/* Project/Company Logo */}
-                <FormField
-                  control={form.control}
-                  name="project_company_logo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="dark:text-gray-200 text-md">
-                        Project/Company Logo
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
-                          onChange={(e) => {
-                            const file = e.target.files ? e.target.files[0] : null;
-                            field.onChange(file);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage className="dark:text-red-400" />
-                    </FormItem>
-                  )}
-                />
-                
-                {/* Project/Company Banner */}
-                <FormField
-                  control={form.control}
-                  name="project_company_banner"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="dark:text-gray-200 text-md">
-                        Project/Company Banner
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          className="border-gray-300 dark:border-zinc-800 dark:bg-zinc-800 dark:text-gray-100"
-                          onChange={(e) => {
-                            const file = e.target.files ? e.target.files[0] : null;
-                            field.onChange(file);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage className="dark:text-red-400" />
-                    </FormItem>
-                  )}
-                />
+
+                {/* Project/Company Logo - HIDDEN FOR NOW */}
+                <input type="hidden" name="project_company_logo" value="N/A" />
+
+                {/* Project/Company Banner - HIDDEN FOR NOW */}
+                <input type="hidden" name="project_company_banner" value="N/A" />
                 
                 {/* Media Kit */}
                 <FormField
