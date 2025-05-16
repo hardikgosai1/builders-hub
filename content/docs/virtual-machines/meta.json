@@ -9,7 +9,7 @@
     "introduction-vms",
     "simple-vm-any-language",
     "manage-vm-binaries",
-    "---Subnet-EVM Customization---",
+    "---EVM Customization---",
     "evm-l1-customization",
     "custom-precompiles",
     "---Golang VMs---",
