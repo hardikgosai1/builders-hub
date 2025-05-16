@@ -1,7 +1,7 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, useSelectedL1, getToolboxStore, useL1ByChainId } from "../toolboxStore";
-import { useWalletStore } from "../../lib/walletStore";
+import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
+import { useWalletStore } from "../../stores/walletStore";
 import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo } from "react";
 import { Button } from "../../components/Button";
@@ -10,9 +10,9 @@ import { createPublicClient, http } from 'viem';
 import ICMDemoABI from "../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../components/Input";
-import { Container } from "../components/Container";
-import SelectChainID from "../components/SelectChainID";
-
+import { Container } from "../../components/Container";
+import SelectChainID from "../../components/SelectChainID";
+import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 export default function SendICMMessage() {
     const { showBoundary } = useErrorBoundary();
     const { icmReceiverAddress } = useToolboxStore();
