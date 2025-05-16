@@ -23,7 +23,7 @@ import {
     AlertDialogFooter, 
     AlertDialogHeader, 
     AlertDialogTitle 
-} from "../../../../components/ui/alert-dialog"
+} from "../AlertDialog"
 
 export type WalletModeRequired = "l1" | "c-chain"
 export type WalletMode = "optional" | WalletModeRequired
