@@ -17,7 +17,7 @@ import InterchainTransfer from "../InterchainTransfer"
 import { ExplorerButton } from "./ExplorerButton"
 import { ChainSelector } from "./ChainSelector"
 
-export type WalletModeRequired = "l1" | "c-chain"
+export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
 export type WalletMode = "optional" | WalletModeRequired
 
 const LOW_BALANCE_THRESHOLD = 0.5
@@ -313,7 +313,7 @@ export const ConnectWallet = ({
             {walletEVMAddress && (
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-xl p-4 relative overflow-hidden">
                     {/* Core Wallet header */}
-                    <div className="flex items-center justify-between mt-2 mb-6">
+                    <div className="flex items-center justify-between mt-2 mb-2">
                         <div className="flex items-center space-x-2">
                             <img src="/core-logo.svg" alt="Core Logo" className="h-10 w-auto mt-1 mb-1 dark:hidden" />
                             <img src="/core-logo-dark.svg" alt="Core Logo" className="h-10 w-auto mt-1 mb-1 hidden dark:block" />
@@ -343,158 +343,162 @@ export const ConnectWallet = ({
                     </div>
 
                     {/* Chain cards */}
-                    <div className={`grid grid-cols-1 gap-4 items-center mb-4 ${gridLayoutClass}`}>
-                        {/* L1 Chain Card */}
-                        <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 h-full">
-                            <div className="flex justify-between items-start mb-2">
-                                <div>
-                                <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">
-                                    {displayedL1ChainName}
-                                </span>
-                                <ExplorerButton
-                                    rpcUrl={rpcUrl}
-                                    evmChainId={displayedEvmChainId}
-                                />
-                                </div>
-                                {showL1SelectedBadge && (
-                                    <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Selected</span>
-                                )}
-                            </div>
-                            <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
-                                {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
-                                <button
-                                    onClick={updateDisplayedL1Balance}
-                                    className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title="Refresh balance"
-                                    disabled={isDisplayedL1BalanceLoading}
-                                >
-                                    <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isDisplayedL1BalanceLoading ? 'animate-spin' : ''}`} />
-                                </button>
-                                {faucetUrl && (
-                                    <button
-                                        onClick={() => window.open(faucetUrl, "_blank")}
-                                        className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${displayedL1Balance < LOW_BALANCE_THRESHOLD
-                                            ? "shimmer"
-                                            : ""
-                                            }`}
-                                        title="Open faucet"
-                                    >
-                                        Get tokens
-                                    </button>
-                                )}
-                            </div>
-                            {/* EVM Address inside the card */}
-                            <div className="flex items-center justify-between">
-                                <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
-                                    {displayedL1Address ? displayedL1Address : "Loading..."}
-                                </div>
-                                {displayedL1Address && (
-                                    <button
-                                        onClick={() => copyToClipboard(displayedL1Address)}
-                                        className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
-                                        title="Copy address"
-                                    >
-                                        <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Arrows between cards */}
-                        {showInterchainArrows && (
-                            <InterchainTransfer glow={pChainBalance < LOW_BALANCE_THRESHOLD && glowConditionL1Balance > LOW_BALANCE_THRESHOLD} />
-                        )}
-
-                        {/* P-Chain */}
-                        {showPChainCard && (
-                            <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 h-full">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">P-Chain</span>
-                                    <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Always Connected</span>
-                                </div>
-                                <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
-                                    {pChainBalance.toFixed(2)} AVAX
-                                    <button
-                                        onClick={updatePChainBalance}
-                                        className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title="Refresh balance"
-                                        disabled={isPChainBalanceLoading}
-                                    >
-                                        <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isPChainBalanceLoading ? 'animate-spin' : ''}`} />
-                                    </button>
-                                    {pChainAddress && isTestnet && (
-                                        <button
-                                            onClick={async () => {
-                                                if (!isRequestingPTokens) {
-                                                    setIsRequestingPTokens(true);
-                                                    setPTokenRequestError(null);
-                                                    try {
-                                                        const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
-                                                        const rawText = await response.text();
-                                                        let data;
-                                                        try {
-                                                            data = JSON.parse(rawText);
-                                                        } catch (parseError) {
-                                                            throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
-                                                        }
-
-                                                        if (!response.ok) {
-                                                            if (response.status === 401) {
-                                                                throw new Error("Please login first");
-                                                            }
-                                                            if (response.status === 429) {
-                                                                throw new Error(data.message || "Rate limit exceeded. Please try again later.");
-                                                            }
-                                                            throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
-                                                        }
-
-                                                        if (data.success) {
-                                                            console.log('Token request successful, txID:', data.txID);
-                                                            setTimeout(() => updatePChainBalance(), 3000);
-                                                        } else {
-                                                            throw new Error(data.message || "Failed to get tokens");
-                                                        }
-                                                    } catch (error) {
-                                                        console.error("P-Chain token request error:", error);
-                                                        setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
-                                                    } finally {
-                                                        setIsRequestingPTokens(false);
-                                                    }
-                                                }
-                                            }}
-                                            disabled={isRequestingPTokens}
-                                            className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
-                                                } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
-                                            title="Get free P-Chain AVAX"
-                                        >
-                                            {isRequestingPTokens ? "Requesting..." : "Get tokens"}
-                                        </button>
-                                    )}
-                                </div>
-
-                                {pTokenRequestError && (
-                                    <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
-                                )}
-
-                                <div className="flex items-center justify-between">
-                                    <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
-                                        {pChainAddress ? pChainAddress : "Loading..."}
+                    {walletMode !== "testnet-mainnet" && (
+                        <>
+                            <div className={`grid grid-cols-1 gap-4 items-center mt-4 mb-4 ${gridLayoutClass}`}>
+                                {/* L1 Chain Card */}
+                                <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 h-full">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">
+                                                {displayedL1ChainName}
+                                            </span>
+                                            <ExplorerButton
+                                                rpcUrl={rpcUrl}
+                                                evmChainId={displayedEvmChainId}
+                                            />
+                                        </div>
+                                        {showL1SelectedBadge && (
+                                            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Selected</span>
+                                        )}
                                     </div>
-                                    {pChainAddress && (
+                                    <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
+                                        {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
                                         <button
-                                            onClick={() => copyToClipboard(pChainAddress)}
-                                            className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
-                                            title="Copy address"
+                                            onClick={updateDisplayedL1Balance}
+                                            className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            title="Refresh balance"
+                                            disabled={isDisplayedL1BalanceLoading}
                                         >
-                                            <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                            <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isDisplayedL1BalanceLoading ? 'animate-spin' : ''}`} />
                                         </button>
-                                    )}
+                                        {faucetUrl && (
+                                            <button
+                                                onClick={() => window.open(faucetUrl, "_blank")}
+                                                className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${displayedL1Balance < LOW_BALANCE_THRESHOLD
+                                                    ? "shimmer"
+                                                    : ""
+                                                    }`}
+                                                title="Open faucet"
+                                            >
+                                                Get tokens
+                                            </button>
+                                        )}
+                                    </div>
+                                    {/* EVM Address inside the card */}
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
+                                            {displayedL1Address ? displayedL1Address : "Loading..."}
+                                        </div>
+                                        {displayedL1Address && (
+                                            <button
+                                                onClick={() => copyToClipboard(displayedL1Address)}
+                                                className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                                title="Copy address"
+                                            >
+                                                <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
 
-                    {walletMode !== "c-chain" && <ChainSelector enforceChainId={enforceChainId} />}
+                                {/* Arrows between cards */}
+                                {showInterchainArrows && (
+                                    <InterchainTransfer glow={pChainBalance < LOW_BALANCE_THRESHOLD && glowConditionL1Balance > LOW_BALANCE_THRESHOLD} />
+                                )}
+
+                                {/* P-Chain */}
+                                {showPChainCard && (
+                                    <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 h-full">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-zinc-600 dark:text-zinc-400 text-sm font-medium">P-Chain</span>
+                                            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full">Always Connected</span>
+                                        </div>
+                                        <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
+                                            {pChainBalance.toFixed(2)} AVAX
+                                            <button
+                                                onClick={updatePChainBalance}
+                                                className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                title="Refresh balance"
+                                                disabled={isPChainBalanceLoading}
+                                            >
+                                                <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isPChainBalanceLoading ? 'animate-spin' : ''}`} />
+                                            </button>
+                                            {pChainAddress && isTestnet && (
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!isRequestingPTokens) {
+                                                            setIsRequestingPTokens(true);
+                                                            setPTokenRequestError(null);
+                                                            try {
+                                                                const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
+                                                                const rawText = await response.text();
+                                                                let data;
+                                                                try {
+                                                                    data = JSON.parse(rawText);
+                                                                } catch (parseError) {
+                                                                    throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
+                                                                }
+
+                                                                if (!response.ok) {
+                                                                    if (response.status === 401) {
+                                                                        throw new Error("Please login first");
+                                                                    }
+                                                                    if (response.status === 429) {
+                                                                        throw new Error(data.message || "Rate limit exceeded. Please try again later.");
+                                                                    }
+                                                                    throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
+                                                                }
+
+                                                                if (data.success) {
+                                                                    console.log('Token request successful, txID:', data.txID);
+                                                                    setTimeout(() => updatePChainBalance(), 3000);
+                                                                } else {
+                                                                    throw new Error(data.message || "Failed to get tokens");
+                                                                }
+                                                            } catch (error) {
+                                                                console.error("P-Chain token request error:", error);
+                                                                setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
+                                                            } finally {
+                                                                setIsRequestingPTokens(false);
+                                                            }
+                                                        }
+                                                    }}
+                                                    disabled={isRequestingPTokens}
+                                                    className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
+                                                        } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                    title="Get free P-Chain AVAX"
+                                                >
+                                                    {isRequestingPTokens ? "Requesting..." : "Get tokens"}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {pTokenRequestError && (
+                                            <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
+                                        )}
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
+                                                {pChainAddress ? pChainAddress : "Loading..."}
+                                            </div>
+                                            {pChainAddress && (
+                                                <button
+                                                    onClick={() => copyToClipboard(pChainAddress)}
+                                                    className="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm"
+                                                    title="Copy address"
+                                                >
+                                                    <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-black" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {walletMode !== "c-chain" && <ChainSelector enforceChainId={enforceChainId} />}
+                        </>
+                    )}
                 </div>
             )}
 

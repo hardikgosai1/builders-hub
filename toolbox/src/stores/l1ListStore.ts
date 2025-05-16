@@ -67,7 +67,7 @@ const l1ListInitialStateMainnet = {
     l1List: [
         {
             id: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",
-            name: "Avalanche Mainnet",
+            name: "C-Chain Mainnet",
             rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
             evmChainId: 43114,
             coinName: "AVAX",

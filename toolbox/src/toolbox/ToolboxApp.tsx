@@ -47,7 +47,7 @@ const componentGroups: Record<string, ComponentGroupType> = {
         label: "Node Setup with Docker",
         component: lazy(() => import('./Nodes/AvalanchegoDocker')),
         fileNames: ["toolbox/src/toolbox/Nodes/AvalanchegoDocker.tsx"],
-        walletMode: "optional",
+        walletMode: "testnet-mainnet",
       },
       {
         id: 'convertToL1',
@@ -129,7 +129,7 @@ const componentGroups: Record<string, ComponentGroupType> = {
         label: "Query L1 Validator Set",
         component: lazy(() => import('./ValidatorManager/QueryL1ValidatorSet')),
         fileNames: ["toolbox/src/toolbox/ValidatorManager/QueryL1ValidatorSet.tsx"],
-        walletMode: "optional"
+        walletMode: "testnet-mainnet"
       },
       {
         id: 'balanceTopup',
