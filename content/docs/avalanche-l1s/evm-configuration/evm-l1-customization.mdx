@@ -1,16 +1,16 @@
 ---
 title: Introduction
-description: Learn how to customize the Ethereum Virtual Machine with Subnet-EVM and Precompiles.
+description: Learn how to customize the Ethereum Virtual Machine with EVM and Precompiles.
 root: true
 ---
 
-Welcome to the Subnet-EVM customization guide. This documentation explores how to extend and customize your Avalanche L1 using **Subnet-EVM** and **precompiles**. Building upon the Validator Manager capabilities we discussed in the previous section, we'll now dive into other powerful customization features available in Subnet-EVM.
+Welcome to the EVM configuration guide. This documentation explores how to extend and customize your Avalanche L1 using **EVM** and **precompiles**. Building upon the Validator Manager capabilities we discussed in the previous section, we'll now dive into other powerful customization features available in EVM.
 
-## Overview of Subnet-EVM
+## Overview of EVM
 
-Subnet-EVM is Avalanche's customized version of the Ethereum Virtual Machine, tailored to run on Avalanche L1s. It allows developers to deploy Solidity smart contracts with enhanced capabilities, benefiting from Avalanche's high throughput and low latency. Subnet-EVM enables more flexibility and performance optimizations compared to the standard EVM.
+EVM is Avalanche's customized version of the Ethereum Virtual Machine, tailored to run on Avalanche L1s. It allows developers to deploy Solidity smart contracts with enhanced capabilities, benefiting from Avalanche's high throughput and low latency. EVM enables more flexibility and performance optimizations compared to the standard EVM.
 
-Beyond the Validator Manager functionality we've covered, Subnet-EVM provides additional customization options through precompiles, allowing you to extend your L1's capabilities even further.
+Beyond the Validator Manager functionality we've covered, EVM provides additional configuration options through precompiles, allowing you to extend your L1's capabilities even further.
 
 ## Genesis Configuration
 
@@ -87,9 +87,9 @@ These parameters have specific roles:
 
 Precompiles are specialized smart contracts that execute native Go code within the EVM context. They act as a bridge between Solidity and lower-level functionalities, allowing for performance optimizations and access to features not available in Solidity alone.
 
-### Default Precompiles in Subnet-EVM
+### Default Precompiles in EVM
 
-Subnet-EVM comes with a set of default precompiles that extend the EVM's functionality:
+EVM comes with a set of default precompiles that extend the EVM's functionality:
 
 - **AllowList**: Interface that manages access control by allowing or restricting specific addresses, inherited by all precompiles.
 - **Deployer AllowList**: Restricts which addresses can deploy smart contracts.
@@ -103,7 +103,7 @@ Subnet-EVM comes with a set of default precompiles that extend the EVM's functio
 
 If a precompile is enabled within the `genesis.json` using the respective `ConfigKey`, you can interact with the precompile using Foundry or other tools such as Remix.
 
-Below are the addresses and `ConfigKey` values of default precompiles available in Subnet-EVM. The address and `ConfigKey` [are defined in the `module.go` of each precompile contract](https://github.com/ava-labs/subnet-evm/tree/master/precompile/contracts).
+Below are the addresses and `ConfigKey` values of default precompiles available in EVM. The address and `ConfigKey` [are defined in the `module.go` of each precompile contract](https://github.com/ava-labs/subnet-evm/tree/master/precompile/contracts).
 
 | Precompile             | ConfigKey                         | Address                                      |
 | ---------------------- | --------------------------------- | -------------------------------------------- |
