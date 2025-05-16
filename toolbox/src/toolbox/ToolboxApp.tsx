@@ -138,6 +138,13 @@ const componentGroups: Record<string, ComponentGroupType> = {
         fileNames: ["toolbox/src/toolbox/Nodes/BalanceTopup.tsx"],
         walletMode: "c-chain"
       },
+      {
+        id: "migrateV1ToV2",
+        label: "Migrate v1 to v2",
+        component: lazy(() => import('./Migrate/MigrateV1ToV2')),
+        fileNames: ["toolbox/src/toolbox/Migrate/MigrateV1ToV2.tsx"],
+        walletMode: "l1"
+      }
     ]
   },
   "Staking Manager Setup": {
