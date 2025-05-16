@@ -1,9 +1,13 @@
+export interface IPartner {
+  name: string;
+  logo: string;
+}
 
 export interface IDataMain {
     title: string;
     description: string;
     location: string;
-    total_prizes: string;
+    total_prizes: number;
     tags: string[];
   }
   
@@ -17,18 +21,20 @@ export interface IDataMain {
   }
   
   export interface ISchedule {
-    url: string;
+    url: string | null;
     date: string;
     name: string;
     category: string;
     location: string;
     description: string;
+    duration: number;
   }
   
   export interface ISpeaker {
     icon: string;
     name: string;
     category: string;
+    picture: string;
   }
   
   export interface IResource {
@@ -41,13 +47,17 @@ export interface IDataMain {
   export interface IDataContent {
     tracks: ITrack[];
     address: string;
-    partners: string[];
+    partners: IPartner[];
     schedule: ISchedule[];
     speakers: ISpeaker[];
     resources: IResource[];
     tracks_text: string;
     speakers_text: string;
+    speakers_banner: string;
     join_custom_link: string;
+    join_custom_text: string | null;
+    become_sponsor_link: string;
+    submission_custom_link: string | null;
     judging_guidelines: string;
     submission_deadline: string;
     registration_deadline: string;
@@ -58,7 +68,9 @@ export interface IDataMain {
     end_date: string;
     timezone: string;
     banner: string;
-    participants: string;
+    participants: number;
+    icon: string;
+    small_banner: string;
   }
   
   export const initialData = {
@@ -66,7 +78,7 @@ export interface IDataMain {
           title: '',
           description: '',
           location: '',
-          total_prizes: '',
+          total_prizes: 0,
           tags: [''],
       },
       content: {
@@ -81,15 +93,16 @@ export interface IDataMain {
             },
           ],
           address: '',
-          partners: [''],
+          partners: [{ name: '', logo: '' }],
           schedule: [
             {
-              url: '',
+              url: null,
               date: '',
               name: '',
               category: '',
               location: '',
               description: '',
+              duration: 0,
             },
           ],
           speakers: [
@@ -97,6 +110,7 @@ export interface IDataMain {
               icon: '',
               name: '',
               category: '',
+              picture: '',
             },
           ],
           resources: [
@@ -109,7 +123,11 @@ export interface IDataMain {
           ],
           tracks_text: '',
           speakers_text: '',
+          speakers_banner: '',
           join_custom_link: '',
+          join_custom_text: null,
+          become_sponsor_link: '',
+          submission_custom_link: null,
           judging_guidelines: '',
           submission_deadline: '',
           registration_deadline: '',
@@ -119,7 +137,8 @@ export interface IDataMain {
           end_date: '',
           timezone: '',
           banner: '',
-          participants: '',
+          participants: 0,
+          icon: '',
+          small_banner: '',
       }
   }
-  
