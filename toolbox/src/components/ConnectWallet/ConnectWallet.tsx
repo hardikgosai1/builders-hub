@@ -12,12 +12,12 @@ import { WalletRequiredPrompt } from "../WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RemountOnWalletChange } from "../RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
+import InterchainTransfer from "../InterchainTransfer"
 import { ExplorerButton } from "./ExplorerButton"
 import { PChainExplorerButton } from "./PChainExplorerButton"
 import { ChainSelector } from "./ChainSelector"
 import { PChainFaucet } from "./Faucet"
 import { PChainBridgeButton } from "./PChainBridgeButton"
-
 
 export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
 export type WalletMode = "optional" | WalletModeRequired
