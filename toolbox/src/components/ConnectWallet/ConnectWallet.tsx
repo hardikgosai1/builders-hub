@@ -15,6 +15,7 @@ import { avalanche, avalancheFuji } from "viem/chains"
 import InterchainTransfer from "../InterchainTransfer"
 import { ExplorerButton } from "./ExplorerButton"
 import { ChainSelector } from "./ChainSelector"
+import { PChainFaucet } from "./Faucet"
 
 export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
 export type WalletMode = "optional" | WalletModeRequired
@@ -75,8 +76,6 @@ export const ConnectWallet = ({
     const l1Balance = useWalletStore(state => state.l1Balance);
     const cChainBalance = useWalletStore(state => state.cChainBalance);
     const { showBoundary } = useErrorBoundary();
-    const [isRequestingPTokens, setIsRequestingPTokens] = useState(false);
-    const [pTokenRequestError, setPTokenRequestError] = useState<string | null>(null);
     const [rpcUrl, setRpcUrl] = useState<string>("");
 
     // Call toolboxStore hooks unconditionally.
@@ -423,59 +422,15 @@ export const ConnectWallet = ({
                                             >
                                                 <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isPChainBalanceLoading ? 'animate-spin' : ''}`} />
                                             </button>
-                                            {pChainAddress && isTestnet && (
-                                                <button
-                                                    onClick={async () => {
-                                                        if (!isRequestingPTokens) {
-                                                            setIsRequestingPTokens(true);
-                                                            setPTokenRequestError(null);
-                                                            try {
-                                                                const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
-                                                                const rawText = await response.text();
-                                                                let data;
-                                                                try {
-                                                                    data = JSON.parse(rawText);
-                                                                } catch (parseError) {
-                                                                    throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
-                                                                }
-
-                                                                if (!response.ok) {
-                                                                    if (response.status === 401) {
-                                                                        throw new Error("Please login first");
-                                                                    }
-                                                                    if (response.status === 429) {
-                                                                        throw new Error(data.message || "Rate limit exceeded. Please try again later.");
-                                                                    }
-                                                                    throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
-                                                                }
-
-                                                                if (data.success) {
-                                                                    console.log('Token request successful, txID:', data.txID);
-                                                                    setTimeout(() => updatePChainBalance(), 3000);
-                                                                } else {
-                                                                    throw new Error(data.message || "Failed to get tokens");
-                                                                }
-                                                            } catch (error) {
-                                                                console.error("P-Chain token request error:", error);
-                                                                setPTokenRequestError(error instanceof Error ? error.message : "Unknown error occurred");
-                                                            } finally {
-                                                                setIsRequestingPTokens(false);
-                                                            }
-                                                        }
-                                                    }}
-                                                    disabled={isRequestingPTokens}
-                                                    className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
-                                                        } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
-                                                    title="Get free P-Chain AVAX"
-                                                >
-                                                    {isRequestingPTokens ? "Requesting..." : "Get tokens"}
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {pTokenRequestError && (
-                                            <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
+                                        {pChainAddress && (
+                                            <PChainFaucet
+                                                pChainAddress={pChainAddress}
+                                                pChainBalance={pChainBalance}
+                                                updatePChainBalance={updatePChainBalance}
+                                                isTestnet={isTestnet ?? false}
+                                            />
                                         )}
+                                        </div>
 
                                         <div className="flex items-center justify-between">
                                             <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
