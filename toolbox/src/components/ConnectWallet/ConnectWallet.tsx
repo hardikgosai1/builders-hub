@@ -12,7 +12,6 @@ import { WalletRequiredPrompt } from "../WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RemountOnWalletChange } from "../RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
-import InterchainTransfer from "../InterchainTransfer"
 import { ExplorerButton } from "./ExplorerButton"
 import { ChainSelector } from "./ChainSelector"
 import { 
@@ -452,7 +451,17 @@ export const ConnectWallet = ({
                                         )}
                                     </div>
                                     <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
-                                        {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
+                                        <span className={glowConditionL1Balance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""}>
+                                            {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
+                                        </span>
+                                        <button
+                                            onClick={updateDisplayedL1Balance}
+                                            className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            title="Refresh balance"
+                                            disabled={isDisplayedL1BalanceLoading}
+                                        >
+                                            <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isDisplayedL1BalanceLoading ? 'animate-spin' : ''}`} />
+                                        </button>
                                         <button
                                             onClick={handlePChainTokenRequest}
                                             disabled={isRequestingPTokens}
