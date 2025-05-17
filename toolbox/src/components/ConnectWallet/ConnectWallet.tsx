@@ -12,17 +12,9 @@ import { WalletRequiredPrompt } from "../WalletRequiredPrompt"
 import { ConnectWalletPrompt } from "./ConnectWalletPrompt"
 import { RemountOnWalletChange } from "../RemountOnWalletChange"
 import { avalanche, avalancheFuji } from "viem/chains"
+import InterchainTransfer from "../InterchainTransfer"
 import { ExplorerButton } from "./ExplorerButton"
 import { ChainSelector } from "./ChainSelector"
-import { 
-    AlertDialog, 
-    AlertDialogAction, 
-    AlertDialogContent, 
-    AlertDialogDescription, 
-    AlertDialogFooter,
-    AlertDialogHeader, 
-    AlertDialogTitle 
-} from "../AlertDialog"
 
 export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
 export type WalletMode = "optional" | WalletModeRequired
@@ -86,11 +78,6 @@ export const ConnectWallet = ({
     const [isRequestingPTokens, setIsRequestingPTokens] = useState(false);
     const [pTokenRequestError, setPTokenRequestError] = useState<string | null>(null);
     const [rpcUrl, setRpcUrl] = useState<string>("");
-    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
-    const [alertDialogTitle, setAlertDialogTitle] = useState("Error");
-    const [alertDialogMessage, setAlertDialogMessage] = useState("");
-    const [isLoginError, setIsLoginError] = useState(false);
-    const handleLogin = () => {window.location.href = "/login";};
 
     // Call toolboxStore hooks unconditionally.
     // 'isTestnet' is defined earlier via useWalletStore and is available here.
@@ -273,57 +260,6 @@ export const ConnectWallet = ({
         }
     }
 
-    const handlePChainTokenRequest = async () => {
-        if (isRequestingPTokens || !pChainAddress) return;        
-        setIsRequestingPTokens(true);
-        setPTokenRequestError(null);
-               
-        try {
-            const response = await fetch(`/api/pchain-faucet?address=${pChainAddress}`);
-            const rawText = await response.text();
-            let data;
-            
-            try {
-                data = JSON.parse(rawText);
-            } catch (parseError) {
-                throw new Error(`Invalid response: ${rawText.substring(0, 100)}...`);
-            }
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error("Please login first");
-                }
-                if (response.status === 429) {
-                    throw new Error(data.message || "Rate limit exceeded. Please try again later.");
-                }
-                throw new Error(data.message || `Error ${response.status}: Failed to get tokens`);
-            }
-
-            if (data.success) {
-                console.log('Token request successful, txID:', data.txID);
-                setTimeout(() => updatePChainBalance(), 3000);
-            } else {
-                throw new Error(data.message || "Failed to get tokens");
-            }
-        } catch (error) {
-            console.error("P-Chain token request error:", error);
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            setPTokenRequestError(errorMessage);
-            if (errorMessage.includes("login") || errorMessage.includes("401")) {
-                setAlertDialogTitle("Authentication Required");
-                setAlertDialogMessage("You need to be logged in to request free tokens from the P-Chain Faucet.");
-                setIsLoginError(true);
-                setIsAlertDialogOpen(true);
-            } else {
-                setAlertDialogTitle("Faucet Request Failed");
-                setAlertDialogMessage(errorMessage);
-                setIsLoginError(false);
-                setIsAlertDialogOpen(true);
-            }
-        } finally {
-            setIsRequestingPTokens(false);
-        }
-    };
 
     // Determine what to display based on props
     const isActuallyCChainSelected = walletChainId === avalanche.id || walletChainId === avalancheFuji.id;
@@ -373,31 +309,6 @@ export const ConnectWallet = ({
 
     return (
         <div className="space-y-4 transition-all duration-300">
-            <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>{alertDialogTitle}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {alertDialogMessage}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="flex gap-2">
-                        {isLoginError ? (
-                            <>
-                                <AlertDialogAction onClick={handleLogin} className="bg-blue-500 hover:bg-blue-600">
-                                    Login
-                                </AlertDialogAction>
-                                <AlertDialogAction className="bg-zinc-200 hover:bg-zinc-300 text-zinc-800">
-                                    Close
-                                </AlertDialogAction>
-                            </>
-                        ) : (
-                            <AlertDialogAction>OK</AlertDialogAction>
-                        )}
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            
             {walletEVMAddress && (
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md rounded-xl p-4 relative overflow-hidden">
                     {/* Core Wallet header */}
@@ -451,23 +362,12 @@ export const ConnectWallet = ({
                                         )}
                                     </div>
                                     <div className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100 mb-2 flex items-center">
-                                        <span className={glowConditionL1Balance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""}>
-                                            {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
-                                        </span>
+                                        {displayedL1Balance.toFixed(2)} {displayedL1TokenSymbol}
                                         <button
                                             onClick={updateDisplayedL1Balance}
                                             className="ml-2 p-1 rounded-md bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             title="Refresh balance"
                                             disabled={isDisplayedL1BalanceLoading}
-                                        >
-                                            <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isDisplayedL1BalanceLoading ? 'animate-spin' : ''}`} />
-                                        </button>
-                                        <button
-                                            onClick={handlePChainTokenRequest}
-                                            disabled={isRequestingPTokens}
-                                            className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
-                                                } ${isRequestingPTokens ? "opacity-50 cursor-not-allowed" : ""}`}
-                                            title="Get free P-Chain AVAX"
                                         >
                                             <RefreshCw className={`w-4 h-4 text-zinc-600 dark:text-zinc-300 ${isDisplayedL1BalanceLoading ? 'animate-spin' : ''}`} />
                                         </button>
@@ -500,8 +400,10 @@ export const ConnectWallet = ({
                                         )}
                                     </div>
                                 </div>
-                                {pTokenRequestError && (
-                                    <div className="text-red-500 text-xs mt-2">{pTokenRequestError}</div>
+
+                                {/* Arrows between cards */}
+                                {showInterchainArrows && (
+                                    <InterchainTransfer glow={pChainBalance < LOW_BALANCE_THRESHOLD && glowConditionL1Balance > LOW_BALANCE_THRESHOLD} />
                                 )}
 
                                 {/* P-Chain */}
@@ -570,6 +472,11 @@ export const ConnectWallet = ({
                                                 </button>
                                             )}
                                         </div>
+
+                                        {pTokenRequestError && (
+                                            <div className="text-red-500 text-xs mb-2">{pTokenRequestError}</div>
+                                        )}
+
                                         <div className="flex items-center justify-between">
                                             <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
                                                 {pChainAddress ? pChainAddress : "Loading..."}
