@@ -13,7 +13,7 @@ import { getRPCEndpoint } from '../../coreViem/utils/rpc';
 import { Loader2, X } from 'lucide-react';
 
 
-export default function PChainBridgeButton() {
+export function PChainBridgeButton() {
     const [open, setOpen] = useState(false);
     const [direction, setDirection] = useState<'c-to-p' | 'p-to-c'>('c-to-p');
     const [amount, setAmount] = useState<string>("");
