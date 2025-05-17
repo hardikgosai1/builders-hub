@@ -15,7 +15,7 @@ import { avalanche, avalancheFuji } from "viem/chains"
 import { ExplorerButton } from "./ExplorerButton"
 import { PChainExplorerButton } from "./PChainExplorerButton"
 import { ChainSelector } from "./ChainSelector"
-import { PChainFaucet } from "./Faucet"
+import { PChainFaucet } from "./PChainFaucet"
 import { PChainBridgeButton } from "./PChainBridgeButton"
 
 export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
