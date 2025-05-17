@@ -1,19 +1,19 @@
-import { ArrowRight, Loader2, X } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWalletStore } from '../stores/walletStore';
-import { Button } from './Button';
-import { Input } from './Input';
-import { evmImportTx } from "../coreViem/methods/evmImport"
-import { evmExport } from "../coreViem/methods/evmExport"
-import { pvmImport } from "../coreViem/methods/pvmImport"
-import { pvmExport } from "../coreViem/methods/pvmExport"
+import { useWalletStore } from '../../stores/walletStore';
+import { Button } from '../Button';
+import { Input } from '../Input';
+import { evmImportTx } from "../../coreViem/methods/evmImport"
+import { evmExport } from "../../coreViem/methods/evmExport"
+import { pvmImport } from "../../coreViem/methods/pvmImport"
+import { pvmExport } from "../../coreViem/methods/pvmExport"
 import { useErrorBoundary } from "react-error-boundary"
 import { pvm, Utxo, TransferOutput, evm } from '@avalabs/avalanchejs';
-import { getRPCEndpoint } from '../coreViem/utils/rpc';
+import { getRPCEndpoint } from '../../coreViem/utils/rpc';
+import { Loader2, X } from 'lucide-react';
 
 
-export default function InterchainTransfer({ glow = false }: { glow?: boolean }) {
+export default function PChainBridgeButton() {
     const [open, setOpen] = useState(false);
     const [direction, setDirection] = useState<'c-to-p' | 'p-to-c'>('c-to-p');
     const [amount, setAmount] = useState<string>("");
@@ -32,6 +32,8 @@ export default function InterchainTransfer({ glow = false }: { glow?: boolean })
     const destinationChain = direction === 'c-to-p' ? 'p-chain' : 'c-chain';
     const currentBalance = direction === 'c-to-p' ? l1Balance : pChainBalance;
     const importableUTXOs = direction === 'c-to-p' ? cToP_UTXOs : pToC_UTXOs;
+
+    const LOW_BALANCE_THRESHOLD = 0.5;
 
     const onBalanceChanged = useCallback(() => {
         updateL1Balance()?.catch(showBoundary)
@@ -213,10 +215,11 @@ export default function InterchainTransfer({ glow = false }: { glow?: boolean })
                 <Dialog.Trigger asChild>
                     <button
                         onClick={() => openDialog('c-to-p')}
-                        className={`p-1.5 rounded-full bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors border border-zinc-200 dark:border-zinc-600 shadow-sm ${glow ? "shimmer" : ""}`}
+                        className={`ml-2 px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors ${pChainBalance < LOW_BALANCE_THRESHOLD ? "shimmer" : ""
+                        } ${open ? "opacity-50 cursor-not-allowed" : ""}`}
                         aria-label="Transfer C-Chain to P-Chain"
                     >
-                        <ArrowRight className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
+                        Bridge
                     </button>
                 </Dialog.Trigger>
             </div>

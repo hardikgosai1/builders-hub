@@ -24,6 +24,7 @@ import {
     AlertDialogHeader, 
     AlertDialogTitle 
 } from "../AlertDialog"
+import PChainBridgeButton from "./PChainBridgeButton"
 
 
 export type WalletModeRequired = "l1" | "c-chain" | "testnet-mainnet"
@@ -86,7 +87,7 @@ export const ConnectWallet = ({
     const cChainBalance = useWalletStore(state => state.cChainBalance);
     const { showBoundary } = useErrorBoundary();
     const [isRequestingPTokens, setIsRequestingPTokens] = useState(false);
-    const [pTokenRequestError, setPTokenRequestError] = useState<string | null>(null);
+    const [_, setPTokenRequestError] = useState<string | null>(null);
     const [rpcUrl, setRpcUrl] = useState<string>("");
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
     const [alertDialogTitle, setAlertDialogTitle] = useState("Error");
@@ -502,9 +503,6 @@ export const ConnectWallet = ({
                                         )}
                                     </div>
                                 </div>
-                                {pTokenRequestError && (
-                                    <div className="text-red-500 text-xs mt-2">{pTokenRequestError}</div>
-                                )}
 
                                 {/* P-Chain */}
                                 {showPChainCard && (
@@ -574,6 +572,7 @@ export const ConnectWallet = ({
                                                     {isRequestingPTokens ? "Requesting..." : "Get tokens"}
                                                 </button>
                                             )}
+                                            <PChainBridgeButton />
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="font-mono text-xs text-zinc-700 dark:text-black bg-zinc-100 dark:bg-zinc-300 px-3 py-1.5 rounded-md overflow-x-auto shadow-sm border border-zinc-200 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-200 transition-colors flex-1 mr-2 truncate">
