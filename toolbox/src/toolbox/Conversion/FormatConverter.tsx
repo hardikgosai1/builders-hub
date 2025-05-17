@@ -85,7 +85,7 @@ const hexToCB58 = (hex: string): string => {
 };
 
 // Convert CB58 to hex
-const cb58ToHex = (cb58: string): string => {
+export const cb58ToHex = (cb58: string): string => {
   try {
     if (!cb58 || cb58.trim() === "") {
       throw new Error("Empty CB58 string");

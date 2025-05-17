@@ -36,13 +36,6 @@ const componentGroups: Record<string, ComponentGroupType> = {
     },
     components: [
       {
-        id: 'createSubnet',
-        label: "Create Subnet",
-        component: lazy(() => import('./L1/CreateSubnet')),
-        fileNames: ["toolbox/src/toolbox/L1/CreateSubnet.tsx"],
-        walletMode: "c-chain"
-      },
-      {
         id: 'createChain',
         label: "Create Chain",
         component: lazy(() => import('./L1/CreateChain')),
@@ -50,57 +43,18 @@ const componentGroups: Record<string, ComponentGroupType> = {
         walletMode: "c-chain"
       },
       {
+        id: "avalanchegoDocker",
+        label: "Node Setup with Docker",
+        component: lazy(() => import('./Nodes/AvalanchegoDocker')),
+        fileNames: ["toolbox/src/toolbox/Nodes/AvalanchegoDocker.tsx"],
+        walletMode: "testnet-mainnet",
+      },
+      {
         id: 'convertToL1',
         label: "Convert Subnet to L1",
         component: lazy(() => import('./L1/ConvertToL1')),
         fileNames: ["toolbox/src/toolbox/L1/ConvertToL1.tsx"],
         walletMode: "c-chain"
-      },
-      {
-        id: 'collectConversionSignatures',
-        label: "Collect conversion signatures",
-        component: lazy(() => import('./L1/CollectConversionSignatures')),
-        fileNames: ["toolbox/src/toolbox/L1/CollectConversionSignatures.tsx", "toolbox/src/toolbox/L1/convertWarp.ts"],
-        walletMode: "optional"
-      },
-      {
-        id: 'queryL1Details',
-        label: "Query L1 Details",
-        component: lazy(() => import('./L1/QueryL1Details')),
-        fileNames: ["toolbox/src/toolbox/L1/QueryL1Details.tsx"],
-        walletMode: "c-chain"
-      }
-    ]
-  },
-  "Nodes": {
-    components: [
-      {
-        id: "avalanchegoDocker",
-        label: "Node Setup with Docker",
-        component: lazy(() => import('./Nodes/AvalanchegoDocker')),
-        fileNames: ["toolbox/src/toolbox/Nodes/AvalanchegoDocker.tsx"],
-        walletMode: "optional",
-      },
-      {
-        id: 'balanceTopup',
-        label: "L1 Validator Balance Topup",
-        component: lazy(() => import('./Nodes/BalanceTopup')),
-        fileNames: ["toolbox/src/toolbox/Nodes/BalanceTopup.tsx"],
-        walletMode: "c-chain"
-      },
-      {
-        id: "rpcMethodsCheck",
-        label: "RPC Methods Check",
-        component: lazy(() => import('./Nodes/RPCMethodsCheck')),
-        fileNames: ["toolbox/src/toolbox/Nodes/RPCMethodsCheck.tsx"],
-        walletMode: "optional",
-      },
-      {
-        id: "performanceMonitor",
-        label: "Performance Monitor",
-        component: lazy(() => import('./Nodes/PerformanceMonitor')),
-        fileNames: ["toolbox/src/toolbox/Nodes/PerformanceMonitor.tsx"],
-        walletMode: "optional",
       }
     ]
   },
@@ -118,6 +72,13 @@ const componentGroups: Record<string, ComponentGroupType> = {
         walletMode: "l1"
       },
       {
+        id: "upgradeProxy",
+        label: "Upgrade Proxy Implementation",
+        component: lazy(() => import('./Proxy/UpgradeProxy')),
+        fileNames: ["toolbox/src/toolbox/Proxy/UpgradeProxy.tsx"],
+        walletMode: "l1"
+      },
+      {
         id: "initialize",
         label: "Set Initial Configuration",
         component: lazy(() => import('./ValidatorManager/Initialize')),
@@ -130,7 +91,11 @@ const componentGroups: Record<string, ComponentGroupType> = {
         component: lazy(() => import('./ValidatorManager/InitValidatorSet')),
         fileNames: ["toolbox/src/toolbox/ValidatorManager/InitValidatorSet.tsx"],
         walletMode: "l1"
-      },
+      }
+    ]
+  },
+  "Validator Manager Operations": {
+    components: [
       {
         id: "readContract",
         label: "Read Validator Manager Contract",
@@ -138,10 +103,6 @@ const componentGroups: Record<string, ComponentGroupType> = {
         fileNames: ["toolbox/src/toolbox/ValidatorManager/ReadContract.tsx"],
         walletMode: "l1"
       },
-    ]
-  },
-  "Validator Manager Operations": {
-    components: [
       {
         id: "addValidator",
         label: "Add L1 Validator",
@@ -168,8 +129,22 @@ const componentGroups: Record<string, ComponentGroupType> = {
         label: "Query L1 Validator Set",
         component: lazy(() => import('./ValidatorManager/QueryL1ValidatorSet')),
         fileNames: ["toolbox/src/toolbox/ValidatorManager/QueryL1ValidatorSet.tsx"],
-        walletMode: "optional"
+        walletMode: "testnet-mainnet"
       },
+      {
+        id: 'balanceTopup',
+        label: "L1 Validator Balance Topup",
+        component: lazy(() => import('./Nodes/BalanceTopup')),
+        fileNames: ["toolbox/src/toolbox/Nodes/BalanceTopup.tsx"],
+        walletMode: "c-chain"
+      },
+      {
+        id: "migrateV1ToV2",
+        label: "Migrate v1 to v2",
+        component: lazy(() => import('./Migrate/MigrateV1ToV2')),
+        fileNames: ["toolbox/src/toolbox/Migrate/MigrateV1ToV2.tsx"],
+        walletMode: "l1"
+      }
     ]
   },
   "Staking Manager Setup": {
@@ -379,6 +354,24 @@ const componentGroups: Record<string, ComponentGroupType> = {
         component: lazy(() => import("./Precompiles/WarpMessenger")),
         fileNames: ["toolbox/src/toolbox/Precompiles/WarpMessenger.tsx"],
         walletMode: "l1",
+      }
+    ]
+  },
+  "Nodes Utils": {
+    components: [
+      {
+        id: "rpcMethodsCheck",
+        label: "RPC Methods Check",
+        component: lazy(() => import('./Nodes/RPCMethodsCheck')),
+        fileNames: ["toolbox/src/toolbox/Nodes/RPCMethodsCheck.tsx"],
+        walletMode: "optional",
+      },
+      {
+        id: "performanceMonitor",
+        label: "Performance Monitor",
+        component: lazy(() => import('./Nodes/PerformanceMonitor')),
+        fileNames: ["toolbox/src/toolbox/Nodes/PerformanceMonitor.tsx"],
+        walletMode: "optional",
       }
     ]
   },

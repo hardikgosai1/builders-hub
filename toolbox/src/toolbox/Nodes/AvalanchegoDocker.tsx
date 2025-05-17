@@ -275,6 +275,7 @@ export default function AvalanchegoDocker() {
                         <InputChainId
                             value={chainId}
                             onChange={setChainId}
+                            hidePrimaryNetwork={true}
                         />
 
                         <Input
