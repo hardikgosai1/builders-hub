@@ -6,22 +6,40 @@ import { Calendar, Clock, Users, Coins, Info, Copy, Check, Search, ChevronDown }
 import { Container } from "../../components/Container"
 import { Button } from "../../components/Button"
 import { networkIDs } from "@avalabs/avalanchejs"
-import { GlobalParamNetwork, L1ValidatorDetailsFull } from "@avalabs/avacloud-sdk/models/components"
+import { GlobalParamNetwork } from "@avalabs/avacloud-sdk/models/components"
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
 import SelectSubnetId from "../../components/SelectSubnetId"
 import BlockchainDetailsDisplay from "../../components/BlockchainDetailsDisplay"
 import { Tooltip } from "../../components/Tooltip"
 import { formatAvaxBalance } from "../../coreViem/utils/format"
-import { cb58ToHex } from "../Conversion/FormatConverter"
 import { getSubnetInfo } from "../../coreViem/utils/glacier"
+import { cb58ToHex } from "../Conversion/FormatConverter"
+
+// Updated interface to match the actual API response
+interface ValidatorResponse {
+  validationId: string;
+  nodeId: string;
+  subnetId: string;
+  weight: number;
+  remainingBalance: string;
+  creationTimestamp: number;
+  remainingBalanceOwner?: {
+    addresses: string[];
+    threshold: number;
+  };
+  deactivationOwner?: {
+    addresses: string[];
+    threshold: number;
+  };
+}
 
 export default function QueryL1ValidatorSet() {
   const { avalancheNetworkID, isTestnet } = useWalletStore()
-  const [validators, setValidators] = useState<L1ValidatorDetailsFull[]>([])
-  const [filteredValidators, setFilteredValidators] = useState<L1ValidatorDetailsFull[]>([])
+  const [validators, setValidators] = useState<ValidatorResponse[]>([])
+  const [filteredValidators, setFilteredValidators] = useState<ValidatorResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedValidator, setSelectedValidator] = useState<L1ValidatorDetailsFull | null>(null)
+  const [selectedValidator, setSelectedValidator] = useState<ValidatorResponse | null>(null)
   const [copiedNodeId, setCopiedNodeId] = useState<string | null>(null)
   const [subnetId, setSubnetId] = useState<string>("")
   const [subnet, setSubnet] = useState<any>(null)
@@ -63,17 +81,10 @@ export default function QueryL1ValidatorSet() {
   const fetchValidators = async () => {
     if (!subnetId) return
 
-    // Check if there are subnet validation errors
-    if (subnetError) {
-      setError(`Invalid subnet: ${subnetError}`)
-      return
-    }
-
     setIsLoading(true)
     setError(null)
     setSelectedValidator(null)
     try {
-
       if (!subnetId.trim()) {
         throw new Error("Subnet ID is required to query L1 validators")
       }
@@ -83,19 +94,26 @@ export default function QueryL1ValidatorSet() {
         throw new Error("Invalid network selected")
       }
 
-      const result = await new AvaCloudSDK({
+      const sdk = new AvaCloudSDK({
         serverURL: isTestnet ? "https://api.avax-test.network" : "https://api.avax.network",
         network: networkNames[Number(avalancheNetworkID)],
-      }).data.primaryNetwork.listL1Validators({
+      })
+
+      const result = await sdk.data.primaryNetwork.listL1Validators({
         network: networkNames[Number(avalancheNetworkID)],
         subnetId,
       })
 
       // Get all pages of results
-      const allValidators: L1ValidatorDetailsFull[] = [];
+      const allValidators: ValidatorResponse[] = [];
       for await (const page of result) {
-        if ('validators' in page) {
-          allValidators.push(...(page.validators as L1ValidatorDetailsFull[]));
+        // Check if the response has a 'result' property (new API structure)
+        if ('result' in page && page.result && 'validators' in page.result) {
+          allValidators.push(...(page.result.validators as unknown as ValidatorResponse[]));
+        }
+        // Also check for direct 'validators' property (old API structure)
+        else if ('validators' in page) {
+          allValidators.push(...(page.validators as unknown as ValidatorResponse[]));
         }
       }
 
@@ -113,14 +131,15 @@ export default function QueryL1ValidatorSet() {
     return new Date(timestamp * 1000).toLocaleString()
   }
 
-  function formatStake(stake: number): string {
-    if (isNaN(stake)) return String(stake)
+  function formatStake(stake: string): string {
+    const stakeNum = parseFloat(stake)
+    if (isNaN(stakeNum)) return stake
 
     // Format as just the number with commas, no conversion
-    return stake.toLocaleString()
+    return stakeNum.toLocaleString()
   }
 
-  const handleViewDetails = (validator: L1ValidatorDetailsFull) => {
+  const handleViewDetails = (validator: ValidatorResponse) => {
     setSelectedValidator(validator)
   }
 
@@ -178,12 +197,13 @@ export default function QueryL1ValidatorSet() {
           <BlockchainDetailsDisplay
             subnet={subnet}
             isLoading={isLoadingSubnet}
+            error={subnetError}
           />
 
           <Button
             onClick={() => fetchValidators()}
             disabled={isLoading || !subnetId.trim() || !!subnetError || isLoadingSubnet}
-            className={`w-full py-2 px-4 rounded-md text-sm font-medium flex items-center justify-center ${isLoading || !subnetId.trim() || !!subnetError || isLoadingSubnet
+            className={`w-full py-2 px-4 rounded-md text-sm font-medium flex items-center justify-center mt-4 ${isLoading || !subnetId.trim() || !!subnetError || isLoadingSubnet
               ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
               : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm hover:shadow transition-all duration-200"
               }`}
@@ -311,10 +331,10 @@ export default function QueryL1ValidatorSet() {
                           </div>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm text-zinc-800 dark:text-zinc-200">
-                          <span className="font-medium text-blue-600 dark:text-blue-400">{formatAvaxBalance(validator.remainingBalance)}</span>
+                          <span className="font-medium text-blue-600 dark:text-blue-400">{formatAvaxBalance(parseFloat(validator.remainingBalance))}</span>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm text-zinc-800 dark:text-zinc-200">
-                          <span className="font-medium">{formatStake(validator.weight)}</span>
+                          <span className="font-medium">{formatStake(validator.weight.toString())}</span>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
                           <div className="flex items-center">
@@ -493,16 +513,16 @@ export default function QueryL1ValidatorSet() {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-2.5 bg-white dark:bg-zinc-900/80 rounded-md border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between">
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Weight</p>
-                    <p className="font-mono text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                      {formatStake(selectedValidator.weight)}
+                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Amount Staked</p>
+                    <p className="font-mono text-sm font-semibold text-blue-600 dark:text-blue-400">
+                      {formatAvaxBalance(parseFloat(selectedValidator.remainingBalance))}
                     </p>
                   </div>
 
                   <div className="p-2.5 bg-white dark:bg-zinc-900/80 rounded-md border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between">
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Balance</p>
-                    <p className="font-mono text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      {formatAvaxBalance(selectedValidator.remainingBalance)}
+                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">Delegation Fee</p>
+                    <p className="font-mono text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                      {formatStake(selectedValidator.weight.toString())}
                     </p>
                   </div>
                 </div>
