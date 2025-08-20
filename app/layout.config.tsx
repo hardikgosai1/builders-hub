@@ -99,6 +99,13 @@ export const integrationsMenu: LinkItemType = {
   ],
 };
 
+export const blogMenu: LinkItemType = {
+  type: 'menu',
+  text: 'Blog',
+  url: '/guides',
+  items: [],
+};
+
 export const docsMenu: LinkItemType = {
   type: 'menu',
   text: 'Documentation',
@@ -458,7 +465,7 @@ export const eventsMenu: LinkItemType = {
 const userMenu: LinkItemType = {
   type: 'custom',
   children: <UserButtonWrapper />,
-  secondary: true
+  secondary: true,
 };
 
 const github: LinkItemType = {
@@ -495,5 +502,6 @@ export const baseOptions: BaseLayoutProps = {
     integrationsMenu,
     github,
     userMenu,
+    blogMenu,
   ],
 };
