@@ -52,7 +52,7 @@ export function SiteHeader() {
                   )}
                 </BreadcrumbItem>
                 {index < breadcrumbs.length - 1 && (
-                  <BreadcrumbSeparator />
+                  <BreadcrumbSeparator key={`breadcrumb-separator-${index}`} />
                 )}
               </>
             ))}
