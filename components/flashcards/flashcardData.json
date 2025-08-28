@@ -4,6 +4,7 @@
             "title": "Codebase Entrepreneur Academy",
             "flashcardSets": [
                 "grants-process",
+                "community-building",
                 "legal-foundations",
                 "security-fundamentals",
                 "business-model-canvas",
@@ -322,6 +323,33 @@
                 "term": "Value-Based Framing",
                 "definition": "Focusing on the business value delivered rather than unit costs",
                 "example": "Highlighting $2M in potential savings rather than discussing the $50K service cost"
+            }
+        ],
+        "community-building": [
+            {
+                "term": "Supply and Demand in Social Media",
+                "definition": "Early-stage projects lack established demand and social capital",
+                "example": "Instead of posting daily without purpose, focus on creating one highly valuable, educational post per week"
+            },
+            {
+                "term": "Content Repurposing",
+                "definition": "Breaking long-form content into multiple smaller formats",
+                "example": "Converting a one-hour livestream into promotional clips, articles, social threads, and quote graphics"
+            },
+            {
+                "term": "Community vs. Audience",
+                "definition": "Community involves active participation while audience merely observes",
+                "example": "100 active members discussing your project daily is more valuable than 10,000 silent followers"
+            },
+            {
+                "term": "Iterative Content Process",
+                "definition": "Testing content ideas on a small scale before expanding",
+                "example": "Avalanche tested a simple 'Triangle adoption' post to gauge community response before launching a full campaign"
+            },
+            {
+                "term": "Event Planning Compass",
+                "definition": "A one-page document outlining an event's goals, audience, and success metrics",
+                "example": "Creating a document specifying that a hackathon aims to generate 10 new project prototypes from senior developers"
             }
         ]
     }
