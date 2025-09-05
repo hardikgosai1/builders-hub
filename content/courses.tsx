@@ -10,7 +10,7 @@ export type Course = {
     languages: string[];
     tools: string[];
     instructors: string[];
-    category: "Fundamentals" | "Smart Contract Development" | "L1 Development" | "Interoperability";
+    category: "Fundamentals" | "Smart Contract Development" | "L1 Development" | "Interoperability" | "Codebase";
 };
 
 const officialCourses: Course[] = [
@@ -87,6 +87,18 @@ const officialCourses: Course[] = [
         category: "L1 Development"
     },
     {
+        name: "L1 Native Tokenomics",
+        description: "Learn how to design and deploy tokenomics for your Avalanche L1",
+        slug: "l1-tokenomics",
+        icon: <Coins />,
+        duration: "2 hours",
+        status: "featured",
+        tools: ["Avalanche CLI", "ICM"],
+        languages: ["Solidity"],
+        instructors: ["Martin Eckardt", "Owen Wahlgren", "Sarp", "Nicolas Arnedo"],
+        category: "L1 Development"
+    },
+    {
         name: "L1 Validator Management",
         description: "Learn how to manage your Avalanche L1 Validators",
         slug: "l1-validator-management",
@@ -157,6 +169,42 @@ const officialCourses: Course[] = [
         languages: ["Solidity"],
         instructors: ["Martin Eckardt", "Andrea Vargas", "Ash"],
         category: "Interoperability"
+    },
+    {
+        name: "Foundations of a Web3 Venture",
+        description: "Pending...",
+        slug: "codebase-entrepreneur-academy",
+        icon: <SquareStackIcon />,
+        status: "featured",
+        duration: "1 hour",
+        languages: [],
+        tools: ["Codebase"],
+        instructors: ["Michael Martin", "Doro Unger-Lee", "Nicolas Arnedo"],
+        category: "Codebase"
+    },
+    {
+        name: "Codebase Entrepreneur: Go-to-Market",
+        description: "Master go-to-market strategies, sales, and pricing for your Web3 startup",
+        slug: "codebase-entrepreneur-go-to-market",
+        icon: <SquareStackIcon />,
+        status: "featured",
+        duration: "3 hours",
+        languages: [],
+        tools: ["Codebase"],
+        instructors: ["Michael Martin", "Doro Unger-Lee", "Nicolas Arnedo"],
+        category: "Codebase"
+    },
+    {
+        name: "Web3 Community Architect",
+        description: "pending...",
+        slug: "codebase-entrepreneur-web3-community",
+        icon: <SquareStackIcon />,
+        status: "featured",
+        duration: "1 hour",
+        languages: [],
+        tools: ["Codebase"],
+        instructors: ["Michael Martin", "Doro Unger-Lee", "Nicolas Arnedo"],
+        category: "Codebase"
     },
 
     /*{
