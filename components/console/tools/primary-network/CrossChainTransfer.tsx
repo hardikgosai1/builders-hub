@@ -100,7 +100,6 @@ export default function CrossChainTransfer({
             await Promise.all([
                 updateCChainBalance(),
                 updatePChainBalance(),
-                await new Promise((resolve, reject) => setTimeout(() => reject("My fake error"), 1000))
             ]);
         } catch (e) {
             // Critical balance update failure - set error state to crash on next render
