@@ -1,6 +1,6 @@
 "use client";
 
-import UnitConverter from "@/toolbox/src/toolbox/Conversion/UnitConverter";
+import UnitConverter from "@/components/console/tools/PrimaryNetwork/UnitConverter";
 import ToolboxConsoleWrapper from "@/toolbox/src/components/ToolboxConsoleWrapper";
 
 export default function Page() {

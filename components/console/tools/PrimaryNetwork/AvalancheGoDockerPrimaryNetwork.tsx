@@ -1,16 +1,16 @@
 "use client";
 
-import { useWalletStore } from "../../stores/walletStore";
+import { useWalletStore } from "../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Container } from "../../components/Container";
+import { Container } from "../../../../toolbox/src/components/Container";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { DockerInstallation } from "../../components/DockerInstallation";
-import { NodeBootstrapCheck } from "../../components/NodeBootstrapCheck";
-import { ReverseProxySetup } from "../../components/ReverseProxySetup";
-import { ConfigureNodeType } from "../../components/ConfigureNodeType";
-import { C_CHAIN_ID, generateDockerCommand } from "./config";
+import { DockerInstallation } from "../../../../toolbox/src/components/DockerInstallation";
+import { NodeBootstrapCheck } from "../../../../toolbox/src/components/NodeBootstrapCheck";
+import { ReverseProxySetup } from "../../../../toolbox/src/components/ReverseProxySetup";
+import { ConfigureNodeType } from "../../../../toolbox/src/components/ConfigureNodeType";
+import { C_CHAIN_ID, generateDockerCommand } from "../../../../toolbox/src/toolbox/Nodes/config";
 
 export default function AvalancheGoDockerPrimaryNetwork() {
     const [nodeType, setNodeType] = useState<"validator" | "public-rpc">("validator");
@@ -28,11 +28,11 @@ export default function AvalancheGoDockerPrimaryNetwork() {
         try {
             setRpcCommand(generateDockerCommand(
                 [], // No subnets for Primary Network
-                isRPC, 
-                avalancheNetworkID, 
-                C_CHAIN_ID, 
+                isRPC,
+                avalancheNetworkID,
+                C_CHAIN_ID,
                 "", // No custom VM ID for Primary Network
-                enableDebugTrace, 
+                enableDebugTrace,
                 pruningEnabled,
                 true // isPrimaryNetwork = true
             ));
@@ -126,7 +126,7 @@ export default function AvalancheGoDockerPrimaryNetwork() {
                             />
                         </Step>
                     )}
-                    
+
 
 
                     {nodeType === "validator" && (

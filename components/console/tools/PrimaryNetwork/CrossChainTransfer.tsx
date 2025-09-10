@@ -1,18 +1,17 @@
 "use client"
 import { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import { Loader2, ArrowDownUp, Clock } from "lucide-react"
-import { Button } from "./Button"
+import { Button } from "../../../../toolbox/src/components/Button"
 
-import { Container } from "./Container"
-import { useWalletStore } from "../stores/walletStore"
+import { Container } from "../../../../toolbox/src/components/Container"
+import { useWalletStore } from "../../../../toolbox/src/stores/walletStore"
 import { pvm, Utxo, TransferOutput, evm } from '@avalabs/avalanchejs'
-import { getRPCEndpoint } from '../coreViem/utils/rpc'
-import { useErrorBoundary } from "react-error-boundary"
-import { CheckWalletRequirements } from "./CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../hooks/useWalletRequirements"
-import { Success } from "./Success"
-import { AmountInput } from "./AmountInput"
-import { StepCard, StepIndicator } from "./StepCard"
+import { getRPCEndpoint } from '../../../../toolbox/src/coreViem/utils/rpc'
+import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements"
+import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements"
+import { Success } from "../../../../toolbox/src/components/Success"
+import { AmountInput } from "../../../../toolbox/src/components/AmountInput"
+import { StepCard, StepIndicator } from "../../../../toolbox/src/components/StepCard"
 import { createAvalancheWalletClient } from "@avalanche-sdk/client"
 import { avalanche, avalancheFuji } from "@avalanche-sdk/client/chains"
 
@@ -42,13 +41,23 @@ export default function CrossChainTransfer({
     const [cToP_UTXOs, setC_To_P_UTXOs] = useState<Utxo<TransferOutput>[]>([])
     const [pToC_UTXOs, setP_To_C_UTXOs] = useState<Utxo<TransferOutput>[]>([])
     const isFetchingRef = useRef(false)
+    const [criticalError, setCriticalError] = useState<Error | null>(null)
 
-    
+
     // Add states for step collapse timing
     const [step1AutoCollapse, setStep1AutoCollapse] = useState(false)
     const [step2AutoCollapse, setStep2AutoCollapse] = useState(false)
 
-    const { showBoundary } = useErrorBoundary()
+    // Throw critical errors during render to crash the component
+    // This pattern is necessary for Next.js because:
+    // 1. Error boundaries only catch errors during synchronous render
+    // 2. Async errors (in callbacks, promises) need to be captured in state
+    // 3. On next render, we throw synchronously so the error boundary catches it
+    // This ensures blockchain-critical errors properly crash the component
+    if (criticalError) {
+        throw criticalError;
+    }
+
 
     const {
         coreWalletClient,
@@ -86,10 +95,18 @@ export default function CrossChainTransfer({
         return sum + Number(utxo.output.amt.value()) / 1_000_000_000;
     }, 0);
 
-    const onBalanceChanged = useCallback(() => {
-        updateCChainBalance()?.catch(showBoundary)
-        updatePChainBalance()?.catch(showBoundary);
-    }, [updateCChainBalance, updatePChainBalance, showBoundary]);
+    const onBalanceChanged = useCallback(async () => {
+        try {
+            await Promise.all([
+                updateCChainBalance(),
+                updatePChainBalance(),
+                await new Promise((resolve, reject) => setTimeout(() => reject("My fake error"), 1000))
+            ]);
+        } catch (e) {
+            // Critical balance update failure - set error state to crash on next render
+            setCriticalError(new Error(`Failed to update balances: ${e instanceof Error ? e.message : String(e)}`));
+        }
+    }, [updateCChainBalance, updatePChainBalance]);
 
     // Fetch UTXOs from both chains
     const fetchUTXOs = useCallback(async () => {
@@ -146,9 +163,10 @@ export default function CrossChainTransfer({
                 }
             }
         } catch (e) {
-            showBoundary(`Error fetching UTXOs: ${e}`);
+            // Critical UTXO fetch failure - blockchain state unknown
+            setCriticalError(new Error(`Failed to fetch UTXOs: ${e instanceof Error ? e.message : String(e)}`));
         }
-    }, [fetchUTXOs, showBoundary]);
+    }, [fetchUTXOs]);
 
     // Initial fetch of UTXOs and balances
     useEffect(() => {
@@ -265,7 +283,7 @@ export default function CrossChainTransfer({
             onBalanceChanged();
 
         } catch (error) {
-            showBoundary(error);
+            console.error('Export error:', error);
             let msg = 'Unknown error';
             if (error instanceof Error) msg = error.message;
             setError(`Export failed: ${msg}`);
@@ -429,8 +447,8 @@ export default function CrossChainTransfer({
                     <StepCard
                         stepNumber={1}
                         title="Export from Source Chain"
-                        description={completedExportTxId === "utxo-available" 
-                            ? `UTXOs already available for import (previous export detected)` 
+                        description={completedExportTxId === "utxo-available"
+                            ? `UTXOs already available for import (previous export detected)`
                             : `Export ${amount} AVAX from ${sourceChain === "c-chain" ? "C-Chain" : "P-Chain"} to ${destinationChain === "p-chain" ? "P-Chain" : "C-Chain"}`}
                         status={getStep1Status()}
                         isExpanded={step1Expanded}

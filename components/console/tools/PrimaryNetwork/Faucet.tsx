@@ -1,18 +1,17 @@
 "use client";
-import { EVMFaucetButton } from "../../components/ConnectWallet/EVMFaucetButton";
-import { PChainFaucetButton } from "../../components/ConnectWallet/PChainFaucetButton";
+import { EVMFaucetButton } from "../../../../toolbox/src/components/ConnectWallet/EVMFaucetButton";
+import { PChainFaucetButton } from "../../../../toolbox/src/components/ConnectWallet/PChainFaucetButton";
 import { Droplets, Sparkles, AlertCircle } from "lucide-react";
 import { CheckWalletRequirements } from "@/components/CheckWalletRequirements";
 import { WalletRequirementsConfigKey } from "@/hooks/useWalletRequirements";
-import { useL1List, L1ListItem } from "../../stores/l1ListStore";
+import { useL1List, L1ListItem } from "../../../../toolbox/src/stores/l1ListStore";
 
 function EVMFaucetCard({ chain }: { chain: L1ListItem }) {
   const getFeatures = () => {
     const baseFeatures = chain.features || [];
     const dripAmount = chain.dripAmount || 3;
-    const dripFeature = `${dripAmount} ${chain.coinName} ${
-      chain.coinName === "AVAX" ? "per request" : "tokens per request"
-    }`;
+    const dripFeature = `${dripAmount} ${chain.coinName} ${chain.coinName === "AVAX" ? "per request" : "tokens per request"
+      }`;
     return [...baseFeatures, dripFeature];
   };
 

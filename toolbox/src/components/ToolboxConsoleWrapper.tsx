@@ -14,7 +14,7 @@ export default function ToolboxConsoleWrapper({ children }: { children: React.Re
         FallbackComponent={ErrorFallback}
         onReset={handleReset}
     >
-    {children}
+        {children}
     </ErrorBoundary>;
 }
 

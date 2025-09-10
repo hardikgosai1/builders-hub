@@ -1,17 +1,26 @@
 "use client";
 
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
-import { Button } from "../../components/Button";
-import { Container } from "../../components/Container";
+import { Button } from "../../../../toolbox/src/components/Button";
+import { Container } from "../../../../toolbox/src/components/Container";
 
 export default function UnitConverter() {
-    const { showBoundary } = useErrorBoundary();
     const [amount, setAmount] = useState<string>("1.00");
     const [selectedUnit, setSelectedUnit] = useState<string>("AVAX");
     const [results, setResults] = useState<Record<string, string>>({});
     const [copied, setCopied] = useState<string | null>(null);
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
+
+    // Throw critical errors during render to crash the component
+    // This pattern is necessary for Next.js because:
+    // 1. Error boundaries only catch errors during synchronous render
+    // 2. Async errors (in callbacks, promises) need to be captured in state
+    // 3. On next render, we throw synchronously so the error boundary catches it
+    // This ensures financial calculation errors properly crash the component
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const units = [
         { id: "wei", label: "Wei (C-Chain) 10⁻¹⁸", factor: BigInt("1"), exponent: -18 },
@@ -68,7 +77,10 @@ export default function UnitConverter() {
 
             return results;
         } catch (error) {
-            showBoundary(error);
+            // Critical conversion error - wrong values could lead to financial loss
+            // This will crash the component on next render
+            const err = new Error(`Unit conversion failed: ${error instanceof Error ? error.message : String(error)}`);
+            setCriticalError(err);
             return {};
         }
     };
@@ -118,7 +130,7 @@ export default function UnitConverter() {
                         <div key={unit.id} className="flex items-center">
                             <div className="w-44 flex-shrink-0 mr-3">
                                 <span className={`text-sm font-medium ${unit.id === "nAVAX" ? "text-red-600 dark:text-red-400" :
-                                        unit.id === "wei" ? "text-blue-600 dark:text-blue-400" : ""
+                                    unit.id === "wei" ? "text-blue-600 dark:text-blue-400" : ""
                                     }`}>
                                     {unit.label}
                                 </span>

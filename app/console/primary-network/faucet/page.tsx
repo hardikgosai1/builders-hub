@@ -1,6 +1,6 @@
 "use client";
 
-import Faucet from "@/toolbox/src/toolbox/Wallet/Faucet";
+import Faucet from "@/components/console/tools/PrimaryNetwork/Faucet";
 
 export default function Page() {
   return (

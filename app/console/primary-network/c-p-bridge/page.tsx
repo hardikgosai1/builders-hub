@@ -1,12 +1,9 @@
 "use client";
 
-import Bridge from "@/toolbox/src/components/CrossChainTransfer";
-import ToolboxConsoleWrapper from "@/toolbox/src/components/ToolboxConsoleWrapper";
+import Bridge from "@/components/console/tools/PrimaryNetwork/CrossChainTransfer";
 
 export default function Page() {
   return (
-    <ToolboxConsoleWrapper>
-      <Bridge />
-    </ToolboxConsoleWrapper>
+    <Bridge />
   );
 }
