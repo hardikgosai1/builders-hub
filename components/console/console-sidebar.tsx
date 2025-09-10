@@ -3,12 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  Layers,  
+import {
+  Home,
+  Layers,
   MessagesSquare,
-  Wrench, 
-  Droplets, 
+  Wrench,
+  Droplets,
   ArrowLeft,
   Shield,
   Network,
@@ -28,7 +28,8 @@ import {
   SlidersVertical,
   SquareMinus,
   SquarePlus,
-  HandCoins
+  HandCoins,
+  ExternalLink
 } from "lucide-react";
 
 import {
@@ -55,10 +56,10 @@ const data = {
       icon: Home,
     },
     {
-        title: "Back to Builder Hub",
-        url: "/",
-        icon: ArrowLeft,
-      },
+      title: "Back to Builder Hub",
+      url: "/",
+      icon: ArrowLeft,
+    },
   ],
   navGroups: [
     {
@@ -285,10 +286,10 @@ const data = {
   navSecondary: [],
 };
 
-interface ConsoleSidebarProps extends React.ComponentProps<typeof Sidebar> {}
+interface ConsoleSidebarProps extends React.ComponentProps<typeof Sidebar> { }
 
-export function ConsoleSidebar({ 
-  ...props 
+export function ConsoleSidebar({
+  ...props
 }: ConsoleSidebarProps) {
   const pathname = usePathname();
   return (
@@ -302,7 +303,7 @@ export function ConsoleSidebar({
           <span className="font-large font-semibold">Builder Console</span>
         </Link>
       </SidebarHeader>
-      
+
       <SidebarContent>
         {/* Main Navigation */}
         <SidebarGroup>
@@ -311,8 +312,8 @@ export function ConsoleSidebar({
               const isActive = pathname === item.url;
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={isActive}
                   >
                     <Link href={item.url}>
@@ -339,19 +340,29 @@ export function ConsoleSidebar({
                   const isComingSoon = 'comingSoon' in item && (item as any).comingSoon;
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton 
+                      <SidebarMenuButton
                         asChild
                         isActive={isActive}
                         className={`${isComingSoon ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isComingSoon}
                       >
 
-                        
+
                         {isComingSoon ? (
                           <Link href="#">
                             <item.icon />
                             <span>{item.title} (soon)</span>
                           </Link>
+                        ) : item.url.startsWith('https://') ? (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 w-full"
+                          >
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </a>
                         ) : (
                           <Link href={item.url}>
                             <item.icon />
