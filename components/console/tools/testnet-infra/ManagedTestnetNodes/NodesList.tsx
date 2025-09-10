@@ -1,11 +1,11 @@
 "use client";
 
-import { 
-    RefreshCw, 
-    XCircle, 
+import {
+    RefreshCw,
+    XCircle,
     Plus
 } from "lucide-react";
-import { Button } from "../../../components/Button";
+import { Button } from "../../../../../toolbox/src/components/Button";
 import { NodeRegistration } from "./types";
 import NodeCard from "./NodeCard";
 
@@ -48,7 +48,7 @@ export default function NodesList({
                 <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
                     You don't have any hosted Nodes set up
                 </h3>
-                <Button 
+                <Button
                     onClick={onShowCreateForm}
                     className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 !w-auto inline-flex"
                 >

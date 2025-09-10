@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useErrorBoundary } from "react-error-boundary";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
 import { formatEther, parseEther } from 'viem';
@@ -30,9 +29,14 @@ const TopUpComponent = ({
 }) => {
     const [amount, setAmount] = useState(formatEther(MINIMUM_BALANCE));
     const [isSending, setIsSending] = useState(false);
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const viemChain = useViemChainStore();
     const { coreWalletClient, publicClient } = useWalletStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const handleTopUp = async () => {
         setIsSending(true);
@@ -46,7 +50,7 @@ const TopUpComponent = ({
             await publicClient.waitForTransactionReceipt({ hash });
             onTopUp();
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsSending(false);
         }
@@ -77,13 +81,18 @@ const TopUpComponent = ({
 };
 
 export default function TeleporterMessenger() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { publicClient, coreWalletClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [deployerBalance, setDeployerBalance] = useState(BigInt(0));
     const [isCheckingBalance, setIsCheckingBalance] = useState(true);
     const [isDeployed, setIsDeployed] = useState(false);
     const [txHash, setTxHash] = useState("");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const deployerAddress = TeleporterMessengerDeployerAddress.content as `0x${string}`;
     const expectedContractAddress = TeleporterMessengerAddress.content;
@@ -130,7 +139,7 @@ export default function TeleporterMessenger() {
             // Refresh balance after deployment
             await checkDeployerBalance();
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }
@@ -142,100 +151,100 @@ export default function TeleporterMessenger() {
         <CheckWalletRequirements configKey={[
             WalletRequirementsConfigKey.EVMChainBalance,
         ]}>
-        <Container
-            title="Deploy ICM Messenger (formerly called TeleporterMessenger)"
-            description="Deploy the ICM messenger contract to your L1 to enable cross-L1 messaging and applications like ICTT."
-        >
-            <div>
-                <p className="mt-2">This tool deploys the TeleporterMessenger contract, which is the core contract that handles cross-subnet message sending and receiving. Please read more <a href="https://github.com/ava-labs/icm-contracts/blob/main/contracts/teleporter/README.md" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">here</a>.</p>
-            </div>
-            <p className="text-sm text-gray-500 mb-4">
-                Contract source: <a href={TELEPORTER_MESSENGER_SOURCE_URL} target="_blank" rel="noreferrer">TeleporterMessenger.sol</a> @ <code>{ICM_COMMIT.slice(0, 7)}</code>
-            </p>
-            <Steps>
-                <Step>
-                    <h2 className="text-lg font-semibold">Check if Deployer Address Balance is sufficient</h2>
-                    <p className="text-sm text-gray-500">
-                        Enter the parameters for your new chain.
-                    </p>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="font-semibold">Deployer Address:</p>
-                                <code className="block py-2 rounded text-sm break-all">
-                                    {deployerAddress}
-                                </code>
-                                <div className="pb-2 text-xs">
-                                    TeleporterMessenger_Deployer_Address_v1.0.0.txt.json
+            <Container
+                title="Deploy ICM Messenger (formerly called TeleporterMessenger)"
+                description="Deploy the ICM messenger contract to your L1 to enable cross-L1 messaging and applications like ICTT."
+            >
+                <div>
+                    <p className="mt-2">This tool deploys the TeleporterMessenger contract, which is the core contract that handles cross-subnet message sending and receiving. Please read more <a href="https://github.com/ava-labs/icm-contracts/blob/main/contracts/teleporter/README.md" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">here</a>.</p>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                    Contract source: <a href={TELEPORTER_MESSENGER_SOURCE_URL} target="_blank" rel="noreferrer">TeleporterMessenger.sol</a> @ <code>{ICM_COMMIT.slice(0, 7)}</code>
+                </p>
+                <Steps>
+                    <Step>
+                        <h2 className="text-lg font-semibold">Check if Deployer Address Balance is sufficient</h2>
+                        <p className="text-sm text-gray-500">
+                            Enter the parameters for your new chain.
+                        </p>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="font-semibold">Deployer Address:</p>
+                                    <code className="block py-2 rounded text-sm break-all">
+                                        {deployerAddress}
+                                    </code>
+                                    <div className="pb-2 text-xs">
+                                        TeleporterMessenger_Deployer_Address_v1.0.0.txt.json
+                                    </div>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Expected Contract Address:</p>
+                                    <code className="block py-2 rounded text-sm break-all">
+                                        {expectedContractAddress}
+                                    </code>
+                                    <div className="pb-2 text-xs">
+                                        TeleporterMessenger_Contract_Address_v1.0.0.txt.json
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <p className="font-semibold">Expected Contract Address:</p>
-                                <code className="block py-2 rounded text-sm break-all">
-                                    {expectedContractAddress}
-                                </code>
-                                <div className="pb-2 text-xs">
-                                    TeleporterMessenger_Contract_Address_v1.0.0.txt.json
+
+                            {!isDeployed &&
+                                <div>
+                                    <p className="font-semibold">Deployer Balance:</p>
+                                    {isCheckingBalance ? (
+                                        <p>Checking balance...</p>
+                                    ) : (
+                                        <p>{formatEther(deployerBalance)} coins {hasEnoughBalance ? '✅' : '❌'}</p>
+                                    )}
+                                    <div className="pb-2 text-xs">
+                                        Should be at least {formatEther(MINIMUM_BALANCE)} native coins
+                                    </div>
                                 </div>
-                            </div>
+                            }
+
+                            {!hasEnoughBalance && !isDeployed && (
+                                <TopUpComponent
+                                    deployerAddress={deployerAddress}
+                                    onTopUp={checkDeployerBalance}
+                                />
+                            )}
                         </div>
-
-                        {!isDeployed &&
-                            <div>
-                                <p className="font-semibold">Deployer Balance:</p>
-                                {isCheckingBalance ? (
-                                    <p>Checking balance...</p>
-                                ) : (
-                                    <p>{formatEther(deployerBalance)} coins {hasEnoughBalance ? '✅' : '❌'}</p>
-                                )}
-                                <div className="pb-2 text-xs">
-                                    Should be at least {formatEther(MINIMUM_BALANCE)} native coins
-                                </div>
+                    </Step>
+                    <Step>
+                        <h2 className="text-lg font-semibold">Deploy ICM Messenger</h2>
+                        {isDeployed ? (
+                            <div className="py-4">
+                                <p className="text-md">Contract Already Deployed</p>
+                                <p>The TeleporterMessenger contract is already deployed at the expected address.</p>
                             </div>
-                        }
-
-                        {!hasEnoughBalance && !isDeployed && (
-                            <TopUpComponent
-                                deployerAddress={deployerAddress}
-                                onTopUp={checkDeployerBalance}
-                            />
+                        ) : (
+                            <Button
+                                variant="primary"
+                                onClick={handleDeploy}
+                                loading={isDeploying}
+                                disabled={isDeploying || !hasEnoughBalance}
+                            >
+                                Deploy TeleporterMessenger
+                            </Button>
                         )}
-                    </div>
-                </Step>
-                <Step>
-                    <h2 className="text-lg font-semibold">Deploy ICM Messenger</h2>
-                    {isDeployed ? (
-                        <div className="py-4">
-                            <p className="text-md">Contract Already Deployed</p>
-                            <p>The TeleporterMessenger contract is already deployed at the expected address.</p>
-                        </div>
-                    ) : (
-                        <Button
-                            variant="primary"
-                            onClick={handleDeploy}
-                            loading={isDeploying}
-                            disabled={isDeploying || !hasEnoughBalance}
-                        >
-                            Deploy TeleporterMessenger
-                        </Button>
-                    )}
 
-                </Step>
-            </Steps>
-            {txHash && (
-                <Success
-                    label="Transaction Hash"
-                    value={txHash}
-                />
-            )}
+                    </Step>
+                </Steps>
+                {txHash && (
+                    <Success
+                        label="Transaction Hash"
+                        value={txHash}
+                    />
+                )}
 
-            {isDeployed && (
-                <Success
-                    label="TeleporterMessenger Address"
-                    value={expectedContractAddress}
-                />
-            )}
-        </Container >
+                {isDeployed && (
+                    <Success
+                        label="TeleporterMessenger Address"
+                        value={expectedContractAddress}
+                    />
+                )}
+            </Container >
         </CheckWalletRequirements>
     );
 }

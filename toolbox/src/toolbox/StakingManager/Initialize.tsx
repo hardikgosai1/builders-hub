@@ -3,7 +3,6 @@
 import { useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
@@ -16,7 +15,7 @@ import { EVMAddressInput } from "../../components/EVMAddressInput";
 
 export default function Initialize() {
     const selectedL1 = useSelectedL1()();
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { stakingManagerAddress, setStakingManagerAddress, rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
@@ -32,6 +31,11 @@ export default function Initialize() {
     const [uptimeBlockchainID, setUptimeBlockchainID] = useState("");
     const viemChain = useViemChainStore();
     const [managerAddress, setManagerAddress] = useState(selectedL1?.validatorManagerAddress || "");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         if (stakingManagerAddress) {
@@ -105,7 +109,7 @@ export default function Initialize() {
             }
         } catch (error) {
             console.error('Error checking initialization:', error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsChecking(false);
         }
@@ -139,7 +143,7 @@ export default function Initialize() {
             await publicClient.waitForTransactionReceipt({ hash });
             await checkIfInitialized();
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsInitializing(false);
         }

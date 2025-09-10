@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { createPublicClient, http, formatUnits } from 'viem';
-import { useErrorBoundary } from "react-error-boundary";
 import { pvm } from '@avalabs/avalanchejs';
 import { RPCURLInput } from "../../components/RPCURLInput";
 import { useWalletStore } from "../../stores/walletStore";
@@ -263,7 +262,7 @@ export default function RPCMethodsCheck() {
     const { pChainAddress, walletEVMAddress } = useWalletStore();
     const [baseURL, setBaseURL] = useState<string>("https://api.avax-test.network");
 
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const [isChecking, setIsChecking] = useState(false);
     const [testResults, setTestResults] = useState<{
         pChain: TestResult | null,
@@ -271,6 +270,11 @@ export default function RPCMethodsCheck() {
         admin: TestResult | null,
         metrics: TestResult | null
     }>({ pChain: null, evm: null, admin: null, metrics: null });
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         if (!baseURL && isInExtBcFormat(evmChainRpcUrl)) {
@@ -302,7 +306,7 @@ export default function RPCMethodsCheck() {
 
             setTestResults({ pChain: pChainResults, evm: evmResults, admin: adminResults, metrics: metricsResults });
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsChecking(false);
         }

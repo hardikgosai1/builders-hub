@@ -2,7 +2,6 @@
 
 import { useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { ResultField } from "../../components/ResultField";
@@ -18,7 +17,7 @@ import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
 import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
 
 export default function TransferOwnership() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { coreWalletClient, publicClient, walletEVMAddress } = useWalletStore();
     const [isTransferring, setIsTransferring] = useState(false);
     const [selectedSubnetId, setSelectedSubnetId] = useState<string>('');
@@ -28,6 +27,11 @@ export default function TransferOwnership() {
     const [isNewOwnerContract, setIsNewOwnerContract] = useState(false);
     const [isCheckingNewOwner, setIsCheckingNewOwner] = useState(false);
     const viemChain = useViemChainStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const validatorManagerData = useValidatorManagerDetails({ subnetId: selectedSubnetId });
     const {
@@ -104,7 +108,7 @@ export default function TransferOwnership() {
 
             setReceipt(receipt);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsTransferring(false);
         }
@@ -121,92 +125,92 @@ export default function TransferOwnership() {
         <CheckWalletRequirements configKey={[
             WalletRequirementsConfigKey.EVMChainBalance,
         ]}>
-        <Container
-            title="Transfer Validator Manager Ownership"
-            description="This will transfer the ownership of the Validator Manager to a new address, which could be an EOA, StakingManager or PoAManager."
-        >
-            <div className="space-y-4">
-                <SelectSubnetId
-                    value={selectedSubnetId}
-                    onChange={setSelectedSubnetId}
-                    onlyNotConverted={false}
-                    hidePrimaryNetwork={true}
-                    error={validatorManagerError}
-                />
+            <Container
+                title="Transfer Validator Manager Ownership"
+                description="This will transfer the ownership of the Validator Manager to a new address, which could be an EOA, StakingManager or PoAManager."
+            >
+                <div className="space-y-4">
+                    <SelectSubnetId
+                        value={selectedSubnetId}
+                        onChange={setSelectedSubnetId}
+                        onlyNotConverted={false}
+                        hidePrimaryNetwork={true}
+                        error={validatorManagerError}
+                    />
 
-                <ValidatorManagerDetails
-                    validatorManagerAddress={validatorManagerData.validatorManagerAddress}
-                    blockchainId={validatorManagerData.blockchainId}
-                    subnetId={selectedSubnetId}
-                    isLoading={validatorManagerData.isLoading}
-                    signingSubnetId={validatorManagerData.signingSubnetId}
-                    contractTotalWeight={validatorManagerData.contractTotalWeight}
-                    l1WeightError={validatorManagerData.l1WeightError}
-                    isLoadingL1Weight={validatorManagerData.isLoadingL1Weight}
-                    contractOwner={validatorManagerData.contractOwner}
-                    ownershipError={validatorManagerData.ownershipError}
-                    isLoadingOwnership={validatorManagerData.isLoadingOwnership}
-                    isOwnerContract={validatorManagerData.isOwnerContract}
-                    ownerType={validatorManagerData.ownerType}
-                    isDetectingOwnerType={validatorManagerData.isDetectingOwnerType}
-                    isExpanded={isDetailsExpanded}
-                    onToggleExpanded={() => setIsDetailsExpanded(!isDetailsExpanded)}
-                />
+                    <ValidatorManagerDetails
+                        validatorManagerAddress={validatorManagerData.validatorManagerAddress}
+                        blockchainId={validatorManagerData.blockchainId}
+                        subnetId={selectedSubnetId}
+                        isLoading={validatorManagerData.isLoading}
+                        signingSubnetId={validatorManagerData.signingSubnetId}
+                        contractTotalWeight={validatorManagerData.contractTotalWeight}
+                        l1WeightError={validatorManagerData.l1WeightError}
+                        isLoadingL1Weight={validatorManagerData.isLoadingL1Weight}
+                        contractOwner={validatorManagerData.contractOwner}
+                        ownershipError={validatorManagerData.ownershipError}
+                        isLoadingOwnership={validatorManagerData.isLoadingOwnership}
+                        isOwnerContract={validatorManagerData.isOwnerContract}
+                        ownerType={validatorManagerData.ownerType}
+                        isDetectingOwnerType={validatorManagerData.isDetectingOwnerType}
+                        isExpanded={isDetailsExpanded}
+                        onToggleExpanded={() => setIsDetailsExpanded(!isDetailsExpanded)}
+                    />
 
-                {/* Minimal ownership error display */}
-                {showOwnershipError && (
-                    <div className="p-3 rounded-lg border bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200 flex items-start space-x-2">
-                        <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                            <p className="text-sm">You are not the owner of this Validator Manager. Only the current owner can transfer ownership.</p>
-                        </div>
-                    </div>
-                )}
-
-                <EVMAddressInput
-                    label="New Owner Address"
-                    value={newOwnerAddress}
-                    onChange={setNewOwnerAddress}
-                    disabled={isTransferring}
-                />
-
-                {/* Contract owner warning */}
-                {isNewOwnerContract && !isCheckingNewOwner && (
-                    <div className="p-3 rounded-lg border-l-4 border-l-amber-400 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 dark:border-l-amber-400">
-                        <div className="flex items-start gap-3">
-                            <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                            <div className="flex-1">
-                                <h4 className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
-                                    Contract Address Detected
-                                </h4>
-                                <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
-                                    The new owner address is a contract. Please ensure this contract is either a <strong>PoAManager</strong> or <strong>StakingManager</strong> that follows the ACP-99 standard.
-                                </p>
-                                <p className="text-xs text-amber-600 dark:text-amber-400">
-                                    This action is irreversible unless ValidatorManager is deployed behind proxy
-                                </p>
+                    {/* Minimal ownership error display */}
+                    {showOwnershipError && (
+                        <div className="p-3 rounded-lg border bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200 flex items-start space-x-2">
+                            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                            <div>
+                                <p className="text-sm">You are not the owner of this Validator Manager. Only the current owner can transfer ownership.</p>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                <Button
-                    variant="primary"
-                    onClick={handleTransferOwnership}
-                    loading={isTransferring}
-                    disabled={!canTransfer}
-                >
-                    Transfer Ownership
-                </Button>
-            </div>
-            {receipt && (
-                <ResultField
-                    label="Transaction Hash"
-                    value={receipt.transactionHash}
-                    showCheck={!!receipt.transactionHash}
-                />
-            )}
-        </Container>
+                    <EVMAddressInput
+                        label="New Owner Address"
+                        value={newOwnerAddress}
+                        onChange={setNewOwnerAddress}
+                        disabled={isTransferring}
+                    />
+
+                    {/* Contract owner warning */}
+                    {isNewOwnerContract && !isCheckingNewOwner && (
+                        <div className="p-3 rounded-lg border-l-4 border-l-amber-400 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 dark:border-l-amber-400">
+                            <div className="flex items-start gap-3">
+                                <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                                        Contract Address Detected
+                                    </h4>
+                                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
+                                        The new owner address is a contract. Please ensure this contract is either a <strong>PoAManager</strong> or <strong>StakingManager</strong> that follows the ACP-99 standard.
+                                    </p>
+                                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                                        This action is irreversible unless ValidatorManager is deployed behind proxy
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <Button
+                        variant="primary"
+                        onClick={handleTransferOwnership}
+                        loading={isTransferring}
+                        disabled={!canTransfer}
+                    >
+                        Transfer Ownership
+                    </Button>
+                </div>
+                {receipt && (
+                    <ResultField
+                        label="Transaction Hash"
+                        value={receipt.transactionHash}
+                        showCheck={!!receipt.transactionHash}
+                    />
+                )}
+            </Container>
         </CheckWalletRequirements>
     );
 };

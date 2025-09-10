@@ -1,28 +1,28 @@
 "use client";
 
-import { useWalletStore } from "../../../stores/walletStore";
+import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Container } from "../../../components/Container";
-import { Button } from "../../../components/Button";
-import { AddChainModal } from "../../../components/ConnectWallet/AddChainModal";
-import { useL1ListStore } from "../../../stores/l1ListStore";
-import { 
-    AlertDialog, 
-    AlertDialogAction, 
-    AlertDialogContent, 
-    AlertDialogDescription, 
+import { Container } from "../../../../../toolbox/src/components/Container";
+import { Button } from "../../../../../toolbox/src/components/Button";
+import { AddChainModal } from "../../../../../toolbox/src/components/ConnectWallet/AddChainModal";
+import { useL1ListStore } from "../../../../../toolbox/src/stores/l1ListStore";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
     AlertDialogFooter,
-    AlertDialogHeader, 
-    AlertDialogTitle 
-} from "../../../components/AlertDialog";
-import { 
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "../../../../../toolbox/src/components/AlertDialog";
+import {
     Plus,
     X,
 } from "lucide-react";
 
-import { 
+import {
     NodeRegistration,
-    RegisterSubnetResponse 
+    RegisterSubnetResponse
 } from "./types";
 import CreateNodeForm from "./CreateNodeForm";
 import SuccessMessage from "./SuccessMessage";
@@ -136,7 +136,7 @@ export default function ManagedTestnetNodes() {
         }
 
         setDeletingNodes(prev => new Set(prev).add(node.id));
-        
+
         try {
             const response = await fetch(`/api/managed-testnet-nodes/${node.subnet_id}/${node.node_index}`, {
                 method: 'DELETE',
@@ -146,7 +146,7 @@ export default function ManagedTestnetNodes() {
             });
 
             const data = await response.json();
-            
+
             if (!response.ok || data.error) {
                 throw new Error(data.message || data.error || 'Failed to delete node');
             }
@@ -155,13 +155,13 @@ export default function ManagedTestnetNodes() {
             setAlertDialogMessage(data.message || "The node has been successfully removed from the subnet.");
             setIsLoginError(false);
             setIsAlertDialogOpen(true);
-            
+
             // Refresh the nodes list
             fetchNodes();
         } catch (error) {
             console.error('Failed to delete node:', error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to delete node';
-            
+
             // Check for authentication errors
             if (errorMessage.includes('Authentication required') || errorMessage.includes('401')) {
                 setAlertDialogTitle("Authentication Required");
@@ -249,7 +249,7 @@ export default function ManagedTestnetNodes() {
                                 <span className="font-semibold">{nodes.length}</span> / 3 active nodes
                             </p>
                         </div>
-                        <Button 
+                        <Button
                             onClick={() => setShowCreateForm(true)}
                             className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 !w-auto"
                             size="sm"

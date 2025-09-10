@@ -1,7 +1,6 @@
 "use client";
 
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -20,7 +19,7 @@ import { useToolboxStore } from "../../stores/toolboxStore";
 import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 
 export default function AddCollateral() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { erc20TokenRemoteAddress, nativeTokenRemoteAddress } = useToolboxStore();
     const { coreWalletClient, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
@@ -40,6 +39,11 @@ export default function AddCollateral() {
     const [isCheckingStatus, setIsCheckingStatus] = useState(false);
     const [isCollateralized, setIsCollateralized] = useState<boolean | null>(null);
     const [isAutoFilled, setIsAutoFilled] = useState(false);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
     const sourceToolboxStore = getToolboxStore(sourceChainId)();
@@ -230,7 +234,7 @@ export default function AddCollateral() {
         } catch (error: any) {
             console.error("Approval failed:", error);
             setLocalError(`Approval failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsProcessing(false);
         }
@@ -277,7 +281,7 @@ export default function AddCollateral() {
         } catch (error: any) {
             console.error("Add Collateral failed:", error);
             setLocalError(`Add Collateral failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsProcessing(false);
         }

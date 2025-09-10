@@ -3,7 +3,6 @@
 import ExampleERC20 from "../../../contracts/icm-contracts/compiled/ExampleERC20.json"
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -12,12 +11,17 @@ import { Container } from "../../components/Container";
 import { ExternalLink } from "lucide-react";
 
 export default function DeployExampleERC20() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { exampleErc20Address, setExampleErc20Address } = useToolboxStore();
     const { coreWalletClient } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const { walletChainId } = useWalletStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -43,7 +47,7 @@ export default function DeployExampleERC20() {
 
             setExampleErc20Address(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

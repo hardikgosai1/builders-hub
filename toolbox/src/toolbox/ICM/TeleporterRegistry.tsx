@@ -3,7 +3,6 @@
 import { useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -20,12 +19,17 @@ const TELEPORTER_REGISTRY_SOURCE_URL = `https://github.com/ava-labs/icm-contract
 
 
 export default function TeleporterRegistry() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { setTeleporterRegistryAddress, teleporterRegistryAddress } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
     const selectedL1 = useSelectedL1()();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -51,7 +55,7 @@ export default function TeleporterRegistry() {
 
             setTeleporterRegistryAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

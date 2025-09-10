@@ -1,6 +1,6 @@
 "use client";
 
-import ManagedTestnetNodes from "@/toolbox/src/toolbox/Nodes/ManagedTestnetNodes";
+import ManagedTestnetNodes from "@/components/console/tools/testnet-infra/ManagedTestnetNodes";
 
 export default function Page() {
   return (

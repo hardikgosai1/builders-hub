@@ -38,10 +38,10 @@ import posthog from 'posthog-js';
 
 import ToolboxMdxWrapper from "@/toolbox/src/components/ToolboxMdxWrapper"
 import CrossChainTransfer from "@/components/console/tools/primary-network/CrossChainTransfer"
-import AvalancheGoDocker from '@/toolbox/src/toolbox/Nodes/AvalancheGoDockerL1';
+import AvalancheGoDocker from '@/components/console/tools/layer-1/AvalancheGoDockerL1';
 import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
-import CreateChain from "@/toolbox/src/toolbox/L1/CreateChain"
-import ConvertToL1 from "@/toolbox/src/toolbox/L1/ConvertToL1"
+import CreateChain from "@/components/console/tools/layer-1/create/CreateChain"
+import ConvertToL1 from "@/components/console/tools/layer-1/create/ConvertToL1"
 import GenesisBuilder from '@/toolbox/src/toolbox/L1/GenesisBuilder';
 import DeployExampleERC20 from '@/toolbox/src/toolbox/ICTT/DeployExampleERC20';
 import DeployTokenHome from '@/toolbox/src/toolbox/ICTT/DeployTokenHome';

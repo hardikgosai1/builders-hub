@@ -4,7 +4,6 @@ import NativeTokenRemote from "../../../contracts/icm-contracts/compiled/NativeT
 import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -20,7 +19,7 @@ import { CheckPrecompile } from "../../components/CheckPrecompile";
 import { Container } from "../../components/Container";
 import TeleporterRegistryAddressInput from "../../components/TeleporterRegistryAddressInput";
 export default function DeployNativeTokenRemote() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const {
         nativeTokenRemoteAddress,
         setNativeTokenRemoteAddress,
@@ -40,6 +39,11 @@ export default function DeployNativeTokenRemote() {
     const [initialReserveImbalance, setInitialReserveImbalance] = useState("0");
     const [burnedFeesReportingRewardPercentage, setBurnedFeesReportingRewardPercentage] = useState("0");
     const [tokenHomeAddress, setTokenHomeAddress] = useState("");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
     const sourceToolboxStore = getToolboxStore(sourceChainId)();
@@ -168,7 +172,7 @@ export default function DeployNativeTokenRemote() {
         } catch (error: any) {
             console.error("Deployment failed:", error);
             setLocalError(`Deployment failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

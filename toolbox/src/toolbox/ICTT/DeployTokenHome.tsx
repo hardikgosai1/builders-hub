@@ -4,7 +4,6 @@ import ERC20TokenHome from "../../../contracts/icm-contracts/compiled/ERC20Token
 import NativeTokenHome from "../../../contracts/icm-contracts/compiled/NativeTokenHome.json";
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -19,7 +18,7 @@ import { RadioGroup } from "../../components/RadioGroup";
 import { useSelectedL1 } from "../../stores/l1ListStore";
 
 export default function DeployTokenHome() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const {
         exampleErc20Address,
         wrappedNativeTokenAddress,
@@ -40,6 +39,11 @@ export default function DeployTokenHome() {
     const [deployError, setDeployError] = useState("");
     const [teleporterRegistryAddress, setTeleporterRegistryAddress] = useState("");//local, not in store
     const [tokenType, setTokenType] = useState<"erc20" | "native">("erc20");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         const tokenAddress = tokenType === "erc20" ? exampleErc20Address : (wrappedNativeTokenAddress || selectedL1?.wrappedTokenAddress);
@@ -128,7 +132,7 @@ export default function DeployTokenHome() {
                 setNativeTokenHomeAddress(receipt.contractAddress);
             }
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

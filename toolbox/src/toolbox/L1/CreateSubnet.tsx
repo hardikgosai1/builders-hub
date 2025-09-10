@@ -4,16 +4,20 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useCreateChainStore } from "../../stores/createChainStore";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { ResultField } from "../../components/ResultField";
 import { Container } from "../../components/Container";
 
 export default function CreateSubnet() {
-  const { showBoundary } = useErrorBoundary();
+  const [criticalError, setCriticalError] = useState<Error | null>(null);
   const { setSubnetID, subnetId } = useCreateChainStore()();
   const { coreWalletClient, pChainAddress } = useWalletStore();
   const [isCreating, setIsCreating] = useState(false);
+
+  // Throw critical errors during render
+  if (criticalError) {
+    throw criticalError;
+  }
 
   async function handleCreateSubnet() {
     setSubnetID("");
@@ -25,7 +29,7 @@ export default function CreateSubnet() {
 
       setSubnetID(txID);
     } catch (error) {
-      showBoundary(error);
+      setCriticalError(error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsCreating(false);
     }

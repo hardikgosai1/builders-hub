@@ -2,7 +2,6 @@
 
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { ResultField } from "../../components/ResultField";
@@ -17,12 +16,16 @@ function calculateLibraryHash(libraryPath: string) {
     return hash.slice(0, 34);
 }
 export default function DeployStakingManager() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { stakingManagerAddress, setStakingManagerAddress, validatorMessagesLibAddress } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const viemChain = useViemChainStore();
 
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const getLinkedBytecode = () => {
         if (!validatorMessagesLibAddress) {
@@ -64,7 +67,7 @@ export default function DeployStakingManager() {
 
             setStakingManagerAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

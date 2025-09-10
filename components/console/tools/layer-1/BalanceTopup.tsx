@@ -1,17 +1,17 @@
 "use client"
 import { useEffect, useState } from "react"
 import { AlertCircle, Loader2, CheckCircle2, ArrowUpRight, RefreshCw } from "lucide-react"
-import { Button } from "../../components/Button"
-import { Container } from "../../components/Container"
+import { Button } from "../../../../toolbox/src/components/Button"
+import { Container } from "../../../../toolbox/src/components/Container"
 import { Context, pvm, utils } from "@avalabs/avalanchejs"
-import { useWalletStore } from "../../stores/walletStore"
+import { useWalletStore } from "../../../../toolbox/src/stores/walletStore"
 import { bytesToHex } from "viem"
-import { getRPCEndpoint } from "../../coreViem/utils/rpc"
-import { Input } from "../../components/Input"
-import SelectValidationID, { ValidationSelection } from "../../components/SelectValidationID"
-import SelectSubnetId from "../../components/SelectSubnetId"
+import { getRPCEndpoint } from "../../../../toolbox/src/coreViem/utils/rpc"
+import { Input } from "../../../../toolbox/src/components/Input"
+import SelectValidationID, { ValidationSelection } from "../../../../toolbox/src/components/SelectValidationID"
+import SelectSubnetId from "../../../../toolbox/src/components/SelectSubnetId"
 import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
+import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements";
 
 // Helper function for delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -3,7 +3,6 @@
 import { useWalletStore } from "../../stores/walletStore";
 import { useViemChainStore } from "../../stores/toolboxStore";
 import { useSelectedL1 } from "../../stores/l1ListStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -21,7 +20,7 @@ import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
 const ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
 
 export default function UpgradeProxy() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { validatorManagerAddress } = useToolboxStore();
     const [proxyAdminAddress, setProxyAdminAddress] = useState<`0x${string}` | null>(null);
     const selectedL1 = useSelectedL1()();
@@ -34,6 +33,11 @@ export default function UpgradeProxy() {
     const viemChain = useViemChainStore();
 
     const [proxyAddress, setProxyAddress] = useState<string>("");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         (async function () {
@@ -49,7 +53,7 @@ export default function UpgradeProxy() {
                 if (!newProxyAddress) return
                 await readProxyAdminSlot(newProxyAddress);
             } catch (error) {
-                showBoundary(error);
+                setCriticalError(error instanceof Error ? error : new Error(String(error)));
             }
         })()
     }, [walletChainId]);
@@ -145,7 +149,7 @@ export default function UpgradeProxy() {
             await publicClient.waitForTransactionReceipt({ hash });
             await checkCurrentImplementation();
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsUpgrading(false);
         }

@@ -4,7 +4,6 @@ import ERC20TokenRemote from "../../../contracts/icm-contracts/compiled/ERC20Tok
 import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -20,7 +19,7 @@ import { Container } from "../../components/Container";
 import TeleporterRegistryAddressInput from "../../components/TeleporterRegistryAddressInput";
 
 export default function DeployERC20TokenRemote() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const {
         erc20TokenRemoteAddress,
         setErc20TokenRemoteAddress,
@@ -38,6 +37,11 @@ export default function DeployERC20TokenRemote() {
     const [minTeleporterVersion, setMinTeleporterVersion] = useState("1");
     const [tokenHomeAddress, setTokenHomeAddress] = useState("");
     const [teleporterRegistryAddress, setTeleporterRegistryAddress] = useState("");
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
     const sourceToolboxStore = getToolboxStore(sourceChainId)();
@@ -189,7 +193,7 @@ export default function DeployERC20TokenRemote() {
         } catch (error: any) {
             console.error("Deployment failed:", error);
             setLocalError(`Deployment failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

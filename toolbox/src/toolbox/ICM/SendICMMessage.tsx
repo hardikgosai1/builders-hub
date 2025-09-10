@@ -2,7 +2,6 @@
 
 import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -23,7 +22,7 @@ const predeployedDemos: Record<string, string> = {
 }
 
 export default function SendICMMessage() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { icmReceiverAddress, setIcmReceiverAddress } = useToolboxStore();
     const { coreWalletClient } = useWalletStore();
     const selectedL1 = useSelectedL1()();
@@ -34,6 +33,11 @@ export default function SendICMMessage() {
     const viemChain = useViemChainStore();
     const [isQuerying, setIsQuerying] = useState(false);
     const [lastReceivedMessage, setLastReceivedMessage] = useState<number>();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const targetToolboxStore = getToolboxStore(destinationChainId)()
     const targetL1 = useL1ByChainId(destinationChainId)();
@@ -75,7 +79,7 @@ export default function SendICMMessage() {
 
     async function handleSendMessage() {
         if (!icmReceiverAddress || !targetToolboxStore.icmReceiverAddress || !destinationBlockchainIDHex || !viemChain || !coreWalletClient) {
-            showBoundary(new Error('Missing required information to send message.'));
+            setCriticalError(new Error('Missing required information to send message.'));
             return;
         }
 
@@ -116,7 +120,7 @@ export default function SendICMMessage() {
 
         } catch (error) {
             console.error("ICM Send Error:", error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsSending(false);
         }
@@ -124,7 +128,7 @@ export default function SendICMMessage() {
 
     async function queryLastMessage() {
         if (!targetL1?.rpcUrl || !targetToolboxStore.icmReceiverAddress) {
-            showBoundary(new Error('Missing required information to query message'));
+            setCriticalError(new Error('Missing required information to query message'));
             return;
         }
 
@@ -143,7 +147,7 @@ export default function SendICMMessage() {
             setLastReceivedMessage(Number(lastMessage));
         } catch (error) {
             console.error("ICM Query Error:", error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsQuerying(false);
         }

@@ -2,7 +2,6 @@
 
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { ResultField } from "../../components/ResultField";
@@ -11,12 +10,17 @@ import ExampleRewardCalculatorABI from "../../../contracts/icm-contracts/compile
 import { Container } from "../../components/Container";
 
 export default function DeployRewardCalculator() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { rewardCalculatorAddress, setRewardCalculatorAddress } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [rewardBasisPoints, setRewardBasisPoints] = useState<number>(500);
     const viemChain = useViemChainStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -37,7 +41,7 @@ export default function DeployRewardCalculator() {
 
             setRewardCalculatorAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

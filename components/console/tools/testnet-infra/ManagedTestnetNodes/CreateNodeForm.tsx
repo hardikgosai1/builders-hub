@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
-import { getBlockchainInfo, getSubnetInfo } from "../../../coreViem/utils/glacier";
-import InputSubnetId from "../../../components/InputSubnetId";
-import BlockchainDetailsDisplay from "../../../components/BlockchainDetailsDisplay";
-import { Button } from "../../../components/Button";
+import { getBlockchainInfo, getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier";
+import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
+import BlockchainDetailsDisplay from "../../../../../toolbox/src/components/BlockchainDetailsDisplay";
+import { Button } from "../../../../../toolbox/src/components/Button";
 import { RegisterSubnetResponse } from "./types";
 
 interface CreateNodeFormProps {
@@ -112,7 +112,7 @@ export default function CreateNodeForm({ onClose, onRegister, onError, avalanche
         } catch (error) {
             console.error("Builder Hub registration error:", error);
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            
+
             // Check for authentication errors
             if (errorMessage.includes('Authentication required') || errorMessage.includes('401')) {
                 onError("Authentication Required", "Please sign in to create Builder Hub nodes. Use the login button above to authenticate.", true);
@@ -162,7 +162,7 @@ export default function CreateNodeForm({ onClose, onRegister, onError, avalanche
             )}
 
             {subnetId && blockchainInfo && (
-                <Button 
+                <Button
                     onClick={handleRegisterSubnet}
                     loading={isRegistering}
                     className="mt-4 !w-auto"

@@ -72,7 +72,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: 'createChain',
         label: "Create Chain",
-        component: lazy(() => import('./L1/CreateChain')),
+        component: lazy(() => import('../../../components/console/tools/layer-1/create/CreateChain')),
         fileNames: ["toolbox/src/toolbox/L1/CreateChain.tsx"],
         walletMode: "c-chain",
         icon: <Plus className="w-4 h-4" />
@@ -80,7 +80,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: "avalanchegoDockerL1",
         label: "L1 Node Setup with Docker",
-        component: lazy(() => import('./Nodes/AvalancheGoDockerL1')),
+        component: lazy(() => import('../../../components/console/tools/layer-1/AvalancheGoDockerL1')),
         fileNames: ["toolbox/src/toolbox/Nodes/AvalancheGoDockerL1.tsx"],
         walletMode: "testnet-mainnet",
         icon: <Server className="w-4 h-4" />
@@ -88,7 +88,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: "managedTestnetNodes",
         label: "Managed Testnet Nodes",
-        component: lazy(() => import('./Nodes/ManagedTestnetNodes/ManagedTestnetNodes')),
+        component: lazy(() => import('../../../components/console/tools/testnet-infra/ManagedTestnetNodes/ManagedTestnetNodes')),
         fileNames: ["toolbox/src/toolbox/Nodes/BuilderHubNodes/BuilderHubNodes.tsx"],
         walletMode: "testnet-mainnet",
         icon: <Server className="w-4 h-4" />
@@ -96,7 +96,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: 'convertToL1',
         label: "Convert Subnet to L1",
-        component: lazy(() => import('./L1/ConvertToL1')),
+        component: lazy(() => import('../../../components/console/tools/layer-1/create/ConvertToL1')),
         fileNames: ["toolbox/src/toolbox/L1/ConvertToL1.tsx"],
         walletMode: "c-chain",
         icon: <ArrowUpDown className="w-4 h-4" />
@@ -104,7 +104,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: "selfHostedExplorer",
         label: "Self-Hosted Explorer",
-        component: lazy(() => import('./L1/SelfHostedExplorer')),
+        component: lazy(() => import('../../../components/console/tools/layer-1/create/SelfHostedExplorer')),
         fileNames: ["toolbox/src/toolbox/Nodes/SelfHostedExplorer.tsx"],
         walletMode: "testnet-mainnet",
         icon: <Globe className="w-4 h-4" />
@@ -217,7 +217,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
           {
             id: 'balanceTopup',
             label: "Increase L1 Validator Balance",
-            component: lazy(() => import('./Nodes/BalanceTopup')),
+            component: lazy(() => import('../../../components/console/tools/layer-1/BalanceTopup')),
             fileNames: ["toolbox/src/toolbox/Nodes/BalanceTopup.tsx"],
             walletMode: "c-chain",
             icon: <DollarSign className="w-4 h-4" />

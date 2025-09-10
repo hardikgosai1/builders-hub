@@ -2,7 +2,6 @@
 
 import { useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import ProxyAdminABI from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
@@ -20,7 +19,7 @@ const PROXYADMIN_SOURCE_URL = "https://github.com/OpenZeppelin/openzeppelin-cont
 const TRANSPARENT_PROXY_SOURCE_URL = "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.0/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 export default function DeployProxyContract() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { coreWalletClient, publicClient } = useWalletStore();
     const [isDeployingProxyAdmin, setIsDeployingProxyAdmin] = useState(false);
     const [isDeployingProxy, setIsDeployingProxy] = useState(false);
@@ -29,6 +28,11 @@ export default function DeployProxyContract() {
     const [proxyAdminAddress, setProxyAdminAddress] = useState<string>("");
     const viemChain = useViemChainStore();
     const [acknowledged, setAcknowledged] = useState(false);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function deployProxyAdmin() {
         setIsDeployingProxyAdmin(true);
@@ -50,7 +54,7 @@ export default function DeployProxyContract() {
 
             setProxyAdminAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeployingProxyAdmin(false);
         }
@@ -83,7 +87,7 @@ export default function DeployProxyContract() {
 
             setProxyAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeployingProxy(false);
         }

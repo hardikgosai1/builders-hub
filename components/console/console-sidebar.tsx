@@ -362,6 +362,7 @@ export function ConsoleSidebar({
                           >
                             <item.icon />
                             <span>{item.title}</span>
+                            <ExternalLink className="ml-auto h-4 w-4" />
                           </a>
                         ) : (
                           <Link href={item.url}>

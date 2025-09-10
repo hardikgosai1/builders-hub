@@ -3,7 +3,6 @@
 import WrappedNativeToken from "../../../contracts/icm-contracts/compiled/WrappedNativeToken.json"
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -14,7 +13,7 @@ import { WalletRequirementsConfigKey } from "@/hooks/useWalletRequirements";
 import { CheckWalletRequirements } from "@/components/CheckWalletRequirements";
 
 export default function DeployWrappedNative() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
 
     const { wrappedNativeTokenAddress: wrappedNativeTokenAddressStore, setWrappedNativeTokenAddress } = useToolboxStore();
     const selectedL1 = useSelectedL1()();
@@ -24,6 +23,11 @@ export default function DeployWrappedNative() {
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const { walletChainId } = useWalletStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function handleDeploy() {
         setIsDeploying(true);
@@ -49,7 +53,7 @@ export default function DeployWrappedNative() {
 
             setWrappedNativeTokenAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

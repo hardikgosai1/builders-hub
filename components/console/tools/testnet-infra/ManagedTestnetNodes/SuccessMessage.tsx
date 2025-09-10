@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "../../../components/Button";
+import { Button } from "../../../../../toolbox/src/components/Button";
 
 interface SuccessMessageProps {
     onReset: () => void;
@@ -27,14 +27,14 @@ export default function SuccessMessage({ onReset, onClose }: SuccessMessageProps
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <Button 
+                    <Button
                         onClick={onReset}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700 text-white !w-auto"
                     >
                         View Node
                     </Button>
-                    <Button 
+                    <Button
                         onClick={onClose}
                         variant="outline"
                         size="sm"

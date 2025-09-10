@@ -2,12 +2,16 @@ import { useWalletStore } from "../stores/walletStore";
 import { Chain } from "viem/chains";
 import { Button } from "./Button";
 import { useState } from "react";
-import { useErrorBoundary } from "react-error-boundary";
 
 export function RequireChain({ children, chain }: { children: React.ReactNode, chain: Chain }) {
     const { walletChainId, coreWalletClient } = useWalletStore();
     const [isSwitching, setIsSwitching] = useState(false);
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     async function switchToChain() {
         try {
@@ -15,7 +19,7 @@ export function RequireChain({ children, chain }: { children: React.ReactNode, c
             await coreWalletClient.addChain({ chain: chain });
             await coreWalletClient.switchChain({ id: chain.id });
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsSwitching(false);
         }

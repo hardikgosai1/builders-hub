@@ -8,7 +8,6 @@ import { useWalletStore } from '../../stores/walletStore';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { useState, useEffect } from 'react';
-import { useErrorBoundary } from "react-error-boundary";
 import { RefreshCw } from 'lucide-react';
 
 import versions from '../../versions.json';
@@ -21,7 +20,7 @@ import { WalletRequirementsConfigKey } from '../../hooks/useWalletRequirements';
 
 export default function ICMRelayer() {
     const selectedL1 = useSelectedL1()();
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { coreWalletClient, isTestnet, walletEVMAddress } = useWalletStore();
     const { l1List } = useL1ListStore()();
 
@@ -39,6 +38,11 @@ export default function ICMRelayer() {
 
     // Use sessionStorage for private key to persist across refreshes
     const [privateKey, setPrivateKey] = useState<`0x${string}` | null>(null);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -132,7 +136,7 @@ export default function ICMRelayer() {
             }
             setBalances(newBalances);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsLoadingBalances(false);
         }
@@ -178,7 +182,7 @@ export default function ICMRelayer() {
             await publicClient.waitForTransactionReceipt({ hash: txHash });
             await fetchBalances();
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsSending(false);
         }

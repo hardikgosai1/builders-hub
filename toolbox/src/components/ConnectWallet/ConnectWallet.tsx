@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { useErrorBoundary } from "react-error-boundary";
 import { createCoreWalletClient } from "../../coreViem";
 import { networkIDs } from "@avalabs/avalanchejs";
 import { useWalletStore } from "../../stores/walletStore";
@@ -54,7 +53,12 @@ export const ConnectWallet = ({
   enforceChainId?: number;
   children: React.ReactNode;
 }) => {
-  const { showBoundary } = useErrorBoundary();
+  const [criticalError, setCriticalError] = useState<Error | null>(null);
+
+  // Throw critical errors during render
+  if (criticalError) {
+    throw criticalError;
+  }
 
   const {
     walletChainId,
@@ -189,7 +193,7 @@ export const ConnectWallet = ({
       } catch (error) {
         console.error("Error initializing wallet:", error);
         setHasWallet(false);
-        showBoundary(error);
+        setCriticalError(error instanceof Error ? error : new Error(String(error)));
       }
     }
 
@@ -199,8 +203,8 @@ export const ConnectWallet = ({
     return () => {
       if (window.avalanche?.removeListener) {
         try {
-          window.avalanche.removeListener("accountsChanged", () => {});
-          window.avalanche.removeListener("chainChanged", () => {});
+          window.avalanche.removeListener("accountsChanged", () => { });
+          window.avalanche.removeListener("chainChanged", () => { });
         } catch (e) {
           console.warn("Failed to remove event listeners:", e);
         }
@@ -248,9 +252,7 @@ export const ConnectWallet = ({
       setWalletEVMAddress("");
       return;
     } else if (accounts.length > 1) {
-      showBoundary(
-        new Error("Multiple accounts found, we don't support that yet")
-      );
+      setCriticalError(new Error("Multiple accounts found, we don't support that yet"));
       return;
     }
 
@@ -304,9 +306,7 @@ export const ConnectWallet = ({
         setWalletEVMAddress("");
         return;
       } else if (accounts.length > 1) {
-        showBoundary(
-          new Error("Multiple accounts found, we don't support that yet")
-        );
+        setCriticalError(new Error("Multiple accounts found, we don't support that yet"));
         return;
       }
 
@@ -337,7 +337,7 @@ export const ConnectWallet = ({
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      showBoundary(error);
+      setCriticalError(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -451,16 +451,16 @@ export const ConnectWallet = ({
           {enforceChainId} and try again.
         </div>
       )) || (
-        <RemountOnWalletChange>
-          <div className="transition-all duration-300">
-            <div className="rounded-lg border bg-white dark:bg-slate-800 border-zinc-200 dark:border-zinc-800 mb-8">
-              <div className="border-b border-zinc-200 dark:border-zinc-800 p-6 md:p-8">
-                {children}
+          <RemountOnWalletChange>
+            <div className="transition-all duration-300">
+              <div className="rounded-lg border bg-white dark:bg-slate-800 border-zinc-200 dark:border-zinc-800 mb-8">
+                <div className="border-b border-zinc-200 dark:border-zinc-800 p-6 md:p-8">
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
-        </RemountOnWalletChange>
-      )}
+          </RemountOnWalletChange>
+        )}
     </div>
   );
 };

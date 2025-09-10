@@ -1,21 +1,20 @@
 "use client";
 
-import { useCreateChainStore } from "../../stores/createChainStore";
-import { useErrorBoundary } from "react-error-boundary";
+import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
 import { useState } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { Container } from "../../components/Container";
-import { useWalletStore } from "../../stores/walletStore";
-import GenesisBuilder from "./GenesisBuilder";
+import { Button } from "../../../../../toolbox/src/components/Button";
+import { Input } from "../../../../../toolbox/src/components/Input";
+import { Container } from "../../../../../toolbox/src/components/Container";
+import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import GenesisBuilder from "../../../../../toolbox/src/toolbox/L1/GenesisBuilder";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import generateName from 'boring-name-generator'
-import { Success } from "../../components/Success";
-import { RadioGroup } from "../../components/RadioGroup";
-import InputSubnetId from "../../components/InputSubnetId";
-import { SUBNET_EVM_VM_ID } from "../Nodes/config";
-import { CheckWalletRequirements } from "../../components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
+import { Success } from "../../../../../toolbox/src/components/Success";
+import { RadioGroup } from "../../../../../toolbox/src/components/RadioGroup";
+import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
+import { SUBNET_EVM_VM_ID } from "../../../../../toolbox/src/toolbox/Nodes/config";
+import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
 
 const generateRandomName = () => {
     //makes sure the name doesn't contain a dash
@@ -29,7 +28,7 @@ const generateRandomName = () => {
 
 
 export default function CreateChain() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const {
         subnetId,
         setChainID,
@@ -51,6 +50,11 @@ export default function CreateChain() {
     const [showVMIdInput, setShowVMIdInput] = useState<boolean>(false);
     const [vmId, setVmId] = useState<string>(SUBNET_EVM_VM_ID);
 
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
+
     // Wrapper function to handle subnet ID changes properly
     const handleSubnetIdChange = (newSubnetId: string) => {
         setSubnetID(newSubnetId);
@@ -68,7 +72,7 @@ export default function CreateChain() {
             setSubnetID(txID);
             setCreatedSubnetId(txID);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsCreatingSubnet(false);
         }
@@ -94,7 +98,7 @@ export default function CreateChain() {
 
             setLocalChainName(generateRandomName());
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsCreatingChain(false);
         }

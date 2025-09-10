@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { 
-    Clock, 
+import {
+    Clock,
     Wallet,
     Trash2,
     XCircle,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { NodeRegistration } from "./types";
 import { calculateTimeRemaining, formatTimeRemaining, getStatusData } from "./useTimeRemaining";
-import { Button } from "../../../components/Button";
+import { Button } from "../../../../../toolbox/src/components/Button";
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 
 interface NodeCardProps {
@@ -20,11 +20,11 @@ interface NodeCardProps {
     isDeletingNode: boolean;
 }
 
-export default function NodeCard({ 
-    node, 
-    onConnectWallet, 
-    onDeleteNode, 
-    isDeletingNode 
+export default function NodeCard({
+    node,
+    onConnectWallet,
+    onDeleteNode,
+    isDeletingNode
 }: NodeCardProps) {
     const [secondsUntilWalletEnabled, setSecondsUntilWalletEnabled] = useState<number>(0);
     const timeRemaining = calculateTimeRemaining(node.expires_at);
@@ -98,19 +98,19 @@ export default function NodeCard({
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3">
                         <div className="text-right text-xs text-gray-500 dark:text-gray-400 space-y-1">
                             <div>
-                                Created: {new Date(node.created_at).toLocaleDateString('en-US', { 
-                                    month: 'short', 
+                                Created: {new Date(node.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
                                     day: 'numeric',
                                     year: 'numeric'
                                 })}
                             </div>
                             <div>
-                                Expires: {new Date(node.expires_at).toLocaleDateString('en-US', { 
-                                    month: 'short', 
+                                Expires: {new Date(node.expires_at).toLocaleDateString('en-US', {
+                                    month: 'short',
                                     day: 'numeric',
                                     year: 'numeric'
                                 })}

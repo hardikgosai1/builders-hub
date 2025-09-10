@@ -1,7 +1,6 @@
 import { useWalletStore } from "../../stores/walletStore";
 import { ChainTile } from "./ChainTile"
 import { AddChainModal } from "./AddChainModal";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback } from "react";
 import { isDefaultChain, useL1ListStore } from "../../stores/l1ListStore";
 import type { L1ListItem } from "../../stores/l1ListStore";
@@ -12,13 +11,18 @@ export const ChainSelector = ({ enforceChainId }: { enforceChainId?: number }) =
     const [isAddChainModalOpen, setIsAddChainModalOpen] = useState(false)
     const { l1List, addL1, removeL1 } = useL1ListStore()();
     const { coreWalletClient } = useWalletStore();
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const handleSwitchChain = useCallback((chainId: number) => {
         coreWalletClient.switchChain({
             id: `0x${chainId.toString(16)}`,
-        }).catch(showBoundary);
-    }, [coreWalletClient, showBoundary]);
+        }).catch((error: unknown) => setCriticalError(error instanceof Error ? error : new Error(String(error))));
+    }, [coreWalletClient]);
 
     return (
         <>

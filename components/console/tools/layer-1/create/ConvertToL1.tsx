@@ -1,21 +1,20 @@
 "use client";
 
-import { useCreateChainStore } from "../../stores/createChainStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
+import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../components/Button";
-import { type ConvertToL1Validator } from "../../components/ValidatorListInput";
-import { useErrorBoundary } from "react-error-boundary";
-import { Container } from "../../components/Container";
-import { ValidatorListInput } from "../../components/ValidatorListInput";
-import InputChainId from "../../components/InputChainId";
-import SelectSubnet, { SubnetSelection } from "../../components/SelectSubnet";
+import { Button } from "../../../../../toolbox/src/components/Button";
+import { type ConvertToL1Validator } from "../../../../../toolbox/src/components/ValidatorListInput";
+import { Container } from "../../../../../toolbox/src/components/Container";
+import { ValidatorListInput } from "../../../../../toolbox/src/components/ValidatorListInput";
+import InputChainId from "../../../../../toolbox/src/components/InputChainId";
+import SelectSubnet, { SubnetSelection } from "../../../../../toolbox/src/components/SelectSubnet";
 import { Callout } from "fumadocs-ui/components/callout";
-import { EVMAddressInput } from "../../components/EVMAddressInput";
-import { getPChainBalance } from "../../coreViem/methods/getPChainbalance";
-import { Success } from "../../components/Success";
-import { CheckWalletRequirements } from "../../components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
+import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
+import { getPChainBalance } from "../../../../../toolbox/src/coreViem/methods/getPChainbalance";
+import { Success } from "../../../../../toolbox/src/components/Success";
+import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
 
 export default function ConvertToL1() {
     const {
@@ -35,9 +34,14 @@ export default function ConvertToL1() {
     const [isConverting, setIsConverting] = useState(false);
     const [validators, setValidators] = useState<ConvertToL1Validator[]>([]);
     const { coreWalletClient, pChainAddress, isTestnet } = useWalletStore();
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
 
     const [rawPChainBalanceNavax, setRawPChainBalanceNavax] = useState<bigint | null>(null);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         const isMounted = { current: true };
@@ -72,7 +76,7 @@ export default function ConvertToL1() {
 
             setConvertToL1TxId(txID);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsConverting(false);
         }

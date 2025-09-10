@@ -3,7 +3,6 @@
 import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -18,7 +17,7 @@ import SelectBlockchainId from "../../components/SelectBlockchainId";
 import { Container } from "../../components/Container";
 
 export default function RegisterWithHome() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { erc20TokenRemoteAddress, nativeTokenRemoteAddress } = useToolboxStore();
     const [remoteAddress, setRemoteAddress] = useState("");
     const { coreWalletClient } = useWalletStore();
@@ -32,6 +31,11 @@ export default function RegisterWithHome() {
     const [homeContractClient, setHomeContractClient] = useState<PublicClient | null>(null);
     const [isRegistered, setIsRegistered] = useState(false);
     const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const sourceL1 = useL1ByChainId(sourceChainId)();
 
@@ -140,7 +144,7 @@ export default function RegisterWithHome() {
         } catch (error: any) {
             console.error("Registration failed:", error);
             setLocalError(`Registration failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsRegistering(false);
         }

@@ -2,7 +2,6 @@
 
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
@@ -22,8 +21,8 @@ import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
 import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
 
 export default function DeployPoAManager() {
-    const { showBoundary } = useErrorBoundary();
-    const { 
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
+    const {
         poaManagerAddress,
         setPoaManagerAddress
     } = useToolboxStore();
@@ -34,13 +33,13 @@ export default function DeployPoAManager() {
     const [isChecking, setIsChecking] = useState(false);
     const [verifiedOwner, setVerifiedOwner] = useState<string | null>(null);
     const [isInitialized, setIsInitialized] = useState<boolean | null>(null);
-    const [safeSelection, setSafeSelection] = useState<SafeSelection>({ 
-        safeAddress: '', 
-        threshold: 0, 
-        owners: [] 
+    const [safeSelection, setSafeSelection] = useState<SafeSelection>({
+        safeAddress: '',
+        threshold: 0,
+        owners: []
     });
     const [safeError, setSafeError] = useState<string | null>(null);
-    
+
     const viemChain = useViemChainStore();
 
     const {
@@ -60,7 +59,10 @@ export default function DeployPoAManager() {
         isDetectingOwnerType
     } = useValidatorManagerDetails({ subnetId: subnetIdL1 });
 
-    
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     const ownerAddress = safeSelection.safeAddress;
 
@@ -103,7 +105,7 @@ export default function DeployPoAManager() {
             setIsInitialized(true);
             setVerifiedOwner(ownerAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }
@@ -126,7 +128,7 @@ export default function DeployPoAManager() {
             setVerifiedOwner(owner);
         } catch (error) {
             console.error('Error checking initialization:', error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsChecking(false);
         }
@@ -135,77 +137,77 @@ export default function DeployPoAManager() {
     return (
         <CheckWalletRequirements configKey={[
             WalletRequirementsConfigKey.EVMChainBalance,
-          ]}>
-        <Container
-            title="Deploy PoA Manager"
-            description="Deploy and initialize the PoAManager contract to manage Proof of Authority validators."
-        >
-            <div className="space-y-4">
-                {/* Subnet Selection */}
-                <div className="space-y-2">
-                    <SelectSubnetId
-                        value={subnetIdL1}
-                        onChange={setSubnetIdL1}
-                        hidePrimaryNetwork={true}
-                    />
-                    
-                    {/* Validator Manager Details */}
-                    {subnetIdL1 && (
-                        <ValidatorManagerDetails
-                            validatorManagerAddress={validatorManagerAddress}
-                            blockchainId={blockchainId}
-                            subnetId={subnetIdL1}
-                            isLoading={isLoadingVMCDetails}
-                            signingSubnetId={signingSubnetId}
-                            contractTotalWeight={contractTotalWeight}
-                            l1WeightError={l1WeightError}
-                            isLoadingL1Weight={isLoadingL1Weight}
-                            contractOwner={contractOwner}
-                            ownershipError={ownershipError}
-                            isLoadingOwnership={isLoadingOwnership}
-                            isOwnerContract={isOwnerContract}
-                            ownerType={ownerType}
-                            isDetectingOwnerType={isDetectingOwnerType}
+        ]}>
+            <Container
+                title="Deploy PoA Manager"
+                description="Deploy and initialize the PoAManager contract to manage Proof of Authority validators."
+            >
+                <div className="space-y-4">
+                    {/* Subnet Selection */}
+                    <div className="space-y-2">
+                        <SelectSubnetId
+                            value={subnetIdL1}
+                            onChange={setSubnetIdL1}
+                            hidePrimaryNetwork={true}
                         />
-                    )}
 
-                    {validatorManagerError && (
-                        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-300 text-sm">
-                            {validatorManagerError}
-                        </div>
-                    )}
-                </div>
-
-                {Boolean(subnetIdL1) && (
-                    <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-yellow-800 dark:text-yellow-200 text-sm">
-                        <strong className="font-semibold">Heads up:</strong> Make sure your Validator Manager is deployed on the same chain as your
-                        {" "}
-                        <a
-                            href="https://wallet.ash.center/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline"
-                        >
-                            Ash Wallet
-                        </a>
-                        {" "}deployment. You can get your L1 indexed to ensure full compatibility. You can proceed with other multisig options, but some console tools may lose compatibility if you do.
-                    </div>
-                )}
-
-                <Steps>
-                    <Step>
-                        <h2 className="text-lg font-semibold">Configure and Deploy PoA Manager</h2>
-                        <p className="text-sm text-gray-500">
-                            Deploy the <code>PoAManager</code> contract with the specified owner and validator manager addresses. 
-                            The contract will be initialized automatically during deployment.
-                        </p>
-                        {viemChain && (
-                            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                                Current chain: {viemChain.name} (ID: {viemChain.id})
-                            </div>
+                        {/* Validator Manager Details */}
+                        {subnetIdL1 && (
+                            <ValidatorManagerDetails
+                                validatorManagerAddress={validatorManagerAddress}
+                                blockchainId={blockchainId}
+                                subnetId={subnetIdL1}
+                                isLoading={isLoadingVMCDetails}
+                                signingSubnetId={signingSubnetId}
+                                contractTotalWeight={contractTotalWeight}
+                                l1WeightError={l1WeightError}
+                                isLoadingL1Weight={isLoadingL1Weight}
+                                contractOwner={contractOwner}
+                                ownershipError={ownershipError}
+                                isLoadingOwnership={isLoadingOwnership}
+                                isOwnerContract={isOwnerContract}
+                                ownerType={ownerType}
+                                isDetectingOwnerType={isDetectingOwnerType}
+                            />
                         )}
 
-                        <div className="space-y-4">
+                        {validatorManagerError && (
+                            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-300 text-sm">
+                                {validatorManagerError}
+                            </div>
+                        )}
+                    </div>
+
+                    {Boolean(subnetIdL1) && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-yellow-800 dark:text-yellow-200 text-sm">
+                            <strong className="font-semibold">Heads up:</strong> Make sure your Validator Manager is deployed on the same chain as your
+                            {" "}
+                            <a
+                                href="https://wallet.ash.center/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                            >
+                                Ash Wallet
+                            </a>
+                            {" "}deployment. You can get your L1 indexed to ensure full compatibility. You can proceed with other multisig options, but some console tools may lose compatibility if you do.
+                        </div>
+                    )}
+
+                    <Steps>
+                        <Step>
+                            <h2 className="text-lg font-semibold">Configure and Deploy PoA Manager</h2>
+                            <p className="text-sm text-gray-500">
+                                Deploy the <code>PoAManager</code> contract with the specified owner and validator manager addresses.
+                                The contract will be initialized automatically during deployment.
+                            </p>
+                            {viemChain && (
+                                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                    Current chain: {viemChain.name} (ID: {viemChain.id})
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
                                 <div className="space-y-3">
                                     <SelectSafeWallet
                                         value={safeSelection.safeAddress}
@@ -252,15 +254,15 @@ export default function DeployPoAManager() {
                                     value={poaManagerAddress}
                                 />
                             )}
-                    </Step>
+                        </Step>
 
-                    <Step>
-                        <h2 className="text-lg font-semibold">Verify Deployment</h2>
-                        <p className="text-sm text-gray-500">
-                            Verify that the PoA Manager was deployed and initialized correctly.
-                        </p>
+                        <Step>
+                            <h2 className="text-lg font-semibold">Verify Deployment</h2>
+                            <p className="text-sm text-gray-500">
+                                Verify that the PoA Manager was deployed and initialized correctly.
+                            </p>
 
-                        <div className="space-y-4">
+                            <div className="space-y-4">
                                 <EVMAddressInput
                                     label="PoA Manager Address"
                                     value={poaManagerAddress}
@@ -291,10 +293,10 @@ export default function DeployPoAManager() {
                                     </div>
                                 )}
                             </div>
-                    </Step>
-                </Steps>
-            </div>
-        </Container>
+                        </Step>
+                    </Steps>
+                </div>
+            </Container>
         </CheckWalletRequirements>
     );
 }

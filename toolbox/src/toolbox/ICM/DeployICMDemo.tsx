@@ -2,7 +2,6 @@
 
 import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -16,13 +15,18 @@ import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
 export const SENDER_C_CHAIN_ADDRESS = "0x05c474824e7d2cc67cf22b456f7cf60c0e3a1289";
 
 export default function DeployICMDemo() {
-    const { showBoundary } = useErrorBoundary();
     const { setIcmReceiverAddress, icmReceiverAddress } = useToolboxStore();
     const { coreWalletClient, publicClient } = useWalletStore();
     const viemChain = useViemChainStore();
     const [isDeploying, setIsDeploying] = useState(false);
     const [isTeleporterDeployed, setIsTeleporterDeployed] = useState(false);
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const selectedL1 = useSelectedL1()();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         async function checkTeleporterExists() {
@@ -58,7 +62,7 @@ export default function DeployICMDemo() {
 
             setIcmReceiverAddress(receipt.contractAddress);
         } catch (error) {
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsDeploying(false);
         }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
@@ -20,7 +19,7 @@ import { CheckWalletRequirements } from "../../components/CheckWalletRequirement
 import { WalletRequirementsConfigKey } from "../../hooks/useWalletRequirements";
 
 export default function Initialize() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const [proxyAddress, setProxyAddress] = useState<string>("");
     const { walletEVMAddress, coreWalletClient, publicClient } = useWalletStore();
     const [isChecking, setIsChecking] = useState(false);
@@ -34,6 +33,11 @@ export default function Initialize() {
     const selectedL1 = useSelectedL1()();
     const [subnetId, setSubnetId] = useState("");
     const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId);
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     useEffect(() => {
         if (walletEVMAddress && !adminAddress) {
@@ -112,7 +116,7 @@ export default function Initialize() {
             }
         } catch (error) {
             console.error('Error checking initialization:', error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsChecking(false);
         }
@@ -148,7 +152,7 @@ export default function Initialize() {
             await checkIfInitialized();
         } catch (error) {
             console.error('Error initializing:', error);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsInitializing(false);
         }
@@ -242,14 +246,14 @@ export default function Initialize() {
                         </Button>
 
                     </Step>
-                    </Steps>
-                    {isInitialized === true && (
-                        <ResultField
-                            label="Initialization Event"
-                            value={jsonStringifyWithBigint(initEvent)}
-                            showCheck={isInitialized}
-                        />
-                    )}
+                </Steps>
+                {isInitialized === true && (
+                    <ResultField
+                        label="Initialization Event"
+                        value={jsonStringifyWithBigint(initEvent)}
+                        showCheck={isInitialized}
+                    />
+                )}
             </Container>
         </CheckWalletRequirements>
 

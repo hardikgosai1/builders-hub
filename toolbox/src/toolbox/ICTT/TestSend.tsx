@@ -4,7 +4,6 @@
 import { useL1ByChainId, useSelectedL1 } from "../../stores/l1ListStore";
 import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../stores/toolboxStore";
 import { useWalletStore } from "../../stores/walletStore";
-import { useErrorBoundary } from "react-error-boundary";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "../../components/Button";
 import { Success } from "../../components/Success";
@@ -26,7 +25,7 @@ import { Ellipsis } from "lucide-react";
 const DEFAULT_GAS_LIMIT = 250000n;
 
 export default function TokenBridge() {
-    const { showBoundary } = useErrorBoundary();
+    const [criticalError, setCriticalError] = useState<Error | null>(null);
     const { coreWalletClient, walletEVMAddress } = useWalletStore();
     const viemChain = useViemChainStore();
     const selectedL1 = useSelectedL1()();
@@ -76,6 +75,11 @@ export default function TokenBridge() {
     const destToolboxStore = getToolboxStore(destinationSelection.blockchainId)();
 
     const { erc20TokenHomeAddress, nativeTokenHomeAddress } = useToolboxStore();
+
+    // Throw critical errors during render
+    if (criticalError) {
+        throw criticalError;
+    }
 
     // Destination chain validation
     let destChainError: string | undefined = undefined;
@@ -312,7 +316,7 @@ export default function TokenBridge() {
         } catch (error: any) {
             console.error("Approval failed:", error);
             setLocalError(`Approval failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsProcessingApproval(false);
         }
@@ -399,7 +403,7 @@ export default function TokenBridge() {
         } catch (error: any) {
             console.error("Send failed:", error);
             setLocalError(`Send failed: ${error.shortMessage || error.message}`);
-            showBoundary(error);
+            setCriticalError(error instanceof Error ? error : new Error(String(error)));
         } finally {
             setIsProcessingSend(false);
         }
