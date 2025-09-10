@@ -488,7 +488,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
           {
             id: 'unitConverter',
             label: "AVAX Unit Converter",
-            component: lazy(() => import('../../../components/console/tools/PrimaryNetwork/UnitConverter')),
+            component: lazy(() => import('../../../components/console/tools/primary-network/UnitConverter')),
             fileNames: [],
             walletMode: "optional",
             icon: <Calculator className="w-4 h-4" />
@@ -515,7 +515,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: "crossChainTransfer",
         label: "Cross-Chain Transfer",
-        component: lazy(() => import('../../../components/console/tools/PrimaryNetwork/CrossChainTransfer')),
+        component: lazy(() => import('../../../components/console/tools/primary-network/CrossChainTransfer')),
         fileNames: ["toolbox/src/components/CrossChainTransfer.tsx"],
         walletMode: "c-chain",
         icon: <ArrowUpDown className="w-4 h-4" />
@@ -532,7 +532,7 @@ export const componentGroups: Record<string, ComponentGroupType> = {
       {
         id: "faucet",
         label: "Get Test Tokens",
-        component: lazy(() => import('../../../components/console/tools/PrimaryNetwork/Faucet')),
+        component: lazy(() => import('../../../components/console/tools/primary-network/Faucet')),
         fileNames: ["toolbox/src/toolbox/Wallet/Faucet.tsx"],
         walletMode: "c-chain",
         icon: <Droplets className="w-4 h-4" />

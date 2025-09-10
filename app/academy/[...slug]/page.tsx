@@ -37,7 +37,7 @@ import { Feedback } from '@/components/ui/feedback';
 import posthog from 'posthog-js';
 
 import ToolboxMdxWrapper from "@/toolbox/src/components/ToolboxMdxWrapper"
-import CrossChainTransfer from "@/components/console/tools/PrimaryNetwork/CrossChainTransfer"
+import CrossChainTransfer from "@/components/console/tools/primary-network/CrossChainTransfer"
 import AvalancheGoDocker from '@/toolbox/src/toolbox/Nodes/AvalancheGoDockerL1';
 import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
 import CreateChain from "@/toolbox/src/toolbox/L1/CreateChain"
@@ -50,7 +50,7 @@ import RegisterWithHome from '@/toolbox/src/toolbox/ICTT/RegisterWithHome';
 import TestSend from '@/toolbox/src/toolbox/ICTT/TestSend';
 import TeleporterRegistry from '@/toolbox/src/toolbox/ICM/TeleporterRegistry';
 import ICMRelayer from '@/toolbox/src/toolbox/ICM/ICMRelayer';
-import Faucet from '@/components/console/tools/PrimaryNetwork/Faucet';
+import Faucet from '@/components/console/tools/primary-network/Faucet';
 
 export const dynamicParams = false;
 

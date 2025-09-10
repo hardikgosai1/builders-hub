@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 import { useWalletStore } from '../../stores/walletStore';
-import CrossChainTransfer from '../../../../components/console/tools/PrimaryNetwork/CrossChainTransfer';
+import CrossChainTransfer from '../../../../components/console/tools/primary-network/CrossChainTransfer';
 import { X } from 'lucide-react';
 
 export function BridgeButton() {
@@ -13,8 +13,8 @@ export function BridgeButton() {
             <Dialog.Trigger asChild>
                 <button
                     className={`hidden md:block px-2 py-1 text-xs font-medium text-white rounded transition-colors ${pChainBalance < 0.5 && cChainBalance > 0.5
-                            ? "bg-blue-500 hover:bg-blue-600 shimmer"
-                            : "bg-zinc-600 hover:bg-zinc-700"
+                        ? "bg-blue-500 hover:bg-blue-600 shimmer"
+                        : "bg-zinc-600 hover:bg-zinc-700"
                         }`}
                     aria-label="Transfer AVAX between chains"
                 >
