@@ -4,8 +4,8 @@ import { getTotalStake } from "../../coreViem/hooks/getTotalStake";
 import { getSubnetInfoForNetwork, getBlockchainInfoForNetwork } from "../../coreViem/utils/glacier";
 import { useWalletStore } from "../../stores/walletStore";
 import { useViemChainStore } from "../../stores/toolboxStore";
-import validatorManagerAbi from '../../../contracts/icm-contracts/compiled/ValidatorManager.json';
-import poaManagerAbi from '../../../contracts/icm-contracts/compiled/PoAManager.json';
+import validatorManagerAbi from '../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import poaManagerAbi from '../../../../contracts/icm-contracts/compiled/PoAManager.json';
 
 interface ValidatorManagerDetails {
     validatorManagerAddress: string;
@@ -257,7 +257,7 @@ export function useValidatorManagerDetails({ subnetId }: UseValidatorManagerDeta
                         const bytecode = await publicClient.getBytecode({ address: owner });
                         const isContract = !!bytecode && bytecode !== '0x';
                         setIsOwnerContract(isContract);
-                        
+
                         // If it's not a contract, set it as EOA immediately
                         if (!isContract) {
                             setOwnerType('EOA');

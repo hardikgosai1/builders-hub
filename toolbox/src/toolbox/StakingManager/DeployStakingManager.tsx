@@ -5,7 +5,7 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { ResultField } from "../../components/ResultField";
-import NativeTokenStakingManagerABI from "../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
+import NativeTokenStakingManagerABI from "../../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
 
 import { Container } from "../../components/Container";
 import { keccak256 } from "viem";

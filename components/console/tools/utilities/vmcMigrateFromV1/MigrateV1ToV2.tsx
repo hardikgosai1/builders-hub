@@ -9,7 +9,7 @@ import { Input } from "../../../../../toolbox/src/components/Input";
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { ResultField } from "../../../../../toolbox/src/components/ResultField";
 import { ExternalLink } from "lucide-react";
-import ValidatorManagerABI from "../../../../../toolbox/contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
 import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import WrappedNativeToken from "../../../../../toolbox/contracts/icm-contracts/compiled/WrappedNativeToken.json"
+import WrappedNativeToken from "../../../../../contracts/icm-contracts/compiled/WrappedNativeToken.json"
 import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState } from "react";

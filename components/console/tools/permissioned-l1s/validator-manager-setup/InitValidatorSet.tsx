@@ -8,7 +8,7 @@ import { useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStor
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from '../../../../../toolbox/src/toolbox/ValidatorManager/packWarp';
-import ValidatorManagerABI from "../../../../../toolbox/contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { Input } from "../../../../../toolbox/src/components/Input";

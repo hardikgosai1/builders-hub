@@ -1,12 +1,12 @@
 import { parseEther } from 'viem'
 import { AllowlistPrecompileConfig, AllocationEntry } from './types';
 import { PreinstallConfig } from './PreinstalledContractsSection';
-import TransparentUpgradeableProxy from "../../../contracts/openzeppelin-4.9/compiled/TransparentUpgradeableProxy.json"
-import ProxyAdmin from "../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json"
-import TeleporterMessenger from "../../../contracts/icm-contracts/compiled/TeleporterMessenger.json"
-import WrappedNativeToken from "../../../contracts/icm-contracts/compiled/WrappedNativeToken.json"
-import Create2Deployer from "../../../contracts/create2-contracts/compiled/Create2Deployer.json"
-import Multicall3 from "../../../contracts/multicall3-contracts/compiled/Multicall3.json"
+import TransparentUpgradeableProxy from "../../../../contracts/openzeppelin-4.9/compiled/TransparentUpgradeableProxy.json"
+import ProxyAdmin from "../../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json"
+import TeleporterMessenger from "../../../../contracts/icm-contracts/compiled/TeleporterMessenger.json"
+import WrappedNativeToken from "../../../../contracts/icm-contracts/compiled/WrappedNativeToken.json"
+import Create2Deployer from "../../../../contracts/create2-contracts/compiled/Create2Deployer.json"
+import Multicall3 from "../../../../contracts/multicall3-contracts/compiled/Multicall3.json"
 
 export const PROXY_ADDRESS = "0xfacade0000000000000000000000000000000000"
 export const PROXY_ADMIN_ADDRESS = "0xdad0000000000000000000000000000000000000"
@@ -134,22 +134,22 @@ export function generateGenesis({ evmChainId, tokenAllocations, txAllowlistConfi
         // Slot 2: _totalSupply (uint256) - starts at 0
         // Slot 3: _name (string)
         // Slot 4: _symbol (string)
-        
+
         // For strings in storage, if length <= 31 bytes, the data is stored as:
         // [data...][length*2] in a single slot
         // If length > 31 bytes, slot contains [length*2+1] and data is stored in keccak256(slot)
-        
+
         const tokenName = "Wrapped Native Token";
         const tokenSymbol = "WNT";
-        
+
         // Encode name: "Wrapped AVAX" (12 bytes)
         // Hex: 0x577261707065642041564158 + length*2 (12*2 = 24 = 0x18)
         const nameHex = "0x" + Buffer.from(tokenName, 'utf8').toString('hex').padEnd(62, '0') + (tokenName.length * 2).toString(16).padStart(2, '0');
-        
+
         // Encode symbol: "WAVAX" (5 bytes)  
         // Hex: 0x5741564158 + length*2 (5*2 = 10 = 0x0a)
         const symbolHex = "0x" + Buffer.from(tokenSymbol, 'utf8').toString('hex').padEnd(62, '0') + (tokenSymbol.length * 2).toString(16).padStart(2, '0');
-        
+
         allocations[WRAPPED_NATIVE_TOKEN_ADDRESS.slice(2).toLowerCase()] = {
             balance: "0x0",
             code: (WrappedNativeToken.deployedBytecode as any).object,

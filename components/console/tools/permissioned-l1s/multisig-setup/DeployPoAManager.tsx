@@ -5,7 +5,7 @@ import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { Input } from "../../../../../toolbox/src/components/Input";
-import PoAManagerABI from "../../../../../toolbox/contracts/icm-contracts/compiled/PoAManager.json";
+import PoAManagerABI from "../../../../../contracts/icm-contracts/compiled/PoAManager.json";
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { Success } from "../../../../../toolbox/src/components/Success";

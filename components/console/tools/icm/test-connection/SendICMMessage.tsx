@@ -6,7 +6,7 @@ import { useState, useMemo } from "react";
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { Success } from "../../../../../toolbox/src/components/Success";
 import { createPublicClient, http } from 'viem';
-import ICMDemoABI from "../../../../../toolbox/contracts/example-contracts/compiled/ICMDemo.json";
+import ICMDemoABI from "../../../../../contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
 import { Input } from "../../../../../toolbox/src/components/Input";
 import { Container } from "../../../../../toolbox/src/components/Container";

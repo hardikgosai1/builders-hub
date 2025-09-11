@@ -7,7 +7,7 @@ import { Button } from "../../../../toolbox/src/components/Button";
 import { Container } from "../../../../toolbox/src/components/Container";
 import { EVMAddressInput } from "../../../../toolbox/src/components/EVMAddressInput";
 import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
-import rewardManagerAbi from "../../../../toolbox/contracts/precompiles/RewardManager.json";
+import rewardManagerAbi from "../../../../contracts/precompiles/RewardManager.json";
 import { CheckCircle, Edit, Users, Wallet } from "lucide-react";
 import { cn } from "../../../../toolbox/src/lib/utils";
 import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";

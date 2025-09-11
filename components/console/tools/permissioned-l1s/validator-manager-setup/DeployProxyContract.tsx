@@ -4,8 +4,8 @@ import { useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStor
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState } from "react";
 import { Button } from "../../../../../toolbox/src/components/Button";
-import ProxyAdminABI from "../../../../../toolbox/contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
-import TransparentUpgradeableProxyABI from "../../../../../toolbox/contracts/openzeppelin-4.9/compiled/TransparentUpgradeableProxy.json";
+import ProxyAdminABI from "../../../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
+import TransparentUpgradeableProxyABI from "../../../../../contracts/openzeppelin-4.9/compiled/TransparentUpgradeableProxy.json";
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";

@@ -6,7 +6,7 @@ import { Button } from '../../../components/Button';
 import SelectValidationID, { ValidationSelection } from '../../../components/SelectValidationID';
 import { getValidatorWeight } from '../../../coreViem/hooks/getValidatorWeight';
 import { validateStakePercentage } from '../../../coreViem/hooks/getTotalStake';
-import validatorManagerAbi from '../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
 import { AlertCircle } from 'lucide-react';
 import { Success } from '../../../components/Success';
 import { MultisigOption } from '../../../components/MultisigOption';
@@ -44,9 +44,9 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
   const { coreWalletClient, publicClient } = useWalletStore();
   const viemChain = useViemChainStore();
 
-  const [validation, setValidation] = useState<ValidationSelection>({ 
-    validationId: initialValidationId || '', 
-    nodeId: initialNodeId || '' 
+  const [validation, setValidation] = useState<ValidationSelection>({
+    validationId: initialValidationId || '',
+    nodeId: initialNodeId || ''
   });
   const [weight, setWeight] = useState(initialWeight || '');
   const [componentKey, setComponentKey] = useState<number>(0);
@@ -140,7 +140,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
       }
 
       setTxSuccess(`Transaction successful! Hash: ${changeWeightTx}`);
-      onSuccess({ 
+      onSuccess({
         txHash: changeWeightTx,
         nodeId: validation.nodeId,
         validationId: validation.validationId,
@@ -148,7 +148,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
       });
     } catch (err: any) {
       let message = err instanceof Error ? err.message : String(err);
-      
+
       // Handle specific error types
       if (message.includes('User rejected')) {
         message = 'Transaction was rejected by user';
@@ -159,7 +159,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
       } else if (message.includes('nonce')) {
         message = 'Transaction nonce error. Please try again.';
       }
-      
+
       setErrorState(`Transaction failed: ${message}`);
       onError(`Transaction failed: ${message}`);
     } finally {
@@ -169,7 +169,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
 
   const handleMultisigSuccess = (txHash: string) => {
     setTxSuccess(`Multisig transaction proposed! Hash: ${txHash}`);
-    onSuccess({ 
+    onSuccess({
       txHash: txHash as `0x${string}`,
       nodeId: validation.nodeId,
       validationId: validation.validationId,
@@ -200,7 +200,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
         subnetId={subnetId}
         format="hex"
       />
-      
+
       <Input
         id="weight"
         type="text"
@@ -211,7 +211,7 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
         disabled={isProcessing || !subnetId}
         error={error && (error.includes("Weight") || error.includes("positive number")) ? error : undefined}
       />
-      
+
       {ownershipState === 'contract' && (
         <MultisigOption
           validatorManagerAddress={validatorManagerAddress}
@@ -245,9 +245,9 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
           onClick={handleInitiateChangeWeight}
           disabled={true}
           error={
-            ownershipState === 'differentEOA' 
+            ownershipState === 'differentEOA'
               ? "You are not the owner of this contract. Only the contract owner can change validator weights."
-              : ownershipState === 'loading' 
+              : ownershipState === 'loading'
                 ? "Verifying ownership..."
                 : (!validatorManagerAddress && subnetId ? "Could not find Validator Manager for this L1." : undefined)
           }
@@ -264,9 +264,9 @@ const InitiateChangeWeight: React.FC<InitiateChangeWeightProps> = ({
           </div>
         </div>
       )}
-      
+
       {txSuccess && (
-        <Success 
+        <Success
           label="Transaction Hash"
           value={txSuccess.replace('Transaction successful! Hash: ', '').replace('Multisig transaction proposed! Hash: ', '')}
         />

@@ -1,6 +1,6 @@
 "use client";
 
-import NativeTokenRemote from "../../../../../toolbox/contracts/icm-contracts/compiled/NativeTokenRemote.json";
+import NativeTokenRemote from "../../../../../contracts/icm-contracts/compiled/NativeTokenRemote.json";
 import { useL1ByChainId, useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
 import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
@@ -12,8 +12,8 @@ import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddres
 import { createPublicClient, http } from "viem";
 import { Note } from "../../../../../toolbox/src/components/Note";
 import { utils } from "@avalabs/avalanchejs";
-import ERC20TokenHomeABI from "../../../../../toolbox/contracts/icm-contracts/compiled/ERC20TokenHome.json";
-import ExampleERC20 from "../../../../../toolbox/contracts/icm-contracts/compiled/ExampleERC20.json";
+import ERC20TokenHomeABI from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
+import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json";
 import SelectBlockchainId from "../../../../../toolbox/src/components/SelectBlockchainId";
 import { CheckPrecompile } from "../../../../../toolbox/src/components/CheckPrecompile";
 import { Container } from "../../../../../toolbox/src/components/Container";

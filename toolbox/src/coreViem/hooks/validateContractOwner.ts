@@ -1,6 +1,6 @@
 import { PublicClient } from "viem";
 import { CoreWalletRpcSchema } from "../rpcSchema";
-import validatorManagerAbi from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"   
+import validatorManagerAbi from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 
 
 /**

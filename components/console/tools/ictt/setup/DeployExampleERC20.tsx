@@ -1,6 +1,6 @@
 "use client";
 
-import ExampleERC20 from "../../../../../toolbox/contracts/icm-contracts/compiled/ExampleERC20.json"
+import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json"
 import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState } from "react";

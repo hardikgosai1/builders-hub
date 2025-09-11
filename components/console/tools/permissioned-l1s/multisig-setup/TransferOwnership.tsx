@@ -5,7 +5,7 @@ import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { ResultField } from "../../../../../toolbox/src/components/ResultField";
-import ValidatorManagerABI from "../../../../../toolbox/contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
 import SelectSubnetId from "../../../../../toolbox/src/components/SelectSubnetId";

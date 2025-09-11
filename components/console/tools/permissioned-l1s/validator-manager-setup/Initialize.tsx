@@ -6,7 +6,7 @@ import { Button } from "../../../../../toolbox/src/components/Button";
 import { Input } from "../../../../../toolbox/src/components/Input";
 import { ResultField } from "../../../../../toolbox/src/components/ResultField";
 import { AbiEvent } from 'viem';
-import ValidatorManagerABI from "../../../../../toolbox/contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
 import SelectSubnetId from "../../../../../toolbox/src/components/SelectSubnetId";
 import { Container } from "../../../../../toolbox/src/components/Container";

@@ -1,6 +1,6 @@
 import { PublicClient } from "viem";
 import { CoreWalletRpcSchema } from "../rpcSchema";
-import validatorManagerAbi from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
+import validatorManagerAbi from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 
 /**
  * Get the current weight of a validator from the validator manager contract
@@ -23,7 +23,7 @@ export async function getValidatorWeight(
       functionName: "getValidator",
       args: [validationID],
     });
-    
+
     // Viem returns the struct as an object with named properties.
     // Access the 'weight' property directly.
     // The Validator struct has a 'weight' field of type uint64, which Viem maps to bigint.

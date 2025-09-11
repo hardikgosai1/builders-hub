@@ -1,6 +1,6 @@
 import { PublicClient } from "viem";
 import { CoreWalletRpcSchema } from "../rpcSchema";
-import validatorManagerAbi from "../../../contracts/icm-contracts/compiled/ValidatorManager.json"
+import validatorManagerAbi from "../../../../contracts/icm-contracts/compiled/ValidatorManager.json"
 
 /**
  * Get the total L1 weight from the validator manager contract
@@ -20,7 +20,7 @@ export async function getTotalStake(
       abi: validatorManagerAbi.abi,
       functionName: "l1TotalWeight",
     });
-    
+
     return totalWeight as bigint;
   } catch (error) {
     console.error("Error fetching total L1 weight:", error);
@@ -39,7 +39,7 @@ export async function getTotalStake(
  * @returns An object with the calculated percentage of total L1 stake that the adjustment represents, and whether it exceeds the 20% maximum.
  */
 export function validateStakePercentage(
-  totalL1StakeBeforeChange: bigint, 
+  totalL1StakeBeforeChange: bigint,
   newProposedWeightForValidator: bigint,
   currentWeightOfValidatorToChange: bigint = 0n
 ): { percentageChange: number; exceedsMaximum: boolean } {
@@ -55,13 +55,13 @@ export function validateStakePercentage(
     return { percentageChange: 0, exceedsMaximum: false };
   }
 
-  const weightAdjustment = newProposedWeightForValidator > currentWeightOfValidatorToChange 
-    ? newProposedWeightForValidator - currentWeightOfValidatorToChange 
+  const weightAdjustment = newProposedWeightForValidator > currentWeightOfValidatorToChange
+    ? newProposedWeightForValidator - currentWeightOfValidatorToChange
     : currentWeightOfValidatorToChange - newProposedWeightForValidator; // abs() for BigInt
 
   // Calculate the percentage of the total L1 stake that this adjustment represents.
   // Multiply by 10000 for precision with two decimal places, then divide by 100.
-  const percentageOfTotalRepresentedByChange = 
+  const percentageOfTotalRepresentedByChange =
     Number((weightAdjustment * 10000n) / totalL1StakeBeforeChange) / 100;
 
   return {

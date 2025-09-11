@@ -6,7 +6,7 @@ import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
 import { useState, useEffect } from "react";
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { Success } from "../../../../../toolbox/src/components/Success";
-import ProxyAdminABI from "../../../../../toolbox/contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
+import ProxyAdminABI from "../../../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { useToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
 import { getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier";

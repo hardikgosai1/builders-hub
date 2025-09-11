@@ -4,7 +4,7 @@ import { useWalletStore } from '../../../stores/walletStore';
 import { Button } from '../../../components/Button';
 import { ConvertToL1Validator } from '../../../components/ValidatorListInput';
 import { validateStakePercentage } from '../../../coreViem/hooks/getTotalStake';
-import validatorManagerAbi from '../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
 import { AlertCircle } from 'lucide-react';
 import { Success } from '../../../components/Success';
 import { parseNodeID } from '../../../coreViem/utils/ids';
@@ -119,7 +119,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   const handleInitiateValidatorRegistration = async () => {
     setErrorState(null);
     setTxSuccess(null);
-    
+
     if (!validateInputs()) {
       return;
     }
@@ -143,11 +143,11 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     try {
       const validator = validators[0];
       const [account] = await coreWalletClient.requestAddresses();
-      
+
       // Process P-Chain Address
       const pChainAddressBytes = utils.bech32ToBytes(pChainAddress!);
       const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
-      
+
       // Build arguments for transaction
       const args = [
         parseNodeID(validator.nodeID),
@@ -190,7 +190,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
         const validationIdHex = receipt.logs[1].topics[1] ?? "";
 
         setTxSuccess(`Transaction successful! Hash: ${hash}`);
-        onSuccess({ 
+        onSuccess({
           txHash: hash,
           nodeId: validator.nodeID,
           validationId: validationIdHex,
@@ -228,7 +228,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
           });
 
           const fallbackReceipt = await publicClient.waitForTransactionReceipt({ hash: fallbackHash });
-          
+
           if (fallbackReceipt.status === 'reverted') {
             setErrorState(`Fallback transaction reverted. Hash: ${fallbackHash}`);
             onError(`Fallback transaction reverted. Hash: ${fallbackHash}`);
@@ -236,9 +236,9 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
           }
 
           const unsignedWarpMessage = fallbackReceipt.logs[0].data ?? "";
-          
+
           setTxSuccess(`Fallback transaction successful! Hash: ${fallbackHash}`);
-          onSuccess({ 
+          onSuccess({
             txHash: fallbackHash,
             nodeId: validator.nodeID,
             validationId: validationId,
@@ -250,21 +250,21 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
 
         } catch (fallbackError: any) {
           let fallbackMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-          
+
           // Handle specific fallback error types
           if (fallbackMessage.includes('User rejected')) {
             fallbackMessage = 'Transaction was rejected by user';
           } else if (fallbackMessage.includes('insufficient funds')) {
             fallbackMessage = 'Insufficient funds for transaction';
           }
-          
+
           setErrorState(`Both primary transaction and fallback failed: ${fallbackMessage}`);
           onError(`Both primary transaction and fallback failed: ${fallbackMessage}`);
         }
       }
     } catch (err: any) {
       let message = err instanceof Error ? err.message : String(err);
-      
+
       // Handle specific error types
       if (message.includes('User rejected')) {
         message = 'Transaction was rejected by user';
@@ -275,7 +275,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
       } else if (message.includes('nonce')) {
         message = 'Transaction nonce error. Please try again.';
       }
-      
+
       setErrorState(`Transaction failed: ${message}`);
       onError(`Transaction failed: ${message}`);
     } finally {
@@ -287,7 +287,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     setTxSuccess(`Multisig transaction proposed! Hash: ${txHash}`);
     // For multisig, we can't extract logs immediately, so we provide minimal data
     const validator = validators[0];
-    onSuccess({ 
+    onSuccess({
       txHash: txHash as `0x${string}`,
       nodeId: validator.nodeID,
       validationId: "0x0000000000000000000000000000000000000000000000000000000000000000", // Will be available after execution
@@ -324,11 +324,11 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   // Prepare args for multisig
   const getMultisigArgs = () => {
     if (validators.length === 0 || !pChainAddress) return [];
-    
+
     const validator = validators[0];
     const pChainAddressBytes = utils.bech32ToBytes(pChainAddress);
     const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
-    
+
     return [
       parseNodeID(validator.nodeID),
       validator.nodePOP.publicKey,
@@ -379,9 +379,9 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
           onClick={handleInitiateValidatorRegistration}
           disabled={true}
           error={
-            ownershipState === 'differentEOA' 
+            ownershipState === 'differentEOA'
               ? "You are not the owner of this contract. Only the contract owner can add validators."
-              : ownershipState === 'loading' 
+              : ownershipState === 'loading'
                 ? "Verifying ownership..."
                 : (!validatorManagerAddress && subnetId ? "Could not find Validator Manager for this L1." : undefined)
           }
@@ -400,7 +400,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
       )}
 
       {txSuccess && (
-        <Success 
+        <Success
           label="Transaction Hash"
           value={txSuccess.replace('Transaction successful! Hash: ', '').replace('Fallback transaction successful! Hash: ', '').replace('Multisig transaction proposed! Hash: ', '')}
         />

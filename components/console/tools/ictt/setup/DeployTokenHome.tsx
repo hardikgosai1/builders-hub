@@ -1,7 +1,7 @@
 "use client";
 
-import ERC20TokenHome from "../../../../../toolbox/contracts/icm-contracts/compiled/ERC20TokenHome.json";
-import NativeTokenHome from "../../../../../toolbox/contracts/icm-contracts/compiled/NativeTokenHome.json";
+import ERC20TokenHome from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
+import NativeTokenHome from "../../../../../contracts/icm-contracts/compiled/NativeTokenHome.json";
 import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
 import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
 import { useState, useEffect } from "react";
@@ -9,7 +9,7 @@ import { Button } from "../../../../../toolbox/src/components/Button";
 import { Success } from "../../../../../toolbox/src/components/Success";
 import { Input } from "../../../../../toolbox/src/components/Input";
 import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import ExampleERC20 from "../../../../../toolbox/contracts/icm-contracts/compiled/ExampleERC20.json"
+import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json"
 import { createPublicClient, http } from "viem";
 import { Note } from "../../../../../toolbox/src/components/Note";
 import { Container } from "../../../../../toolbox/src/components/Container";

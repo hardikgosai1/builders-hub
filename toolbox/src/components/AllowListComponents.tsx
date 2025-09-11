@@ -7,7 +7,7 @@ import { Container } from "./Container";
 import { Button } from "./Button";
 import { EVMAddressInput } from "./EVMAddressInput";
 import { ResultField } from "./ResultField";
-import allowListAbi from "../../contracts/precompiles/AllowList.json";
+import allowListAbi from "../../../contracts/precompiles/AllowList.json";
 
 // Component for setting Enabled permissions
 export function SetEnabledComponent({

@@ -9,8 +9,8 @@ import { extractRegisterL1ValidatorMessage } from '../../../coreViem/methods/ext
 import { GetRegistrationJustification } from '../justification';
 import { packWarpIntoAccessList } from '../packWarp';
 import { hexToBytes, bytesToHex } from 'viem';
-import validatorManagerAbi from '../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
-import poaManagerAbi from '../../../../contracts/icm-contracts/compiled/PoAManager.json';
+import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import poaManagerAbi from '../../../../../contracts/icm-contracts/compiled/PoAManager.json';
 import { packL1ValidatorRegistration } from '../../../coreViem/utils/convertWarp';
 import { getValidationIdHex } from '../../../coreViem/hooks/getValidationID';
 import { useAvaCloudSDK } from '../../../stores/useAvaCloudSDK';

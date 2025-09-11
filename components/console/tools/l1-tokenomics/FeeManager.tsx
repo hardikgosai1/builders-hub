@@ -7,7 +7,7 @@ import { Button } from "../../../../toolbox/src/components/Button";
 import { Input } from "../../../../toolbox/src/components/Input";
 import { Container } from "../../../../toolbox/src/components/Container";
 import { ResultField } from "../../../../toolbox/src/components/ResultField";
-import feeManagerAbi from "../../../../toolbox/contracts/precompiles/FeeManager.json";
+import feeManagerAbi from "../../../../contracts/precompiles/FeeManager.json";
 import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
 import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
 import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";

@@ -8,7 +8,7 @@ import { Container } from "../../components/Container";
 import { Input } from "../../components/Input";
 import { Success } from "../../components/Success";
 import { AllowlistComponent } from "../../components/AllowListComponents";
-import warpMessengerAbi from "../../../contracts/precompiles/WarpMessenger.json";
+import warpMessengerAbi from "../../../../contracts/precompiles/WarpMessenger.json";
 import { RadioGroup } from "../../components/RadioGroup";
 import { avalancheFuji } from 'viem/chains';
 import { createPublicClient, http } from 'viem';

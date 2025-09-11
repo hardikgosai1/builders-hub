@@ -8,7 +8,7 @@ import { Input } from "../../../../toolbox/src/components/Input";
 import { Container } from "../../../../toolbox/src/components/Container";
 import { ResultField } from "../../../../toolbox/src/components/ResultField";
 import { EVMAddressInput } from "../../../../toolbox/src/components/EVMAddressInput";
-import nativeMinterAbi from "../../../../toolbox/contracts/precompiles/NativeMinter.json";
+import nativeMinterAbi from "../../../../contracts/precompiles/NativeMinter.json";
 import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
 import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
 import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";

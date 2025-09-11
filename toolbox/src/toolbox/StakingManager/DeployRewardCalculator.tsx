@@ -5,7 +5,7 @@ import { useWalletStore } from "../../stores/walletStore";
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { ResultField } from "../../components/ResultField";
-import ExampleRewardCalculatorABI from "../../../contracts/icm-contracts/compiled/ExampleRewardCalculator.json";
+import ExampleRewardCalculatorABI from "../../../../contracts/icm-contracts/compiled/ExampleRewardCalculator.json";
 
 import { Container } from "../../components/Container";
 
