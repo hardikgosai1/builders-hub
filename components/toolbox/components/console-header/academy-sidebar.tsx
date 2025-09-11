@@ -40,7 +40,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { AvalancheLogo } from "@/navigation/avalanche-logo";
+import { AvalancheLogo } from "./avalanche-logo";
 
 // Navigation data structure matching user specification
 const data = {

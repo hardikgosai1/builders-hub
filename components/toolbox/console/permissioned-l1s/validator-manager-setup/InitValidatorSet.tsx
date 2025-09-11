@@ -7,7 +7,7 @@ import { useSelectedL1 } from "../../../stores/l1ListStore";
 import { useViemChainStore } from "../../../stores/toolboxStore";
 import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
-import { packWarpIntoAccessList } from '../../../../../toolbox/src/toolbox/ValidatorManager/packWarp';
+import { packWarpIntoAccessList } from '../ValidatorManager/packWarp';
 import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
 
 import { Button } from "../../../components/Button";

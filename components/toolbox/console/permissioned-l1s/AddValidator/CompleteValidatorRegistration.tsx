@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useWalletStore } from '@/components/toolbox/stores/walletStore';
-import { useViemChainStore } from '../../../stores/toolboxStore';
-import { Button } from '../../../components/Button';
-import { Input } from '../../../components/Input';
+import { useViemChainStore } from '@/components/toolbox/stores/toolboxStore';
+import { Button } from '@/components/toolbox/components/Button';
+import { Input } from '@/components/toolbox/components/Input';
 import { AlertCircle } from 'lucide-react';
-import { Success } from '../../../components/Success';
-import { extractRegisterL1ValidatorMessage } from '../../../coreViem/methods/extractRegisterL1ValidatorMessage';
-import { GetRegistrationJustification } from '../../../../../toolbox/src/toolbox/ValidatorManager/justification';
-import { packWarpIntoAccessList } from '../../../../../toolbox/src/toolbox/ValidatorManager/packWarp';
+import { Success } from '@/components/toolbox/components/Success';
+import { extractRegisterL1ValidatorMessage } from '@/components/toolbox/coreViem/methods/extractRegisterL1ValidatorMessage';
+import { GetRegistrationJustification } from '@/components/toolbox/console/permissioned-l1s/ValidatorManager/justification';
+import { packWarpIntoAccessList } from '@/components/toolbox/console/permissioned-l1s/ValidatorManager/packWarp';
 import { hexToBytes, bytesToHex } from 'viem';
-import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
-import poaManagerAbi from '../../../../../contracts/icm-contracts/compiled/PoAManager.json';
-import { packL1ValidatorRegistration } from '../../../coreViem/utils/convertWarp';
-import { getValidationIdHex } from '../../../coreViem/hooks/getValidationID';
-import { useAvaCloudSDK } from '../../../stores/useAvaCloudSDK';
+import validatorManagerAbi from '@/contracts/icm-contracts/compiled/ValidatorManager.json';
+import poaManagerAbi from '@/contracts/icm-contracts/compiled/PoAManager.json';
+import { packL1ValidatorRegistration } from '@/components/toolbox/coreViem/utils/convertWarp';
+import { getValidationIdHex } from '@/components/toolbox/coreViem/hooks/getValidationID';
+import { useAvaCloudSDK } from '@/components/toolbox/stores/useAvaCloudSDK';
 
 interface CompleteValidatorRegistrationProps {
   subnetIdL1: string;
