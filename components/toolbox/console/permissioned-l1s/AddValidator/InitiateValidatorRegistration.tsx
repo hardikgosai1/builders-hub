@@ -43,7 +43,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   ownershipState,
   contractTotalWeight,
 }) => {
-  const { coreWalletClient, publicClient, pChainAddress } = useWalletStore();
+  const { coreWalletClient, publicClient } = useWalletStore();
   const viemChain = useViemChainStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -54,7 +54,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   // Fetch P-Chain balance when component mounts
   useEffect(() => {
     const fetchBalance = async () => {
-      if (!pChainAddress || !coreWalletClient) return;
+      if (!coreWalletClient) return;
 
       try {
         const balanceValue = await getPChainBalance(coreWalletClient);
@@ -66,7 +66,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     };
 
     fetchBalance();
-  }, [pChainAddress, coreWalletClient]);
+  }, [coreWalletClient]);
 
   const validateInputs = (): boolean => {
     if (validators.length === 0) {
@@ -144,21 +144,28 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
       const validator = validators[0];
       const [account] = await coreWalletClient.requestAddresses();
 
-      // Process P-Chain Address
-      const pChainAddressBytes = utils.bech32ToBytes(pChainAddress!);
-      const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
+      // Process P-Chain Addresses
+      const pChainRemainingBalanceOwnerAddressesHex = validator.remainingBalanceOwner.addresses.map(address => {
+        const addressBytes = utils.bech32ToBytes(address);
+        return fromBytes(addressBytes, "hex");
+      });
+
+      const pChainDisableOwnerAddressesHex = validator.deactivationOwner.addresses.map(address => {
+        const addressBytes = utils.bech32ToBytes(address);
+        return fromBytes(addressBytes, "hex");
+      });
 
       // Build arguments for transaction
       const args = [
         parseNodeID(validator.nodeID),
         validator.nodePOP.publicKey,
         {
-          threshold: 1,
-          addresses: [pChainAddressHex],
+          threshold: validator.remainingBalanceOwner.addresses.length,
+          addresses: pChainRemainingBalanceOwnerAddressesHex,
         },
         {
-          threshold: 1,
-          addresses: [pChainAddressHex],
+          threshold: validator.deactivationOwner.addresses.length,
+          addresses: pChainDisableOwnerAddressesHex,
         },
         validator.validatorWeight
       ];
@@ -323,22 +330,25 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
 
   // Prepare args for multisig
   const getMultisigArgs = () => {
-    if (validators.length === 0 || !pChainAddress) return [];
+    if (validators.length === 0) return [];
 
     const validator = validators[0];
-    const pChainAddressBytes = utils.bech32ToBytes(pChainAddress);
-    const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
+    const pChainRemainingBalanceOwnerAddressBytes = utils.bech32ToBytes(validator.remainingBalanceOwner.addresses[0]);
+    const pChainRemainingBalanceOwnerAddressHex = fromBytes(pChainRemainingBalanceOwnerAddressBytes, "hex");
+
+    const pChainDisableOwnerAddressBytes = utils.bech32ToBytes(validator.deactivationOwner.addresses[0]);
+    const pChainDisableOwnerAddressHex = fromBytes(pChainDisableOwnerAddressBytes, "hex");
 
     return [
       parseNodeID(validator.nodeID),
       validator.nodePOP.publicKey,
       {
         threshold: 1,
-        addresses: [pChainAddressHex],
+        addresses: [pChainRemainingBalanceOwnerAddressHex],
       },
       {
         threshold: 1,
-        addresses: [pChainAddressHex],
+        addresses: [pChainDisableOwnerAddressHex],
       },
       validator.validatorWeight
     ];
