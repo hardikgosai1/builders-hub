@@ -3,23 +3,23 @@
 import { useEffect, useState } from 'react';
 import { Step, Steps } from "fumadocs-ui/components/steps";
 
-import { useSelectedL1 } from "../../../stores/l1ListStore";
-import { useViemChainStore } from "../../../stores/toolboxStore";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
 import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { hexToBytes, decodeErrorResult, Abi } from 'viem';
 import { packWarpIntoAccessList } from '../ValidatorManager/packWarp';
-import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "@/contracts/icm-contracts/compiled/ValidatorManager.json";
 
-import { Button } from "../../../components/Button";
-import { Input } from "../../../components/Input";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
 import { utils } from '@avalabs/avalanchejs';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { Container } from '../../../components/Container';
-import { ResultField } from '../../../components/ResultField';
-import { getSubnetInfo } from '../../../coreViem/utils/glacier';
-import { useAvaCloudSDK } from "../../../stores/useAvaCloudSDK";
-import { CheckWalletRequirements } from "../../../components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../hooks/useWalletRequirements";
+import { Container } from '@/components/toolbox/components/Container';
+import { ResultField } from '@/components/toolbox/components/ResultField';
+import { getSubnetInfo } from '@/components/toolbox/coreViem/utils/glacier';
+import { useAvaCloudSDK } from "@/components/toolbox/stores/useAvaCloudSDK";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 const cb58ToHex = (cb58: string) => utils.bufferToHex(utils.base58check.decode(cb58));
 const add0x = (hex: string): `0x${string}` => hex.startsWith('0x') ? hex as `0x${string}` : `0x${hex}`;

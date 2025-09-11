@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useViemChainStore } from '../../../stores/toolboxStore';
+import { useViemChainStore } from '@/components/toolbox/stores/toolboxStore';
 import { useWalletStore } from '@/components/toolbox/stores/walletStore';
-import { Button } from '../../../components/Button';
-import { ConvertToL1Validator } from '../../../components/ValidatorListInput';
-import { validateStakePercentage } from '../../../coreViem/hooks/getTotalStake';
-import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import { Button } from '@/components/toolbox/components/Button';
+import { ConvertToL1Validator } from '@/components/toolbox/components/ValidatorListInput';
+import { validateStakePercentage } from '@/components/toolbox/coreViem/hooks/getTotalStake';
+import validatorManagerAbi from '@/contracts/icm-contracts/compiled/ValidatorManager.json';
 import { AlertCircle } from 'lucide-react';
-import { Success } from '../../../components/Success';
-import { parseNodeID } from '../../../coreViem/utils/ids';
+import { Success } from '@/components/toolbox/components/Success';
+import { parseNodeID } from '@/components/toolbox/coreViem/utils/ids';
 import { fromBytes } from 'viem';
 import { utils } from '@avalabs/avalanchejs';
-import { formatAvaxBalance } from '../../../coreViem/utils/format';
-import { getPChainBalance } from '../../../coreViem/methods/getPChainbalance';
-import { MultisigOption } from '../../../components/MultisigOption';
-import { getValidationIdHex } from '../../../coreViem/hooks/getValidationID';
+import { formatAvaxBalance } from '@/components/toolbox/coreViem/utils/format';
+import { getPChainBalance } from '@/components/toolbox/coreViem/methods/getPChainbalance';
+import { MultisigOption } from '@/components/toolbox/components/MultisigOption';
+import { getValidationIdHex } from '@/components/toolbox/coreViem/hooks/getValidationID';
 
 interface InitiateValidatorRegistrationProps {
   subnetId: string;

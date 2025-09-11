@@ -2,21 +2,21 @@
 
 import { useEffect, useState, useCallback, SetStateAction } from "react";
 import { useWalletStore } from "@/components/toolbox/stores/walletStore";
-import { Button } from "../../../components/Button";
+import { Button } from "@/components/toolbox/components/Button";
 import { Copy, Download, AlertCircle, Check } from "lucide-react";
 import { Address } from "viem";
 
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 // Genesis Components
-import { ChainParamsSection } from "../../../components/genesis/sections/ChainParamsSection";
-import { TokenomicsSection } from "../../../components/genesis/sections/TokenomicsSection";
-import { PermissionsSection } from "../../../components/genesis/sections/PermissionsSection";
-import { TransactionFeesSection } from "../../../components/genesis/sections/TransactionFeesSection";
-import { PreinstallsTab } from "../../../components/genesis/tabs/PreinstallsTab";
+import { ChainParamsSection } from "@/components/toolbox/components/genesis/sections/ChainParamsSection";
+import { TokenomicsSection } from "@/components/toolbox/components/genesis/sections/TokenomicsSection";
+import { PermissionsSection } from "@/components/toolbox/components/genesis/sections/PermissionsSection";
+import { TransactionFeesSection } from "@/components/toolbox/components/genesis/sections/TransactionFeesSection";
+import { PreinstallsTab } from "@/components/toolbox/components/genesis/tabs/PreinstallsTab";
 
 // Genesis Utilities & Types
-import { generateGenesis } from "../../../components/genesis/genGenesis";
+import { generateGenesis } from "@/components/toolbox/components/genesis/genGenesis";
 import {
     AllocationEntry,
     AllowlistPrecompileConfig,
@@ -25,8 +25,8 @@ import {
     ValidationMessages,
     generateEmptyAllowlistPrecompileConfig,
     isValidAllowlistPrecompileConfig
-} from "../../../components/genesis/types";
-import { PreinstallConfig } from "../../../components/genesis/PreinstalledContractsSection";
+} from "@/components/toolbox/components/genesis/types";
+import { PreinstallConfig } from "@/components/toolbox/components/genesis/PreinstalledContractsSection";
 
 // --- Constants --- 
 const DEFAULT_FEE_CONFIG: FeeConfigType = {

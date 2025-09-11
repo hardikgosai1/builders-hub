@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useWalletStore } from '@/components/toolbox/stores/walletStore';
-import { useViemChainStore } from '../../../stores/toolboxStore';
-import { Button } from '../../../components/Button';
-import { Input } from '../../../components/Input';
+import { useViemChainStore } from '@/components/toolbox/stores/toolboxStore';
+import { Button } from '@/components/toolbox/components/Button';
+import { Input } from '@/components/toolbox/components/Input';
 import { AlertCircle } from 'lucide-react';
-import { Success } from '../../../components/Success';
+import { Success } from '@/components/toolbox/components/Success';
 import { bytesToHex, hexToBytes } from 'viem';
-import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
-import poaManagerAbi from '../../../../../contracts/icm-contracts/compiled/PoAManager.json';
+import validatorManagerAbi from '@/contracts/icm-contracts/compiled/ValidatorManager.json';
+import poaManagerAbi from '@/contracts/icm-contracts/compiled/PoAManager.json';
 import { GetRegistrationJustification } from '../ValidatorManager/justification';
-import { packL1ValidatorRegistration } from '../../../coreViem/utils/convertWarp';
+import { packL1ValidatorRegistration } from '@/components/toolbox/coreViem/utils/convertWarp';
 import { packWarpIntoAccessList } from '../ValidatorManager/packWarp';
-import { extractL1ValidatorWeightMessage } from '../../../coreViem/methods/extractL1ValidatorWeightMessage';
-import { useAvaCloudSDK } from '../../../stores/useAvaCloudSDK';
+import { extractL1ValidatorWeightMessage } from '@/components/toolbox/coreViem/methods/extractL1ValidatorWeightMessage';
+import { useAvaCloudSDK } from '@/components/toolbox/stores/useAvaCloudSDK';
 
 interface CompleteValidatorRemovalProps {
   subnetIdL1: string;

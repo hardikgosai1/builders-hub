@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useWalletStore } from '@/components/toolbox/stores/walletStore';
-import { Button } from '../../../components/Button';
-import { Input } from '../../../components/Input';
+import { Button } from '@/components/toolbox/components/Button';
+import { Input } from '@/components/toolbox/components/Input';
 import { AlertCircle } from 'lucide-react';
-import { Success } from '../../../components/Success';
-import { useAvaCloudSDK } from '../../../stores/useAvaCloudSDK';
+import { Success } from '@/components/toolbox/components/Success';
+import { useAvaCloudSDK } from '@/components/toolbox/stores/useAvaCloudSDK';
 
 interface SubmitPChainTxRemovalProps {
   subnetIdL1: string;

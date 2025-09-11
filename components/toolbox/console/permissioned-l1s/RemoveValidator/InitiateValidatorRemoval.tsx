@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useViemChainStore } from '../../../stores/toolboxStore';
+import { useViemChainStore } from '@/components/toolbox/stores/toolboxStore';
 import { useWalletStore } from '@/components/toolbox/stores/walletStore';
-import { Button } from '../../../components/Button';
-import SelectValidationID, { ValidationSelection } from '../../../components/SelectValidationID';
-import validatorManagerAbi from '../../../../../contracts/icm-contracts/compiled/ValidatorManager.json';
+import { Button } from '@/components/toolbox/components/Button';
+import SelectValidationID, { ValidationSelection } from '@/components/toolbox/components/SelectValidationID';
+import validatorManagerAbi from '@/contracts/icm-contracts/compiled/ValidatorManager.json';
 import { AlertCircle } from 'lucide-react';
-import { Success } from '../../../components/Success';
-import { MultisigOption } from '../../../components/MultisigOption';
+import { Success } from '@/components/toolbox/components/Success';
+import { MultisigOption } from '@/components/toolbox/components/MultisigOption';
 
 interface InitiateValidatorRemovalProps {
   subnetId: string;
