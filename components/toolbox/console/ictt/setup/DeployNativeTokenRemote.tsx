@@ -1,23 +1,23 @@
 "use client";
 
-import NativeTokenRemote from "../../../../../contracts/icm-contracts/compiled/NativeTokenRemote.json";
-import { useL1ByChainId, useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
-import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import NativeTokenRemote from "@/contracts/icm-contracts/compiled/NativeTokenRemote.json";
+import { useL1ByChainId, useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { useToolboxStore, useViemChainStore, getToolboxStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect, useMemo } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
+import { Input } from "@/components/toolbox/components/Input";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
 import { createPublicClient, http } from "viem";
-import { Note } from "../../../../../toolbox/src/components/Note";
+import { Note } from "@/components/toolbox/components/Note";
 import { utils } from "@avalabs/avalanchejs";
-import ERC20TokenHomeABI from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
-import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json";
-import SelectBlockchainId from "../../../../../toolbox/src/components/SelectBlockchainId";
-import { CheckPrecompile } from "../../../../../toolbox/src/components/CheckPrecompile";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import TeleporterRegistryAddressInput from "../../../../../toolbox/src/components/TeleporterRegistryAddressInput";
+import ERC20TokenHomeABI from "@/contracts/icm-contracts/compiled/ERC20TokenHome.json";
+import ExampleERC20 from "@/contracts/icm-contracts/compiled/ExampleERC20.json";
+import SelectBlockchainId from "@/components/toolbox/components/SelectBlockchainId";
+import { CheckPrecompile } from "@/components/toolbox/components/CheckPrecompile";
+import { Container } from "@/components/toolbox/components/Container";
+import TeleporterRegistryAddressInput from "@/components/toolbox/components/TeleporterRegistryAddressInput";
 export default function DeployNativeTokenRemote() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);
     const {

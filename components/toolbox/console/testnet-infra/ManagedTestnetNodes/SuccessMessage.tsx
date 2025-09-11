@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "../../../../../toolbox/src/components/Button";
+import { Button } from "@/components/toolbox/components/Button";
 
 interface SuccessMessageProps {
     onReset: () => void;

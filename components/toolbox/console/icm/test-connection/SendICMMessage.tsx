@@ -1,20 +1,20 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useToolboxStore, useViemChainStore, getToolboxStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useMemo } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
 import { createPublicClient, http } from 'viem';
-import ICMDemoABI from "../../../../../contracts/example-contracts/compiled/ICMDemo.json";
+import ICMDemoABI from "@/contracts/example-contracts/compiled/ICMDemo.json";
 import { utils } from "@avalabs/avalanchejs";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import SelectBlockchainId from "../../../../../toolbox/src/components/SelectBlockchainId";
-import { useL1ByChainId, useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
+import { Input } from "@/components/toolbox/components/Input";
+import { Container } from "@/components/toolbox/components/Container";
+import SelectBlockchainId from "@/components/toolbox/components/SelectBlockchainId";
+import { useL1ByChainId, useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
 import { useEffect } from "react";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 const predeployedDemos: Record<string, string> = {
     //fuji

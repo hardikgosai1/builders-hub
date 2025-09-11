@@ -1,20 +1,20 @@
 "use client";
 
-import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useCreateChainStore } from "@/components/toolbox/stores/createChainStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { type ConvertToL1Validator } from "../../../../../toolbox/src/components/ValidatorListInput";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { ValidatorListInput } from "../../../../../toolbox/src/components/ValidatorListInput";
-import InputChainId from "../../../../../toolbox/src/components/InputChainId";
-import SelectSubnet, { SubnetSelection } from "../../../../../toolbox/src/components/SelectSubnet";
+import { Button } from "@/components/toolbox/components/Button";
+import { type ConvertToL1Validator } from "@/components/toolbox/components/ValidatorListInput";
+import { Container } from "@/components/toolbox/components/Container";
+import { ValidatorListInput } from "@/components/toolbox/components/ValidatorListInput";
+import InputChainId from "@/components/toolbox/components/InputChainId";
+import SelectSubnet, { SubnetSelection } from "@/components/toolbox/components/SelectSubnet";
 import { Callout } from "fumadocs-ui/components/callout";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import { getPChainBalance } from "../../../../../toolbox/src/coreViem/methods/getPChainbalance";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import { getPChainBalance } from "@/components/toolbox/coreViem/methods/getPChainbalance";
+import { Success } from "@/components/toolbox/components/Success";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 export default function ConvertToL1() {
     const {

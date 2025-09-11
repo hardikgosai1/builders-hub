@@ -1,7 +1,7 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
+import ToolboxConsoleWrapper from "../../../../components/toolbox/components/ToolboxConsoleWrapper";
 
 import AddCollateral from "../../../../components/toolbox/console/ictt/setup/AddCollateral";
 import TestSend from "../../../../components/toolbox/console/ictt/token-transfer/TestSend";

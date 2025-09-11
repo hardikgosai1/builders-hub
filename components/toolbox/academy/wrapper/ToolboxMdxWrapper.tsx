@@ -3,8 +3,8 @@
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./ErrorFallback";
 
-import { AcademySidebar } from "@console-header/academy-sidebar";
-import { AcademyHeader } from "@console-header/academy-header";
+import { AcademySidebar } from "@/components/toolbox/components/console-header/academy-sidebar";
+import { AcademyHeader } from "@/components/toolbox/components/console-header/academy-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function ToolboxMdxWrapper({ children }: { children: React.ReactNode, walletMode?: "l1" | "c-chain", enforceChainId?: number }) {

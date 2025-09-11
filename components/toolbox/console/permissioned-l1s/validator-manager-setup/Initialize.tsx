@@ -1,22 +1,22 @@
 "use client";
 
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useEffect, useState } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { ResultField } from "../../../../../toolbox/src/components/ResultField";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import { ResultField } from "@/components/toolbox/components/ResultField";
 import { AbiEvent } from 'viem';
-import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
+import ValidatorManagerABI from "@/contracts/icm-contracts/compiled/ValidatorManager.json";
 import { utils } from "@avalabs/avalanchejs";
-import SelectSubnetId from "../../../../../toolbox/src/components/SelectSubnetId";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import { useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
-import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
+import SelectSubnetId from "@/components/toolbox/components/SelectSubnetId";
+import { Container } from "@/components/toolbox/components/Container";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { useCreateChainStore } from "@/components/toolbox/stores/createChainStore";
 import { Step, Steps } from "fumadocs-ui/components/steps";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 export default function Initialize() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

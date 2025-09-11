@@ -1,4 +1,4 @@
-import { Button } from "../../../../toolbox/src/components/Button";
+import { Button } from "../../components/Button";
 
 export const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error, resetErrorBoundary: () => void }) => {
     return (

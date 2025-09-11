@@ -1,20 +1,20 @@
 "use client";
 
-import { useL1ByChainId, useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useL1ByChainId, useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import ERC20TokenRemoteABI from "../../../../../contracts/icm-contracts/compiled/ERC20TokenRemote.json";
-import ERC20TokenHomeABI from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
+import ERC20TokenRemoteABI from "@/contracts/icm-contracts/compiled/ERC20TokenRemote.json";
+import ERC20TokenHomeABI from "@/contracts/icm-contracts/compiled/ERC20TokenHome.json";
 import { Abi, createPublicClient, http, PublicClient, zeroAddress } from "viem";
-import { Suggestion } from "../../../../../toolbox/src/components/Input";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
+import { Suggestion } from "@/components/toolbox/components/Input";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
 import { utils } from "@avalabs/avalanchejs";
-import { ListContractEvents } from "../../../../../toolbox/src/components/ListContractEvents";
-import SelectBlockchainId from "../../../../../toolbox/src/components/SelectBlockchainId";
-import { Container } from "../../../../../toolbox/src/components/Container";
+import { ListContractEvents } from "@/components/toolbox/components/ListContractEvents";
+import SelectBlockchainId from "@/components/toolbox/components/SelectBlockchainId";
+import { Container } from "@/components/toolbox/components/Container";
 
 export default function RegisterWithHome() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

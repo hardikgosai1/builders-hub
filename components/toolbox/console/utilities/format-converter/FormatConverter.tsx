@@ -3,9 +3,9 @@
 import { useState, useCallback } from "react";
 import { utils } from "@avalabs/avalanchejs";
 import { Copy, Check } from "lucide-react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { Container } from "../../../../../toolbox/src/components/Container";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import { Container } from "@/components/toolbox/components/Container";
 
 // Utility functions for conversions
 export const hexToBytes = (hex: string): Uint8Array => {

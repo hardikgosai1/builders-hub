@@ -1,17 +1,17 @@
 "use client"
 
-import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore"
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore"
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore"
+import { useWalletStore } from "@/components/toolbox/stores/walletStore"
 import type { AbiEvent } from "viem"
 import { useEffect, useState } from "react"
-import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json"
-import { Button } from "../../../../../toolbox/src/components/Button"
-import { Container } from "../../../../../toolbox/src/components/Container"
+import ValidatorManagerABI from "@/contracts/icm-contracts/compiled/ValidatorManager.json"
+import { Button } from "@/components/toolbox/components/Button"
+import { Container } from "@/components/toolbox/components/Container"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier"
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput"
-import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { getSubnetInfo } from "@/components/toolbox/coreViem/utils/glacier"
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput"
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements"
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 type ViewData = {
   [key: string]: any

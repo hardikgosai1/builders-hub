@@ -1,10 +1,10 @@
 "use client";
-import { EVMFaucetButton } from "../../../../toolbox/src/components/ConnectWallet/EVMFaucetButton";
-import { PChainFaucetButton } from "../../../../toolbox/src/components/ConnectWallet/PChainFaucetButton";
+import { EVMFaucetButton } from "@/components/toolbox/components/ConnectWallet/EVMFaucetButton";
+import { PChainFaucetButton } from "@/components/toolbox/components/ConnectWallet/PChainFaucetButton";
 import { Droplets, Sparkles, AlertCircle } from "lucide-react";
-import { CheckWalletRequirements } from "@/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "@/hooks/useWalletRequirements";
-import { useL1List, L1ListItem } from "../../../../toolbox/src/stores/l1ListStore";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
+import { useL1List, L1ListItem } from "@/components/toolbox/stores/l1ListStore";
 
 function EVMFaucetCard({ chain }: { chain: L1ListItem }) {
   const getFeatures = () => {

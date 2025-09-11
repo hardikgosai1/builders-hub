@@ -1,23 +1,24 @@
 "use client";
 
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
-import { Container } from "../../../../toolbox/src/components/Container";
-import { getBlockchainInfo, getSubnetInfo } from "../../../../toolbox/src/coreViem/utils/glacier";
-import InputSubnetId from "../../../../toolbox/src/components/InputSubnetId";
-import BlockchainDetailsDisplay from "../../../../toolbox/src/components/BlockchainDetailsDisplay";
+import { Container } from "../../components/Container";
+import { getBlockchainInfo, getSubnetInfo } from "../../coreViem/utils/glacier";
+import InputSubnetId from "../../components/InputSubnetId";
+import BlockchainDetailsDisplay from "../../components/BlockchainDetailsDisplay";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { Button } from "../../../../toolbox/src/components/Button";
-import { Success } from "../../../../toolbox/src/components/Success";
-import { DockerInstallation } from "../../../../toolbox/src/components/DockerInstallation";
-import { NodeBootstrapCheck } from "../../../../toolbox/src/components/NodeBootstrapCheck";
-import { ReverseProxySetup } from "../../../../toolbox/src/components/ReverseProxySetup";
-import { AddToWalletStep } from "../../../../toolbox/src/components/AddToWalletStep";
-import { ConfigureNodeType } from "../../../../toolbox/src/components/ConfigureNodeType";
-import { SUBNET_EVM_VM_ID, generateDockerCommand } from "../../../../toolbox/src/toolbox/Nodes/config";
+import { Button } from "../../components/Button";
+import { Success } from "../../components/Success";
+import { DockerInstallation } from "../../components/DockerInstallation";
+import { NodeBootstrapCheck } from "../../components/NodeBootstrapCheck";
+import { ReverseProxySetup } from "../../components/ReverseProxySetup";
+import { AddToWalletStep } from "../../components/AddToWalletStep";
+import { ConfigureNodeType } from "../../components/ConfigureNodeType";
+import { generateDockerCommand } from "./create/config";
+import { SUBNET_EVM_VM_ID } from "@/constants/console";
 
 export default function AvalanchegoDocker() {
     const [chainId, setChainId] = useState("");

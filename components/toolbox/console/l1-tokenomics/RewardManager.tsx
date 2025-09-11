@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore";
-import { useViemChainStore } from "../../../../toolbox/src/stores/toolboxStore";
-import { Button } from "../../../../toolbox/src/components/Button";
-import { Container } from "../../../../toolbox/src/components/Container";
-import { EVMAddressInput } from "../../../../toolbox/src/components/EVMAddressInput";
-import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
-import rewardManagerAbi from "../../../../contracts/precompiles/RewardManager.json";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { Button } from "@/components/toolbox/components/Button";
+import { Container } from "@/components/toolbox/components/Container";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import { AllowlistComponent } from "@/components/toolbox/components/AllowListComponents";
+import rewardManagerAbi from "@/contracts/precompiles/RewardManager.json";
 import { CheckCircle, Edit, Users, Wallet } from "lucide-react";
-import { cn } from "../../../../toolbox/src/lib/utils";
-import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements";
+import { cn } from "@/components/toolbox/lib/utils";
+import { CheckPrecompile } from "@/components/toolbox/components/CheckPrecompile";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 // Default Reward Manager address
 const DEFAULT_REWARD_MANAGER_ADDRESS =

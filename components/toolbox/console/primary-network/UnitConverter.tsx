@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
-import { Button } from "../../../../toolbox/src/components/Button";
-import { Container } from "../../../../toolbox/src/components/Container";
+import { Button } from "@/components/toolbox/components/Button";
+import { Container } from "@/components/toolbox/components/Container";
 
 export default function UnitConverter() {
     const [amount, setAmount] = useState<string>("1.00");

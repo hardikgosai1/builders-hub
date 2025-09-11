@@ -1,17 +1,17 @@
 "use client";
 
-import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import TeleporterRegistryBytecode from '../../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterRegistry_Bytecode_v1.0.0.txt.json';
-import TeleporterMessengerAddress from '../../../../../contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
-import TeleporterRegistryManualyCompiled from '../../../../../contracts/icm-contracts/compiled/TeleporterRegistry.json';
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
+import TeleporterRegistryBytecode from '@/contracts/icm-contracts-releases/v1.0.0/TeleporterRegistry_Bytecode_v1.0.0.txt.json';
+import TeleporterMessengerAddress from '@/contracts/icm-contracts-releases/v1.0.0/TeleporterMessenger_Contract_Address_v1.0.0.txt.json';
+import TeleporterRegistryManualyCompiled from '@/contracts/icm-contracts/compiled/TeleporterRegistry.json';
+import { Container } from "@/components/toolbox/components/Container";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 import versions from '@/scripts/versions.json';
 
 const ICM_COMMIT = versions["ava-labs/icm-contracts"];

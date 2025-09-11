@@ -1,22 +1,22 @@
 "use client"
 import React, { useState, useMemo } from 'react'
 import { AlertCircle } from "lucide-react"
-import { Container } from "../../../../toolbox/src/components/Container"
-import { Button } from "../../../../toolbox/src/components/Button"
-import SelectSubnetId from "../../../../toolbox/src/components/SelectSubnetId"
-import { ValidatorManagerDetails } from "../../../../toolbox/src/components/ValidatorManagerDetails"
-import { Success } from "../../../../toolbox/src/components/Success"
+import { Container } from "@/components/toolbox/components/Container"
+import { Button } from "@/components/toolbox/components/Button"
+import SelectSubnetId from "@/components/toolbox/components/SelectSubnetId"
+import { ValidatorManagerDetails } from "@/components/toolbox/components/ValidatorManagerDetails"
+import { Success } from "@/components/toolbox/components/Success"
 
-import { useCreateChainStore } from "../../../../toolbox/src/stores/createChainStore"
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore"
-import { useValidatorManagerDetails } from "../../../../toolbox/src/toolbox/hooks/useValidatorManagerDetails"
+import { useCreateChainStore } from "@/components/toolbox/stores/createChainStore"
+import { useWalletStore } from "@/components/toolbox/stores/walletStore"
+import { useValidatorManagerDetails } from "@/components/toolbox/hooks/useValidatorManagerDetails"
 
-import InitiateValidatorRemoval from "../../../../toolbox/src/toolbox/ValidatorManager/RemoveValidator/InitiateValidatorRemoval"
-import CompleteValidatorRemoval from "../../../../toolbox/src/toolbox/ValidatorManager/RemoveValidator/CompleteValidatorRemoval"
-import SubmitPChainTxRemoval from "../../../../toolbox/src/toolbox/ValidatorManager/RemoveValidator/SubmitPChainTxRemoval"
+import InitiateValidatorRemoval from "@/components/toolbox/console/permissioned-l1s/RemoveValidator/InitiateValidatorRemoval"
+import CompleteValidatorRemoval from "@/components/toolbox/console/permissioned-l1s/RemoveValidator/CompleteValidatorRemoval"
+import SubmitPChainTxRemoval from "@/components/toolbox/console/permissioned-l1s/RemoveValidator/SubmitPChainTxRemoval"
 import { Step, Steps } from "fumadocs-ui/components/steps"
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements"
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements"
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements"
 
 const RemoveValidatorExpert: React.FC = () => {
   const [globalError, setGlobalError] = useState<string | null>(null)

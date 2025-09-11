@@ -1,20 +1,20 @@
 "use client";
 
-import { useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { ResultField } from "../../../../../toolbox/src/components/ResultField";
-import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import SelectSubnetId from "../../../../../toolbox/src/components/SelectSubnetId";
-import { useValidatorManagerDetails } from "../../../../../toolbox/src/toolbox/hooks/useValidatorManagerDetails";
-import { ValidatorManagerDetails } from "../../../../../toolbox/src/components/ValidatorManagerDetails";
+import { Button } from "@/components/toolbox/components/Button";
+import { ResultField } from "@/components/toolbox/components/ResultField";
+import ValidatorManagerABI from "@/contracts/icm-contracts/compiled/ValidatorManager.json";
+import { Container } from "@/components/toolbox/components/Container";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import SelectSubnetId from "@/components/toolbox/components/SelectSubnetId";
+import { useValidatorManagerDetails } from "@/components/toolbox/hooks/useValidatorManagerDetails";
+import { ValidatorManagerDetails } from "@/components/toolbox/components/ValidatorManagerDetails";
 import { TransactionReceipt } from "viem";
 import { AlertCircle, Info } from "lucide-react";
-import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 export default function TransferOwnership() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

@@ -8,9 +8,9 @@ import {
     CheckCircle2,
     AlertTriangle,
 } from "lucide-react";
-import { NodeRegistration } from "./types";
-import { calculateTimeRemaining, formatTimeRemaining, getStatusData } from "./useTimeRemaining";
-import { Button } from "../../../../../toolbox/src/components/Button";
+import { NodeRegistration } from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes/types";
+import { calculateTimeRemaining, formatTimeRemaining, getStatusData } from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes/useTimeRemaining";
+import { Button } from "@/components/toolbox/components/Button";
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 
 interface NodeCardProps {

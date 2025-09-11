@@ -1,13 +1,13 @@
 "use client";
 
-import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json"
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import ExampleERC20 from "@/contracts/icm-contracts/compiled/ExampleERC20.json";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
 import { http, createPublicClient } from "viem";
-import { Container } from "../../../../../toolbox/src/components/Container";
+import { Container } from "@/components/toolbox/components/Container";
 import { ExternalLink } from "lucide-react";
 
 export default function DeployExampleERC20() {

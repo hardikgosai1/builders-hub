@@ -5,9 +5,9 @@ import {
     XCircle,
     Plus
 } from "lucide-react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { NodeRegistration } from "./types";
-import NodeCard from "./NodeCard";
+import { Button } from "@/components/toolbox/components/Button";
+import { NodeRegistration } from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes/types";
+import NodeCard from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes/NodeCard";
 
 interface NodesListProps {
     nodes: NodeRegistration[];

@@ -10,8 +10,8 @@ import {
   Database,
   ExternalLink,
 } from "lucide-react"
-import { Container } from "../../../../toolbox/src/components/Container"
-import SelectSubnet, { SubnetSelection } from "../../../../toolbox/src/components/SelectSubnet"
+import { Container } from "../../components/Container"
+import SelectSubnet, { SubnetSelection } from "../../components/SelectSubnet"
 
 export default function QueryL1Details() {
   const [selection, setSelection] = useState<SubnetSelection>({ subnetId: '', subnet: null })

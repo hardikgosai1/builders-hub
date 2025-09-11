@@ -1,16 +1,16 @@
 "use client";
 
-import WrappedNativeToken from "../../../../../contracts/icm-contracts/compiled/WrappedNativeToken.json"
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import WrappedNativeToken from "@/contracts/icm-contracts/compiled/WrappedNativeToken.json";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
 import { http, createPublicClient } from "viem";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { useSelectedL1 } from "@/stores/l1ListStore";
-import { WalletRequirementsConfigKey } from "@/hooks/useWalletRequirements";
-import { CheckWalletRequirements } from "@/components/CheckWalletRequirements";
+import { Container } from "@/components/toolbox/components/Container";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
 
 export default function DeployWrappedNative() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

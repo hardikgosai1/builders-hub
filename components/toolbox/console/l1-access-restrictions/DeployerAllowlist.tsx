@@ -1,9 +1,9 @@
 "use client";
 
-import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
-import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "@/hooks/useWalletRequirements";
+import { AllowlistComponent } from "@/components/toolbox/components/AllowListComponents";
+import { CheckPrecompile } from "@/components/toolbox/components/CheckPrecompile";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 // Default Deployer AllowList address
 const DEFAULT_DEPLOYER_ALLOWLIST_ADDRESS =

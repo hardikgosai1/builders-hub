@@ -1,14 +1,14 @@
 "use client"
 
-import { useWalletStore } from "../../stores/walletStore"
+import { useWalletStore } from "../../../../components/toolbox/stores/walletStore"
 import { useState, useEffect } from "react"
 import { createPublicClient, http, webSocket } from "viem"
-import { Button } from "../../components/Button"
-import { Input } from "../../components/Input"
-import { Container } from "../../components/Container"
+import { Button } from "../../../../components/toolbox/components/Button"
+import { Input } from "../../../../components/toolbox/components/Input"
+import { Container } from "../../../../components/toolbox/components/Container"
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
-import { fetchChainId } from "../../lib/chainId"
-import { getBlockchainInfo } from "../../coreViem/utils/glacier";
+import { fetchChainId } from "../../../../components/toolbox/lib/chainId"
+import { getBlockchainInfo } from "../../../../components/toolbox/coreViem/utils/glacier";
 
 export default function L1Form() {
     const [isSwitching, setIsSwitching] = useState(false);

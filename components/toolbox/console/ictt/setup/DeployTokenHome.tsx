@@ -1,21 +1,21 @@
 "use client";
 
-import ERC20TokenHome from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
-import NativeTokenHome from "../../../../../contracts/icm-contracts/compiled/NativeTokenHome.json";
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import ERC20TokenHome from "@/contracts/icm-contracts/compiled/ERC20TokenHome.json";
+import NativeTokenHome from "@/contracts/icm-contracts/compiled/NativeTokenHome.json";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import ExampleERC20 from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json"
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
+import { Input } from "@/components/toolbox/components/Input";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import ExampleERC20 from "@/contracts/icm-contracts/compiled/ExampleERC20.json";
 import { createPublicClient, http } from "viem";
-import { Note } from "../../../../../toolbox/src/components/Note";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import TeleporterRegistryAddressInput from "../../../../../toolbox/src/components/TeleporterRegistryAddressInput";
-import { RadioGroup } from "../../../../../toolbox/src/components/RadioGroup";
-import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
+import { Note } from "@/components/toolbox/components/Note";
+import { Container } from "@/components/toolbox/components/Container";
+import TeleporterRegistryAddressInput from "@/components/toolbox/components/TeleporterRegistryAddressInput";
+import { RadioGroup } from "@/components/toolbox/components/RadioGroup";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
 
 export default function DeployTokenHome() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

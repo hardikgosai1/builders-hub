@@ -1,17 +1,17 @@
 "use client"
 import { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import { Loader2, ArrowDownUp, Clock } from "lucide-react"
-import { Button } from "../../../../toolbox/src/components/Button"
+import { Button } from "@/components/toolbox/components/Button"
 
-import { Container } from "../../../../toolbox/src/components/Container"
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore"
+import { Container } from "@/components/toolbox/components/Container"
+import { useWalletStore } from "@/components/toolbox/stores/walletStore"
 import { pvm, Utxo, TransferOutput, evm } from '@avalabs/avalanchejs'
-import { getRPCEndpoint } from '../../../../toolbox/src/coreViem/utils/rpc'
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements"
-import { Success } from "../../../../toolbox/src/components/Success"
-import { AmountInput } from "../../../../toolbox/src/components/AmountInput"
-import { StepCard, StepIndicator } from "../../../../toolbox/src/components/StepCard"
+import { getRPCEndpoint } from '@/components/toolbox/coreViem/utils/rpc'
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements"
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements"
+import { Success } from "@/components/toolbox/components/Success"
+import { AmountInput } from "@/components/toolbox/components/AmountInput"
+import { StepCard, StepIndicator } from "@/components/toolbox/components/StepCard"
 import { createAvalancheWalletClient } from "@avalanche-sdk/client"
 import { avalanche, avalancheFuji } from "@avalanche-sdk/client/chains"
 

@@ -1,26 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { getBlockchainInfo, getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier";
-import InputChainId from "../../../../../toolbox/src/components/InputChainId";
-import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
-import BlockchainDetailsDisplay from "../../../../../toolbox/src/components/BlockchainDetailsDisplay";
+import { Container } from "@/components/toolbox/components/Container";
+import { Input } from "@/components/toolbox/components/Input";
+import { getBlockchainInfo, getSubnetInfo } from "@/components/toolbox/coreViem/utils/glacier";
+import InputChainId from "@/components/toolbox/components/InputChainId";
+import InputSubnetId from "@/components/toolbox/components/InputSubnetId";
+import BlockchainDetailsDisplay from "@/components/toolbox/components/BlockchainDetailsDisplay";
 import versions from '@/scripts/versions.json';
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { nodeConfigBase64 } from "../../../../../toolbox/src/toolbox/Nodes/config";
-import { useL1ByChainId } from "../../../../../toolbox/src/stores/l1ListStore";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { nipify, HostInput } from "../../../../../toolbox/src/components/HostInput";
-import { RadioGroup } from "../../../../../toolbox/src/components/RadioGroup";
-import { RPCURLInput } from "../../../../../toolbox/src/components/RPCURLInput";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
-import { DockerInstallation } from "../../../../../toolbox/src/components/DockerInstallation";
-import { NodeBootstrapCheck } from "../../../../../toolbox/src/components/NodeBootstrapCheck";
-import { Checkbox } from "../../../../../toolbox/src/components/Checkbox";
-import { Button } from "../../../../../toolbox/src/components/Button";
+import { nodeConfigBase64 } from "./config";
+import { useL1ByChainId } from "@/components/toolbox/stores/l1ListStore";
+import { Success } from "@/components/toolbox/components/Success";
+import { nipify, HostInput } from "@/components/toolbox/components/HostInput";
+import { RadioGroup } from "@/components/toolbox/components/RadioGroup";
+import { RPCURLInput } from "@/components/toolbox/components/RPCURLInput";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import { DockerInstallation } from "@/components/toolbox/components/DockerInstallation";
+import { NodeBootstrapCheck } from "@/components/toolbox/components/NodeBootstrapCheck";
+import { Checkbox } from "@/components/toolbox/components/Checkbox";
+import { Button } from "@/components/toolbox/components/Button";
 
 
 const dockerComposePsOutput = `NAME          IMAGE                                 COMMAND                  SERVICE       CREATED        STATUS        PORTS

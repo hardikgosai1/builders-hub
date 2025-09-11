@@ -1,16 +1,16 @@
 "use client";
 
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Container } from "../../../../toolbox/src/components/Container";
+import { Container } from "@/components/toolbox/components/Container";
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { DockerInstallation } from "../../../../toolbox/src/components/DockerInstallation";
-import { NodeBootstrapCheck } from "../../../../toolbox/src/components/NodeBootstrapCheck";
-import { ReverseProxySetup } from "../../../../toolbox/src/components/ReverseProxySetup";
-import { ConfigureNodeType } from "../../../../toolbox/src/components/ConfigureNodeType";
-import { C_CHAIN_ID, generateDockerCommand } from "../../../../toolbox/src/toolbox/Nodes/config";
+import { DockerInstallation } from "@/components/toolbox/components/DockerInstallation";
+import { NodeBootstrapCheck } from "@/components/toolbox/components/NodeBootstrapCheck";
+import { ReverseProxySetup } from "@/components/toolbox/components/ReverseProxySetup";
+import { ConfigureNodeType } from "@/components/toolbox/components/ConfigureNodeType";
+import { C_CHAIN_ID, generateDockerCommand } from "@/components/toolbox/console/layer-1/create/config";
 
 export default function AvalancheGoDockerPrimaryNetwork() {
     const [nodeType, setNodeType] = useState<"validator" | "public-rpc">("validator");

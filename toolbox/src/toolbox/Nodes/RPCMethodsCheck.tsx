@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
+import { Button } from "../../../../components/toolbox/components/Button";
 import { createPublicClient, http, formatUnits } from 'viem';
 import { pvm } from '@avalabs/avalanchejs';
-import { RPCURLInput } from "../../components/RPCURLInput";
-import { useWalletStore } from "../../stores/walletStore";
+import { RPCURLInput } from "../../../../components/toolbox/components/RPCURLInput";
+import { useWalletStore } from "../../../../components/toolbox/stores/walletStore";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 type TestResult = Record<string, { passed: boolean, message: string }>;

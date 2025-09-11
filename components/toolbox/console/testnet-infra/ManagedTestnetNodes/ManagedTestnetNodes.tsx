@@ -1,11 +1,11 @@
 "use client";
 
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { AddChainModal } from "../../../../../toolbox/src/components/ConnectWallet/AddChainModal";
-import { useL1ListStore } from "../../../../../toolbox/src/stores/l1ListStore";
+import { Container } from "@/components/toolbox/components/Container";
+import { Button } from "@/components/toolbox/components/Button";
+import { AddChainModal } from "@/components/toolbox/components/ConnectWallet/AddChainModal";
+import { useL1ListStore } from "@/components/toolbox/stores/l1ListStore";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,7 +14,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
-} from "../../../../../toolbox/src/components/AlertDialog";
+} from "@/components/toolbox/components/AlertDialog";
 import {
     Plus,
     X,

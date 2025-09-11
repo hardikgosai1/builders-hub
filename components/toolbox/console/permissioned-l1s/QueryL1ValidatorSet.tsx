@@ -1,20 +1,20 @@
 "use client"
 
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore"
+import { useWalletStore } from "@/components/toolbox/stores/walletStore"
 import { useState, useEffect } from "react"
 import { Calendar, Clock, Users, Coins, Info, Copy, Check, Search, ChevronDown } from "lucide-react"
-import { Container } from "../../../../toolbox/src/components/Container"
-import { Button } from "../../../../toolbox/src/components/Button"
+import { Container } from "@/components/toolbox/components/Container"
+import { Button } from "@/components/toolbox/components/Button"
 import { networkIDs } from "@avalabs/avalanchejs"
 
 import { GlobalParamNetwork } from "@avalabs/avacloud-sdk/models/components"
 import { AvaCloudSDK } from "@avalabs/avacloud-sdk"
-import SelectSubnetId from "../../../../toolbox/src/components/SelectSubnetId"
-import BlockchainDetailsDisplay from "../../../../toolbox/src/components/BlockchainDetailsDisplay"
-import { Tooltip } from "../../../../toolbox/src/components/Tooltip"
-import { formatAvaxBalance } from "../../../../toolbox/src/coreViem/utils/format"
-import { getSubnetInfo } from "../../../../toolbox/src/coreViem/utils/glacier"
-import { cb58ToHex } from "../utilities/format-converter/FormatConverter"
+import SelectSubnetId from "@/components/toolbox/components/SelectSubnetId"
+import BlockchainDetailsDisplay from "@/components/toolbox/components/BlockchainDetailsDisplay"
+import { Tooltip } from "@/components/toolbox/components/Tooltip"
+import { formatAvaxBalance } from "@/components/toolbox/coreViem/utils/format"
+import { getSubnetInfo } from "@/components/toolbox/coreViem/utils/glacier"
+import { cb58ToHex } from "@/components/toolbox/console/utilities/format-converter/FormatConverter"
 
 // Updated interface to match the actual API response
 interface ValidatorResponse {

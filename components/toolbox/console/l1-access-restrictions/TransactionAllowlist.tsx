@@ -1,9 +1,9 @@
 "use client";
 
-import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
-import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
-import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements";
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";
+import { AllowlistComponent } from "@/components/toolbox/components/AllowListComponents";
+import { CheckPrecompile } from "@/components/toolbox/components/CheckPrecompile";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
 
 // Default Transaction AllowList address
 const DEFAULT_TRANSACTION_ALLOWLIST_ADDRESS =

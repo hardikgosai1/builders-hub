@@ -39,10 +39,9 @@ import posthog from 'posthog-js';
 import ToolboxMdxWrapper from "@/components/toolbox/academy/wrapper/ToolboxMdxWrapper"
 import CrossChainTransfer from "@/components/toolbox/console/primary-network/CrossChainTransfer"
 import AvalancheGoDocker from '@/components/toolbox/console/layer-1/AvalancheGoDockerL1';
-import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
 import CreateChain from "@/components/toolbox/console/layer-1/create/CreateChain"
 import ConvertToL1 from "@/components/toolbox/console/layer-1/create/ConvertToL1"
-import GenesisBuilder from '@/toolbox/src/toolbox/L1/GenesisBuilder';
+import GenesisBuilder from '@/components/toolbox/console/layer-1/create/GenesisBuilder';
 import DeployExampleERC20 from '@/components/toolbox/console/ictt/setup/DeployExampleERC20';
 import DeployTokenHome from '@/components/toolbox/console/ictt/setup/DeployTokenHome';
 import DeployERC20TokenRemote from '@/components/toolbox/console/ictt/setup/DeployERC20TokenRemote';
@@ -57,7 +56,6 @@ export const dynamicParams = false;
 const toolboxComponents = {
   ToolboxMdxWrapper,
   CrossChainTransfer,
-  CreateSubnet,
   GenesisBuilder,
   CreateChain,
   AvalancheGoDocker,

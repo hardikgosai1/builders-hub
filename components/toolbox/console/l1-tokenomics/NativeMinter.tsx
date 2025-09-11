@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletStore } from "../../../../toolbox/src/stores/walletStore";
-import { useViemChainStore } from "../../../../toolbox/src/stores/toolboxStore";
-import { Button } from "../../../../toolbox/src/components/Button";
-import { Input } from "../../../../toolbox/src/components/Input";
-import { Container } from "../../../../toolbox/src/components/Container";
-import { ResultField } from "../../../../toolbox/src/components/ResultField";
-import { EVMAddressInput } from "../../../../toolbox/src/components/EVMAddressInput";
-import nativeMinterAbi from "../../../../contracts/precompiles/NativeMinter.json";
-import { AllowlistComponent } from "../../../../toolbox/src/components/AllowListComponents";
-import { CheckPrecompile } from "../../../../toolbox/src/components/CheckPrecompile";
-import { CheckWalletRequirements } from "../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../toolbox/src/hooks/useWalletRequirements";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import { Container } from "@/components/toolbox/components/Container";
+import { ResultField } from "@/components/toolbox/components/ResultField";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import nativeMinterAbi from "@/contracts/precompiles/NativeMinter.json";
+import { AllowlistComponent } from "@/components/toolbox/components/AllowListComponents";
+import { CheckPrecompile } from "@/components/toolbox/components/CheckPrecompile";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 // Default Native Minter address
 const DEFAULT_NATIVE_MINTER_ADDRESS =

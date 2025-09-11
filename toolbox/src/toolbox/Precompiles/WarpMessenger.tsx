@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletStore } from "../../stores/walletStore";
-import { useViemChainStore } from "../../stores/toolboxStore";
-import { Button } from "../../components/Button";
-import { Container } from "../../components/Container";
-import { Input } from "../../components/Input";
-import { Success } from "../../components/Success";
-import { AllowlistComponent } from "../../components/AllowListComponents";
+import { useWalletStore } from "../../../../components/toolbox/stores/walletStore";
+import { useViemChainStore } from "../../../../components/toolbox/stores/toolboxStore";
+import { Button } from "../../../../components/toolbox/components/Button";
+import { Container } from "../../../../components/toolbox/components/Container";
+import { Input } from "../../../../components/toolbox/components/Input";
+import { Success } from "../../../../components/toolbox/components/Success";
+import { AllowlistComponent } from "../../../../components/toolbox/components/AllowListComponents";
 import warpMessengerAbi from "../../../../contracts/precompiles/WarpMessenger.json";
-import { RadioGroup } from "../../components/RadioGroup";
+import { RadioGroup } from "../../../../components/toolbox/components/RadioGroup";
 import { avalancheFuji } from 'viem/chains';
 import { createPublicClient, http } from 'viem';
-import { CheckPrecompile } from "../../components/CheckPrecompile";
+import { CheckPrecompile } from "../../../../components/toolbox/components/CheckPrecompile";
 
 // Default Warp Messenger address
 const DEFAULT_WARP_MESSENGER_ADDRESS =

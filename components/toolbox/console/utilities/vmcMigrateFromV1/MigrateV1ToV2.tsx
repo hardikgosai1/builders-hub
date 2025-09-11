@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
-import { useViemChainStore, useToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import { useViemChainStore, useToolboxStore } from "@/components/toolbox/stores/toolboxStore";
 import { Chain } from "viem";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { ResultField } from "../../../../../toolbox/src/components/ResultField";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import { Container } from "@/components/toolbox/components/Container";
+import { ResultField } from "@/components/toolbox/components/ResultField";
 import { ExternalLink } from "lucide-react";
-import ValidatorManagerABI from "../../../../../contracts/icm-contracts/compiled/ValidatorManager.json";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import ValidatorManagerABI from "@/contracts/icm-contracts/compiled/ValidatorManager.json";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 export default function MigrateV1ToV2() {
   const { coreWalletClient, publicClient } = useWalletStore();

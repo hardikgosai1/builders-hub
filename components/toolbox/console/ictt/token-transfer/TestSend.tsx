@@ -1,25 +1,25 @@
 // src/toolbox/ICTT/TestSend.ts
 "use client";
 
-import { useL1ByChainId, useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
-import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useL1ByChainId, useSelectedL1 } from "../../../stores/l1ListStore";
+import { useToolboxStore, useViemChainStore, getToolboxStore } from "../../../stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
+import { Button } from "../../../components/Button";
+import { Success } from "../../../components/Success";
 import ERC20TokenHomeABI from "../../../../../contracts/icm-contracts/compiled/ERC20TokenHome.json";
 import NativeTokenHomeABI from "../../../../../contracts/icm-contracts/compiled/NativeTokenHome.json";
 import ExampleERC20ABI from "../../../../../contracts/icm-contracts/compiled/ExampleERC20.json";
 import ITeleporterMessenger from "../../../../../contracts/example-contracts/compiled/ITeleporterMessenger.json";
 import { createPublicClient, http, formatUnits, parseUnits, Address, zeroAddress, decodeEventLog, AbiEvent } from "viem";
-import { AmountInput } from "../../../../../toolbox/src/components/AmountInput";
-import { Suggestion } from "../../../../../toolbox/src/components/TokenInput";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import { Token, TokenInput } from "../../../../../toolbox/src/components/TokenInputToolbox";
+import { AmountInput } from "../../../components/AmountInput";
+import { Suggestion } from "../../../components/TokenInput";
+import { EVMAddressInput } from "../../../components/EVMAddressInput";
+import { Token, TokenInput } from "../../../components/TokenInputToolbox";
 import { utils } from "@avalabs/avalanchejs";
-import SelectBlockchain, { type BlockchainSelection } from "../../../../../toolbox/src/components/SelectBlockchain";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { Toggle } from "../../../../../toolbox/src/components/Toggle";
+import SelectBlockchain, { type BlockchainSelection } from "../../../components/SelectBlockchain";
+import { Container } from "../../../components/Container";
+import { Toggle } from "../../../components/Toggle";
 import { Ellipsis } from "lucide-react";
 
 const DEFAULT_GAS_LIMIT = 250000n;

@@ -1,24 +1,24 @@
 "use client";
 
-import { useToolboxStore, useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
+import { useToolboxStore, useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import PoAManagerABI from "../../../../../contracts/icm-contracts/compiled/PoAManager.json";
-import { Container } from "../../../../../toolbox/src/components/Container";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import PoAManagerABI from "@/contracts/icm-contracts/compiled/PoAManager.json";
+import { Container } from "@/components/toolbox/components/Container";
 import { Steps, Step } from "fumadocs-ui/components/steps";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
+import { Success } from "@/components/toolbox/components/Success";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
 
-import SelectSubnetId from "../../../../../toolbox/src/components/SelectSubnetId";
-import { useValidatorManagerDetails } from "../../../../../toolbox/src/toolbox/hooks/useValidatorManagerDetails";
-import { ValidatorManagerDetails } from "../../../../../toolbox/src/components/ValidatorManagerDetails";
-import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
-import SelectSafeWallet, { SafeSelection } from "../../../../../toolbox/src/components/SelectSafeWallet";
+import SelectSubnetId from "@/components/toolbox/components/SelectSubnetId";
+import { useValidatorManagerDetails } from "@/components/toolbox/hooks/useValidatorManagerDetails";
+import { ValidatorManagerDetails } from "@/components/toolbox/components/ValidatorManagerDetails";
+import { useCreateChainStore } from "@/components/toolbox/stores/createChainStore";
+import SelectSafeWallet, { SafeSelection } from "@/components/toolbox/components/SelectSafeWallet";
 
-import { CheckWalletRequirements } from "@/components/CheckWalletRequirements"
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 export default function DeployPoAManager() {
     const [criticalError, setCriticalError] = useState<Error | null>(null);

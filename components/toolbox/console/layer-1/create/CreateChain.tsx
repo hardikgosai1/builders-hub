@@ -1,20 +1,20 @@
 "use client";
 
-import { useCreateChainStore } from "../../../../../toolbox/src/stores/createChainStore";
+import { useCreateChainStore } from "@/components/toolbox/stores/createChainStore";
 import { useState } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Input } from "../../../../../toolbox/src/components/Input";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
-import GenesisBuilder from "../../../../../toolbox/src/toolbox/L1/GenesisBuilder";
+import { Button } from "@/components/toolbox/components/Button";
+import { Input } from "@/components/toolbox/components/Input";
+import { Container } from "@/components/toolbox/components/Container";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import GenesisBuilder from '@/components/toolbox/console/layer-1/create/GenesisBuilder';
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import generateName from 'boring-name-generator'
-import { Success } from "../../../../../toolbox/src/components/Success";
-import { RadioGroup } from "../../../../../toolbox/src/components/RadioGroup";
-import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
-import { SUBNET_EVM_VM_ID } from "../../../../../toolbox/src/toolbox/Nodes/config";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { Success } from "@/components/toolbox/components/Success";
+import { RadioGroup } from "@/components/toolbox/components/RadioGroup";
+import InputSubnetId from "@/components/toolbox/components/InputSubnetId";
+import { SUBNET_EVM_VM_ID } from "@/constants/console";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 const generateRandomName = () => {
     //makes sure the name doesn't contain a dash

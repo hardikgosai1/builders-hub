@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { networkIDs } from "@avalabs/avalanchejs";
-import { getBlockchainInfo, getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier";
-import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
-import BlockchainDetailsDisplay from "../../../../../toolbox/src/components/BlockchainDetailsDisplay";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { RegisterSubnetResponse } from "./types";
+import { getBlockchainInfo, getSubnetInfo } from "@/components/toolbox/coreViem/utils/glacier";
+import InputSubnetId from "@/components/toolbox/components/InputSubnetId";
+import BlockchainDetailsDisplay from "@/components/toolbox/components/BlockchainDetailsDisplay";
+import { Button } from "@/components/toolbox/components/Button";
+import { RegisterSubnetResponse } from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes/types";
 
 interface CreateNodeFormProps {
     onClose: () => void;

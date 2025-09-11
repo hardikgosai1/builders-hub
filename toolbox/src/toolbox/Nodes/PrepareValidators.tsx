@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Button } from "../../components/Button"
+import { Button } from "../../../../components/toolbox/components/Button"
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
 
 const dockerInstallInstructions: Record<string, string> = {

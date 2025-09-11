@@ -16,10 +16,10 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
 import { pathToBreadcrumb } from "./breadcrumbs-mapping";
 import { BuilderHubAccountButton } from "./builder-hub-account-button";
 
-const TestnetMainnetSwitch = dynamic(() => import("@console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
-const WalletPChain = dynamic(() => import("@console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
-const EvmNetworkWallet = dynamic(() => import("@console-header/evm-network-wallet/index").then(m => m.EvmNetworkWallet), { ssr: false });
-const WalletBootstrap = dynamic(() => import("@console-header/wallet-bootstrap").then(m => m.WalletBootstrap), { ssr: false });
+const TestnetMainnetSwitch = dynamic(() => import("@/components/toolbox/components/console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
+const WalletPChain = dynamic(() => import("@/components/toolbox/components/console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
+const EvmNetworkWallet = dynamic(() => import("@/components/toolbox/components/console-header/evm-network-wallet/index").then(m => m.EvmNetworkWallet), { ssr: false });
+const WalletBootstrap = dynamic(() => import("@/components/toolbox/components/console-header/wallet-bootstrap").then(m => m.WalletBootstrap), { ssr: false });
 
 
 

@@ -2,20 +2,20 @@
 
 import { formatEther, parseEther, createPublicClient, http, Chain } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { L1ListItem, useSelectedL1 } from '../../../../../toolbox/src/stores/l1ListStore';
-import { useL1ListStore } from '../../../../../toolbox/src/stores/l1ListStore';
-import { useWalletStore } from '../../../../../toolbox/src/stores/walletStore';
-import { Input } from '../../../../../toolbox/src/components/Input';
-import { Button } from '../../../../../toolbox/src/components/Button';
+import { L1ListItem, useSelectedL1 } from '@/components/toolbox/stores/l1ListStore';
+import { useL1ListStore } from '@/components/toolbox/stores/l1ListStore';
+import { useWalletStore } from '@/components/toolbox/stores/walletStore';
+import { Input } from '@/components/toolbox/components/Input';
+import { Button } from '@/components/toolbox/components/Button';
 import { useState, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 import versions from '@/scripts/versions.json';
-import { Note } from '../../../../../toolbox/src/components/Note';
-import { Container } from '../../../../../toolbox/src/components/Container';
+import { Note } from '@/components/toolbox/components/Note';
+import { Container } from '@/components/toolbox/components/Container';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { CheckWalletRequirements } from '../../../../../toolbox/src/components/CheckWalletRequirements';
-import { WalletRequirementsConfigKey } from '../../../../../toolbox/src/hooks/useWalletRequirements';
+import { CheckWalletRequirements } from '@/components/toolbox/components/CheckWalletRequirements';
+import { WalletRequirementsConfigKey } from '@/components/toolbox/hooks/useWalletRequirements';
 
 
 export default function ICMRelayer() {

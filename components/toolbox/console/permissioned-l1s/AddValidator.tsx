@@ -1,23 +1,23 @@
 "use client"
 import React, { useState, useMemo, useEffect } from 'react';
-import { Container } from '../../../../toolbox/src/components/Container';
-import { Button } from '../../../../toolbox/src/components/Button';
+import { Container } from '@/components/toolbox/components/Container';
+import { Button } from '@/components/toolbox/components/Button';
 import { AlertCircle } from 'lucide-react';
-import SelectSubnetId from '../../../../toolbox/src/components/SelectSubnetId';
-import { ValidatorManagerDetails } from '../../../../toolbox/src/components/ValidatorManagerDetails';
-import { useValidatorManagerDetails } from '../../../../toolbox/src/toolbox/hooks/useValidatorManagerDetails';
+import SelectSubnetId from '@/components/toolbox/components/SelectSubnetId';
+import { ValidatorManagerDetails } from '@/components/toolbox/components/ValidatorManagerDetails';
+import { useValidatorManagerDetails } from '@/components/toolbox/hooks/useValidatorManagerDetails';
 import { Step, Steps } from "fumadocs-ui/components/steps";
-import { Success } from '../../../../toolbox/src/components/Success';
+import { Success } from '@/components/toolbox/components/Success';
 
-import InitiateValidatorRegistration from '../../../../toolbox/src/toolbox/ValidatorManager/AddValidator/InitiateValidatorRegistration';
-import SubmitPChainTxRegisterL1Validator from '../../../../toolbox/src/toolbox/ValidatorManager/AddValidator/SubmitPChainTxRegisterL1Validator';
-import CompleteValidatorRegistration from '../../../../toolbox/src/toolbox/ValidatorManager/AddValidator/CompleteValidatorRegistration';
-import { ValidatorListInput, ConvertToL1Validator } from '../../../../toolbox/src/components/ValidatorListInput';
-import { useCreateChainStore } from '../../../../toolbox/src/stores/createChainStore';
-import { useWalletStore } from '../../../../toolbox/src/stores/walletStore';
-import { getPChainBalance } from '../../../../toolbox/src/coreViem/methods/getPChainbalance';
-import { CheckWalletRequirements } from '../../../../toolbox/src/components/CheckWalletRequirements';
-import { WalletRequirementsConfigKey } from '../../../../toolbox/src/hooks/useWalletRequirements';
+import InitiateValidatorRegistration from '@/components/toolbox/console/permissioned-l1s/AddValidator/InitiateValidatorRegistration';
+import SubmitPChainTxRegisterL1Validator from '@/components/toolbox/console/permissioned-l1s/AddValidator/SubmitPChainTxRegisterL1Validator';
+import CompleteValidatorRegistration from '@/components/toolbox/console/permissioned-l1s/AddValidator/CompleteValidatorRegistration';
+import { ValidatorListInput, ConvertToL1Validator } from '@/components/toolbox/components/ValidatorListInput';
+import { useCreateChainStore } from '@/components/toolbox/stores/createChainStore';
+import { useWalletStore } from '@/components/toolbox/stores/walletStore';
+import { getPChainBalance } from '@/components/toolbox/coreViem/methods/getPChainbalance';
+import { CheckWalletRequirements } from '@/components/toolbox/components/CheckWalletRequirements';
+import { WalletRequirementsConfigKey } from '@/components/toolbox/hooks/useWalletRequirements';
 
 // Helper functions for BigInt serialization
 const serializeValidators = (validators: ConvertToL1Validator[]) => {

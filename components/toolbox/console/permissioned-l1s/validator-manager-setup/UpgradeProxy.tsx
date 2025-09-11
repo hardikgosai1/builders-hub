@@ -1,20 +1,20 @@
 "use client";
 
-import { useWalletStore } from "../../../../../toolbox/src/stores/walletStore";
-import { useViemChainStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { useSelectedL1 } from "../../../../../toolbox/src/stores/l1ListStore";
+import { useWalletStore } from "@/components/toolbox/stores/walletStore";
+import { useViemChainStore } from "@/components/toolbox/stores/toolboxStore";
+import { useSelectedL1 } from "@/components/toolbox/stores/l1ListStore";
 import { useState, useEffect } from "react";
-import { Button } from "../../../../../toolbox/src/components/Button";
-import { Success } from "../../../../../toolbox/src/components/Success";
-import ProxyAdminABI from "../../../../../contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
-import { Container } from "../../../../../toolbox/src/components/Container";
-import { useToolboxStore } from "../../../../../toolbox/src/stores/toolboxStore";
-import { getSubnetInfo } from "../../../../../toolbox/src/coreViem/utils/glacier";
-import { EVMAddressInput } from "../../../../../toolbox/src/components/EVMAddressInput";
-import { Input } from "../../../../../toolbox/src/components/Input";
+import { Button } from "@/components/toolbox/components/Button";
+import { Success } from "@/components/toolbox/components/Success";
+import ProxyAdminABI from "@/contracts/openzeppelin-4.9/compiled/ProxyAdmin.json";
+import { Container } from "@/components/toolbox/components/Container";
+import { useToolboxStore } from "@/components/toolbox/stores/toolboxStore";
+import { getSubnetInfo } from "@/components/toolbox/coreViem/utils/glacier";
+import { EVMAddressInput } from "@/components/toolbox/components/EVMAddressInput";
+import { Input } from "@/components/toolbox/components/Input";
 import { Step, Steps } from "fumadocs-ui/components/steps";
-import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
-import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
+import { CheckWalletRequirements } from "@/components/toolbox/components/CheckWalletRequirements";
+import { WalletRequirementsConfigKey } from "@/components/toolbox/hooks/useWalletRequirements";
 
 // Storage slot with the admin of the proxy (following EIP1967)
 const ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";

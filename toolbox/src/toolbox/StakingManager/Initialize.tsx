@@ -1,17 +1,17 @@
 "use client";
 
-import { useSelectedL1 } from "../../stores/l1ListStore";
-import { useToolboxStore, useViemChainStore } from "../../stores/toolboxStore";
-import { useWalletStore } from "../../stores/walletStore";
+import { useSelectedL1 } from "../../../../components/toolbox/stores/l1ListStore";
+import { useToolboxStore, useViemChainStore } from "../../../../components/toolbox/stores/toolboxStore";
+import { useWalletStore } from "../../../../components/toolbox/stores/walletStore";
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { ResultField } from "../../components/ResultField";
+import { Button } from "../../../../components/toolbox/components/Button";
+import { Input } from "../../../../components/toolbox/components/Input";
+import { ResultField } from "../../../../components/toolbox/components/ResultField";
 import { AbiEvent, Log, parseEther } from 'viem';
 import NativeTokenStakingManagerABI from "../../../../contracts/icm-contracts/compiled/NativeTokenStakingManager.json";
 
-import { Container } from "../../components/Container";
-import { EVMAddressInput } from "../../components/EVMAddressInput";
+import { Container } from "../../../../components/toolbox/components/Container";
+import { EVMAddressInput } from "../../../../components/toolbox/components/EVMAddressInput";
 
 export default function Initialize() {
     const selectedL1 = useSelectedL1()();
