@@ -147,7 +147,7 @@ const RemoveValidatorExpert: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Initiate Validator Removal</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Start the removal process by selecting the validator to remove.
+                Start the removal process by selecting the validator to remove and calling the initiateValidatorRemoval function on the Validator Manager contract. This transaction will emit a L1ValidatorWeightMessage event.
               </p>
               <InitiateValidatorRemoval
                 subnetId={subnetIdL1}
@@ -168,9 +168,9 @@ const RemoveValidatorExpert: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign Warp Message & Submit to P-Chain</h2>
+              <h2 className="text-lg font-semibold">Sign L1ValidatorWeightMessage & Submit SetL1ValidatorWeightTx P-Chain</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Sign the warp message and submit the removal transaction to the P-Chain.
+                Sign the L1ValidatorWeightMessage and submit the SetL1ValidatorWeightTx to the P-Chain. This transaction will emit a L1ValidatorRegistrationMessage event.
               </p>
               <SubmitPChainTxRemoval
                 key={`submit-pchain-${resetKey}`}
@@ -186,9 +186,9 @@ const RemoveValidatorExpert: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign P-Chain Warp Message & Complete Removal</h2>
+              <h2 className="text-lg font-semibold">Sign P-Chain L1ValidatorRegistrationMessage & Submit completeValidatorRemoval on Validator Manager contract</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Complete the validator removal by signing the P-Chain warp message.
+                Complete the validator removal by signing the P-Chain L1ValidatorRegistrationMessage and calling the completeValidatorRemoval function on the Validator Manager contract.
               </p>
               <CompleteValidatorRemoval
                 key={`complete-removal-${resetKey}`}

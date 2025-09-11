@@ -326,10 +326,10 @@ const SubmitPChainTxRemoval: React.FC<SubmitPChainTxRemovalProps> = ({
   return (
     <div className="space-y-4">
       <Input
-        label="EVM Transaction Hash"
+        label="initiateValidatorRemoval Transaction Hash"
         value={evmTxHash}
         onChange={handleTxHashChange}
-        placeholder="Enter the transaction hash from step 1 (0x...)"
+        placeholder="Enter the transaction hash from step 2 (0x...)"
         disabled={isProcessing || txSuccess !== null}
       />
 

@@ -145,7 +145,7 @@ const ChangeWeightStateless: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Initiate Weight Change</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Start the weight change process by specifying the validator and new weight.
+                Start the weight change process by specifying the validator and new weight and calling the initiateValidatorWeightUpdate function on the Validator Manager contract. This transaction will emit an L1ValidatorWeightMessage event.
               </p>
               <InitiateChangeWeight
                 subnetId={subnetIdL1}
@@ -169,9 +169,9 @@ const ChangeWeightStateless: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign Warp Message & Submit to P-Chain</h2>
+              <h2 className="text-lg font-semibold">Sign L1ValidatorWeightMessage & Submit SetL1ValidatorWeightTx to P-Chain</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Sign the warp message and submit the transaction to the P-Chain.
+                Sign the L1ValidatorWeightMessage and submit a SetL1ValidatorWeightTx to the P-Chain.
               </p>
               <SubmitPChainTxChangeWeight
                 key={`submit-pchain-${resetKey}`}
@@ -187,9 +187,9 @@ const ChangeWeightStateless: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign P-Chain Warp Message & Complete Weight Change</h2>
+              <h2 className="text-lg font-semibold">Sign P-Chain L1ValidatorWeightMessage & Submit completeValidatorWeightUpdate on Validator Manager contract</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Complete the weight change by signing the P-Chain warp message.
+                Complete the weight change by signing the P-Chain L1ValidatorWeightMessage and calling the completeValidatorWeightUpdate function on the Validator Manager contract.
               </p>
               <CompleteChangeWeight
                 key={`complete-change-${resetKey}`}

@@ -241,7 +241,7 @@ const AddValidatorExpert: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Initiate Validator Registration</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Submit the validator registration transaction to the blockchain.
+                Call the initiateValidatorRegistration function on the Validator Manager contract. This transaction will emit a RegisterL1ValidatorMessage event.
               </p>
 
               <InitiateValidatorRegistration
@@ -263,9 +263,9 @@ const AddValidatorExpert: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign Warp Message & Submit to P-Chain</h2>
+              <h2 className="text-lg font-semibold">Sign RegisterL1ValidatorMessage & Submit RegisterL1ValidatorTx to P-Chain</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Sign the warp message and submit the validator registration to the P-Chain.
+                Sign the emitted RegisterL1ValidatorMessage and submit a RegisterL1ValidatorTx to P-Chain. This transaction will emit a L1ValidatorRegistrationMessage event.
               </p>
               <SubmitPChainTxRegisterL1Validator
                 key={`submit-pchain-${resetKey}`}
@@ -283,9 +283,9 @@ const AddValidatorExpert: React.FC = () => {
             </Step>
 
             <Step>
-              <h2 className="text-lg font-semibold">Sign P-Chain Warp Message & Complete Registration</h2>
+              <h2 className="text-lg font-semibold">Sign L1ValidatorRegistrationMessage & Submit completeValidatorRegistration on Validator Manager contract</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Complete the validator registration by signing the P-Chain warp message.
+                Complete the validator registration by signing the P-Chain L1ValidatorRegistrationMessage and calling the completeValidatorRegistration function on the Validator Manager contract.
               </p>
               <CompleteValidatorRegistration
                 key={`complete-registration-${resetKey}`}

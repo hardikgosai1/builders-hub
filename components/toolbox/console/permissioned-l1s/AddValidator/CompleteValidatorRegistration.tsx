@@ -238,7 +238,7 @@ const CompleteValidatorRegistration: React.FC<CompleteValidatorRegistrationProps
         label="P-Chain Transaction ID"
         value={pChainTxIdState}
         onChange={setPChainTxId}
-        placeholder="Enter the P-Chain transaction ID from step 2"
+        placeholder="Enter the P-Chain transaction ID from step 4"
         disabled={isProcessing}
       />
 
@@ -247,33 +247,6 @@ const CompleteValidatorRegistration: React.FC<CompleteValidatorRegistrationProps
           Checking contract ownership...
         </div>
       )}
-
-      <div className="text-sm text-zinc-600 dark:text-zinc-400">
-        <p><strong>Target Contract:</strong> {useMultisig ? 'PoAManager' : 'ValidatorManager'}</p>
-        <p><strong>Contract Address:</strong> {targetContractAddress || 'Not set'}</p>
-        {ownershipState !== 'loading' && (
-          <p><strong>Contract Owner:</strong> {
-            ownershipState === 'currentWallet' ? 'You are the owner' :
-              ownershipState === 'contract' ? `Owned by ${ownerType || 'contract'}` :
-                'You are not the owner'
-          }</p>
-        )}
-        {extractedData && (
-          <div className="mt-2 space-y-1">
-            <p><strong>Subnet ID:</strong> {extractedData.subnetID}</p>
-            <p><strong>Node ID:</strong> {extractedData.nodeID}</p>
-            <p><strong>BLS Public Key:</strong> {extractedData.blsPublicKey.substring(0, 50)}...</p>
-            <p><strong>Expiry:</strong> {extractedData.expiry.toString()}</p>
-            <p><strong>Weight:</strong> {extractedData.weight.toString()}</p>
-            {extractedData.validationId && (
-              <p><strong>Validation ID:</strong> {extractedData.validationId}</p>
-            )}
-          </div>
-        )}
-        {pChainSignature && (
-          <p className="mt-2"><strong>P-Chain Signature:</strong> {pChainSignature.substring(0, 50)}...</p>
-        )}
-      </div>
 
       <Button
         onClick={handleCompleteRegisterValidator}

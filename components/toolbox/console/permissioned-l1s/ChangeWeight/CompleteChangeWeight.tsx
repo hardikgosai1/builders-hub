@@ -206,7 +206,7 @@ const CompleteChangeWeight: React.FC<CompleteChangeWeightProps> = ({
         label="P-Chain Transaction ID"
         value={pChainTxId}
         onChange={setPChainTxId}
-        placeholder="Enter the P-Chain transaction ID from step 2"
+        placeholder="Enter the P-Chain transaction ID from step 3"
         disabled={isProcessing}
       />
 
@@ -215,26 +215,6 @@ const CompleteChangeWeight: React.FC<CompleteChangeWeightProps> = ({
           Checking contract ownership...
         </div>
       )}
-
-      <div className="text-sm text-zinc-600 dark:text-zinc-400">
-        <p><strong>Target Contract:</strong> {useMultisig ? 'PoAManager' : 'ValidatorManager'}</p>
-        <p><strong>Contract Address:</strong> {targetContractAddress || 'Not set'}</p>
-        <p><strong>Contract Owner:</strong> {
-          isContractOwner === true ? 'You are the owner' :
-            isContractOwner === false ? `Owned by ${ownerType || 'contract'}` :
-              'Checking...'
-        }</p>
-        {extractedData && (
-          <div className="mt-2 space-y-1">
-            <p><strong>Validation ID:</strong> {extractedData.validationID}</p>
-            <p><strong>Nonce:</strong> {extractedData.nonce.toString()}</p>
-            <p><strong>New Weight:</strong> {extractedData.weight.toString()}</p>
-          </div>
-        )}
-        {pChainSignature && (
-          <p className="mt-2"><strong>P-Chain Signature:</strong> {pChainSignature.substring(0, 50)}...</p>
-        )}
-      </div>
 
       <Button
         onClick={handleCompleteChangeWeight}
