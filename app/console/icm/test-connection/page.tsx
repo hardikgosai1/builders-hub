@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
 import DeployICMDemo from "../../../../components/toolbox/console/icm/test-connection/DeployICMDemo";
 import SendICMMessage from "../../../../components/toolbox/console/icm/test-connection/SendICMMessage";
 
-export default function Page() {
+function ICMTestConnectionFlow() {
   const steps: StepDefinition[] = [
     {
       type: "single",
@@ -23,6 +24,14 @@ export default function Page() {
 
   return (
     <StepFlow steps={steps} />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ICMTestConnectionFlow />
+    </Suspense>
   );
 }
 

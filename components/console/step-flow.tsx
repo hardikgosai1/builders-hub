@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 type SingleStep = {
   type: "single";
@@ -43,6 +44,10 @@ export default function StepFlow({
   initialBranchSelections,
   onFinish,
 }: StepFlowProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const [currentIndex, setCurrentIndex] = useState<number>(initialStepIndex);
   const [branchSelections, setBranchSelections] = useState<Record<string, string>>(
     () => {
@@ -57,6 +62,66 @@ export default function StepFlow({
       return defaults;
     }
   );
+
+  // Handle URL-based step navigation
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      // Find the step by key
+      const stepIndex = steps.findIndex(step => {
+        if (step.type === 'single') {
+          return step.key === stepParam;
+        } else {
+          // For branch steps, check if the param matches any option
+          const [branchKey, optionKey] = stepParam.includes(':') 
+            ? stepParam.split(':') 
+            : [step.key, stepParam];
+          
+          if (step.key === branchKey) {
+            // If we have a specific option, select it
+            if (optionKey && step.options.some(opt => opt.key === optionKey)) {
+              setBranchSelections(prev => ({ ...prev, [step.key]: optionKey }));
+            }
+            return true;
+          }
+          
+          // Also check if stepParam matches any option key directly
+          return step.options.some(opt => opt.key === stepParam);
+        }
+      });
+      
+      if (stepIndex !== -1) {
+        setCurrentIndex(stepIndex);
+        
+        // For branch steps, also set the selection if specified
+        const step = steps[stepIndex];
+        if (step.type === 'branch' && stepParam.includes(':')) {
+          const [, optionKey] = stepParam.split(':');
+          if (step.options.some(opt => opt.key === optionKey)) {
+            setBranchSelections(prev => ({ ...prev, [step.key]: optionKey }));
+          }
+        }
+      }
+    }
+  }, [searchParams, steps]);
+
+  // Update URL when step changes
+  const updateURL = (stepIndex: number, branchKey?: string, optionKey?: string) => {
+    const step = steps[stepIndex];
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (step.type === 'single') {
+      params.set('step', step.key);
+    } else if (branchKey && optionKey) {
+      // For branch steps, include both the branch key and option key
+      params.set('step', `${branchKey}:${optionKey}`);
+    } else {
+      // Default to just the step key
+      params.set('step', step.key);
+    }
+    
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const totalSteps = steps.length;
   const atFirst = currentIndex <= 0;
@@ -111,16 +176,28 @@ export default function StepFlow({
       onFinish?.();
       return;
     }
-    setCurrentIndex((i) => Math.min(i + 1, totalSteps - 1));
+    const nextIndex = Math.min(currentIndex + 1, totalSteps - 1);
+    setCurrentIndex(nextIndex);
+    updateURL(nextIndex);
   };
 
   const goPrev = () => {
-    setCurrentIndex((i) => Math.max(i - 1, 0));
+    const prevIndex = Math.max(currentIndex - 1, 0);
+    setCurrentIndex(prevIndex);
+    updateURL(prevIndex);
   };
 
   const skipStep = () => {
     if (!("optional" in currentStep) || !currentStep.optional) return;
     goNext();
+  };
+
+  const navigateToStep = (stepIdx: number, branchKey?: string, optionKey?: string) => {
+    setCurrentIndex(stepIdx);
+    if (branchKey && optionKey) {
+      setBranchSelections(prev => ({ ...prev, [branchKey]: optionKey }));
+    }
+    updateURL(stepIdx, branchKey, optionKey);
   };
 
   return (
@@ -135,7 +212,7 @@ export default function StepFlow({
                 {s.type === "single" ? (
                   <button
                     type="button"
-                    onClick={() => setCurrentIndex(stepIdx)}
+                    onClick={() => navigateToStep(stepIdx)}
                     className={[
                       "inline-flex items-center gap-2 rounded-md px-3 py-1.5 border",
                       isActiveStep
@@ -170,10 +247,7 @@ export default function StepFlow({
                         <React.Fragment key={`${s.key}:${opt.key}`}>
                           <button
                             type="button"
-                            onClick={() => {
-                              setCurrentIndex(stepIdx);
-                              setBranchSelections((prev) => ({ ...prev, [s.key]: opt.key }));
-                            }}
+                            onClick={() => navigateToStep(stepIdx, s.key, opt.key)}
                             className={[
                               "inline-flex items-center gap-2 rounded-md px-3 py-1.5 border",
                               isActive

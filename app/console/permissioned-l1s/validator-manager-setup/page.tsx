@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
 import DeployProxyContract from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployProxyContract";
@@ -9,7 +10,7 @@ import Initialize from "../../../../components/toolbox/console/permissioned-l1s/
 import InitValidatorSet from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/InitValidatorSet";
 import ReadContract from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/ReadContract";
 
-export default function Page() {
+function ValidatorManagerSetupFlow() {
   const steps: StepDefinition[] = [
     { type: "single", key: "deploy-validator-manager", title: "Deploy Validator Manager", component: DeployValidatorManager },
     { type: "single", key: "deploy-proxy", title: "Deploy Proxy", component: DeployProxyContract },
@@ -21,6 +22,14 @@ export default function Page() {
 
   return (
     <StepFlow steps={steps} />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ValidatorManagerSetupFlow />
+    </Suspense>
   );
 }
 

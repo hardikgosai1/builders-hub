@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
 import DeployExampleERC20 from "../../../../components/toolbox/console/ictt/setup/DeployExampleERC20";
@@ -10,7 +11,7 @@ import RegisterWithHome from "../../../../components/toolbox/console/ictt/setup/
 import AddCollateral from "../../../../components/toolbox/console/ictt/setup/AddCollateral";
 import DeployWrappedNative from "@/components/toolbox/console/ictt/setup/DeployWrappedNative";
 
-export default function Page() {
+function ICTTSetupFlow() {
   const steps: StepDefinition[] = [
     {
       type: "branch",
@@ -53,6 +54,14 @@ export default function Page() {
 
   return (
     <StepFlow steps={steps} />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ICTTSetupFlow />
+    </Suspense>
   );
 }
 

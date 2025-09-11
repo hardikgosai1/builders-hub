@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import StepFlow, { type StepDefinition } from "@/components/console/step-flow";
 import CreateChain from "@/components/toolbox/console/layer-1/create/CreateChain";
 import AvalancheGoDockerL1 from "@/components/toolbox/console/layer-1/AvalancheGoDockerL1";
 import ConvertToL1 from "@/components/toolbox/console/layer-1/create/ConvertToL1";
 import ManagedTestnetNodes from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes";
 
-export default function Page() {
+function CreateLayer1Flow() {
   const steps: StepDefinition[] = [
     {
       type: "single",
@@ -36,5 +37,13 @@ export default function Page() {
 
   return (
     <StepFlow steps={steps} />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateLayer1Flow />
+    </Suspense>
   );
 }

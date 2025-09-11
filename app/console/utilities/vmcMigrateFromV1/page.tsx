@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 import DeployValidatorManager from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
 import UpgradeProxy from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/UpgradeProxy";
 import QueryL1ValidatorSet from "@/components/toolbox/console/permissioned-l1s/QueryL1ValidatorSet";
 import MigrateV1ToV2 from "@/components/toolbox/console/utilities/vmcMigrateFromV1/MigrateV1ToV2";
 
-export default function Page() {
+function VMCMigrateFlow() {
   const steps: StepDefinition[] = [
     {
       type: "single",
@@ -40,5 +41,13 @@ export default function Page() {
 
   return (
     <StepFlow steps={steps} />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VMCMigrateFlow />
+    </Suspense>
   );
 }
