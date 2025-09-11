@@ -43,13 +43,13 @@ import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
 import CreateChain from "@/components/console/tools/layer-1/create/CreateChain"
 import ConvertToL1 from "@/components/console/tools/layer-1/create/ConvertToL1"
 import GenesisBuilder from '@/toolbox/src/toolbox/L1/GenesisBuilder';
-import DeployExampleERC20 from '@/toolbox/src/toolbox/ICTT/DeployExampleERC20';
-import DeployTokenHome from '@/toolbox/src/toolbox/ICTT/DeployTokenHome';
-import DeployERC20TokenRemote from '@/toolbox/src/toolbox/ICTT/DeployERC20TokenRemote';
-import RegisterWithHome from '@/toolbox/src/toolbox/ICTT/RegisterWithHome';
-import TestSend from '@/toolbox/src/toolbox/ICTT/TestSend';
-import TeleporterRegistry from '@/toolbox/src/toolbox/ICM/TeleporterRegistry';
-import ICMRelayer from '@/toolbox/src/toolbox/ICM/ICMRelayer';
+import DeployExampleERC20 from '@/components/console/tools/ictt/setup/DeployExampleERC20';
+import DeployTokenHome from '@/components/console/tools/ictt/setup/DeployTokenHome';
+import DeployERC20TokenRemote from '@/components/console/tools/ictt/setup/DeployERC20TokenRemote';
+import RegisterWithHome from '@/components/console/tools/ictt/setup/RegisterWithHome';
+import TestSend from '@/components/console/tools/ictt/token-transfer/TestSend';
+import TeleporterRegistry from '@/components/console/tools/icm/setup/TeleporterRegistry';
+import ICMRelayer from '@/components/console/tools/icm/setup/ICMRelayer';
 import Faucet from '@/components/console/tools/primary-network/Faucet';
 
 export const dynamicParams = false;

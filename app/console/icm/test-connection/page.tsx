@@ -1,10 +1,9 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
 
-import DeployICMDemo from "../../../../toolbox/src/toolbox/ICM/DeployICMDemo";
-import SendICMMessage from "../../../../toolbox/src/toolbox/ICM/SendICMMessage";
+import DeployICMDemo from "../../../../components/console/tools/icm/test-connection/DeployICMDemo";
+import SendICMMessage from "../../../../components/console/tools/icm/test-connection/SendICMMessage";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -23,9 +22,7 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }
 

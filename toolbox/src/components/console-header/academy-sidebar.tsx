@@ -162,12 +162,12 @@ const data = {
       items: [
         {
           title: "Contract Deployer Allowlist",
-          url: "/console/permissioned-l1s/deployer-allowlist",
+          url: "/console/l1-access-restrictions/deployer-allowlist",
           icon: ShieldCheck,
         },
         {
           title: "Transactor Allowlist",
-          url: "/console/permissioned-l1s/transactor-allowlist",
+          url: "/console/l1-access-restrictions/transactor-allowlist",
           icon: ShieldUser,
         },
       ],
@@ -237,7 +237,7 @@ const data = {
   navSecondary: [],
 };
 
-interface AcademySidebarProps extends React.ComponentProps<typeof Sidebar> {}
+interface AcademySidebarProps extends React.ComponentProps<typeof Sidebar> { }
 
 export function AcademySidebar({ ...props }: AcademySidebarProps) {
   const pathname = usePathname();
@@ -295,9 +295,8 @@ export function AcademySidebar({ ...props }: AcademySidebarProps) {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
-                        className={`${
-                          isComingSoon ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
+                        className={`${isComingSoon ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
                         disabled={isComingSoon}
                       >
                         {isComingSoon ? (

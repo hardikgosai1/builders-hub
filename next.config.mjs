@@ -256,6 +256,16 @@ const config = {
         destination: "/academy/permissioned-l1s",
         permanent: true,
       },
+      {
+        source: "/console/permissioned-l1s/transactor-allowlist",
+        destination: "/console/l1-access-restrictions/transactor-allowlist",
+        permanent: true,
+      },
+      {
+        source: "/console/permissioned-l1s/deployer-allowlist",
+        destination: "/console/l1-access-restrictions/deployer-allowlist",
+        permanent: true,
+      },
     ];
   },
 };

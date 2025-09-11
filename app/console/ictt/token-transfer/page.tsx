@@ -3,8 +3,8 @@
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
 
-import AddCollateral from "../../../../toolbox/src/toolbox/ICTT/AddCollateral";
-import TestSend from "../../../../toolbox/src/toolbox/ICTT/TestSend";
+import AddCollateral from "../../../../components/console/tools/ictt/setup/AddCollateral";
+import TestSend from "../../../../components/console/tools/ictt/token-transfer/TestSend";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -14,7 +14,7 @@ export default function Page() {
 
   return (
     <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
+      <StepFlow steps={steps} />
     </ToolboxConsoleWrapper>
   );
 }

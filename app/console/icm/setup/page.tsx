@@ -1,11 +1,10 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
 
-import TeleporterMessenger from "../../../../toolbox/src/toolbox/ICM/TeleporterMessenger";
-import TeleporterRegistry from "../../../../toolbox/src/toolbox/ICM/TeleporterRegistry";
-import ICMRelayer from "../../../../toolbox/src/toolbox/ICM/ICMRelayer";
+import TeleporterMessenger from "../../../../components/console/tools/icm/setup/TeleporterMessenger";
+import TeleporterRegistry from "../../../../components/console/tools/icm/setup/TeleporterRegistry";
+import ICMRelayer from "../../../../components/console/tools/icm/setup/ICMRelayer";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -30,9 +29,7 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }
 

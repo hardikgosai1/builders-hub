@@ -206,12 +206,12 @@ const data = {
       items: [
         {
           title: "Contract Deployer Allowlist",
-          url: "/console/permissioned-l1s/deployer-allowlist",
+          url: "/console/l1-access-restrictions/deployer-allowlist",
           icon: ShieldCheck,
         },
         {
           title: "Transactor Allowlist",
-          url: "/console/permissioned-l1s/transactor-allowlist",
+          url: "/console/l1-access-restrictions/transactor-allowlist",
           icon: ShieldUser,
         },
       ],

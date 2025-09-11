@@ -1,12 +1,11 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
 
-import DeployPoAManager from "../../../../toolbox/src/toolbox/ValidatorManager/DeployPoAManager";
-import TransferOwnership from "../../../../toolbox/src/toolbox/StakingManager/TransferOwnership";
+import DeployPoAManager from "../../../../components/console/tools/permissioned-l1s/multisig-setup/DeployPoAManager";
+import TransferOwnership from "../../../../components/console/tools/permissioned-l1s/multisig-setup/TransferOwnership";
 
-import ReadContract from "@/toolbox/src/toolbox/ValidatorManager/ReadContract";
+import ReadContract from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/ReadContract";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -16,9 +15,7 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }
 
