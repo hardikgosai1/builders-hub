@@ -268,7 +268,7 @@ const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1Valida
         label="initiateValidatorRegistration Transaction Hash"
         value={evmTxHashState}
         onChange={handleTxHashChange}
-        placeholder="Enter the transaction hash from step 3 (0x...)"
+        placeholder="Enter the initiateValidatorRegistration transaction hash from step 3 (0x...)"
         disabled={isProcessing || txSuccess !== null}
         error={evmTxHashError}
       />

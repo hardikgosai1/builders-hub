@@ -170,7 +170,7 @@ const RemoveValidatorExpert: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Sign L1ValidatorWeightMessage & Submit SetL1ValidatorWeightTx P-Chain</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Sign the L1ValidatorWeightMessage and submit the SetL1ValidatorWeightTx to the P-Chain. This transaction will emit a L1ValidatorRegistrationMessage event.
+                Sign the L1ValidatorWeightMessage and submit the SetL1ValidatorWeightTx to the P-Chain. This transaction will emit a L1ValidatorRegistrationMessage warp message.
               </p>
               <SubmitPChainTxRemoval
                 key={`submit-pchain-${resetKey}`}

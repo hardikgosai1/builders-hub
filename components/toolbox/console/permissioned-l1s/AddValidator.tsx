@@ -241,7 +241,7 @@ const AddValidatorExpert: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Initiate Validator Registration</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Call the initiateValidatorRegistration function on the Validator Manager contract. This transaction will emit a RegisterL1ValidatorMessage event.
+                Call the initiateValidatorRegistration function on the Validator Manager contract. This transaction will emit a RegisterL1ValidatorMessage warp message.
               </p>
 
               <InitiateValidatorRegistration

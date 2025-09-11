@@ -206,7 +206,7 @@ const CompleteChangeWeight: React.FC<CompleteChangeWeightProps> = ({
         label="P-Chain Transaction ID"
         value={pChainTxId}
         onChange={setPChainTxId}
-        placeholder="Enter the P-Chain transaction ID from step 3"
+        placeholder="Enter the P-Chain RegisterL1ValidatorTx ID from step 3"
         disabled={isProcessing}
       />
 

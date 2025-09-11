@@ -207,7 +207,7 @@ const CompleteValidatorRemoval: React.FC<CompleteValidatorRemovalProps> = ({
         label="P-Chain Transaction ID"
         value={pChainTxId}
         onChange={setPChainTxId}
-        placeholder="Enter the P-Chain transaction ID from step 3"
+        placeholder="Enter the P-Chain SetL1ValidatorWeightTx ID from step 3"
         disabled={isProcessing}
       />
 

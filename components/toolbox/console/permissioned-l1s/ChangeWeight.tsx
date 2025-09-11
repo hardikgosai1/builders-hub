@@ -145,7 +145,7 @@ const ChangeWeightStateless: React.FC = () => {
             <Step>
               <h2 className="text-lg font-semibold">Initiate Weight Change</h2>
               <p className="text-sm text-gray-500 mb-4">
-                Start the weight change process by specifying the validator and new weight and calling the initiateValidatorWeightUpdate function on the Validator Manager contract. This transaction will emit an L1ValidatorWeightMessage event.
+                Start the weight change process by specifying the validator and new weight and calling the initiateValidatorWeightUpdate function on the Validator Manager contract. This transaction will emit an L1ValidatorWeightMessage warp message.
               </p>
               <InitiateChangeWeight
                 subnetId={subnetIdL1}

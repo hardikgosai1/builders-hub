@@ -329,18 +329,10 @@ const SubmitPChainTxRemoval: React.FC<SubmitPChainTxRemovalProps> = ({
         label="initiateValidatorRemoval Transaction Hash"
         value={evmTxHash}
         onChange={handleTxHashChange}
-        placeholder="Enter the transaction hash from step 2 (0x...)"
+        placeholder="Enter the initiateValidatorRemoval transaction hash from step 2 (0x...)"
         disabled={isProcessing || txSuccess !== null}
       />
 
-      {unsignedWarpMessage && (
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          <p><strong>Unsigned Warp Message:</strong> {unsignedWarpMessage.substring(0, 50)}...</p>
-          {signedWarpMessage && (
-            <p><strong>Signed Warp Message:</strong> {signedWarpMessage.substring(0, 50)}...</p>
-          )}
-        </div>
-      )}
       <Button
         onClick={handleSubmitPChainTx}
         disabled={isProcessing || !evmTxHash.trim() || !unsignedWarpMessage || !eventData || txSuccess !== null}

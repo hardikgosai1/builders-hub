@@ -256,7 +256,7 @@ const SubmitPChainTxChangeWeight: React.FC<SubmitPChainTxChangeWeightProps> = ({
         label="initiateValidatorWeightUpdate Transaction Hash"
         value={evmTxHash}
         onChange={handleTxHashChange}
-        placeholder="Enter the transaction hash from step 2 (0x...)"
+        placeholder="Enter the initiateValidatorWeightUpdate transaction hash from step 2 (0x...)"
         disabled={isProcessing || txSuccess !== null}
       />
 
