@@ -10,8 +10,6 @@ import { Success } from '@/components/toolbox/components/Success';
 import { parseNodeID } from '@/components/toolbox/coreViem/utils/ids';
 import { fromBytes } from 'viem';
 import { utils } from '@avalabs/avalanchejs';
-import { formatAvaxBalance } from '@/components/toolbox/coreViem/utils/format';
-import { getPChainBalance } from '@/components/toolbox/coreViem/methods/getPChainbalance';
 import { MultisigOption } from '@/components/toolbox/components/MultisigOption';
 import { getValidationIdHex } from '@/components/toolbox/coreViem/hooks/getValidationID';
 
@@ -43,30 +41,13 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   ownershipState,
   contractTotalWeight,
 }) => {
-  const { coreWalletClient, publicClient, pChainAddress } = useWalletStore();
+  const { coreWalletClient, publicClient } = useWalletStore();
   const viemChain = useViemChainStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setErrorState] = useState<string | null>(null);
   const [txSuccess, setTxSuccess] = useState<string | null>(null);
-  const [balance, setBalance] = useState("0");
 
-  // Fetch P-Chain balance when component mounts
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!pChainAddress || !coreWalletClient) return;
-
-      try {
-        const balanceValue = await getPChainBalance(coreWalletClient);
-        const formattedBalance = formatAvaxBalance(balanceValue);
-        setBalance(formattedBalance);
-      } catch (balanceError) {
-        console.error("Error fetching balance:", balanceError);
-      }
-    };
-
-    fetchBalance();
-  }, [pChainAddress, coreWalletClient]);
 
   const validateInputs = (): boolean => {
     if (validators.length === 0) {
@@ -81,18 +62,6 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     }
 
     const validator = validators[0];
-
-    // Skip balance check if we couldn't fetch the balance
-    if (balance) {
-      // Extract numerical value from balance string (remove " AVAX" and commas)
-      const balanceValue = parseFloat(balance.replace(" AVAX", "").replace(/,/g, ""));
-      const requiredBalance = Number(validator.validatorBalance) / 1000000000;
-
-      if (balanceValue < requiredBalance) {
-        setErrorState(`Insufficient P-Chain balance. You need at least ${requiredBalance.toFixed(2)} AVAX.`);
-        return false;
-      }
-    }
 
     // Use contract total weight for validation if available
     if (contractTotalWeight > 0n) {
@@ -144,21 +113,28 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
       const validator = validators[0];
       const [account] = await coreWalletClient.requestAddresses();
 
-      // Process P-Chain Address
-      const pChainAddressBytes = utils.bech32ToBytes(pChainAddress!);
-      const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
+      // Process P-Chain Addresses
+      const pChainRemainingBalanceOwnerAddressesHex = validator.remainingBalanceOwner.addresses.map(address => {
+        const addressBytes = utils.bech32ToBytes(address);
+        return fromBytes(addressBytes, "hex");
+      });
+
+      const pChainDisableOwnerAddressesHex = validator.deactivationOwner.addresses.map(address => {
+        const addressBytes = utils.bech32ToBytes(address);
+        return fromBytes(addressBytes, "hex");
+      });
 
       // Build arguments for transaction
       const args = [
         parseNodeID(validator.nodeID),
         validator.nodePOP.publicKey,
         {
-          threshold: 1,
-          addresses: [pChainAddressHex],
+          threshold: validator.remainingBalanceOwner.addresses.length,
+          addresses: pChainRemainingBalanceOwnerAddressesHex,
         },
         {
-          threshold: 1,
-          addresses: [pChainAddressHex],
+          threshold: validator.deactivationOwner.addresses.length,
+          addresses: pChainDisableOwnerAddressesHex,
         },
         validator.validatorWeight
       ];
@@ -323,22 +299,25 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
 
   // Prepare args for multisig
   const getMultisigArgs = () => {
-    if (validators.length === 0 || !pChainAddress) return [];
+    if (validators.length === 0) return [];
 
     const validator = validators[0];
-    const pChainAddressBytes = utils.bech32ToBytes(pChainAddress);
-    const pChainAddressHex = fromBytes(pChainAddressBytes, "hex");
+    const pChainRemainingBalanceOwnerAddressBytes = utils.bech32ToBytes(validator.remainingBalanceOwner.addresses[0]);
+    const pChainRemainingBalanceOwnerAddressHex = fromBytes(pChainRemainingBalanceOwnerAddressBytes, "hex");
+
+    const pChainDisableOwnerAddressBytes = utils.bech32ToBytes(validator.deactivationOwner.addresses[0]);
+    const pChainDisableOwnerAddressHex = fromBytes(pChainDisableOwnerAddressBytes, "hex");
 
     return [
       parseNodeID(validator.nodeID),
       validator.nodePOP.publicKey,
       {
         threshold: 1,
-        addresses: [pChainAddressHex],
+        addresses: [pChainRemainingBalanceOwnerAddressHex],
       },
       {
         threshold: 1,
-        addresses: [pChainAddressHex],
+        addresses: [pChainDisableOwnerAddressHex],
       },
       validator.validatorWeight
     ];

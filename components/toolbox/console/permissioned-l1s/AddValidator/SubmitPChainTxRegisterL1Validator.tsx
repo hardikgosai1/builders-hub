@@ -9,6 +9,7 @@ import { useAvaCloudSDK } from '@/components/toolbox/stores/useAvaCloudSDK';
 interface SubmitPChainTxRegisterL1ValidatorProps {
   subnetIdL1: string;
   validatorBalance?: string;
+  userPChainBalanceNavax?: bigint | null;
   blsProofOfPossession?: string;
   evmTxHash?: string;
   signingSubnetId: string;
@@ -19,6 +20,7 @@ interface SubmitPChainTxRegisterL1ValidatorProps {
 const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1ValidatorProps> = ({
   subnetIdL1,
   validatorBalance,
+  userPChainBalanceNavax,
   blsProofOfPossession,
   evmTxHash,
   signingSubnetId,
@@ -262,13 +264,14 @@ const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1Valida
     );
   }
 
+
   return (
     <div className="space-y-4">
       <Input
-        label="EVM Transaction Hash"
+        label="initiateValidatorRegistration Transaction Hash"
         value={evmTxHashState}
         onChange={handleTxHashChange}
-        placeholder="Enter the transaction hash from step 2 (0x...)"
+        placeholder="Enter the initiateValidatorRegistration transaction hash from step 3 (0x...)"
         disabled={isProcessing || txSuccess !== null}
         error={evmTxHashError}
       />
@@ -277,25 +280,21 @@ const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1Valida
       {(validatorBalance || blsProofOfPossession) && (
         <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700">
           <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
-            Validator Details (from previous steps)
+            Validator Details (collected from step 2)
           </h3>
           <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
             {validatorBalance && (
               <p><span className="font-medium">Initial AVAX Balance:</span> {validatorBalance} AVAX</p>
             )}
+            {userPChainBalanceNavax && validatorBalance && BigInt(Number(validatorBalance) * 1e9) > userPChainBalanceNavax && (
+              <p className="text-xs mt-1 text-red-500 dark:text-red-400">
+                Validator balance ({validatorBalance} AVAX) exceeds your P-Chain balance ({(Number(userPChainBalanceNavax) / 1e9).toFixed(2)} AVAX).
+              </p>
+            )}
             {blsProofOfPossession && (
               <p><span className="font-medium">BLS Proof of Possession:</span> {blsProofOfPossession.substring(0, 50)}...</p>
             )}
           </div>
-        </div>
-      )}
-
-      {unsignedWarpMessage && (
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          <p><strong>Unsigned Warp Message:</strong> {unsignedWarpMessage.substring(0, 50)}...</p>
-          {signedWarpMessage && (
-            <p><strong>Signed Warp Message:</strong> {signedWarpMessage.substring(0, 50)}...</p>
-          )}
         </div>
       )}
 
