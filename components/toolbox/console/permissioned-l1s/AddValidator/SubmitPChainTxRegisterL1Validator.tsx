@@ -9,6 +9,7 @@ import { useAvaCloudSDK } from '@/components/toolbox/stores/useAvaCloudSDK';
 interface SubmitPChainTxRegisterL1ValidatorProps {
   subnetIdL1: string;
   validatorBalance?: string;
+  userPChainBalanceNavax?: bigint | null;
   blsProofOfPossession?: string;
   evmTxHash?: string;
   signingSubnetId: string;
@@ -19,6 +20,7 @@ interface SubmitPChainTxRegisterL1ValidatorProps {
 const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1ValidatorProps> = ({
   subnetIdL1,
   validatorBalance,
+  userPChainBalanceNavax,
   blsProofOfPossession,
   evmTxHash,
   signingSubnetId,
@@ -262,6 +264,7 @@ const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1Valida
     );
   }
 
+
   return (
     <div className="space-y-4">
       <Input
@@ -282,6 +285,11 @@ const SubmitPChainTxRegisterL1Validator: React.FC<SubmitPChainTxRegisterL1Valida
           <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
             {validatorBalance && (
               <p><span className="font-medium">Initial AVAX Balance:</span> {validatorBalance} AVAX</p>
+            )}
+            {userPChainBalanceNavax && validatorBalance && BigInt(Number(validatorBalance) * 1e9) > userPChainBalanceNavax && (
+              <p className="text-xs mt-1 text-red-500 dark:text-red-400">
+                Validator balance ({validatorBalance} AVAX) exceeds your P-Chain balance ({(Number(userPChainBalanceNavax) / 1e9).toFixed(2)} AVAX).
+              </p>
             )}
             {blsProofOfPossession && (
               <p><span className="font-medium">BLS Proof of Possession:</span> {blsProofOfPossession.substring(0, 50)}...</p>

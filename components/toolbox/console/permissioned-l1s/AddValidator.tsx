@@ -130,6 +130,16 @@ const AddValidatorExpert: React.FC = () => {
     }
   }, [validators, validatorBalance, blsProofOfPossession]);
 
+  // Keep validatorBalance in sync with current validators selection
+  useEffect(() => {
+    if (validators.length > 0) {
+      const validator = validators[0];
+      setValidatorBalance((Number(validator.validatorBalance) / 1e9).toString());
+    } else {
+      setValidatorBalance('');
+    }
+  }, [validators]);
+
   // Simple ownership check - direct computation
   const isContractOwner = useMemo(() => {
     return contractOwner && walletEVMAddress
@@ -279,6 +289,7 @@ const AddValidatorExpert: React.FC = () => {
                   setGlobalError(null);
                 }}
                 onError={(message) => setGlobalError(message)}
+                userPChainBalanceNavax={userPChainBalanceNavax}
               />
             </Step>
 

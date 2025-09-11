@@ -235,7 +235,7 @@ const CompleteValidatorRegistration: React.FC<CompleteValidatorRegistrationProps
       )}
 
       <Input
-        label="P-Chain Transaction ID"
+        label="P-Chain RegisterL1ValidatorTx ID"
         value={pChainTxIdState}
         onChange={setPChainTxId}
         placeholder="Enter the P-Chain RegisterL1ValidatorTx ID from step 4"
