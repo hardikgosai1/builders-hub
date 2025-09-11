@@ -13,7 +13,7 @@ import ValidatorManagerABI from "../../../../../toolbox/contracts/icm-contracts/
 import { Button } from "../../../../../toolbox/src/components/Button";
 import { Input } from "../../../../../toolbox/src/components/Input";
 import { utils } from '@avalabs/avalanchejs';
-import { CodeHighlighter } from '../../../../../toolbox/src/components/CodeHighlighter';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { Container } from '../../../../../toolbox/src/components/Container';
 import { ResultField } from '../../../../../toolbox/src/components/ResultField';
 import { getSubnetInfo } from '../../../../../toolbox/src/coreViem/utils/glacier';
@@ -247,7 +247,7 @@ export default function InitValidatorSet() {
                         <div className="space-y-2">
                             <span onClick={() => setShowDebugData(!showDebugData)} className="cursor-pointer text-blue-500  hover:underline">{showDebugData ? "Hide" : "Show"} debug data</span>
                             {showDebugData && (
-                                <CodeHighlighter code={JSON.stringify(collectedData, null, 2)} lang="json" />
+                                <DynamicCodeBlock lang="json" code={JSON.stringify(collectedData, null, 2)} />
                             )}
                         </div>
                     )

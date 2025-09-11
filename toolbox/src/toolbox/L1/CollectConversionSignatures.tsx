@@ -3,7 +3,7 @@
 import { useWalletStore } from "../../stores/walletStore";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
-import { CodeHighlighter } from "../../components/CodeHighlighter";
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { Container } from "../../components/Container";
 import { Input } from "../../components/Input";
 import InputChainId from "../../components/InputChainId";
@@ -107,9 +107,9 @@ export default function CollectConversionSignatures() {
                                 <li>Every node has a static IP and port 9651 open to external traffic</li>
                             </ul>
                             <p className="mt-4">If you're running this on a device without a dedicated public IP (e.g., laptop), try:</p>
-                            <CodeHighlighter
-                                code={`docker run -it --net=host --rm containerman17/local_agg:latest ${conversionID}`}
+                            <DynamicCodeBlock
                                 lang="bash"
+                                code={`docker run -it --net=host --rm containerman17/local_agg:latest ${conversionID}`}
                             />
                             <p className="text-sm text-gray-600 dark:text-gray-400">Paste the last line of its output into the signature field above.</p>
                             <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{error}</p>

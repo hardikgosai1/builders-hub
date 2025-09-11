@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { Button } from "../../components/Button"
-import { CodeHighlighter } from "../../components/CodeHighlighter"
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
 
 const dockerInstallInstructions: Record<string, string> = {
   "Ubuntu/Debian": `sudo apt-get update && \\
@@ -104,7 +104,7 @@ export default function PrepareValidators() {
         </div>
 
         <div className="bg-gray-100 dark:bg-gray-800 rounded-md overflow-x-auto">
-          <CodeHighlighter code={dockerInstallInstructions[activeOS]} lang="bash" />
+          <DynamicCodeBlock lang="bash" code={dockerInstallInstructions[activeOS]} />
         </div>
 
         <p className="mt-4">

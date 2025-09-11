@@ -1,5 +1,4 @@
 import { networkIDs } from "@avalabs/avalanchejs";
-import { SigningKey } from "ethers";//TODO: remove etheres dependency
 import { WalletClient } from "viem";
 import {
     utils,
@@ -8,6 +7,7 @@ import {
 import { Buffer as BufferPolyfill } from "buffer";
 import { CoreWalletRpcSchema } from "../rpcSchema";
 import { isTestnet } from "./isTestnet";
+import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1';
 
 export async function getPChainAddress(client: WalletClient<any, any, any, CoreWalletRpcSchema>) {
     const networkID = (await isTestnet(client)) ? networkIDs.FujiID : networkIDs.MainnetID
@@ -15,13 +15,34 @@ export async function getPChainAddress(client: WalletClient<any, any, any, CoreW
     const pubkeys = await client.request({
         method: "avalanche_getAccountPubKey",
         params: []
-    }) as {evm: string, xp: string}
+    }) as { evm: string, xp: string }
 
-    if (!pubkeys.xp.startsWith("0x")) {
-        pubkeys.xp = `0x${pubkeys.xp}`;
-    }
-    const compressed = SigningKey.computePublicKey(pubkeys.xp, true).slice(2);
-    const pubComp = BufferPolyfill.from(compressed, "hex");
-    const address = secp256k1.publicKeyBytesToAddress(pubComp);
-    return utils.format("P", networkIDs.getHRP(networkID), address)
+    return getPChainAddressFromPrivateKey(pubkeys.xp, networkID);
 }
+
+function getPChainAddressFromPrivateKey(xpPubKey: string, networkID: number) {
+    // Ensure the public key has 0x prefix
+    if (!xpPubKey.startsWith("0x")) {
+        xpPubKey = `0x${xpPubKey}`;
+    }
+
+    // Remove 0x prefix for processing
+    const pubKeyHex = xpPubKey.slice(2);
+
+    // Convert hex string to Uint8Array
+    const pubKeyBytes = new Uint8Array(pubKeyHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+
+    // Use noble/curves to compress the public key
+    const point = nobleSecp256k1.ProjectivePoint.fromHex(pubKeyBytes);
+    const compressedBytes = point.toRawBytes(true); // true = compressed format
+
+    // Convert to Buffer for avalanchejs compatibility
+    const pubComp = BufferPolyfill.from(compressedBytes);
+
+    // Use avalanchejs to convert to address
+    const address = secp256k1.publicKeyBytesToAddress(pubComp);
+
+    // Format as P-Chain address
+    return utils.format("P", networkIDs.getHRP(networkID), address);
+}
+

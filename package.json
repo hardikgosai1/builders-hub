@@ -3,13 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "cd toolbox && node update_docker_tags.js",
     "build": "next build",
     "dev": "next dev --turbopack",
     "build:remote": "tsx ./utils/remote-content.mts",
     "start": "pnpm build:remote && next build && next start",
     "check-links": "tsx .github/linkChecker.ts",
-    "postinstall": "prisma generate && fumadocs-mdx && cd toolbox && yarn"
+    "postinstall": "prisma generate && fumadocs-mdx"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",
@@ -30,7 +29,8 @@
     "@next/mdx": "^15.2.2",
     "@next/third-parties": "^15.2.2",
     "@noble/bls12-381": "^1.4.0",
-    "@noble/secp256k1": "^2.2.3",
+    "@noble/curves": "^2.0.0",
+    "@noble/secp256k1": "^3.0.0",
     "@prisma/client": "^6.4.1",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",

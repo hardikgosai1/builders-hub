@@ -1,6 +1,17 @@
-import debounce from 'debounce';
 import { getPChainBalance, getNativeTokenBalance, getChains } from '../coreViem/utils/glacier';
 import { avalancheFuji, avalanche } from 'viem/chains';
+
+// Local debounce function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 // Cache for indexed chains to avoid repeated API calls
 let indexedChainsCache: Number[] | null = null;
@@ -8,7 +19,7 @@ let indexedChainsPromise: Promise<Number[]> | null = null;
 
 async function getIndexedChains(): Promise<Number[]> {
   if (indexedChainsCache) return indexedChainsCache;
-  
+
   if (!indexedChainsPromise) {
     indexedChainsPromise = getChains().then(chains => {
       const chainIds = chains.map(chain => parseInt(chain.chainId));
@@ -16,7 +27,7 @@ async function getIndexedChains(): Promise<Number[]> {
       return chainIds;
     });
   }
-  
+
   return indexedChainsPromise;
 }
 
@@ -42,7 +53,7 @@ export class BalanceService {
   private callbacks: BalanceUpdateCallbacks | null = null;
 
 
-  constructor(private debounceTime: number = 500) {}
+  constructor(private debounceTime: number = 500) { }
 
   setCallbacks(callbacks: BalanceUpdateCallbacks) {
     this.callbacks = callbacks;
@@ -55,9 +66,9 @@ export class BalanceService {
     const debouncedPChainUpdate = debounce(async () => {
       if (!this.callbacks) return;
       const state = this.callbacks.getState();
-      
+
       if (state.isLoading.pChain) return;
-      
+
       this.callbacks.setLoading('pChain', true);
       try {
         const balance = await this.fetchPChainBalance(state.isTestnet ?? false, state.pChainAddress);
@@ -66,7 +77,7 @@ export class BalanceService {
         this.callbacks.setLoading('pChain', false);
       }
     }, this.debounceTime);
-    
+
     this.updatePChainBalance = async () => {
       await debouncedPChainUpdate();
     };
@@ -75,14 +86,14 @@ export class BalanceService {
     const createDebouncedL1Update = (chainId: string) => debounce(async () => {
       if (!this.callbacks) return;
       const state = this.callbacks.getState();
-      
+
       if (state.isLoading.l1Chains[chainId]) return;
-      
+
       this.callbacks.setLoading(chainId, true);
       try {
         const balance = await this.fetchL1Balance(
-          parseInt(chainId), 
-          state.walletEVMAddress, 
+          parseInt(chainId),
+          state.walletEVMAddress,
           state.publicClient
         );
         this.callbacks.setBalance(chainId, balance);
@@ -93,7 +104,7 @@ export class BalanceService {
 
     // Store debounced functions for each chain
     const debouncedL1Updates = new Map<string, ReturnType<typeof createDebouncedL1Update>>();
-    
+
     this.updateL1Balance = async (chainId: string) => {
       if (!debouncedL1Updates.has(chainId)) {
         debouncedL1Updates.set(chainId, createDebouncedL1Update(chainId));
@@ -104,9 +115,9 @@ export class BalanceService {
     const debouncedCChainUpdate = debounce(async () => {
       if (!this.callbacks) return;
       const state = this.callbacks.getState();
-      
+
       if (state.isLoading.cChain) return;
-      
+
       this.callbacks.setLoading('cChain', true);
       try {
         const balance = await this.fetchCChainBalance(state.isTestnet ?? false, state.walletEVMAddress);
@@ -115,7 +126,7 @@ export class BalanceService {
         this.callbacks.setLoading('cChain', false);
       }
     }, this.debounceTime);
-    
+
     this.updateCChainBalance = async () => {
       await debouncedCChainUpdate();
     };
@@ -124,7 +135,7 @@ export class BalanceService {
   // P-Chain balance fetching
   async fetchPChainBalance(isTestnet: boolean, pChainAddress: string): Promise<number> {
     if (!pChainAddress) return 0;
-    
+
     try {
       const network = isTestnet ? "testnet" : "mainnet";
       const response = await getPChainBalance(network, pChainAddress);
@@ -137,7 +148,7 @@ export class BalanceService {
 
   // L1 balance fetching
   async fetchL1Balance(
-    walletChainId: number, 
+    walletChainId: number,
     walletEVMAddress: string,
     publicClient: any
   ): Promise<number> {
@@ -192,10 +203,10 @@ export class BalanceService {
   };
 
   // Update all balances including all L1s
-  updateAllBalancesWithAllL1s = async (l1List?: Array<{evmChainId: number}>) => {
+  updateAllBalancesWithAllL1s = async (l1List?: Array<{ evmChainId: number }>) => {
     if (l1List && l1List.length > 0) {
       // Update balances for all L1s in the list
-      const updatePromises = l1List.map(l1 => 
+      const updatePromises = l1List.map(l1 =>
         this.updateL1Balance(l1.evmChainId.toString())
       );
       await Promise.all([

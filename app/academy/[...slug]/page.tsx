@@ -36,7 +36,7 @@ import Mermaid from "@/components/content-design/mermaid";
 import { Feedback } from '@/components/ui/feedback';
 import posthog from 'posthog-js';
 
-import ToolboxMdxWrapper from "@/toolbox/src/components/ToolboxMdxWrapper"
+import ToolboxMdxWrapper from "@/components/academy/wrapper/ToolboxMdxWrapper"
 import CrossChainTransfer from "@/components/console/tools/primary-network/CrossChainTransfer"
 import AvalancheGoDocker from '@/components/console/tools/layer-1/AvalancheGoDockerL1';
 import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
