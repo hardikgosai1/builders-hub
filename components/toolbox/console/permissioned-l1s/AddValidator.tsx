@@ -101,7 +101,7 @@ const AddValidatorExpert: React.FC = () => {
     isDetectingOwnerType
   } = useValidatorManagerDetails({ subnetId: subnetIdL1 });
 
-  // Fetch P-Chain balance when component mounts
+  // Fetch P-Chain balance when component mounts so we can pass it to the ValidatorListInput to check if the validator balance is greater than the user's current P-Chain balance
   useEffect(() => {
     const fetchBalance = async () => {
       if (!pChainAddress || !coreWalletClient) return;

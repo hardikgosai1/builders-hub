@@ -102,7 +102,7 @@ export function ValidatorItem({
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Validator Balance (AVAX)
+                Validator Balance (P-Chain AVAX)
               </label>
               <input
                 type="number"

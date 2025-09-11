@@ -10,8 +10,6 @@ import { Success } from '@/components/toolbox/components/Success';
 import { parseNodeID } from '@/components/toolbox/coreViem/utils/ids';
 import { fromBytes } from 'viem';
 import { utils } from '@avalabs/avalanchejs';
-import { formatAvaxBalance } from '@/components/toolbox/coreViem/utils/format';
-import { getPChainBalance } from '@/components/toolbox/coreViem/methods/getPChainbalance';
 import { MultisigOption } from '@/components/toolbox/components/MultisigOption';
 import { getValidationIdHex } from '@/components/toolbox/coreViem/hooks/getValidationID';
 
@@ -49,24 +47,7 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setErrorState] = useState<string | null>(null);
   const [txSuccess, setTxSuccess] = useState<string | null>(null);
-  const [balance, setBalance] = useState("0");
 
-  // Fetch P-Chain balance when component mounts
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!coreWalletClient) return;
-
-      try {
-        const balanceValue = await getPChainBalance(coreWalletClient);
-        const formattedBalance = formatAvaxBalance(balanceValue);
-        setBalance(formattedBalance);
-      } catch (balanceError) {
-        console.error("Error fetching balance:", balanceError);
-      }
-    };
-
-    fetchBalance();
-  }, [coreWalletClient]);
 
   const validateInputs = (): boolean => {
     if (validators.length === 0) {
@@ -81,18 +62,6 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     }
 
     const validator = validators[0];
-
-    // Skip balance check if we couldn't fetch the balance
-    if (balance) {
-      // Extract numerical value from balance string (remove " AVAX" and commas)
-      const balanceValue = parseFloat(balance.replace(" AVAX", "").replace(/,/g, ""));
-      const requiredBalance = Number(validator.validatorBalance) / 1000000000;
-
-      if (balanceValue < requiredBalance) {
-        setErrorState(`Insufficient P-Chain balance. You need at least ${requiredBalance.toFixed(2)} AVAX.`);
-        return false;
-      }
-    }
 
     // Use contract total weight for validation if available
     if (contractTotalWeight > 0n) {
