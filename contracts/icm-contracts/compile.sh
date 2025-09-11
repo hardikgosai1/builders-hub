@@ -11,7 +11,7 @@ if ! command -v jq >/dev/null 2>&1; then
     exit 1
 fi
 
-VERSIONS_PATH=$(cd "$SCRIPT_DIR/../../src" && pwd)/versions.json
+VERSIONS_PATH=$(cd "$SCRIPT_DIR/../../scripts" && pwd)/versions.json
 if [ ! -f "$VERSIONS_PATH" ]; then
     echo "ERROR: versions.json not found at $VERSIONS_PATH" >&2
     exit 1

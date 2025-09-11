@@ -13,7 +13,7 @@ import { Container } from "../../../../../toolbox/src/components/Container";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
 import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
-import versions from "../../../../../toolbox/src/versions.json";
+import versions from '@/scripts/versions.json';
 
 const MINIMUM_BALANCE = parseEther('11');
 

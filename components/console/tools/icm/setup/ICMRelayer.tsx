@@ -10,7 +10,7 @@ import { Button } from '../../../../../toolbox/src/components/Button';
 import { useState, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
-import versions from '../../../../../toolbox/src/versions.json';
+import versions from '@/scripts/versions.json';
 import { Note } from '../../../../../toolbox/src/components/Note';
 import { Container } from '../../../../../toolbox/src/components/Container';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';

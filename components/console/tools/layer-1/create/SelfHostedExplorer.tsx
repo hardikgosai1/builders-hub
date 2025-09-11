@@ -7,7 +7,7 @@ import { getBlockchainInfo, getSubnetInfo } from "../../../../../toolbox/src/cor
 import InputChainId from "../../../../../toolbox/src/components/InputChainId";
 import InputSubnetId from "../../../../../toolbox/src/components/InputSubnetId";
 import BlockchainDetailsDisplay from "../../../../../toolbox/src/components/BlockchainDetailsDisplay";
-import versions from "../../../../../toolbox/src/versions.json";
+import versions from '@/scripts/versions.json';
 import { Steps, Step } from "fumadocs-ui/components/steps";
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { nodeConfigBase64 } from "../../../../../toolbox/src/toolbox/Nodes/config";

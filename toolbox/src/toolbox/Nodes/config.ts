@@ -1,6 +1,6 @@
 // Common configuration for Avalanche node setup
 
-import versions from "../../versions.json";
+import versions from '@/scripts/versions.json';
 
 // Constants
 export const SUBNET_EVM_VM_ID = "srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy";

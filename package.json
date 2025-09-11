@@ -8,7 +8,7 @@
     "build:remote": "tsx ./utils/remote-content.mts",
     "start": "pnpm build:remote && next build && next start",
     "check-links": "tsx .github/linkChecker.ts",
-    "postinstall": "prisma generate && fumadocs-mdx"
+    "postinstall": "prisma generate && fumadocs-mdx && node ./scripts/update_docker_tags.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",

@@ -12,7 +12,7 @@ import TeleporterRegistryManualyCompiled from '../../../../../contracts/icm-cont
 import { Container } from "../../../../../toolbox/src/components/Container";
 import { CheckWalletRequirements } from "../../../../../toolbox/src/components/CheckWalletRequirements";
 import { WalletRequirementsConfigKey } from "../../../../../toolbox/src/hooks/useWalletRequirements";
-import versions from "../../../../../toolbox/src/versions.json";
+import versions from '@/scripts/versions.json';
 
 const ICM_COMMIT = versions["ava-labs/icm-contracts"];
 const TELEPORTER_REGISTRY_SOURCE_URL = `https://github.com/ava-labs/icm-contracts/blob/${ICM_COMMIT}/contracts/teleporter/registry/TeleporterRegistry.sol`;

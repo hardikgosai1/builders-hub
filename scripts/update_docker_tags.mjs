@@ -1,9 +1,13 @@
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES module equivalent of __dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const versionsPath = path.join(__dirname, 'versions.json');
 
 function readVersionsFile() {
-    const versionsPath = path.join('src', 'versions.json');
     const content = fs.readFileSync(versionsPath, 'utf8');
     return JSON.parse(content);
 }
@@ -206,10 +210,12 @@ async function main() {
         // Check for AvalancheGo updates via GitHub Releases (more reliable than Docker tags)
         const latestAvagoTag = await fetchGithubLatestReleaseTag('ava-labs', 'avalanchego');
         const currentAvagoVersion = versions['avaplatform/avalanchego'] || '';
+        const avagoStatus = latestAvagoTag === currentAvagoVersion ? '(same as before)' : '(new)';
+        console.log(`avalanchego: ${latestAvagoTag} ${avagoStatus}`);
 
         if (latestAvagoTag && latestAvagoTag !== currentAvagoVersion) {
             versions['avaplatform/avalanchego'] = latestAvagoTag;
-            fs.writeFileSync('src/versions.json', JSON.stringify(versions, null, 2));
+            fs.writeFileSync(versionsPath, JSON.stringify(versions, null, 2));
             console.error(`New version ${latestAvagoTag} is available for avalanchego. Current version is ${currentAvagoVersion}`);
         }
 
@@ -244,9 +250,12 @@ async function main() {
             // If Docker Hub listing fails, keep intended combined tag and hope it exists
         }
 
+        const subnetEvmStatus = combinedSubnetEvmAvagoTag === currentSubnetEvmVersion ? '(same as before)' : '(new)';
+        console.log(`subnet-evm_avalanchego: ${combinedSubnetEvmAvagoTag} ${subnetEvmStatus}`);
+
         if (combinedSubnetEvmAvagoTag && combinedSubnetEvmAvagoTag !== currentSubnetEvmVersion) {
             versions['avaplatform/subnet-evm_avalanchego'] = combinedSubnetEvmAvagoTag;
-            fs.writeFileSync('src/versions.json', JSON.stringify(versions, null, 2));
+            fs.writeFileSync(versionsPath, JSON.stringify(versions, null, 2));
             console.error(`New version ${combinedSubnetEvmAvagoTag} is available for subnet-evm_avalanchego. Current version is ${currentSubnetEvmVersion}`);
         }
 
@@ -261,10 +270,12 @@ async function main() {
             latestRelayerTag = await fetchTags('avaplatform/icm-relayer');
         }
         const currentRelayerVersion = versions['avaplatform/icm-relayer'] || '';
+        const relayerStatus = latestRelayerTag === currentRelayerVersion ? '(same as before)' : '(new)';
+        console.log(`icm-relayer: ${latestRelayerTag} ${relayerStatus}`);
 
         if (latestRelayerTag !== currentRelayerVersion) {
             versions['avaplatform/icm-relayer'] = latestRelayerTag;
-            fs.writeFileSync('src/versions.json', JSON.stringify(versions, null, 2));
+            fs.writeFileSync(versionsPath, JSON.stringify(versions, null, 2));
 
             console.error(`New version ${latestRelayerTag} is available for icm-relayer. Current version is ${currentRelayerVersion}`);
         }
