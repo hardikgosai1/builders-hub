@@ -17,10 +17,10 @@ export async function getPChainAddress(client: WalletClient<any, any, any, CoreW
         params: []
     }) as { evm: string, xp: string }
 
-    return getPChainAddressFromPrivateKey(pubkeys.xp, networkID);
+    return getPChainAddressFromPublicKey(pubkeys.xp, networkID);
 }
 
-function getPChainAddressFromPrivateKey(xpPubKey: string, networkID: number) {
+function getPChainAddressFromPublicKey(xpPubKey: string, networkID: number) {
     // Ensure the public key has 0x prefix
     if (!xpPubKey.startsWith("0x")) {
         xpPubKey = `0x${xpPubKey}`;
@@ -33,8 +33,10 @@ function getPChainAddressFromPrivateKey(xpPubKey: string, networkID: number) {
     const pubKeyBytes = new Uint8Array(pubKeyHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
 
     // Use noble/curves to compress the public key
-    const point = nobleSecp256k1.ProjectivePoint.fromHex(pubKeyBytes);
-    const compressedBytes = point.toRawBytes(true); // true = compressed format
+    // The public key is already in uncompressed format (04 prefix)
+    // We just need to get the compressed version
+    const point = nobleSecp256k1.Point.fromHex(pubKeyHex);
+    const compressedBytes = point.toBytes(true); // true = compressed format
 
     // Convert to Buffer for avalanchejs compatibility
     const pubComp = BufferPolyfill.from(compressedBytes);
