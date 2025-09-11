@@ -1,6 +1,6 @@
 "use client";
 
-import Stake from "@/components/console/tools/primary-network/Stake";
+import Stake from "@/components/toolbox/console/primary-network/Stake";
 
 export default function Page() {
   return (

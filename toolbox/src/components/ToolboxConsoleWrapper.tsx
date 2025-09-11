@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorFallback } from "../../../components/academy/wrapper/ErrorFallback";
+import { ErrorFallback } from "../../../components/toolbox/academy/wrapper/ErrorFallback";
 
 export default function ToolboxConsoleWrapper({ children }: { children: React.ReactNode }) {
     const handleReset = () => {

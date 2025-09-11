@@ -2,9 +2,9 @@
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
-import TeleporterMessenger from "../../../../components/console/tools/icm/setup/TeleporterMessenger";
-import TeleporterRegistry from "../../../../components/console/tools/icm/setup/TeleporterRegistry";
-import ICMRelayer from "../../../../components/console/tools/icm/setup/ICMRelayer";
+import TeleporterMessenger from "../../../../components/toolbox/console/icm/setup/TeleporterMessenger";
+import TeleporterRegistry from "../../../../components/toolbox/console/icm/setup/TeleporterRegistry";
+import ICMRelayer from "../../../../components/toolbox/console/icm/setup/ICMRelayer";
 
 export default function Page() {
   const steps: StepDefinition[] = [

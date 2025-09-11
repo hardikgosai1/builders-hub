@@ -2,13 +2,13 @@
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
-import DeployExampleERC20 from "../../../../components/console/tools/ictt/setup/DeployExampleERC20";
-import DeployTokenHome from "../../../../components/console/tools/ictt/setup/DeployTokenHome";
-import DeployERC20TokenRemote from "../../../../components/console/tools/ictt/setup/DeployERC20TokenRemote";
-import DeployNativeTokenRemote from "../../../../components/console/tools/ictt/setup/DeployNativeTokenRemote";
-import RegisterWithHome from "../../../../components/console/tools/ictt/setup/RegisterWithHome";
-import AddCollateral from "../../../../components/console/tools/ictt/setup/AddCollateral";
-import DeployWrappedNative from "@/components/console/tools/ictt/setup/DeployWrappedNative";
+import DeployExampleERC20 from "../../../../components/toolbox/console/ictt/setup/DeployExampleERC20";
+import DeployTokenHome from "../../../../components/toolbox/console/ictt/setup/DeployTokenHome";
+import DeployERC20TokenRemote from "../../../../components/toolbox/console/ictt/setup/DeployERC20TokenRemote";
+import DeployNativeTokenRemote from "../../../../components/toolbox/console/ictt/setup/DeployNativeTokenRemote";
+import RegisterWithHome from "../../../../components/toolbox/console/ictt/setup/RegisterWithHome";
+import AddCollateral from "../../../../components/toolbox/console/ictt/setup/AddCollateral";
+import DeployWrappedNative from "@/components/toolbox/console/ictt/setup/DeployWrappedNative";
 
 export default function Page() {
   const steps: StepDefinition[] = [

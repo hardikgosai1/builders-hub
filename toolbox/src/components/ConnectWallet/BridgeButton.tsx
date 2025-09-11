@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 import { useWalletStore } from '../../stores/walletStore';
-import CrossChainTransfer from '../../../../components/console/tools/primary-network/CrossChainTransfer';
+import CrossChainTransfer from '../../../../components/toolbox/console/primary-network/CrossChainTransfer';
 import { X } from 'lucide-react';
 
 export function BridgeButton() {

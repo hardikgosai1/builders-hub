@@ -1,6 +1,6 @@
 "use client";
 
-import NativeMinter from "@/components/console/tools/l1-tokenomics/NativeMinter";
+import NativeMinter from "@/components/toolbox/console/l1-tokenomics/NativeMinter";
 
 export default function Page() {
   return (

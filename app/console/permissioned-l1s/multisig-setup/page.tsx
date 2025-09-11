@@ -2,10 +2,10 @@
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
-import DeployPoAManager from "../../../../components/console/tools/permissioned-l1s/multisig-setup/DeployPoAManager";
-import TransferOwnership from "../../../../components/console/tools/permissioned-l1s/multisig-setup/TransferOwnership";
+import DeployPoAManager from "../../../../components/toolbox/console/permissioned-l1s/multisig-setup/DeployPoAManager";
+import TransferOwnership from "../../../../components/toolbox/console/permissioned-l1s/multisig-setup/TransferOwnership";
 
-import ReadContract from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/ReadContract";
+import ReadContract from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/ReadContract";
 
 export default function Page() {
   const steps: StepDefinition[] = [

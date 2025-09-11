@@ -1,6 +1,6 @@
 "use client";
 
-import L1ExplorerSetup from "@/components/console/tools/layer-1/create/SelfHostedExplorer";
+import L1ExplorerSetup from "@/components/toolbox/console/layer-1/create/SelfHostedExplorer";
 
 export default function Page() {
   return (

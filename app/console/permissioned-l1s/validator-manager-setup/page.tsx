@@ -2,12 +2,12 @@
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
 
-import DeployProxyContract from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/DeployProxyContract";
-import DeployValidatorManager from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
-import UpgradeProxy from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/UpgradeProxy";
-import Initialize from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/Initialize";
-import InitValidatorSet from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/InitValidatorSet";
-import ReadContract from "../../../../components/console/tools/permissioned-l1s/validator-manager-setup/ReadContract";
+import DeployProxyContract from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployProxyContract";
+import DeployValidatorManager from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
+import UpgradeProxy from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/UpgradeProxy";
+import Initialize from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/Initialize";
+import InitValidatorSet from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/InitValidatorSet";
+import ReadContract from "../../../../components/toolbox/console/permissioned-l1s/validator-manager-setup/ReadContract";
 
 export default function Page() {
   const steps: StepDefinition[] = [

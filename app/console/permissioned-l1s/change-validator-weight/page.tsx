@@ -1,6 +1,6 @@
 "use client";
 
-import ChangeWeight from "@/components/console/tools/permissioned-l1s/ChangeWeight";
+import ChangeWeight from "@/components/toolbox/console/permissioned-l1s/ChangeWeight";
 
 export default function Page() {
   return (

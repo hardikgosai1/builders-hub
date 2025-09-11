@@ -36,21 +36,21 @@ import Mermaid from "@/components/content-design/mermaid";
 import { Feedback } from '@/components/ui/feedback';
 import posthog from 'posthog-js';
 
-import ToolboxMdxWrapper from "@/components/academy/wrapper/ToolboxMdxWrapper"
-import CrossChainTransfer from "@/components/console/tools/primary-network/CrossChainTransfer"
-import AvalancheGoDocker from '@/components/console/tools/layer-1/AvalancheGoDockerL1';
+import ToolboxMdxWrapper from "@/components/toolbox/academy/wrapper/ToolboxMdxWrapper"
+import CrossChainTransfer from "@/components/toolbox/console/primary-network/CrossChainTransfer"
+import AvalancheGoDocker from '@/components/toolbox/console/layer-1/AvalancheGoDockerL1';
 import CreateSubnet from "@/toolbox/src/toolbox/L1/CreateSubnet"
-import CreateChain from "@/components/console/tools/layer-1/create/CreateChain"
-import ConvertToL1 from "@/components/console/tools/layer-1/create/ConvertToL1"
+import CreateChain from "@/components/toolbox/console/layer-1/create/CreateChain"
+import ConvertToL1 from "@/components/toolbox/console/layer-1/create/ConvertToL1"
 import GenesisBuilder from '@/toolbox/src/toolbox/L1/GenesisBuilder';
-import DeployExampleERC20 from '@/components/console/tools/ictt/setup/DeployExampleERC20';
-import DeployTokenHome from '@/components/console/tools/ictt/setup/DeployTokenHome';
-import DeployERC20TokenRemote from '@/components/console/tools/ictt/setup/DeployERC20TokenRemote';
-import RegisterWithHome from '@/components/console/tools/ictt/setup/RegisterWithHome';
-import TestSend from '@/components/console/tools/ictt/token-transfer/TestSend';
-import TeleporterRegistry from '@/components/console/tools/icm/setup/TeleporterRegistry';
-import ICMRelayer from '@/components/console/tools/icm/setup/ICMRelayer';
-import Faucet from '@/components/console/tools/primary-network/Faucet';
+import DeployExampleERC20 from '@/components/toolbox/console/ictt/setup/DeployExampleERC20';
+import DeployTokenHome from '@/components/toolbox/console/ictt/setup/DeployTokenHome';
+import DeployERC20TokenRemote from '@/components/toolbox/console/ictt/setup/DeployERC20TokenRemote';
+import RegisterWithHome from '@/components/toolbox/console/ictt/setup/RegisterWithHome';
+import TestSend from '@/components/toolbox/console/ictt/token-transfer/TestSend';
+import TeleporterRegistry from '@/components/toolbox/console/icm/setup/TeleporterRegistry';
+import ICMRelayer from '@/components/toolbox/console/icm/setup/ICMRelayer';
+import Faucet from '@/components/toolbox/console/primary-network/Faucet';
 
 export const dynamicParams = false;
 

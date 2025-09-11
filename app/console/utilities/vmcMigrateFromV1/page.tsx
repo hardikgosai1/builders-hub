@@ -1,10 +1,10 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import DeployValidatorManager from "@/components/console/tools/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
-import UpgradeProxy from "@/components/console/tools/permissioned-l1s/validator-manager-setup/UpgradeProxy";
-import QueryL1ValidatorSet from "@/components/console/tools/permissioned-l1s/QueryL1ValidatorSet";
-import MigrateV1ToV2 from "@/components/console/tools/utilities/vmcMigrateFromV1/MigrateV1ToV2";
+import DeployValidatorManager from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
+import UpgradeProxy from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/UpgradeProxy";
+import QueryL1ValidatorSet from "@/components/toolbox/console/permissioned-l1s/QueryL1ValidatorSet";
+import MigrateV1ToV2 from "@/components/toolbox/console/utilities/vmcMigrateFromV1/MigrateV1ToV2";
 
 export default function Page() {
   const steps: StepDefinition[] = [
