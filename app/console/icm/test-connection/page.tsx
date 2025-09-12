@@ -1,29 +1,7 @@
-"use client";
-
-import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-
-import DeployICMDemo from "../../../../components/toolbox/console/icm/test-connection/DeployICMDemo";
-import SendICMMessage from "../../../../components/toolbox/console/icm/test-connection/SendICMMessage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  const steps: StepDefinition[] = [
-    {
-      type: "single",
-      key: "deploy-icm-demo",
-      title: "Deploy ICM Demo",
-      component: DeployICMDemo,
-    },
-    {
-      type: "single",
-      key: "send-icm-message",
-      title: "Send ICM Message",
-      component: SendICMMessage,
-    },
-  ];
-
-  return (
-    <StepFlow steps={steps} />
-  );
+  redirect("/console/icm/test-connection/deploy-icm-demo");
 }
 
 
