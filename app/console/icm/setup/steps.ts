@@ -12,7 +12,7 @@ export const steps: StepDefinition[] = [
     },
     {
       type: "single",
-      key: "teleporter-registry",
+      key: "icm-registry",
       title: "Deploy Teleporter Registry",
       component: TeleporterRegistry,
     },
