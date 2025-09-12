@@ -238,7 +238,7 @@ const CompleteValidatorRegistration: React.FC<CompleteValidatorRegistrationProps
         label="P-Chain RegisterL1ValidatorTx ID"
         value={pChainTxIdState}
         onChange={setPChainTxId}
-        placeholder="Enter the P-Chain RegisterL1ValidatorTx ID from step 4"
+        placeholder="Enter the P-Chain RegisterL1ValidatorTx ID from step 5"
         disabled={isProcessing}
       />
 
