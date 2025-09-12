@@ -335,6 +335,7 @@ export default function Stake() {
             <Success 
               label="Transaction Submitted" 
               value={txId}
+              isTestnet={isTestnet}
             />
           )}
           
