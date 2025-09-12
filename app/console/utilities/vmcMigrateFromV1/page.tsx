@@ -1,11 +1,10 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
-import DeployValidatorManager from "@/toolbox/src/toolbox/ValidatorManager/DeployValidatorManager";
-import UpgradeProxy from "@/toolbox/src/toolbox/Proxy/UpgradeProxy";
-import QueryL1ValidatorSet from "@/toolbox/src/toolbox/ValidatorManager/QueryL1ValidatorSet";
-import MigrateV1ToV2 from "@/toolbox/src/toolbox/ValidatorManager/MigrateV1ToV2";
+import DeployValidatorManager from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/DeployValidatorManager";
+import UpgradeProxy from "@/components/toolbox/console/permissioned-l1s/validator-manager-setup/UpgradeProxy";
+import QueryL1ValidatorSet from "@/components/toolbox/console/permissioned-l1s/QueryL1ValidatorSet";
+import MigrateV1ToV2 from "@/components/toolbox/console/utilities/vmcMigrateFromV1/MigrateV1ToV2";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -40,8 +39,6 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-      <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }

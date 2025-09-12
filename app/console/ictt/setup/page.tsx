@@ -1,15 +1,14 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
 
-import DeployExampleERC20 from "../../../../toolbox/src/toolbox/ICTT/DeployExampleERC20";
-import DeployTokenHome from "../../../../toolbox/src/toolbox/ICTT/DeployTokenHome";
-import DeployERC20TokenRemote from "../../../../toolbox/src/toolbox/ICTT/DeployERC20TokenRemote";
-import DeployNativeTokenRemote from "../../../../toolbox/src/toolbox/ICTT/DeployNativeTokenRemote";
-import RegisterWithHome from "../../../../toolbox/src/toolbox/ICTT/RegisterWithHome";
-import AddCollateral from "../../../../toolbox/src/toolbox/ICTT/AddCollateral";
-import DeployWrappedNative from "@/toolbox/src/toolbox/ICTT/DeployWrappedNative";
+import DeployExampleERC20 from "../../../../components/toolbox/console/ictt/setup/DeployExampleERC20";
+import DeployTokenHome from "../../../../components/toolbox/console/ictt/setup/DeployTokenHome";
+import DeployERC20TokenRemote from "../../../../components/toolbox/console/ictt/setup/DeployERC20TokenRemote";
+import DeployNativeTokenRemote from "../../../../components/toolbox/console/ictt/setup/DeployNativeTokenRemote";
+import RegisterWithHome from "../../../../components/toolbox/console/ictt/setup/RegisterWithHome";
+import AddCollateral from "../../../../components/toolbox/console/ictt/setup/AddCollateral";
+import DeployWrappedNative from "@/components/toolbox/console/ictt/setup/DeployWrappedNative";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -53,9 +52,7 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }
 

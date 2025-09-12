@@ -1,11 +1,10 @@
 "use client";
 
-import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
-import CreateChain from "../../../../toolbox/src/toolbox/L1/CreateChain";
-import AvalancheGoDockerL1 from "../../../../toolbox/src/toolbox/Nodes/AvalancheGoDockerL1";
-import ConvertToL1 from "../../../../toolbox/src/toolbox/L1/ConvertToL1";
-import ManagedTestnetNodes from "@/toolbox/src/toolbox/Nodes/ManagedTestnetNodes";
+import StepFlow, { type StepDefinition } from "@/components/console/step-flow";
+import CreateChain from "@/components/toolbox/console/layer-1/create/CreateChain";
+import AvalancheGoDockerL1 from "@/components/toolbox/console/layer-1/AvalancheGoDockerL1";
+import ConvertToL1 from "@/components/toolbox/console/layer-1/create/ConvertToL1";
+import ManagedTestnetNodes from "@/components/toolbox/console/testnet-infra/ManagedTestnetNodes";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -36,8 +35,6 @@ export default function Page() {
   ];
 
   return (
-    <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
-    </ToolboxConsoleWrapper>
+    <StepFlow steps={steps} />
   );
 }

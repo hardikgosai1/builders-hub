@@ -11,15 +11,15 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import dynamic from "next/dynamic";
 import { ThemeToggle } from "fumadocs-ui/components/layout/theme-toggle";
-
+import { Fragment } from "react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
 import { pathToBreadcrumb } from "./breadcrumbs-mapping";
 import { BuilderHubAccountButton } from "./builder-hub-account-button";
 
-const TestnetMainnetSwitch = dynamic(() => import("@console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
-const WalletPChain = dynamic(() => import("@console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
-const EvmNetworkWallet = dynamic(() => import("@console-header/evm-network-wallet/index").then(m => m.EvmNetworkWallet), { ssr: false });
-const WalletBootstrap = dynamic(() => import("@console-header/wallet-bootstrap").then(m => m.WalletBootstrap), { ssr: false });
+const TestnetMainnetSwitch = dynamic(() => import("@/components/toolbox/components/console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
+const WalletPChain = dynamic(() => import("@/components/toolbox/components/console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
+const EvmNetworkWallet = dynamic(() => import("@/components/toolbox/components/console-header/evm-network-wallet/index").then(m => m.EvmNetworkWallet), { ssr: false });
+const WalletBootstrap = dynamic(() => import("@/components/toolbox/components/console-header/wallet-bootstrap").then(m => m.WalletBootstrap), { ssr: false });
 
 
 
@@ -32,14 +32,15 @@ export function SiteHeader() {
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6 min-w-0">
         <WalletBootstrap />
         <SidebarTrigger className="-ml-1" />
-        
+
         <Separator
           orientation="vertical"
           className="mr-2 data-[orientation=vertical]:h-4"
         />
         <Breadcrumb className="overflow-hidden min-w-0">
           <BreadcrumbList className="flex-nowrap">
-            {breadcrumbs.map((breadcrumb, index) => (<>
+            {breadcrumbs.map((breadcrumb, index) => (
+              <Fragment key={`${breadcrumb.href}-${index}`}>
                 <BreadcrumbItem key={`${breadcrumb.href}-${index}`} className="whitespace-nowrap">
                   {breadcrumb.isCurrentPage ? (
                     <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
@@ -54,7 +55,7 @@ export function SiteHeader() {
                 {index < breadcrumbs.length - 1 && (
                   <BreadcrumbSeparator key={`breadcrumb-separator-${index}`} />
                 )}
-              </>
+              </Fragment>
             ))}
           </BreadcrumbList>
         </Breadcrumb>

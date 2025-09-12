@@ -1,10 +1,10 @@
 "use client";
 
 import StepFlow, { type StepDefinition } from "../../../../components/console/step-flow";
-import ToolboxConsoleWrapper from "../../../../toolbox/src/components/ToolboxConsoleWrapper";
+import ToolboxConsoleWrapper from "../../../../components/toolbox/components/ToolboxConsoleWrapper";
 
-import AddCollateral from "../../../../toolbox/src/toolbox/ICTT/AddCollateral";
-import TestSend from "../../../../toolbox/src/toolbox/ICTT/TestSend";
+import AddCollateral from "../../../../components/toolbox/console/ictt/setup/AddCollateral";
+import TestSend from "../../../../components/toolbox/console/ictt/token-transfer/TestSend";
 
 export default function Page() {
   const steps: StepDefinition[] = [
@@ -14,7 +14,7 @@ export default function Page() {
 
   return (
     <ToolboxConsoleWrapper>
-        <StepFlow steps={steps} />
+      <StepFlow steps={steps} />
     </ToolboxConsoleWrapper>
   );
 }
