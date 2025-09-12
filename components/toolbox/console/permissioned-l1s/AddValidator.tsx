@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { Container } from '@/components/toolbox/components/Container';
 import { Button } from '@/components/toolbox/components/Button';
 import { AlertCircle } from 'lucide-react';
@@ -50,7 +51,7 @@ const AddValidatorExpert: React.FC = () => {
   const [evmTxHash, setEvmTxHash] = useState<string>('');
 
   // Form state with local persistence
-  const { walletEVMAddress, pChainAddress, coreWalletClient } = useWalletStore();
+  const { walletEVMAddress, pChainAddress, coreWalletClient, isTestnet } = useWalletStore();
   const createChainStoreSubnetId = useCreateChainStore()(state => state.subnetId);
   const [subnetIdL1, setSubnetIdL1] = useState<string>(createChainStoreSubnetId || "");
   const [resetKey, setResetKey] = useState<number>(0);
@@ -197,6 +198,19 @@ const AddValidatorExpert: React.FC = () => {
           )}
 
           <Steps>
+            <Step>
+              <h2 className="text-lg font-semibold">Ensure L1 Node is Running</h2>
+              <p className="text-sm text-gray-500 mb-4">
+                Before adding a validator, you must have an L1 node set up and running. If you haven't done this yet, 
+                visit the <Link href="/console/layer-1/l1-node-setup" className="text-blue-600 hover:text-blue-800 underline">L1 Node Setup Tool</Link> first.
+                {isTestnet && (
+                  <>
+                    {' '}On testnet, you can also use our <Link href="/console/testnet-infra/nodes" className="text-blue-600 hover:text-blue-800 underline">free testnet infrastructure</Link>.
+                  </>
+                )}
+              </p>
+            </Step>
+            
             <Step>
               <h2 className="text-lg font-semibold">Select L1 Subnet</h2>
               <p className="text-sm text-gray-500 mb-4">
