@@ -129,11 +129,11 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
         parseNodeID(validator.nodeID),
         validator.nodePOP.publicKey,
         {
-          threshold: validator.remainingBalanceOwner.addresses.length,
+          threshold: validator.remainingBalanceOwner.threshold,
           addresses: pChainRemainingBalanceOwnerAddressesHex,
         },
         {
-          threshold: validator.deactivationOwner.addresses.length,
+          threshold: validator.deactivationOwner.threshold,
           addresses: pChainDisableOwnerAddressesHex,
         },
         validator.validatorWeight
@@ -302,22 +302,28 @@ const InitiateValidatorRegistration: React.FC<InitiateValidatorRegistrationProps
     if (validators.length === 0) return [];
 
     const validator = validators[0];
-    const pChainRemainingBalanceOwnerAddressBytes = utils.bech32ToBytes(validator.remainingBalanceOwner.addresses[0]);
-    const pChainRemainingBalanceOwnerAddressHex = fromBytes(pChainRemainingBalanceOwnerAddressBytes, "hex");
+    
+    // Process all P-Chain addresses for multisig
+    const pChainRemainingBalanceOwnerAddressesHex = validator.remainingBalanceOwner.addresses.map(address => {
+      const addressBytes = utils.bech32ToBytes(address);
+      return fromBytes(addressBytes, "hex");
+    });
 
-    const pChainDisableOwnerAddressBytes = utils.bech32ToBytes(validator.deactivationOwner.addresses[0]);
-    const pChainDisableOwnerAddressHex = fromBytes(pChainDisableOwnerAddressBytes, "hex");
+    const pChainDisableOwnerAddressesHex = validator.deactivationOwner.addresses.map(address => {
+      const addressBytes = utils.bech32ToBytes(address);
+      return fromBytes(addressBytes, "hex");
+    });
 
     return [
       parseNodeID(validator.nodeID),
       validator.nodePOP.publicKey,
       {
-        threshold: 1,
-        addresses: [pChainRemainingBalanceOwnerAddressHex],
+        threshold: validator.remainingBalanceOwner.threshold,
+        addresses: pChainRemainingBalanceOwnerAddressesHex,
       },
       {
-        threshold: 1,
-        addresses: [pChainDisableOwnerAddressHex],
+        threshold: validator.deactivationOwner.threshold,
+        addresses: pChainDisableOwnerAddressesHex,
       },
       validator.validatorWeight
     ];
