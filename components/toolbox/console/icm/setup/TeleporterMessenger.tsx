@@ -52,7 +52,7 @@ const TopUpComponent = ({
                 chain: viemChain
             });
 
-            await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+            await publicClient.waitForTransactionReceipt({ hash });
             onTopUp();
         } catch (error) {
             setCriticalError(error instanceof Error ? error : new Error(String(error)));

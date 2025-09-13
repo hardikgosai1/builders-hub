@@ -228,7 +228,7 @@ export default function AddCollateral() {
             const hash = await coreWalletClient.writeContract(request);
             setLastApprovalTxId(hash);
 
-            await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+            await publicClient.waitForTransactionReceipt({ hash });
             await fetchStatus();
 
         } catch (error: any) {
@@ -275,7 +275,7 @@ export default function AddCollateral() {
             const hash = await coreWalletClient.writeContract(request);
             setLastAddCollateralTxId(hash);
 
-            await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+            await publicClient.waitForTransactionReceipt({ hash });
             await fetchStatus();
 
         } catch (error: any) {
