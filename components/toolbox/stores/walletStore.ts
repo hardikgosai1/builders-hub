@@ -22,7 +22,7 @@ interface WalletState {
   
   // Network state
   avalancheNetworkID: typeof networkIDs.FujiID | typeof networkIDs.MainnetID;
-  isTestnet: boolean | undefined;
+  isTestnet: boolean;
   evmChainName: string;
   
   // Balance state - support individual L1 balances by chain ID
@@ -112,7 +112,7 @@ export const useWalletStore = create<WalletStore>((set, get) => {
     avalancheNetworkID: networkIDs.FujiID as typeof networkIDs.FujiID | typeof networkIDs.MainnetID,
     pChainAddress: "",
     coreEthAddress: "",
-    isTestnet: undefined as boolean | undefined,
+    isTestnet: false,
     evmChainName: "",
     balances: {
       pChain: 0,
