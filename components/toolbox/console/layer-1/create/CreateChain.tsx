@@ -20,7 +20,7 @@ const generateRandomName = () => {
     //makes sure the name doesn't contain a dash
     const firstLetterUppercase = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
     for (let i = 0; i < 1000; i++) {
-        const randomName = generateName({ words: 3 }).raw.map(firstLetterUppercase).join(' ');
+        const randomName = generateName({ words: 2 }).raw.map(firstLetterUppercase).join(' ');
         if (!randomName.includes('-')) return randomName + " Chain";
     }
     throw new Error("Could not generate a name with a dash after 1000 attempts");
