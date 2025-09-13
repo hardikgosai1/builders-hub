@@ -62,10 +62,15 @@ export default function CreateChain() {
 
 
     async function handleCreateSubnet() {
+        if (!coreWalletClient) {
+            setCriticalError(new Error('Core wallet not found'));
+            return;
+        }
+
         setIsCreatingSubnet(true);
 
         try {
-            const txID = await coreWalletClient!.createSubnet({
+            const txID = await coreWalletClient.createSubnet({
                 subnetOwners: [pChainAddress]
             });
 
@@ -79,10 +84,15 @@ export default function CreateChain() {
     }
 
     async function handleCreateChain() {
+        if (!coreWalletClient) {
+            setCriticalError(new Error('Core wallet not found'));
+            return;
+        }
+
         setIsCreatingChain(true);
 
         try {
-            const txID = await coreWalletClient!.createChain({
+            const txID = await coreWalletClient.createChain({
                 chainName: localChainName,
                 subnetId: subnetId,
                 vmId,
