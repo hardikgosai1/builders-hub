@@ -100,6 +100,12 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
     }, [fixedRPCUrl]);
 
     async function handleAddChain() {
+
+        if (!coreWalletClient) {
+            setLocalError("Core wallet not found");
+            return;
+        }
+
         try {
             setIsAddingChain(true)
 
@@ -116,12 +122,12 @@ export const AddChainModal: React.FC<AddChainModalProps> = ({
                 }
             }
 
-            await coreWalletClient!.addChain({ chain: { ...viemChain, isTestnet: isTestnet } });
-            await coreWalletClient!.switchChain({
+            await coreWalletClient.addChain({ chain: { ...viemChain, isTestnet: isTestnet } });
+            await coreWalletClient.switchChain({
                 id: evmChainId,
             });
 
-            await onAddChain({
+            onAddChain({
                 id: chainId,
                 name: chainName,
                 rpcUrl: rpcUrl,
