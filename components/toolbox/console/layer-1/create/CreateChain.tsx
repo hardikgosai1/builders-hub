@@ -65,7 +65,7 @@ export default function CreateChain() {
         setIsCreatingSubnet(true);
 
         try {
-            const txID = await coreWalletClient.createSubnet({
+            const txID = await coreWalletClient!.createSubnet({
                 subnetOwners: [pChainAddress]
             });
 
@@ -82,7 +82,7 @@ export default function CreateChain() {
         setIsCreatingChain(true);
 
         try {
-            const txID = await coreWalletClient.createChain({
+            const txID = await coreWalletClient!.createChain({
                 chainName: localChainName,
                 subnetId: subnetId,
                 vmId,

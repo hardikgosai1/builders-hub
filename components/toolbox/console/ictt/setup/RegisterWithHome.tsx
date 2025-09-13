@@ -101,6 +101,11 @@ export default function RegisterWithHome() {
     async function handleRegister() {
         setLocalError("");
 
+        if (!coreWalletClient) {
+            setLocalError('Core wallet not found');
+            return;
+        }
+
         if (!remoteAddress) {
             setLocalError("Please enter a valid remote contract address");
             return;
@@ -134,7 +139,7 @@ export default function RegisterWithHome() {
             });
 
             // Send the transaction
-            const hash = await coreWalletClient.writeContract(request);
+            const hash = await coreWalletClient!.writeContract(request) as `0x${string}`;
             setLastTxId(hash);
 
             // Wait for confirmation
