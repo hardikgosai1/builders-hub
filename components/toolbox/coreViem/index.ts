@@ -1,4 +1,4 @@
-import { createWalletClient, custom, rpcSchema, DeployContractParameters } from 'viem'
+import { createWalletClient, custom, rpcSchema, DeployContractParameters, DeployContractReturnType, WriteContractReturnType, SendTransactionReturnType } from 'viem'
 import { addChain, CoreWalletAddChainParameters } from './overrides/addChain'
 import { CoreWalletRpcSchema } from './rpcSchema'
 import { isTestnet } from './methods/isTestnet'
@@ -29,9 +29,9 @@ type GetEthereumChainResponse = Extract<CoreWalletRpcSchema[number], { Method: '
 // Type for the extended wallet client with all custom methods
 export type CoreWalletClientType = ReturnType<typeof createWalletClient<any, any, any, CoreWalletRpcSchema>> & {
     addChain: (args: CoreWalletAddChainParameters) => Promise<void>;
-    sendTransaction: (args: any) => Promise<string>;
-    writeContract: (args: any) => Promise<string>;
-    deployContract: (args: DeployContractParameters) => Promise<string>;
+    sendTransaction: (args: any) => Promise<SendTransactionReturnType>;
+    writeContract: (args: any) => Promise<WriteContractReturnType>;
+    deployContract: (args: DeployContractParameters) => Promise<DeployContractReturnType>;
     isTestnet: () => Promise<boolean>;
     getPChainAddress: () => Promise<string>;
     getCorethAddress: () => Promise<string>;

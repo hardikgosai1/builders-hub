@@ -58,7 +58,7 @@ export default function DeployICMDemo() {
                 bytecode: ICMDemoABI.bytecode.object as `0x${string}`,
                 account: walletEVMAddress as `0x${string}`,
                 chain: viemChain
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 

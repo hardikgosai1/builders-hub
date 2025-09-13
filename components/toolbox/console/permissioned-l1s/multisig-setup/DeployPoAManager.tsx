@@ -99,7 +99,7 @@ export default function DeployPoAManager() {
                 args: [ownerAddress as `0x${string}`, validatorManagerAddress as `0x${string}`],
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 

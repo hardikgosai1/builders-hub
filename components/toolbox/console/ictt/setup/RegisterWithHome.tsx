@@ -139,7 +139,7 @@ export default function RegisterWithHome() {
             });
 
             // Send the transaction
-            const hash = await coreWalletClient.writeContract(request) as `0x${string}`;
+            const hash = await coreWalletClient.writeContract(request);
             setLastTxId(hash);
 
             // Wait for confirmation

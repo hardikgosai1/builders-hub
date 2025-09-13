@@ -124,7 +124,7 @@ export default function DeployTokenHome() {
                 args,
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`,
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 

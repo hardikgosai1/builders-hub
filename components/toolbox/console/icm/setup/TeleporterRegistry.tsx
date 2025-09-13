@@ -41,7 +41,7 @@ export default function TeleporterRegistry() {
         setTeleporterRegistryAddress("");
         try {
             // Get messenger address
-            const messengerAddress = TeleporterMessengerAddress.content.trim() as `0x${string}`;
+            const messengerAddress = TeleporterMessengerAddress.content.trim();
 
             const hash = await coreWalletClient.deployContract({
                 bytecode: TeleporterRegistryBytecode.content.trim() as `0x${string}`,

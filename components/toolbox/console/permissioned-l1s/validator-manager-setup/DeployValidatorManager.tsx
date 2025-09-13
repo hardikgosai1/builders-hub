@@ -75,7 +75,7 @@ export default function DeployValidatorContracts() {
                 bytecode: ValidatorMessagesABI.bytecode.object as `0x${string}`,
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
@@ -110,7 +110,7 @@ export default function DeployValidatorContracts() {
                 args: [0],
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 

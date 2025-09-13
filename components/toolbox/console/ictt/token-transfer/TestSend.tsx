@@ -307,7 +307,7 @@ export default function TokenBridge() {
                 chain: viemChain,
             });
 
-            const hash = await coreWalletClient.writeContract(request) as `0x${string}`;
+            const hash = await coreWalletClient.writeContract(request);
             setLastApprovalTxId(hash);
 
             await publicClient.waitForTransactionReceipt({ hash });
@@ -377,7 +377,7 @@ export default function TokenBridge() {
                 chain: viemChain,
             });
 
-            const hash = await coreWalletClient.writeContract(request) as `0x${string}`;
+            const hash = await coreWalletClient.writeContract(request);
             setLastSendTxId(hash);
             setLastSendTxDetails({ source: { initiatedAt: Date.now() } });
 

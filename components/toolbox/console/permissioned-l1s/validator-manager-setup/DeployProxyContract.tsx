@@ -51,7 +51,7 @@ export default function DeployProxyContract() {
                 bytecode: ProxyAdminABI.bytecode.object as `0x${string}`,
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
@@ -90,7 +90,7 @@ export default function DeployProxyContract() {
                 args: [implementationAddress, proxyAdminAddress, "0x"], // No initialization data
                 chain: viemChain,
                 account: walletEVMAddress as `0x${string}`
-            }) as `0x${string}`;
+            });
 
             const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
