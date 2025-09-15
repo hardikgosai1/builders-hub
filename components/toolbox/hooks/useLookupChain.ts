@@ -40,7 +40,7 @@ export function useLookupChain() {
             await switchChain(evmChainId);
             
             // Get chain info and verify the switch was successful
-            const evmInfo = await coreWalletClient.getEthereumChain();
+            const evmInfo = await coreWalletClient!.getEthereumChain();
             if (parseInt(evmInfo.chainId, 16) !== evmChainId) {
                 setError("Chain not found in wallet.");
                 return null;
