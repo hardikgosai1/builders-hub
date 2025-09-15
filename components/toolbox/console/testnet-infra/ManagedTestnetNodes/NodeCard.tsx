@@ -31,20 +31,11 @@ export default function NodeCard({
 
     const handleConnectWallet = async () => {
         setIsConnecting(true);
-        try {
-            const result = await addChain({
-                rpcUrl: node.rpc_url,
-                allowLookup: false
-            });
-            
-            if (result.success) {
-                // TODO: Show notification
-            }
-        } catch (error) {
-            console.error('Failed to add chain to wallet:', error);
-        } finally {
-            setIsConnecting(false);
-        }
+        await addChain({
+            rpcUrl: node.rpc_url,
+            allowLookup: false
+        });
+        setIsConnecting(false);
     };
     const timeRemaining = calculateTimeRemaining(node.expires_at);
     const statusData = getStatusData(timeRemaining);

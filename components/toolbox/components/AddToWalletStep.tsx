@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from './Button';
 import { useWallet } from '../hooks/useWallet';
 import { nipify } from './HostInput';
-import { toast } from '@/lib/toast';
 
 interface AddToWalletStepProps {
     chainId: string;
@@ -33,18 +32,13 @@ export const AddToWalletStep: React.FC<AddToWalletStepProps> = ({
 
             <Button
                 onClick={async () => {
-                    try {
-                        const result = await addChain({ 
-                            rpcUrl: getRPCUrl(), 
-                            allowLookup: false 
-                        });
-                        if (result.success) {
-                            const chainName = result.chainData.name;
-                            toast.success(`${chainName} added successfully!`);
-                            onChainAdded?.(chainName);
-                        }
-                    } catch (error) {
-                        console.log("addChain error (non-blocking):", error);
+                    const result = await addChain({ 
+                        rpcUrl: getRPCUrl(), 
+                        allowLookup: false 
+                    });
+                    if (result.success) {
+                        const chainName = result.chainData.name;
+                        onChainAdded?.(chainName);
                     }
                 }}
                 className="mt-4 w-48"

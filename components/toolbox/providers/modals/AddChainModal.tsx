@@ -217,7 +217,7 @@ export function AddChainModal() {
         } catch (error) {
             const errorMessage = (error as Error)?.message || String(error);
             toast.error('Failed to add chain', errorMessage);
-            throw error;
+            return false;
         }
     };
 
