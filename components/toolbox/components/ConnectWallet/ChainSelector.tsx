@@ -1,16 +1,16 @@
 import { useWalletStore } from "@/components/toolbox/stores/walletStore";
 import { ChainTile } from "./ChainTile"
-import { AddChainModal } from "./AddChainModal";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { isDefaultChain, useL1ListStore } from "../../stores/l1ListStore";
 import type { L1ListItem } from "../../stores/l1ListStore";
+import { useWallet } from "../../hooks/useWallet";
 
 
 export const ChainSelector = ({ enforceChainId }: { enforceChainId?: number }) => {
     const { walletChainId } = useWalletStore();
-    const [isAddChainModalOpen, setIsAddChainModalOpen] = useState(false)
-    const { l1List, addL1, removeL1 } = useL1ListStore()();
+    const { l1List, removeL1 } = useL1ListStore()();
     const { coreWalletClient } = useWalletStore();
+    const { addChain } = useWallet();
     const [criticalError, setCriticalError] = useState<Error | null>(null);
 
     // Throw critical errors during render
@@ -50,17 +50,12 @@ export const ChainSelector = ({ enforceChainId }: { enforceChainId?: number }) =
                     })}
                     <ChainTile
                         isAddTile
-                        onClick={() => setIsAddChainModalOpen(true)}
+                        onClick={() => addChain()}
                         isDimmed={enforceChainId !== undefined}
                     />
                 </div>
             </div>
 
-            {/* Add Chain Modal */}
-            {isAddChainModalOpen && <AddChainModal
-                onClose={() => setIsAddChainModalOpen(false)}
-                onAddChain={addL1}
-            />}
         </>
     );
 }
