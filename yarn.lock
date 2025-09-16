@@ -932,7 +932,7 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.8.0.tgz#cee43d801fcef9644b11b8194857695acd5f815a"
   integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
 
-"@noble/hashes@2.0.0", "@noble/hashes@^2.0.0":
+"@noble/hashes@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-2.0.0.tgz#5c39388259a0868cadb17d688cd8cf07eae344a4"
   integrity sha512-h8VUBlE8R42+XIDO229cgisD287im3kdY6nbNZJFjc6ZvKIXPYXe6Vc/t+kyjFdMFyt5JpapzTsEg8n63w5/lw==
