@@ -15,22 +15,21 @@ import { Fragment } from "react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
 import { pathToBreadcrumb } from "./breadcrumbs-mapping";
 import { BuilderHubAccountButton } from "./builder-hub-account-button";
+import { ReportIssueDropdown } from "./report-issue-dropdown";
+import { Button } from "@/components/ui/button";
+import { Bug } from "lucide-react";
 
 const TestnetMainnetSwitch = dynamic(() => import("@/components/toolbox/components/console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
 const WalletPChain = dynamic(() => import("@/components/toolbox/components/console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
 const EvmNetworkWallet = dynamic(() => import("@/components/toolbox/components/console-header/evm-network-wallet/index").then(m => m.EvmNetworkWallet), { ssr: false });
-
-
 
 export function SiteHeader() {
   const breadcrumbs = useBreadcrumbs(pathToBreadcrumb);
 
   return (
     <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b backdrop-blur  transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height) rounded-t-2xl overflow-x-hidden min-w-0">
-
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6 min-w-0">
         <SidebarTrigger className="-ml-1" />
-
         <Separator
           orientation="vertical"
           className="mr-2 data-[orientation=vertical]:h-4"
@@ -61,10 +60,13 @@ export function SiteHeader() {
           <TestnetMainnetSwitch />
           <EvmNetworkWallet />
           <WalletPChain />
-          <Separator
-            orientation="vertical"
-            className="h-4!"
-          />
+          <Separator orientation="vertical" className="h-4!" />
+          <ReportIssueDropdown>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Bug className="h-4 w-4" />
+              <span className="sr-only">Report an issue</span>
+            </Button>
+          </ReportIssueDropdown>
           <BuilderHubAccountButton />
           <ThemeToggle />
         </div>
