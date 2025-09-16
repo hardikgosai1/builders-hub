@@ -3,16 +3,10 @@
 import type { ReactNode } from "react"
 import { ReportIssueButton } from "@/components/console/report-issue-button"
 
-type ColorTheme = "red" | "blue" | "green" | "purple" | "orange" | "cyan" | "amber" | "emerald" | "indigo" | "pink"
-
 interface ContainerProps {
   title: string
   children: ReactNode
   description?: ReactNode
-  showConfetti?: boolean
-  logoSrc?: string
-  logoAlt?: string
-  logoColorTheme?: ColorTheme
 }
 
 // simplified container does not use color themes currently
