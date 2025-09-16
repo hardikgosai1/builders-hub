@@ -15,9 +15,6 @@ import { Fragment } from "react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
 import { pathToBreadcrumb } from "./breadcrumbs-mapping";
 import { BuilderHubAccountButton } from "./builder-hub-account-button";
-import { ReportIssueDropdown } from "./report-issue-dropdown";
-import { Button } from "@/components/ui/button";
-import { Bug } from "lucide-react";
 
 const TestnetMainnetSwitch = dynamic(() => import("@/components/toolbox/components/console-header/testnet-mainnet-switch").then(m => m.TestnetMainnetSwitch), { ssr: false });
 const WalletPChain = dynamic(() => import("@/components/toolbox/components/console-header/pchain-wallet").then(m => m.WalletPChain), { ssr: false });
@@ -61,12 +58,6 @@ export function SiteHeader() {
           <EvmNetworkWallet />
           <WalletPChain />
           <Separator orientation="vertical" className="h-4!" />
-          <ReportIssueDropdown>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Bug className="h-4 w-4" />
-              <span className="sr-only">Report an issue</span>
-            </Button>
-          </ReportIssueDropdown>
           <BuilderHubAccountButton />
           <ThemeToggle />
         </div>

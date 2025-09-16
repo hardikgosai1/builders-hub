@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { ReportIssueButton } from "@/components/console/report-issue-button"
 
 type ColorTheme = "red" | "blue" | "green" | "purple" | "orange" | "cyan" | "amber" | "emerald" | "indigo" | "pink"
 
@@ -26,7 +27,10 @@ export function Container({
 
   return (<>
     <div className="space-y-3 prose">
-      <h3 className="text-xl md:text-2xl font-semibold leading-tight text-foreground">{title}</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl md:text-2xl font-semibold leading-tight text-foreground">{title}</h3>
+        <ReportIssueButton toolTitle={title} />
+      </div>
       {description && (
         <div className="text-sm text-muted-foreground leading-relaxed">
           {description}
@@ -36,12 +40,7 @@ export function Container({
         <p className="text-sm text-muted-foreground leading-relaxed">{subDescription}</p>
       )}
     </div>
-
-
-    <div className="space-y-8 text-foreground prose">
-      {children}
-    </div>
-  </>
-  )
+    <div className="space-y-8 text-foreground prose">{children}</div>
+    </>
+  );
 }
-
