@@ -11,7 +11,7 @@ const filePath = {
 
 const content = fs.readFileSync(filePath);
 const records = JSON.parse(content.toString()) as DocumentRecord[];
-const client = algoliasearch('0T4ZBDJ3AF', process.env.ALGOLIA_WRITE_KEY);
+const client = algoliasearch('0T4ZBDJ3AF', process.env.ALGOLIA_WRITE_KEY || "");
 
 void sync(client, {
   documents: records,

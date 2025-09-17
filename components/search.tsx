@@ -5,7 +5,7 @@ import algoliasearch from "algoliasearch/lite";
 import { useDocsSearch } from "fumadocs-core/search/client";
 
 const appId = "0T4ZBDJ3AF";
-const apiKey = process.env.ALGOLIA_READ_KEY;
+const apiKey = process.env.ALGOLIA_READ_KEY || "";
 const indexName = "builder-hub";
 
 const client = algoliasearch(appId, apiKey);
