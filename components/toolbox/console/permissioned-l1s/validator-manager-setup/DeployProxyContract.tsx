@@ -28,6 +28,7 @@ export default function DeployProxyContract() {
     const [proxyAdminAddress, setProxyAdminAddress] = useState<string>("");
     const viemChain = useViemChainStore();
     const [acknowledged, setAcknowledged] = useState(false);
+    const [warningDismissed, setWarningDismissed] = useState(false);
 
     // Throw critical errors during render
     if (criticalError) {
@@ -124,18 +125,42 @@ export default function DeployProxyContract() {
 
                 <p className="mb-3"><strong>How It Works:</strong> The proxy contract stores state and forwards function calls, while the implementation contract contains only the logic. The proxy admin manages implementation upgrades securely.</p>
 
-                <Callout type="warn" className="mb-8">
-                    <div className="space-y-3">
-                        <p>
-                            If you have created the L1 that you want to deploy the Validator Manager for with the Builder Console, a proxy contract is pre-deployed with the Genesis at the address <code>0xfacade...</code> and you can skip this step. You only need this tool if you want to use the validator manager on a different L1 or if you want to deploy a new proxy contract for any reason.
-                        </p>
-                        <Checkbox
-                            label="I know what I'm doing"
-                            checked={acknowledged}
-                            onChange={setAcknowledged}
-                        />
+                {!warningDismissed && (
+                    <div className="relative">
+                        <div className="absolute -inset-1 bg-red-500/20 dark:bg-red-500/10 rounded-lg blur-sm" />
+                        <Callout type="warn" className="relative mb-8 border-2 border-red-500 dark:border-red-400">
+                            <div className="space-y-3">
+                                <div className="flex items-start gap-2">
+                                    <div className="space-y-2">
+                                        <p>
+                                            If you created your L1 using the <strong>Builder Console</strong>, a proxy contract is <strong>already pre-deployed</strong> at address <code className="bg-red-100 dark:bg-red-900/30 px-1 py-0.5 rounded">0xfacade0000000000000000000000000000000000</code>
+                                        </p>
+                                        <p className="text-sm">
+                                            You only need this tool if:
+                                        </p>
+                                        <ul className="list-disc list-inside text-sm ml-2 space-y-1">
+                                            <li>You want to deploy the Validator Manager on a different L1</li>
+                                            <li>You need to deploy a new proxy contract for a specific reason</li>
+                                            <li>You're working with an L1 not created through Builder Console (AvaCloud, Gelato, alt BaaS provider)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className="pt-2 border-t border-red-300 dark:border-red-700">
+                                    <Checkbox
+                                        label="I understand and need to deploy a new proxy contract"
+                                        checked={acknowledged}
+                                        onChange={(checked) => {
+                                            setAcknowledged(checked);
+                                            if (checked) {
+                                                setWarningDismissed(true);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </Callout>
                     </div>
-                </Callout>
+                )}
 
                 <Steps>
                     <Step>
@@ -151,7 +176,7 @@ export default function DeployProxyContract() {
                             variant="primary"
                             onClick={deployProxyAdmin}
                             loading={isDeployingProxyAdmin}
-                            disabled={isDeployingProxyAdmin || !!proxyAdminAddress || !acknowledged}
+                            disabled={isDeployingProxyAdmin || !!proxyAdminAddress || (!acknowledged && !warningDismissed)}
                             className="mt-4"
                         >
                             Deploy Proxy Admin
@@ -186,7 +211,7 @@ export default function DeployProxyContract() {
                             variant="primary"
                             onClick={deployTransparentProxy}
                             loading={isDeployingProxy}
-                            disabled={isDeployingProxy || !proxyAdminAddress || !implementationAddress || !acknowledged}
+                            disabled={isDeployingProxy || !proxyAdminAddress || !implementationAddress || (!acknowledged && !warningDismissed)}
                             className="mt-4"
                         >
                             Deploy Proxy Contract
