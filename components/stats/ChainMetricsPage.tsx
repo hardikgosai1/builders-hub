@@ -1,39 +1,14 @@
 "use client";
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart";
+import { Area,AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {type ChartConfig, ChartContainer,ChartTooltip,ChartTooltipContent } from "@/components/ui/chart";
 import DateRangeFilter from "@/components/ui/DateRangeFilter";
-import { Users, Activity, FileText, MessageSquare, TrendingUp, UserPlus, Hash, Code2, Zap, Gauge, DollarSign, TrendingDown, Clock, Fuel } from "lucide-react";
+import {Users, Activity, FileText, MessageSquare, TrendingUp, UserPlus, Hash, Code2, Zap, Gauge, DollarSign, TrendingDown, Clock, Fuel } from "lucide-react";
 import BubbleNavigation from "@/components/navigation/BubbleNavigation";
 import { ChartSkeletonLoader } from "@/components/ui/chart-skeleton";
-
-interface TimeSeriesDataPoint {
-  timestamp: number;
-  value: number | string;
-  date: string;
-}
-
-interface TimeSeriesMetric {
-  data: TimeSeriesDataPoint[];
-  current_value: number | string;
-  change_24h: number;
-  change_percentage_24h: number;
-}
-
-interface ICMDataPoint {
-  timestamp: number;
-  date: string;
-  messageCount: number;
-}
-
-interface ICMMetric {
-  data: ICMDataPoint[];
-  current_value: number;
-  change_24h: number;
-  change_percentage_24h: number;
-}
+import {TimeSeriesDataPoint, TimeSeriesMetric, ICMDataPoint, ICMMetric, ChartDataPoint, TimeRange } from "@/types/stats";
 
 interface CChainMetrics {
   activeAddresses: TimeSeriesMetric;
@@ -53,11 +28,6 @@ interface CChainMetrics {
   feesPaid: TimeSeriesMetric;
   icmMessages: ICMMetric;
   last_updated: number;
-}
-
-interface ChartDataPoint {
-  day: string;
-  value: number;
 }
 
 interface ICMChartDataPoint {
@@ -80,9 +50,7 @@ export default function ChainMetricsPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = React.useState<
-    "7d" | "30d" | "90d" | "all"
-  >("30d");
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("1y");
 
   const fetchData = async () => {
     try {
@@ -191,21 +159,37 @@ export default function ChainMetricsPage({
     metricKey: keyof Omit<CChainMetrics, "last_updated" | "icmMessages">
   ): ChartDataPoint[] => {
     if (!metrics || !metrics[metricKey]?.data) return [];
+    const today = new Date().toISOString().split("T")[0];
+    const finalizedData = metrics[metricKey].data.filter(
+      (point) => point.date !== today
+    );
 
-    return metrics[metricKey].data.map((point: TimeSeriesDataPoint) => ({
-      day: point.date,
-      value:
-        typeof point.value === "string" ? parseFloat(point.value) : point.value,
-    }));
+    return finalizedData
+      .map((point: TimeSeriesDataPoint) => ({
+        day: point.date,
+        value:
+          typeof point.value === "string"
+            ? parseFloat(point.value)
+            : point.value,
+      }))
+      .reverse();
   };
 
   const getICMChartData = (): ICMChartDataPoint[] => {
     if (!metrics?.icmMessages?.data) return [];
 
-    return metrics.icmMessages.data.map((point: ICMDataPoint) => ({
-      day: point.date,
-      messageCount: point.messageCount,
-    }));
+    // Filter out today's incomplete data - only show finalized days
+    const today = new Date().toISOString().split("T")[0];
+    const finalizedData = metrics.icmMessages.data.filter(
+      (point) => point.date !== today
+    );
+
+    return finalizedData
+      .map((point: ICMDataPoint) => ({
+        day: point.date,
+        messageCount: point.messageCount,
+      }))
+      .reverse();
   };
 
   const getYAxisDomain = (
@@ -282,6 +266,55 @@ export default function ChainMetricsPage({
     }
   };
 
+  const calculateAverage = (
+    data: ChartDataPoint[] | ICMChartDataPoint[]
+  ): number => {
+    if (!data || data.length === 0) return 0;
+    const sum = data.reduce((acc, point) => {
+      if ("value" in point) {
+        return acc + (typeof point.value === "number" ? point.value : 0);
+      } else if ("messageCount" in point) {
+        return acc + point.messageCount;
+      }
+      return acc;
+    }, 0);
+
+    return sum / data.length;
+  };
+
+  const AVERAGE_LINE_COLOR = "#8b5cf6";
+  const toShowAverageLine = (metricKey: string): boolean => {
+    return ["activeAddresses", "activeSenders", "txCount", "gasUsed"].includes(metricKey);
+  };
+
+  const getAverageLineProps = (
+    chartData: ChartDataPoint[] | ICMChartDataPoint[],
+    metricKey: string,
+    isICMChart: boolean = false
+  ) => {
+    const average = calculateAverage(chartData);
+    const formattedValue = isICMChart ? formatNumber(average) : formatTooltipValue(average, metricKey).replace(/^[^:]*:\s*/, "");
+
+    return {
+      y: average,
+      stroke: AVERAGE_LINE_COLOR,
+      strokeDasharray: "8 4",
+      strokeWidth: 2,
+      opacity: 0.9,
+      label: {
+        value: `Avg: ${formattedValue}`,
+        position: "insideTopLeft" as const,
+        style: {
+          textAnchor: "start" as const,
+          fontSize: "11px",
+          fill: AVERAGE_LINE_COLOR,
+          fontWeight: "600",
+          fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+        },
+      },
+    };
+  };
+
   const formatTooltipValue = (value: number, metricKey: string): string => {
     switch (metricKey) {
       case "activeAddresses":
@@ -344,14 +377,14 @@ export default function ChainMetricsPage({
 
     let comparisonIndex = 1;
     switch (timeRange) {
-      case "7d":
-        comparisonIndex = Math.min(7, data.length - 1);
-        break;
       case "30d":
         comparisonIndex = Math.min(30, data.length - 1);
         break;
       case "90d":
         comparisonIndex = Math.min(90, data.length - 1);
+        break;
+      case "1y":
+        comparisonIndex = Math.min(365, data.length - 1);
         break;
       case "all":
         comparisonIndex = data.length - 1;
@@ -400,31 +433,31 @@ export default function ChainMetricsPage({
 
   function getTimeRangeLabel(range: string): string {
     switch (range) {
-      case "7d":
-        return "7 days";
       case "30d":
         return "30 days";
       case "90d":
         return "90 days";
+      case "1y":
+        return "1 year";
       case "all":
         return "all time";
       default:
-        return "30 days";
+        return "1 year";
     }
   }
 
   function getComparisonPeriodLabel(range: string): string {
     switch (range) {
-      case "7d":
-        return "7 days ago";
       case "30d":
         return "30 days ago";
       case "90d":
         return "90 days ago";
+      case "1y":
+        return "1 year ago";
       case "all":
         return "the beginning of the dataset";
       default:
-        return "30 days ago";
+        return "1 year ago";
     }
   }
 
@@ -782,9 +815,9 @@ export default function ChainMetricsPage({
                           defaultRange={timeRange}
                           onRangeChange={(range) => {
                             if (
-                              range === "7d" ||
                               range === "30d" ||
                               range === "90d" ||
+                              range === "1y" ||
                               range === "all"
                             ) {
                               setTimeRange(range);
@@ -894,6 +927,11 @@ export default function ChainMetricsPage({
                               return null;
                             }}
                           />
+                          {toShowAverageLine(config.metricKey) && (
+                            <ReferenceLine
+                              {...getAverageLineProps(chartData, config.metricKey, true)}
+                            />
+                          )}
                           <Bar
                             dataKey="messageCount"
                             fill={config.chartConfig.messageCount.color}
@@ -979,6 +1017,11 @@ export default function ChainMetricsPage({
                                 opacity={0.6}
                               />
                             ))}
+                          {toShowAverageLine(config.metricKey) && (
+                            <ReferenceLine
+                              {...getAverageLineProps(chartData, config.metricKey, false)}
+                            />
+                          )}
                           <Area
                             dataKey="value"
                             type="natural"
